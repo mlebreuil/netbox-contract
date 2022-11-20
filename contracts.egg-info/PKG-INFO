@@ -1,0 +1,6 @@
+Metadata-Version: 2.1
+Name: contracts
+Version: 0.1
+Summary: A contract management NetBox plugin
+Author: Marc Lebreuil
+License: Apache 2.0
