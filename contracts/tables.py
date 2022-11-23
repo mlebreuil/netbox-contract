@@ -15,6 +15,15 @@ class ContractListTable(NetBoxTable):
         fields = ('pk', 'id', 'name', 'circuit', 'external_partie', 'internal_partie', 'comments', 'actions')
         default_columns = ('name', 'circuit')
 
+class ContractListBottomTable(NetBoxTable):
+    name = tables.Column(
+        linkify=True
+    )
+    class Meta(NetBoxTable.Meta):
+        model = Contract
+        fields = ('pk', 'id', 'name', 'circuit', 'external_partie', 'internal_partie', 'comments', 'actions')
+        default_columns = ('name', 'external_partie')
+
 class InvoiceListTable(NetBoxTable):
     contract = tables.Column(
         linkify=True

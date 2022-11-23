@@ -1,4 +1,6 @@
 from netbox.views import generic
+from utilities.utils import count_related
+from circuits.models import Circuit
 from . import forms, models, tables, filtersets
 
 # Contract views
@@ -27,6 +29,26 @@ class ContractEditView(generic.ObjectEditView):
 class ContractDeleteView(generic.ObjectDeleteView):
     queryset = models.Contract.objects.all()
 
+class ContractBulkImportView(generic.BulkImportView):
+    queryset = models.Contract.objects.all()
+    model_form = forms.ContractCSVForm
+    table = tables.ContractListTable
+
+class ContractBulkEditView(generic.BulkEditView):
+    queryset = models.Contract.objects.annotate(
+        count_circuits=count_related(Circuit, 'contract')
+    )
+    filterset = filtersets.ContractFilterSet
+    table = tables.ContractListTable
+    form = forms.ContractBulkEditForm
+
+class ContractBulkDeleteView(generic.BulkDeleteView):
+    queryset = models.Contract.objects.annotate(
+        count_circuits=count_related(Circuit, 'contract')
+    )
+    filterset = filtersets.ContractFilterSet
+    table = tables.ContractListTable
+
 # Invoice views
 
 class InvoiceView(generic.ObjectView):
@@ -44,3 +66,19 @@ class InvoiceEditView(generic.ObjectEditView):
 
 class InvoiceDeleteView(generic.ObjectDeleteView):
     queryset = models.Invoice.objects.all()
+
+class InvoiceBulkImportView(generic.BulkImportView):
+    queryset = models.Invoice.objects.all()
+    model_form = forms.InvoiceCSVForm
+    table = tables.InvoiceListTable
+
+class InvoiceBulkEditView(generic.BulkEditView):
+    queryset = models.Invoice.objects.all()
+    filterset = filtersets.InvoiceFilterSet
+    table = tables.InvoiceListTable
+    form = forms.InvoiceBulkEditForm
+
+class InvoiceBulkDeleteView(generic.BulkDeleteView):
+    queryset = models.Invoice.objects.all()
+    filterset = filtersets.InvoiceFilterSet
+    table = tables.InvoiceListTable

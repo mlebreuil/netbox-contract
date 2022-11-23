@@ -1,2 +1,2 @@
-contracts.egg-info/
-**/__pycache__/
+contracts.egg-info/**
+**/__pycache__/**
