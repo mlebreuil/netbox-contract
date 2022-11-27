@@ -1,8 +1,0 @@
-README.md
-setup.py
-contracts/__init__.py
-contracts.egg-info/PKG-INFO
-contracts.egg-info/SOURCES.txt
-contracts.egg-info/dependency_links.txt
-contracts.egg-info/not-zip-safe
-contracts.egg-info/top_level.txt
