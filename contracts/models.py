@@ -4,6 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.db import models
 from netbox.models import NetBoxModel
+from circuits.models import Circuit
 
 class Contract(NetBoxModel):
     name = models.CharField(
@@ -17,9 +18,7 @@ class Contract(NetBoxModel):
         max_length=30
     )
 
-    circuit = models.ForeignKey(
-        to='circuits.Circuit',
-        on_delete=models.PROTECT,
+    circuit = models.ManyToManyField(Circuit,
         related_name='contract'
     )
 

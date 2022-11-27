@@ -4,7 +4,7 @@ from .. import filtersets, models
 from .serializers import ContractSerializer, InvoiceSerializer
 
 class ContractViewSet(NetBoxModelViewSet):
-    queryset = models.Contract.objects.prefetch_related('circuits','tags')
+    queryset = models.Contract.objects.prefetch_related('circuit','tags')
     serializer_class = ContractSerializer
 
 class InvoiceViewSet(NetBoxModelViewSet):

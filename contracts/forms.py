@@ -1,13 +1,13 @@
 from django import forms
 from netbox.forms import NetBoxModelForm, NetBoxModelFilterSetForm, NetBoxModelBulkEditForm, NetBoxModelCSVForm
-from utilities.forms.fields import CommentField, DynamicModelChoiceField
+from utilities.forms.fields import CommentField, DynamicModelChoiceField, DynamicModelMultipleChoiceField
 from utilities.forms import CSVModelChoiceField
 from circuits.models import Circuit
 from .models import Contract, Invoice
 
 class ContractForm(NetBoxModelForm):
     comments = CommentField()
-    circuit=DynamicModelChoiceField(
+    circuit=DynamicModelMultipleChoiceField(
         queryset=Circuit.objects.all()
     )
 

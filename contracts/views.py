@@ -9,11 +9,14 @@ class ContractView(generic.ObjectView):
     queryset = models.Contract.objects.all()
 
     def get_extra_context(self, request, instance):
-        table = tables.InvoiceListTable(instance.invoice.all())
-        table.configure(request)
+        invoice_table = tables.InvoiceListTable(instance.invoice.all())
+        invoice_table.configure(request)
+        circuit_table = tables.ContractCircuitListTable(instance.circuit.all())
+        circuit_table.configure(request)
 
         return {
-            'invoices_table': table,
+            'invoices_table': invoice_table,
+            'circuit_table': circuit_table,
         }
 
 class ContractListView(generic.ObjectListView):

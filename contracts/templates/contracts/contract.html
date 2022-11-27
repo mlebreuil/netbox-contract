@@ -19,16 +19,6 @@
               <th scope="row">Internal partie</th>
               <td>{{ object.internal_partie }}</td>
             </tr>
-            <tr>
-                <th scope="row">Circuit</th>
-                <td>
-                    <a href="{{ object.circuit.get_absolute_url }}">{{ object.scircuit }}</a>
-                </td>
-              </tr>
-            <tr>
-              <th scope="row">Comments</th>
-              <td>{{ object.comments }}</td>
-            </tr>
           </table>
         </div>
       </div>
@@ -37,6 +27,16 @@
     <div class="col col-md-6">
       {% include 'inc/panels/tags.html' %}
       {% include 'inc/panels/comments.html' %}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col col-md-12">
+      <div class="card">
+        <h5 class="card-header">Circuits</h5>
+        <div class="card-body table-responsive">
+          {% render_table circuit_table %}
+        </div>
+      </div>
     </div>
   </div>
   <div class="row">
