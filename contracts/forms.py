@@ -1,7 +1,9 @@
 from django import forms
+import django_filters
 from netbox.forms import NetBoxModelForm, NetBoxModelFilterSetForm, NetBoxModelBulkEditForm, NetBoxModelCSVForm
 from utilities.forms.fields import CommentField, DynamicModelChoiceField, DynamicModelMultipleChoiceField
 from utilities.forms import CSVModelChoiceField
+from extras.filters import TagFilter
 from circuits.models import Circuit
 from .models import Contract, Invoice
 
@@ -13,7 +15,9 @@ class ContractForm(NetBoxModelForm):
 
     class Meta:
         model = Contract
-        fields = ('name', 'external_partie', 'internal_partie', 'circuit', 'comments', 'tags')
+        fields = ('name', 'external_partie', 'internal_partie', 'status',
+          'start_date', 'initial_term', 'renewal_term', 'mrc', 'nrc', 'invoice_frequency',
+          'circuit', 'comments', 'tags')
 
 class InvoiceForm(NetBoxModelForm):
     contract=DynamicModelChoiceField(
@@ -22,7 +26,8 @@ class InvoiceForm(NetBoxModelForm):
 
     class Meta:
         model = Invoice
-        fields = ('number', 'contract', 'tags')
+        fields = ('number', 'contract', 'period_start', 'period_end',
+          'amount', 'tags')
 
 class ContractFilterSetForm(NetBoxModelFilterSetForm):
     model = Contract
@@ -32,10 +37,18 @@ class ContractFilterSetForm(NetBoxModelFilterSetForm):
     internal_partie= forms.CharField(
         required=False
     )
+    status = django_filters.MultipleChoiceFilter(
+        choices=(
+            ('active', 'Active'),
+            ('canceled', 'Canceled'),
+        ),
+        null_value=None
+    )
     circuit = DynamicModelChoiceField(
         queryset=Circuit.objects.all(),
         required=False
     )
+    tag = TagFilter()
 
 class InvoiceFilterSetForm(NetBoxModelFilterSetForm):
     model = Invoice
@@ -54,7 +67,9 @@ class ContractCSVForm(NetBoxModelCSVForm):
     class Meta:
         model = Contract
         fields = [
-            'name', 'external_partie', 'internal_partie', 'circuit', 'comments',
+            'name', 'external_partie', 'internal_partie', 'status',
+            'start_date', 'initial_term', 'renewal_term', 'mrc', 'nrc',
+            'invoice_frequency', 'circuit'
         ]
 
 class ContractBulkEditForm(NetBoxModelBulkEditForm):
@@ -90,7 +105,8 @@ class InvoiceCSVForm(NetBoxModelCSVForm):
     class Meta:
         model = Invoice
         fields = [
-            'number', 'contract',
+            'number', 'contract', 'period_start', 'period_end',
+            'amount', 'tags'
         ]
 
 class InvoiceBulkEditForm(NetBoxModelBulkEditForm):

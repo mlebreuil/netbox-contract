@@ -3,8 +3,20 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.db import models
+from utilities.choices import ChoiceSet
 from netbox.models import NetBoxModel
 from circuits.models import Circuit
+
+class StatusChoices(ChoiceSet):
+    key = 'Contract.status'
+
+    STATUS_ACTIVE = 'Active'
+    STATUS_CANCELED = 'Cancled'
+
+    CHOICES = [
+        (STATUS_ACTIVE, 'Active', 'green'),
+        (STATUS_CANCELED, 'Canceled', 'red'),
+    ]
 
 class Contract(NetBoxModel):
     name = models.CharField(
@@ -16,6 +28,41 @@ class Contract(NetBoxModel):
 
     internal_partie = models.CharField(
         max_length=30
+    )
+
+    status = models.CharField(
+        max_length=50,
+        choices=StatusChoices,
+        default=StatusChoices.STATUS_ACTIVE
+    )
+
+    start_date = models.DateField()
+    initial_term = models.IntegerField(
+        help_text = "In month",
+        default = 12
+    )
+
+    renewal_term = models.IntegerField(
+        help_text = "In month",
+        default = 12
+    )
+
+    mrc = models.DecimalField(
+        verbose_name = "Monthly recuring cost",
+        max_digits = 10,
+        decimal_places= 2
+    )
+
+    nrc = models.DecimalField(
+        verbose_name = "None recuring cost",
+        default = 0,
+        max_digits = 10,
+        decimal_places= 2
+    )
+
+    invoice_frequency = models.IntegerField(
+        help_text = "The frequency of invoices in month",
+        default = 1
     )
 
     circuit = models.ManyToManyField(Circuit,
@@ -44,6 +91,15 @@ class Invoice(NetBoxModel):
         to=Contract,
         on_delete=models.CASCADE,
         related_name='invoice'
+    )
+
+    period_start = models.DateField()
+
+    period_end = models.DateField()
+
+    amount = models.DecimalField(
+        max_digits = 10,
+        decimal_places= 2
     )
 
     class Meta:

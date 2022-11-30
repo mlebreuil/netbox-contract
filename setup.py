@@ -6,7 +6,9 @@ setup(
     description='A contract management plugin for NetBox',
     author='Marc Lebreuil',
     license='Apache 2.0',
-    install_requires=[],
+    install_requires=[
+        'python-dateutil'
+    ],
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
