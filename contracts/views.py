@@ -1,5 +1,11 @@
+from datetime import timedelta
+from dateutil.relativedelta import relativedelta
+from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import render
 from netbox.views import generic
-from utilities.utils import count_related
+from netbox.views.generic.utils import get_prerequisite_model
+from utilities.utils import count_related, normalize_querydict
+from utilities.forms import restrict_form_fields
 from circuits.models import Circuit
 from . import forms, models, tables, filtersets
 
@@ -66,6 +72,47 @@ class InvoiceListView(generic.ObjectListView):
 class InvoiceEditView(generic.ObjectEditView):
     queryset = models.Invoice.objects.all()
     form = forms.InvoiceForm
+
+    def get(self, request, *args, **kwargs):
+        """
+        GET request handler
+            Overrides the ObjectEditView function to include form initialization
+            with data from the parent contract object
+
+        Args:
+            request: The current request
+        """
+        obj = self.get_object(**kwargs)
+        obj = self.alter_object(obj, request, args, kwargs)
+        model = self.queryset.model
+
+        initial_data = normalize_querydict(request.GET)
+        if 'contract' in initial_data.keys():
+            contract = models.Contract.objects.get(pk=initial_data['contract'])
+
+            try:
+                last_invoice = contract.invoice.latest('period_end')
+                new_period_start = last_invoice.period_end + timedelta(days=1)
+            except ObjectDoesNotExist:
+                new_period_start = contract.start_date
+
+            initial_data['period_start'] = new_period_start
+            delta = relativedelta(months=contract.invoice_frequency)
+            new_period_end = new_period_start + delta
+            initial_data['period_end'] = new_period_end
+            initial_data['amount'] = contract.mrc
+
+        form = self.form(instance=obj, initial=initial_data)
+        restrict_form_fields(form, request.user)
+
+        return render(request, self.template_name, {
+            'model': model,
+            'object': obj,
+            'form': form,
+            'return_url': self.get_return_url(request, obj),
+            'prerequisite_model': get_prerequisite_model(self.queryset),
+            **self.get_extra_context(request, obj),
+        })
 
 class InvoiceDeleteView(generic.ObjectDeleteView):
     queryset = models.Invoice.objects.all()
