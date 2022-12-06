@@ -103,7 +103,7 @@ class Invoice(NetBoxModel):
     )
 
     class Meta:
-        ordering = ('number',)
+        ordering = ('-period_start',)
 
     def __str__(self):
         return self.number
