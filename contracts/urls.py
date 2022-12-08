@@ -3,6 +3,18 @@ from netbox.views.generic import ObjectChangeLogView
 from . import models, views
 
 urlpatterns = (
+    # Service Providers
+    path('serviceproviders/', views.ServiceProviderListView.as_view(), name='serviceprovider_list'),
+    path('serviceproviders/add/', views.ServiceProviderEditView.as_view(), name='serviceprovider_add'),
+    path('serviceproviders/import/', views.ServiceProviderBulkImportView.as_view(), name='serviceprovider_import'),
+    path('serviceproviders/edit/', views.ServiceProviderBulkEditView.as_view(), name='serviceprovider_bulk_edit'),
+    path('serviceproviders/delete/', views.ServiceProviderBulkDeleteView.as_view(), name='serviceprovider_bulk_delete'),
+    path('serviceproviders/<int:pk>/', views.ServiceProviderView.as_view(), name='serviceprovider'),
+    path('serviceproviders/<int:pk>/edit/', views.ServiceProviderEditView.as_view(), name='serviceprovider_edit'),
+    path('serviceproviders/<int:pk>/delete/', views.ServiceProviderDeleteView.as_view(), name='serviceprovider_delete'),
+    path('serviceproviders/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='serviceprovider_changelog', kwargs={
+        'model': models.ServiceProvider
+    }),
 
     # Contracts
     path('contracts/', views.ContractListView.as_view(), name='contract_list'),

@@ -13,7 +13,9 @@
             </tr>
             <tr>
               <th scope="row">External partie</th>
-              <td>{{ object.external_partie }}</td>
+              <td>
+                <a href="{{ object.external_partie.get_absolute_url }}">{{ object.external_partie.name }}</a>
+              </td>
             </tr>
             <tr>
               <th scope="row">Internal partie</th>

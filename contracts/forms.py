@@ -2,15 +2,18 @@ from django import forms
 import django_filters
 from netbox.forms import NetBoxModelForm, NetBoxModelFilterSetForm, NetBoxModelBulkEditForm, NetBoxModelCSVForm
 from utilities.forms.fields import CommentField, DynamicModelChoiceField, DynamicModelMultipleChoiceField
-from utilities.forms import CSVModelChoiceField, DatePicker
+from utilities.forms import CSVModelChoiceField, DatePicker,SlugField
 from extras.filters import TagFilter
 from circuits.models import Circuit
-from .models import Contract, Invoice
+from .models import Contract, Invoice, ServiceProvider
 
 class ContractForm(NetBoxModelForm):
     comments = CommentField()
     circuit=DynamicModelMultipleChoiceField(
         queryset=Circuit.objects.all()
+    )
+    external_partie=DynamicModelChoiceField(
+        queryset=ServiceProvider.objects.all()
     )
 
     class Meta:
@@ -18,7 +21,7 @@ class ContractForm(NetBoxModelForm):
         fields = ('name', 'external_partie', 'internal_partie', 'status',
           'start_date', 'initial_term', 'renewal_term', 'mrc', 'nrc', 'invoice_frequency',
           'circuit', 'comments', 'tags')
-        
+
         widgets = {
             'start_date': DatePicker(),
         }
@@ -39,7 +42,8 @@ class InvoiceForm(NetBoxModelForm):
 
 class ContractFilterSetForm(NetBoxModelFilterSetForm):
     model = Contract
-    external_partie= forms.CharField(
+    external_partie=DynamicModelMultipleChoiceField(
+        queryset=ServiceProvider.objects.all(),
         required=False
     )
     internal_partie= forms.CharField(
@@ -52,7 +56,7 @@ class ContractFilterSetForm(NetBoxModelFilterSetForm):
         ),
         null_value=None
     )
-    circuit = DynamicModelChoiceField(
+    circuit = DynamicModelMultipleChoiceField(
         queryset=Circuit.objects.all(),
         required=False
     )
@@ -127,3 +131,39 @@ class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
         queryset=Contract.objects.all()
     )
     model = Invoice
+
+# service Provider forms
+
+class ServiceProviderForm(NetBoxModelForm):
+    slug = SlugField()
+    comments = CommentField()
+
+    class Meta:
+        model = ServiceProvider
+        fields = ('name', 'slug','portal_url',
+            'comments', 'tags')
+
+class ServiceProviderFilterSetForm(NetBoxModelFilterSetForm):
+    model = ServiceProvider
+    tag = TagFilter()
+
+class ServiceProviderCSVForm(NetBoxModelCSVForm):
+    slug = SlugField()
+    comments = CommentField()
+    class Meta:
+        model = ServiceProvider
+        fields = [
+            'name', 'slug','portal_url',
+            'comments', 'tags'
+        ]
+
+class ServiceProviderBulkEditForm(NetBoxModelBulkEditForm):
+    name = forms.CharField(
+        max_length=100,
+        required=True
+    )
+    comments = CommentField()
+    nullable_fields = (
+        'comments',
+    )
+    model = ServiceProvider

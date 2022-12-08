@@ -2,11 +2,14 @@ import django_tables2 as tables
 
 from netbox.tables import NetBoxTable
 from circuits.models import Circuit
-from .models import Contract, Invoice
+from .models import Contract, Invoice, ServiceProvider
 
 class ContractListTable(NetBoxTable):
 
     name = tables.Column(
+        linkify=True
+    )
+    external_partie = tables.Column(
         linkify=True
     )
     circuit = tables.ManyToManyColumn()
@@ -54,3 +57,13 @@ class ContractCircuitListTable(NetBoxTable):
         model = Circuit
         fields = ('pk', 'id', 'cid', 'provider', 'type','status')
         default_columns = ('cid', 'provider','status')
+
+class ServiceProviderListTable(NetBoxTable):
+    name = tables.Column(
+        linkify=True
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = ServiceProvider
+        fields = ('pk', 'name', 'slug','portal_url')
+        default_columns = ('name', 'portal_url')

@@ -9,6 +9,40 @@ from utilities.forms import restrict_form_fields
 from circuits.models import Circuit
 from . import forms, models, tables, filtersets
 
+# ServiceProvider views
+
+class ServiceProviderView(generic.ObjectView):
+    queryset = models.ServiceProvider.objects.all()
+
+class ServiceProviderListView(generic.ObjectListView):
+    queryset = models.ServiceProvider.objects.all()
+    table = tables.ServiceProviderListTable
+    filterset = filtersets.ServiceProviderFilterSet
+    filterset_form = forms.ServiceProviderFilterSetForm
+
+class ServiceProviderEditView(generic.ObjectEditView):
+    queryset = models.ServiceProvider.objects.all()
+    form = forms.ServiceProviderForm
+
+class ServiceProviderDeleteView(generic.ObjectDeleteView):
+    queryset = models.ServiceProvider.objects.all()
+
+class ServiceProviderBulkImportView(generic.BulkImportView):
+    queryset = models.ServiceProvider.objects.all()
+    model_form = forms.ServiceProviderCSVForm
+    table = tables.ServiceProviderListTable
+
+class ServiceProviderBulkEditView(generic.BulkEditView):
+    queryset = models.ServiceProvider.objects.annotate()
+    filterset = filtersets.ServiceProviderFilterSet
+    table = tables.ServiceProviderListTable
+    form = forms.ServiceProviderBulkEditForm
+
+class ServiceProviderBulkDeleteView(generic.BulkDeleteView):
+    queryset = models.ServiceProvider.objects.annotate()
+    filterset = filtersets.ServiceProviderFilterSet
+    table = tables.ServiceProviderListTable
+
 # Contract views
 
 class ContractView(generic.ObjectView):
