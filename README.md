@@ -7,9 +7,7 @@ Andd invoices to contracts.
 ## Installation
 ### get the source file  
 download the file at:  
-"https://github.com/mlebreuil/netbox-contract/archive/refs/tags/{{ contract_version }}.tar.gz"  
-
-And decompress the archive.  
+"https://github.com/mlebreuil/netbox-contract/archive/refs/tags/{{ contract_version }}.tar.gz"   
 
 ### Activate venv
 To ensure our plugin is accessible to the NetBox installation, we first need to activate the Python [virtual environment](https://docs.python.org/3/library/venv.html) that was created when we installed NetBox. To do this, determine the virtual environment's path (this will be `/opt/netbox/venv/` if you use the documentation's defaults) and activate it:
@@ -18,10 +16,10 @@ To ensure our plugin is accessible to the NetBox installation, we first need to 
 $ source /opt/netbox/venv/bin/activate
 ```
 
-### Run setup.py  
+### Install the package 
 
 ```bash
-$ python3 setup.py
+$ python3 -m pip install https://github.com/mlebreuil/netbox-contract/archive/refs/tags/v1.0.0.tar.gz
 ```
 
 ### Configure NetBox
