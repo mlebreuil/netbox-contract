@@ -12,7 +12,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     package_data={
-        'netbox-contracts': ["*.html"],
+        'contracts': ["*.html"],
     },
     zip_safe=False,
 )
