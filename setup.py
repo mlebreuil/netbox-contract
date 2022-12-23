@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 setup(
-    name='netbox_contracts',
+    name='netbox-contracts',
     version='1.0',
     description='A contract management plugin for NetBox',
     author='Marc Lebreuil',
