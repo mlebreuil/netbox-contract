@@ -1,7 +1,7 @@
 from extras.plugins import PluginConfig
 
 class ContractsConfig(PluginConfig):
-    name = 'netbox-contract'
+    name = 'netbox_contract'
     verbose_name = 'Netbox contract'
     description = 'Contract management plugin for Netbox'
     version = '1.0'
