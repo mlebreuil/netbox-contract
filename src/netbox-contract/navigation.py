@@ -3,7 +3,7 @@ from utilities.choices import ButtonColorChoices
 
 contract_buttons = [
     PluginMenuButton(
-        link='plugins:contracts:contract_add',
+        link='plugins:contract:contract_add',
         title='Add',
         icon_class='mdi mdi-plus-thick',
         color=ButtonColorChoices.GREEN
@@ -12,7 +12,7 @@ contract_buttons = [
 
 invoice_buttons = [
     PluginMenuButton(
-        link='plugins:contracts:invoice_add',
+        link='plugins:contract:invoice_add',
         title='Add',
         icon_class='mdi mdi-plus-thick',
         color=ButtonColorChoices.GREEN
@@ -21,7 +21,7 @@ invoice_buttons = [
 
 serviceprovider_buttons = [
     PluginMenuButton(
-        link='plugins:contracts:serviceprovider_add',
+        link='plugins:contract:serviceprovider_add',
         title='Add',
         icon_class='mdi mdi-plus-thick',
         color=ButtonColorChoices.GREEN
@@ -30,17 +30,17 @@ serviceprovider_buttons = [
 
 menu_items = (
     PluginMenuItem(
-        link='plugins:contracts:contract_list',
+        link='plugins:contract:contract_list',
         link_text='Contracts',
         buttons=contract_buttons
     ),
     PluginMenuItem(
-        link='plugins:contracts:invoice_list',
+        link='plugins:contract:invoice_list',
         link_text='Invoices',
         buttons=invoice_buttons
     ),
     PluginMenuItem(
-        link='plugins:contracts:serviceprovider_list',
+        link='plugins:contract:serviceprovider_list',
         link_text='Service Providers',
         buttons=serviceprovider_buttons
     ),

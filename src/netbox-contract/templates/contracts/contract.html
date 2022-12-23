@@ -73,7 +73,7 @@
           {% render_table invoices_table %}
         </div>
         <div class="card-footer text-end noprint">
-          <a href="{% url 'plugins:contracts:invoice_add' %}?contract={{ object.pk }}" class="btn btn-primary btn-sm">
+          <a href="{% url 'plugins:contract:invoice_add' %}?contract={{ object.pk }}" class="btn btn-primary btn-sm">
               <i class="mdi mdi-plus-thick" aria-hidden="true"></i>
               Add an invoice
           </a>
