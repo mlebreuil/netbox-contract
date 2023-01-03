@@ -1,7 +1,7 @@
 from netbox.api.routers import NetBoxRouter
 from . import views
 
-app_name = 'contracts'
+app_name = 'netbox-contract'
 
 router = NetBoxRouter()
 router.register('contracts', views.ContractViewSet)
