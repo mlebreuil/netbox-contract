@@ -1,13 +1,13 @@
 from extras.plugins import PluginConfig
 
 class ContractsConfig(PluginConfig):
-    name = 'contracts'
-    verbose_name = 'Contracts'
-    description = 'Contract management NetBox plugin'
-    version = '0.1'
+    name = 'netbox_contract'
+    verbose_name = 'Netbox contract'
+    description = 'Contract management plugin for Netbox'
+    version = '1.0'
     author = 'Marc Lebreuil'
     author_email = 'marc@famillelebreuil.net'
-    base_url = 'contracts'
+    base_url = 'contract'
     required_settings = []
     default_settings = {
     }

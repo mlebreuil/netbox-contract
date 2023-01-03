@@ -1,0 +1,22 @@
+[project]
+name = "netbox-contract"
+version = "1.0.0"
+authors = [
+  { name="Marc Lebreuil", email="marc@famillelebreuil.net" },
+]
+description = "Contract management plugin for Netbox"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/mlebreuil/netbox-contract"
+"Bug Tracker" = "https://github.com/mlebreuil/netbox-contract/issues"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
