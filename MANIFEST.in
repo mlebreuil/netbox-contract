@@ -1,1 +1,2 @@
 graft src/netbox_contract/templates
+graft src/netbox_contract/templates/netbox_contract

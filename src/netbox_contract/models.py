@@ -55,7 +55,7 @@ class ServiceProvider(NetBoxModel):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('plugins:contracts:serviceprovider', args=[self.pk])
+        return reverse('plugins:netbox_contract:serviceprovider', args=[self.pk])
 
 class Contract(NetBoxModel):
     name = models.CharField(
@@ -64,7 +64,7 @@ class Contract(NetBoxModel):
     external_partie = models.ForeignKey(
         to=ServiceProvider,
         on_delete=models.CASCADE,
-        related_name='contract'
+        related_name='contracts'
     )
     internal_partie = models.CharField(
         max_length=50,
@@ -108,14 +108,14 @@ class Contract(NetBoxModel):
         default = 1
     )
     circuit = models.ManyToManyField(Circuit,
-        related_name='contract'
+        related_name='contracts'
     )
     comments = models.TextField(
         blank=True
     )
 
     def get_absolute_url(self):
-        return reverse('plugins:contracts:contract', args=[self.pk])
+        return reverse('plugins:netbox_contract:contract', args=[self.pk])
 
     class Meta:
         ordering = ('name',)
@@ -150,4 +150,4 @@ class Invoice(NetBoxModel):
         return self.number
 
     def get_absolute_url(self):
-        return reverse('plugins:contracts:invoice', args=[self.pk])
+        return reverse('plugins:netbox_contract:invoice', args=[self.pk])

@@ -6,7 +6,7 @@ from ..models import Contract, Invoice, ServiceProvider
 
 class NestedServiceProviderSerializer(WritableNestedSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:contract-api:serviceprovider-detail'
+        view_name='plugins-api:netbox_contract-api:serviceprovider-detail'
     )
 
     class Meta:
@@ -15,7 +15,7 @@ class NestedServiceProviderSerializer(WritableNestedSerializer):
 
 class NestedContracSerializer(WritableNestedSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:contract-api:contract-detail'
+        view_name='plugins-api:netbox_contract-api:contract-detail'
     )
 
     class Meta:
@@ -24,7 +24,7 @@ class NestedContracSerializer(WritableNestedSerializer):
 
 class NestedInvoiceSerializer(WritableNestedSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:contract-api:invoice-detail'
+        view_name='plugins-api:netbox_contract-api:invoice-detail'
     )
 
     class Meta:
@@ -33,10 +33,10 @@ class NestedInvoiceSerializer(WritableNestedSerializer):
 
 class ContractSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:contract-api:contract-detail'
+        view_name='plugins-api:netbox_contract-api:contract-detail'
     )
     circuit= NestedCircuitSerializer(many=True)
-    external_partie = NestedServiceProviderSerializer(many=True)
+    external_partie = NestedServiceProviderSerializer(many=False)
 
     class Meta:
         model = Contract
@@ -47,7 +47,7 @@ class ContractSerializer(NetBoxModelSerializer):
 
 class InvoiceSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:contract-api:invoice-detail'
+        view_name='plugins-api:netbox_contract-api:invoice-detail'
     )
     contract=NestedContracSerializer()
 
@@ -60,7 +60,7 @@ class InvoiceSerializer(NetBoxModelSerializer):
 
 class ServiceProviderSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:contract-api:serviceprovider-detail'
+        view_name='plugins-api:netbox_contract-api:serviceprovider-detail'
     )
 
     class Meta:

@@ -7,7 +7,7 @@ class CircuitContracts(PluginTemplateExtension):
 
     def full_width_page(self):
         circuit = self.context['object']
-        table = tables.ContractListBottomTable(circuit.contract.all())
+        table = tables.ContractListBottomTable(circuit.contracts.all())
         table.configure(self.context['request'])
 
         return self.render('contract_list_bottom.html', extra_context={

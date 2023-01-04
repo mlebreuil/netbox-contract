@@ -79,7 +79,7 @@ class ContractBulkImportView(generic.BulkImportView):
 
 class ContractBulkEditView(generic.BulkEditView):
     queryset = models.Contract.objects.annotate(
-        count_circuits=count_related(Circuit, 'contract')
+        count_circuits=count_related(Circuit, 'contracts')
     )
     filterset = filtersets.ContractFilterSet
     table = tables.ContractListTable
@@ -87,7 +87,7 @@ class ContractBulkEditView(generic.BulkEditView):
 
 class ContractBulkDeleteView(generic.BulkDeleteView):
     queryset = models.Contract.objects.annotate(
-        count_circuits=count_related(Circuit, 'contract')
+        count_circuits=count_related(Circuit, 'contracts')
     )
     filterset = filtersets.ContractFilterSet
     table = tables.ContractListTable
