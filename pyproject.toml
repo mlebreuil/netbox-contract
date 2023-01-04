@@ -1,6 +1,6 @@
 [project]
 name = "netbox_contract"
-version = "1.0.2"
+version = "1.0.3"
 authors = [
   { name="Marc Lebreuil", email="marc@famillelebreuil.net" },
 ]
@@ -29,5 +29,5 @@ zip-safe = false
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["netbox_contract"]
+include = ["*"]
 namespaces = false
