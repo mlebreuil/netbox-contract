@@ -18,7 +18,7 @@ class ContractForm(NetBoxModelForm):
 
     class Meta:
         model = Contract
-        fields = ('name', 'external_partie', 'internal_partie', 'status',
+        fields = ('name', 'external_partie', 'internal_partie','tenant', 'status',
           'start_date', 'initial_term', 'renewal_term', 'mrc', 'nrc', 'invoice_frequency',
           'circuit', 'comments', 'tags')
 
@@ -79,7 +79,7 @@ class ContractCSVForm(NetBoxModelCSVForm):
     class Meta:
         model = Contract
         fields = [
-            'name', 'external_partie', 'internal_partie', 'status',
+            'name', 'external_partie', 'internal_partie','tenant', 'status',
             'start_date', 'initial_term', 'renewal_term', 'mrc', 'nrc',
             'invoice_frequency', 'circuit'
         ]
