@@ -128,12 +128,17 @@ class InvoiceEditView(generic.ObjectEditView):
                 last_invoice = contract.invoice.latest('period_end')
                 new_period_start = last_invoice.period_end + timedelta(days=1)
             except ObjectDoesNotExist:
-                new_period_start = contract.start_date
+                if contract.start_date :
+                    new_period_start = contract.start_date
+                else:
+                    new_period_start = None
 
-            initial_data['period_start'] = new_period_start
-            delta = relativedelta(months=contract.invoice_frequency)
-            new_period_end = new_period_start + delta
-            initial_data['period_end'] = new_period_end
+            if new_period_start :
+                initial_data['period_start'] = new_period_start
+                delta = relativedelta(months=contract.invoice_frequency)
+                new_period_end = new_period_start + delta
+                initial_data['period_end'] = new_period_end
+                
             initial_data['amount'] = contract.mrc
 
         form = self.form(instance=obj, initial=initial_data)
