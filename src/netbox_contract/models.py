@@ -29,6 +29,16 @@ class InternalEntityChoices(ChoiceSet):
         (ENTITY_US1, 'Nagra USA', 'red'),
     ]
 
+class CurrencyChoices(ChoiceSet):
+    key = 'Contract.currency'
+    CURRENCY_USD = 'usd'
+
+    CHOICES = [
+        (CURRENCY_USD, 'USD'),
+        ('eur', 'EUR'),
+        ('chf', 'CHF'),
+    ]
+
 class ServiceProvider(NetBoxModel):
     name = models.CharField(
         max_length=100
@@ -99,6 +109,11 @@ class Contract(NetBoxModel):
         blank=True,
         null=True
     )
+    currency = models.CharField(
+        max_length=3,
+        choices=CurrencyChoices,
+        default=CurrencyChoices.CURRENCY_USD
+    )
     mrc = models.DecimalField(
         verbose_name = "Monthly recuring cost",
         max_digits = 10,
@@ -144,6 +159,12 @@ class Invoice(NetBoxModel):
     period_start = models.DateField()
 
     period_end = models.DateField()
+
+    currency = models.CharField(
+        max_length=3,
+        choices=CurrencyChoices,
+        default=CurrencyChoices.CURRENCY_USD
+    )
 
     amount = models.DecimalField(
         max_digits = 10,

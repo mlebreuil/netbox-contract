@@ -138,8 +138,9 @@ class InvoiceEditView(generic.ObjectEditView):
                 delta = relativedelta(months=contract.invoice_frequency)
                 new_period_end = new_period_start + delta
                 initial_data['period_end'] = new_period_end
-                
+   
             initial_data['amount'] = contract.mrc
+            initial_data['currency'] = contract.currency
 
         form = self.form(instance=obj, initial=initial_data)
         restrict_form_fields(form, request.user)
