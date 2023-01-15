@@ -83,14 +83,21 @@ class Contract(NetBoxModel):
         choices=StatusChoices,
         default=StatusChoices.STATUS_ACTIVE
     )
-    start_date = models.DateField()
+    start_date = models.DateField(
+        blank=True,
+        null=True
+    )
     initial_term = models.IntegerField(
         help_text = "In month",
-        default = 12
+        default = 12,
+        blank=True,
+        null=True
     )
     renewal_term = models.IntegerField(
         help_text = "In month",
-        default = 12
+        default = 12,
+        blank=True,
+        null=True
     )
     mrc = models.DecimalField(
         verbose_name = "Monthly recuring cost",
