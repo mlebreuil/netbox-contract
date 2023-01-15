@@ -141,6 +141,8 @@ class InvoiceEditView(generic.ObjectEditView):
    
             initial_data['amount'] = contract.mrc
             initial_data['currency'] = contract.currency
+            if contract.accounting_dimensions :
+                initial_data['accounting_dimensions'] = contract.accounting_dimensions
 
         form = self.form(instance=obj, initial=initial_data)
         restrict_form_fields(form, request.user)
