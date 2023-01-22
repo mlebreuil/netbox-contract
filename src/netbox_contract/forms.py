@@ -34,9 +34,10 @@ class InvoiceForm(NetBoxModelForm):
 
     class Meta:
         model = Invoice
-        fields = ('number', 'contract', 'period_start', 'period_end',
+        fields = ('number', 'date', 'contract', 'period_start', 'period_end',
           'currency','accounting_dimensions','amount', 'tags')
         widgets = {
+            'date': DatePicker(),
             'period_start': DatePicker(),
             'period_end': DatePicker(),
         }
@@ -118,7 +119,7 @@ class InvoiceCSVForm(NetBoxModelCSVForm):
     class Meta:
         model = Invoice
         fields = [
-            'number', 'contract', 'period_start', 'period_end',
+            'number', 'date', 'contract', 'period_start', 'period_end',
             'amount', 'tags'
         ]
 
