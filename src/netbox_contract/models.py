@@ -176,6 +176,9 @@ class Invoice(NetBoxModel):
         max_digits = 10,
         decimal_places= 2
     )
+    comments = models.TextField(
+        blank=True
+    )
 
     class Meta:
         ordering = ('-period_start',)

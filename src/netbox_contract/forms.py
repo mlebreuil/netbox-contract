@@ -35,7 +35,7 @@ class InvoiceForm(NetBoxModelForm):
     class Meta:
         model = Invoice
         fields = ('number', 'date', 'contract', 'period_start', 'period_end',
-          'currency','accounting_dimensions','amount', 'tags')
+          'currency','accounting_dimensions','amount', 'comments','tags')
         widgets = {
             'date': DatePicker(),
             'period_start': DatePicker(),
