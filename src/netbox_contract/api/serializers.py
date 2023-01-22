@@ -35,7 +35,7 @@ class ContractSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_contract-api:contract-detail'
     )
-    circuit= NestedCircuitSerializer(many=True)
+    circuit= NestedCircuitSerializer(many=True, required=False)
     external_partie = NestedServiceProviderSerializer(many=False)
 
     class Meta:

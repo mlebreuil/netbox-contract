@@ -10,7 +10,8 @@ from .models import Contract, Invoice, ServiceProvider
 class ContractForm(NetBoxModelForm):
     comments = CommentField()
     circuit=DynamicModelMultipleChoiceField(
-        queryset=Circuit.objects.all()
+        queryset=Circuit.objects.all(),
+        required=False
     )
     external_partie=DynamicModelChoiceField(
         queryset=ServiceProvider.objects.all()
