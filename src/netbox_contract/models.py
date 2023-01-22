@@ -133,7 +133,8 @@ class Contract(NetBoxModel):
         default = 1
     )
     circuit = models.ManyToManyField(Circuit,
-        related_name='contracts'
+        related_name='contracts',
+        blank=True,
     )
     comments = models.TextField(
         blank=True
