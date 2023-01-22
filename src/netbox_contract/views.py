@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, date
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
@@ -121,6 +121,7 @@ class InvoiceEditView(generic.ObjectEditView):
         model = self.queryset.model
 
         initial_data = normalize_querydict(request.GET)
+        initial_data['date'] = date.today()
         if 'contract' in initial_data.keys():
             contract = models.Contract.objects.get(pk=initial_data['contract'])
 

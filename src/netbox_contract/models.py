@@ -153,6 +153,10 @@ class Invoice(NetBoxModel):
     number = models.CharField(
         max_length=100
     )
+    date = models.DateField(
+        blank=True,
+        null=True
+    )
     contract = models.ForeignKey(
         to=Contract,
         on_delete=models.CASCADE,

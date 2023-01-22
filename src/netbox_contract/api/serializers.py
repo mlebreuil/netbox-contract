@@ -54,7 +54,7 @@ class InvoiceSerializer(NetBoxModelSerializer):
     class Meta:
         model = Invoice
         fields = (
-            'id', 'url', 'display', 'number', 'contract', 'tags', 'custom_fields', 'created',
+            'id', 'url', 'display', 'number', 'date', 'contract', 'tags', 'custom_fields', 'created',
             'last_updated',
         )
 
