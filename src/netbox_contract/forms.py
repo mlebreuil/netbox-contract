@@ -19,7 +19,7 @@ class ContractForm(NetBoxModelForm):
 
     class Meta:
         model = Contract
-        fields = ('name', 'external_partie', 'internal_partie','tenant', 'status',
+        fields = ('name', 'external_partie', 'external_reference', 'internal_partie','tenant', 'status',
           'start_date', 'initial_term', 'renewal_term', 'currency','accounting_dimensions',
           'mrc', 'nrc','invoice_frequency','circuit', 'comments', 'tags')
 
@@ -46,6 +46,9 @@ class ContractFilterSetForm(NetBoxModelFilterSetForm):
     model = Contract
     external_partie=DynamicModelMultipleChoiceField(
         queryset=ServiceProvider.objects.all(),
+        required=False
+    )
+    external_reference=forms.CharField(
         required=False
     )
     internal_partie= forms.CharField(
@@ -94,6 +97,10 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
     external_partie = forms.CharField(
         max_length=30,
         required=True
+    )
+    external_reference=forms.CharField(
+        max_length=100,
+        required=False
     )
     internal_partie = forms.CharField(
         max_length=30,

@@ -76,6 +76,11 @@ class Contract(NetBoxModel):
         on_delete=models.CASCADE,
         related_name='contracts'
     )
+    external_reference = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
     internal_partie = models.CharField(
         max_length=50,
         choices=InternalEntityChoices,
