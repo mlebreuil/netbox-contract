@@ -28,9 +28,6 @@ class ContractForm(NetBoxModelForm):
         }
 
 class InvoiceForm(NetBoxModelForm):
-    contract=DynamicModelChoiceField(
-        queryset=Contract.objects.all()
-    )
     contracts=DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(),
         required=False
@@ -38,7 +35,7 @@ class InvoiceForm(NetBoxModelForm):
 
     class Meta:
         model = Invoice
-        fields = ('number', 'date', 'contract', 'contracts','period_start', 'period_end',
+        fields = ('number', 'date', 'contracts','period_start', 'period_end',
           'currency','accounting_dimensions','amount', 'comments','tags')
         widgets = {
             'date': DatePicker(),
@@ -73,10 +70,6 @@ class ContractFilterSetForm(NetBoxModelFilterSetForm):
 
 class InvoiceFilterSetForm(NetBoxModelFilterSetForm):
     model = Invoice
-    contract = DynamicModelChoiceField(
-        queryset=Contract.objects.all(),
-        required=False
-    )
     contracts=DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(),
         required=False
@@ -125,11 +118,6 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
     model = Contract
 
 class InvoiceCSVForm(NetBoxModelCSVForm):
-    contract = CSVModelChoiceField(
-        queryset=Contract.objects.all(),
-        to_field_name='name',
-        help_text='Related Contract'
-    )
     contracts = CSVModelChoiceField(
         queryset=Contract.objects.all(),
         to_field_name='name',
@@ -139,7 +127,7 @@ class InvoiceCSVForm(NetBoxModelCSVForm):
     class Meta:
         model = Invoice
         fields = [
-            'number', 'date', 'contract', 'contracts','period_start', 'period_end',
+            'number', 'date', 'contracts','period_start', 'period_end',
             'amount', 'tags'
         ]
 
@@ -147,10 +135,6 @@ class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
     number = forms.CharField(
         max_length=100,
         required=True
-    )
-
-    contract=DynamicModelChoiceField(
-        queryset=Contract.objects.all()
     )
     contracts=DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(),

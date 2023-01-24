@@ -162,11 +162,6 @@ class Invoice(NetBoxModel):
         blank=True,
         null=True
     )
-    contract = models.ForeignKey(
-        to=Contract,
-        on_delete=models.CASCADE,
-        related_name='invoice'
-    )
     contracts = models.ManyToManyField(
         Contract,
         related_name='invoices',

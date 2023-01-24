@@ -134,7 +134,7 @@ class InvoiceEditView(generic.ObjectEditView):
             contract = models.Contract.objects.get(pk=initial_data['contracts'])
 
             try:
-                last_invoice = contract.invoice.latest('period_end')
+                last_invoice = contract.invoices.latest('period_end')
                 new_period_start = last_invoice.period_end + timedelta(days=1)
             except ObjectDoesNotExist:
                 if contract.start_date :
