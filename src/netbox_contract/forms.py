@@ -1,11 +1,11 @@
 from django import forms
 import django_filters
 from netbox.forms import NetBoxModelForm, NetBoxModelFilterSetForm, NetBoxModelBulkEditForm, NetBoxModelCSVForm
-from utilities.forms.fields import CommentField, DynamicModelChoiceField, DynamicModelMultipleChoiceField
+from utilities.forms.fields import CommentField, DynamicModelChoiceField, DynamicModelMultipleChoiceField, MultipleChoiceField
 from utilities.forms import CSVModelChoiceField, DatePicker,SlugField
 from extras.filters import TagFilter
 from circuits.models import Circuit
-from .models import Contract, Invoice, ServiceProvider
+from .models import Contract, Invoice, ServiceProvider, StatusChoices
 
 class ContractForm(NetBoxModelForm):
     comments = CommentField()
@@ -55,18 +55,14 @@ class ContractFilterSetForm(NetBoxModelFilterSetForm):
     internal_partie= forms.CharField(
         required=False
     )
-    status = django_filters.MultipleChoiceFilter(
-        choices=(
-            ('active', 'Active'),
-            ('canceled', 'Canceled'),
-        ),
-        null_value=None
+    status = MultipleChoiceField(
+        choices=StatusChoices,
+        required= False
     )
     circuit = DynamicModelMultipleChoiceField(
         queryset=Circuit.objects.all(),
         required=False
     )
-    tag = TagFilter()
 
 class InvoiceFilterSetForm(NetBoxModelFilterSetForm):
     model = Invoice

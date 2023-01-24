@@ -5,7 +5,7 @@ class ContractFilterSet(NetBoxModelFilterSet):
 
     class Meta:
         model = Contract
-        fields = ('id', 'external_partie', 'internal_partie', 'circuit')
+        fields = ('id', 'external_partie', 'internal_partie', 'status','circuit')
 
 class InvoiceFilterSet(NetBoxModelFilterSet):
 

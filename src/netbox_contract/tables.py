@@ -19,7 +19,7 @@ class ContractListTable(NetBoxTable):
         fields = ('pk', 'id', 'name', 'circuit', 'external_partie',
          'external_reference','internal_partie', 'status', 'mrc',
          'comments', 'actions')
-        default_columns = ('name', 'circuit')
+        default_columns = ('name', 'status', 'circuit')
 
 class ContractListBottomTable(NetBoxTable):
     name = tables.Column(
