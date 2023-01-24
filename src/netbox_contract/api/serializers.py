@@ -41,7 +41,7 @@ class ContractSerializer(NetBoxModelSerializer):
     class Meta:
         model = Contract
         fields = (
-            'id', 'url','display', 'name', 'external_partie','internal_partie','circuit','comments',
+            'id', 'url','display', 'name', 'status', 'external_partie','internal_partie','circuit','comments',
             'tags', 'custom_fields', 'created', 'last_updated',
         )
 
