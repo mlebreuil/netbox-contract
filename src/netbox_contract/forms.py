@@ -28,13 +28,14 @@ class ContractForm(NetBoxModelForm):
         }
 
 class InvoiceForm(NetBoxModelForm):
-    contract=DynamicModelChoiceField(
-        queryset=Contract.objects.all()
+    contracts=DynamicModelMultipleChoiceField(
+        queryset=Contract.objects.all(),
+        required=False
     )
 
     class Meta:
         model = Invoice
-        fields = ('number', 'date', 'contract', 'period_start', 'period_end',
+        fields = ('number', 'date', 'contracts','period_start', 'period_end',
           'currency','accounting_dimensions','amount', 'comments','tags')
         widgets = {
             'date': DatePicker(),
@@ -69,7 +70,7 @@ class ContractFilterSetForm(NetBoxModelFilterSetForm):
 
 class InvoiceFilterSetForm(NetBoxModelFilterSetForm):
     model = Invoice
-    contract = DynamicModelChoiceField(
+    contracts=DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(),
         required=False
     )
@@ -117,16 +118,16 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
     model = Contract
 
 class InvoiceCSVForm(NetBoxModelCSVForm):
-    contract = CSVModelChoiceField(
+    contracts = CSVModelChoiceField(
         queryset=Contract.objects.all(),
         to_field_name='name',
-        help_text='Related Contract'
+        help_text='Related Contracts'
     )
 
     class Meta:
         model = Invoice
         fields = [
-            'number', 'date', 'contract', 'period_start', 'period_end',
+            'number', 'date', 'contracts','period_start', 'period_end',
             'amount', 'tags'
         ]
 
@@ -135,9 +136,9 @@ class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
         max_length=100,
         required=True
     )
-
-    contract=DynamicModelChoiceField(
-        queryset=Contract.objects.all()
+    contracts=DynamicModelMultipleChoiceField(
+        queryset=Contract.objects.all(),
+        required=False
     )
     model = Invoice
 

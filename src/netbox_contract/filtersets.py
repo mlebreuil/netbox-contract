@@ -11,7 +11,7 @@ class InvoiceFilterSet(NetBoxModelFilterSet):
 
     class Meta:
         model = Invoice
-        fields = ('id', 'contract')
+        fields = ('id', 'contracts')
 
 class ServiceProviderFilterSet(NetBoxModelFilterSet):
 

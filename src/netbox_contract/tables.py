@@ -33,7 +33,7 @@ class ContractListBottomTable(NetBoxTable):
         default_columns = ('name', 'external_partie', 'status')
 
 class InvoiceListTable(NetBoxTable):
-    contract = tables.Column(
+    contracts = tables.Column(
         linkify=True
     )
     number = tables.Column(
@@ -42,9 +42,9 @@ class InvoiceListTable(NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = Invoice
-        fields = ('pk', 'id', 'number', 'date', 'contract', 'period_start',
+        fields = ('pk', 'id', 'number', 'date', 'contracts', 'period_start',
           'period_end', 'amount', 'actions')
-        default_columns = ('number', 'date', 'contract', 'period_start', 'period_end', 'amount')
+        default_columns = ('number', 'date', 'contracts', 'period_start', 'period_end', 'amount')
 
 
 class ContractCircuitListTable(NetBoxTable):

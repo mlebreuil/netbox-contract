@@ -49,12 +49,12 @@ class InvoiceSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_contract-api:invoice-detail'
     )
-    contract=NestedContracSerializer()
+    contracts = NestedContracSerializer(many=True, required=False)
 
     class Meta:
         model = Invoice
         fields = (
-            'id', 'url', 'display', 'number', 'date', 'contract', 'tags', 'custom_fields', 'created',
+            'id', 'url', 'display', 'number', 'date', 'contracts', 'tags', 'custom_fields', 'created',
             'last_updated',
         )
 
