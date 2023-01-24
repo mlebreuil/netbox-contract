@@ -1,5 +1,5 @@
 {% extends 'generic/object.html' %}
-
+{% load render_table from django_tables2 %}
 {% block content %}
   <div class="row mb-3">
     <div class="col col-md-6">
@@ -46,6 +46,16 @@
               <td>{{ object.amount }}</td>
             </tr>
           </table>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col col-md-12">
+          <div class="card">
+            <h5 class="card-header">Contracts</h5>
+            <div class="card-body table-responsive">
+              {% render_table contracts_table %}
+            </div>
+          </div>
         </div>
       </div>
       {% include 'inc/panels/custom_fields.html' %}

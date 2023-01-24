@@ -49,7 +49,7 @@ class ContractView(generic.ObjectView):
     queryset = models.Contract.objects.all()
 
     def get_extra_context(self, request, instance):
-        invoice_table = tables.InvoiceListTable(instance.invoice.all())
+        invoice_table = tables.InvoiceListTable(instance.invoices.all())
         invoice_table.configure(request)
         circuit_table = tables.ContractCircuitListTable(instance.circuit.all())
         circuit_table.configure(request)
@@ -97,6 +97,14 @@ class ContractBulkDeleteView(generic.BulkDeleteView):
 class InvoiceView(generic.ObjectView):
     queryset = models.Invoice.objects.all()
 
+    def get_extra_context(self, request, instance):
+        contracts_table = tables.ContractListTable(instance.contracts.all())
+        contracts_table.configure(request)
+
+        return {
+            'contracts_table': contracts_table,
+        }
+
 class InvoiceListView(generic.ObjectListView):
     queryset = models.Invoice.objects.all()
     table = tables.InvoiceListTable
@@ -122,8 +130,8 @@ class InvoiceEditView(generic.ObjectEditView):
 
         initial_data = normalize_querydict(request.GET)
         initial_data['date'] = date.today()
-        if 'contract' in initial_data.keys():
-            contract = models.Contract.objects.get(pk=initial_data['contract'])
+        if 'contracts' in initial_data.keys():
+            contract = models.Contract.objects.get(pk=initial_data['contracts'])
 
             try:
                 last_invoice = contract.invoice.latest('period_end')

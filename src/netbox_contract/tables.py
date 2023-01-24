@@ -42,9 +42,9 @@ class InvoiceListTable(NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = Invoice
-        fields = ('pk', 'id', 'number', 'date', 'contract', 'period_start',
+        fields = ('pk', 'id', 'number', 'date', 'contract','contracts', 'period_start',
           'period_end', 'amount', 'actions')
-        default_columns = ('number', 'date', 'contract', 'period_start', 'period_end', 'amount')
+        default_columns = ('number', 'date', 'contract','contracts', 'period_start', 'period_end', 'amount')
 
 
 class ContractCircuitListTable(NetBoxTable):

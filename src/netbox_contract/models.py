@@ -167,6 +167,11 @@ class Invoice(NetBoxModel):
         on_delete=models.CASCADE,
         related_name='invoice'
     )
+    contracts = models.ManyToManyField(
+        Contract,
+        related_name='invoices',
+        blank=True,
+    )
     period_start = models.DateField()
     period_end = models.DateField()
     currency = models.CharField(
