@@ -1,6 +1,6 @@
 [project]
 name = "netbox_contract"
-version = "1.0.5"
+version = "1.0.6"
 authors = [
   { name="Marc Lebreuil", email="marc@famillelebreuil.net" },
 ]
