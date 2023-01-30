@@ -102,6 +102,10 @@ class Contract(NetBoxModel):
         blank=True,
         null=True
     )
+    end_date = models.DateField(
+        blank=True,
+        null=True
+    )
     initial_term = models.IntegerField(
         help_text = "In month",
         default = 12,
