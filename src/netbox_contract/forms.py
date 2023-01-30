@@ -21,7 +21,7 @@ class ContractForm(NetBoxModelForm):
         model = Contract
         fields = ('name', 'external_partie', 'external_reference', 'internal_partie','tenant', 'status',
           'start_date', 'initial_term', 'renewal_term', 'currency','accounting_dimensions',
-          'mrc', 'nrc','invoice_frequency','circuit', 'comments', 'tags')
+          'mrc', 'nrc','invoice_frequency','circuit', 'documents', 'comments', 'tags')
 
         widgets = {
             'start_date': DatePicker(),
@@ -36,7 +36,7 @@ class InvoiceForm(NetBoxModelForm):
     class Meta:
         model = Invoice
         fields = ('number', 'date', 'contracts','period_start', 'period_end',
-          'currency','accounting_dimensions','amount', 'comments','tags')
+          'currency','accounting_dimensions','amount', 'documents','comments','tags')
         widgets = {
             'date': DatePicker(),
             'period_start': DatePicker(),

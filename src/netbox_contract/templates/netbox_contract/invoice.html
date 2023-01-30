@@ -45,6 +45,14 @@
               <th scope="row">Amount</th>
               <td>{{ object.amount }}</td>
             </tr>
+            {% if object.documents %}
+            <tr>
+              <th scope="row">Documents</th>
+                <td>
+                  <a href="{{ object.documents }}" target="_blank">Documents</a>
+                </td>
+            </tr>
+            {% endif %}
           </table>
         </div>
       </div>
