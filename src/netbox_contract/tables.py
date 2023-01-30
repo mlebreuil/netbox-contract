@@ -33,7 +33,7 @@ class ContractListBottomTable(NetBoxTable):
         default_columns = ('name', 'external_partie', 'status')
 
 class InvoiceListTable(NetBoxTable):
-    contracts = tables.Column(
+    contracts = tables.ManyToManyColumn(
         linkify=True
     )
     number = tables.Column(
