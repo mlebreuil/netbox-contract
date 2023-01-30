@@ -141,6 +141,9 @@ class Contract(NetBoxModel):
         related_name='contracts',
         blank=True,
     )
+    documents = models.URLField(
+        blank=True
+    )
     comments = models.TextField(
         blank=True
     )
@@ -180,6 +183,9 @@ class Invoice(NetBoxModel):
     amount = models.DecimalField(
         max_digits = 10,
         decimal_places= 2
+    )
+    documents = models.URLField(
+        blank=True
     )
     comments = models.TextField(
         blank=True
