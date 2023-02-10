@@ -29,6 +29,21 @@ PLUGINS = [
     'netbox_contract',
 ]
 ```
+
+Customize the internal partie field.  
+Internal partie reference the legal entity of your organization that is a partie to the contract.  
+
+```python
+# configuration.py
+FIELD_CHOICES = {
+    'netbox_contract.Contract.internal_partie': (
+        ('Nagravision SARL', 'Nagravision SARL', 'green'),
+        ('Nagra USA', 'Nagra USA', 'green'),
+        ('Nagra India', 'Nagra India', 'green'),
+    )
+}
+```
+
 ### Run database migrations
 
 ```bash
