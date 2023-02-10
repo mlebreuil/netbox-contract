@@ -21,12 +21,10 @@ class StatusChoices(ChoiceSet):
 class InternalEntityChoices(ChoiceSet):
     key = 'Contract.internal_partie'
 
-    ENTITY_CH1 = 'Nagravision Sarl'
-    ENTITY_US1 = 'Nagra USA'
+    ENTITY = 'Default entity'
 
     CHOICES = [
-        (ENTITY_CH1, 'Nagravision Sarl', 'green'),
-        (ENTITY_US1, 'Nagra USA', 'red'),
+        (ENTITY, 'Default entity', 'green'),
     ]
 
 class CurrencyChoices(ChoiceSet):
