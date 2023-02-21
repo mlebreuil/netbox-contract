@@ -30,6 +30,19 @@ PLUGINS = [
 ]
 ```
 
+Customize the location of the plugin's menu:
+
+
+```python
+# configuration.py
+PLUGINS_CONFIG = {
+    'netbox_contract': {
+        'top_level_menu': True
+    }
+}
+
+```
+
 Customize the internal partie field.  
 Internal partie reference the legal entity of your organization that is a partie to the contract.  
 
@@ -42,6 +55,7 @@ FIELD_CHOICES = {
         ('Nagra India', 'Nagra India', 'green'),
     )
 }
+
 ```
 
 ### Run database migrations
