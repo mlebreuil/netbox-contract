@@ -1,5 +1,9 @@
 {% extends 'generic/object.html' %}
 {% load render_table from django_tables2 %}
+{% block breadcrumbs %}
+  {{ block.super }}
+  <li class="breadcrumb-item"><a href="{% url 'plugins:netbox_contract:contract_list' %}?external_partie={{ object.external_partie.pk }}">{{ object.external_partie }}</a></li>
+{% endblock %}
 {% block content %}
   <div class="row mb-3">
     <div class="col col-md-6">
