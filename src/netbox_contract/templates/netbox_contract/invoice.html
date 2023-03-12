@@ -1,5 +1,13 @@
 {% extends 'generic/object.html' %}
 {% load render_table from django_tables2 %}
+{% block breadcrumbs %}
+  {{ block.super }}
+  <li class="breadcrumb-item">
+    {% for contract in object.contracts.all %}
+    <a href="{% url 'plugins:netbox_contract:invoice_list' %}?contracts={{ contract.pk }}">{{ contract.name }}</a>
+    {% endfor %}
+  </li>
+{% endblock %}
 {% block content %}
   <div class="row mb-3">
     <div class="col col-md-6">
@@ -7,16 +15,6 @@
         <h5 class="card-header">Invoices</h5>
         <div class="card-body">
           <table class="table table-hover attr-table">
-            <tr>
-              <th scope="row">Contract</th>
-              <td>
-                <a href="{{ object.contract.get_absolute_url }}">{{ object.contract }}</a>
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">Index</th>
-              <td>{{ object.index }}</td>
-            </tr>
             <tr>
               <th scope="row">Number</th>
               <td>{{ object.number }}</td>
