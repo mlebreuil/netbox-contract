@@ -16,7 +16,7 @@ $ source /opt/netbox/venv/bin/activate
 ### Install the package 
 
 ```bash
-$ python3 -m pip install netbox_contract
+$ python3 -m pip install netbox-contract
 ```
 
 ### Configure NetBox
