@@ -42,5 +42,14 @@ urlpatterns = (
         'model': models.Invoice
     }),
 
+    # Contract assignements
+    path('assignements/', views.ContractAssignementListView.as_view(), name='contractassignement_list'),
+    path('assignements/add/', views.ContractAssignementEditView.as_view(), name='contractassignement_add'),
+    path('assignements/<int:pk>/', views.ContractAssignementView.as_view(), name='contractassignement'),
+    path('assignements/<int:pk>/edit/', views.ContractAssignementEditView.as_view(), name='contractassignement_edit'),
+    path('assignements/<int:pk>/delete/', views.ContractAssignementDeleteView.as_view(), name='contractassignement_delete'),
+    path('assignements/<int:pk>/changelog/', ObjectChangeLogView.as_view(), name='contractassignement_changelog', kwargs={
+        'model': models.ContractAssignement
+    }),
 
 )

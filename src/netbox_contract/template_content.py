@@ -1,5 +1,7 @@
+from django.contrib.contenttypes.models import ContentType
 from extras.plugins import PluginTemplateExtension
-from .models import Contract
+from circuits.models import Circuit
+from .models import ContractAssignement
 from . import tables
 
 class CircuitContracts(PluginTemplateExtension):
@@ -14,4 +16,18 @@ class CircuitContracts(PluginTemplateExtension):
             'contracts_table': table,
         })
 
-template_extensions = [CircuitContracts]
+class CircuitContractAssignements(PluginTemplateExtension):
+    model = 'circuits.circuit'
+
+    def full_width_page(self):
+        circuit = self.context['object']
+        circuit_type = ContentType.objects.get_for_model(Circuit)
+        contract_assignements = ContractAssignement.objects.filter(content_type__pk=circuit_type.id, object_id=circuit.id)
+        assignements_table = tables.ContractAssignementListTable(contract_assignements)
+        assignements_table.configure(self.context['request'])
+
+        return self.render('contract_assignements_bottom.html', extra_context={
+            'assignements_table': assignements_table,
+        })
+
+template_extensions = [ CircuitContracts, CircuitContractAssignements]

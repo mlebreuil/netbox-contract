@@ -65,6 +65,29 @@ class ServiceProvider(NetBoxModel):
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:serviceprovider', args=[self.pk])
 
+class ContractAssignement(NetBoxModel):
+    content_type = models.ForeignKey(
+        to=ContentType,
+        on_delete=models.CASCADE
+    )
+    object_id = models.PositiveBigIntegerField()
+    content_object = GenericForeignKey(
+        ct_field='content_type',
+        fk_field='object_id'
+    )
+    contract = models.ForeignKey(
+        to='Contract',
+        on_delete=models.PROTECT,
+        related_name='assignments'
+    )
+    clone_fields = ('content_type', 'object_id','contract')
+
+    class Meta:
+        ordering = ('contract',)
+
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_contract:contractassignement', args=[self.pk])
+
 class Contract(NetBoxModel):
     name = models.CharField(
         max_length=100
@@ -158,6 +181,7 @@ class Contract(NetBoxModel):
 
     def __str__(self):
         return self.name
+
 
 class Invoice(NetBoxModel):
     number = models.CharField(

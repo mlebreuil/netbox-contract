@@ -1,8 +1,28 @@
 import django_tables2 as tables
 
-from netbox.tables import NetBoxTable
+from netbox.tables import NetBoxTable, columns
 from circuits.models import Circuit
-from .models import Contract, Invoice, ServiceProvider
+from .models import ContractAssignement, Contract, Invoice, ServiceProvider
+
+class ContractAssignementListTable(NetBoxTable):
+    content_type = columns.ContentTypeColumn(
+        verbose_name='Object Type'
+    )
+    content_object = tables.Column(
+        linkify=True,
+        orderable=False
+    )
+    contract = tables.Column(
+        linkify=True
+    )
+    actions = columns.ActionsColumn(
+        actions=('edit', 'delete')
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = ContractAssignement
+        fields = ('pk', 'content_type', 'content_object', 'contract', 'actions')
+        default_columns = ('pk', 'content_type', 'content_object', 'contract')
 
 class ContractListTable(NetBoxTable):
 
