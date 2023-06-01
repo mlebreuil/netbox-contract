@@ -1,7 +1,8 @@
 from datetime import timedelta, date
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import render
+from django.contrib.contenttypes.models import ContentType
+from django.shortcuts import render, get_object_or_404
 from netbox.views import generic
 from netbox.views.generic.utils import get_prerequisite_model
 from utilities.utils import count_related, normalize_querydict
@@ -43,20 +44,54 @@ class ServiceProviderBulkDeleteView(generic.BulkDeleteView):
     filterset = filtersets.ServiceProviderFilterSet
     table = tables.ServiceProviderListTable
 
+# Contract assignement view
+
+class ContractAssignementView(generic.ObjectView):
+    queryset = models.ContractAssignement.objects.all()
+
+class ContractAssignementListView(generic.ObjectListView):
+    queryset = models.ContractAssignement.objects.all()
+    table = tables.ContractAssignementListTable
+    filterset = filtersets.ContractAssignementFilterSet
+    filterset_form = forms.ContractAssignementFilterSetForm
+
+class ContractAssignementEditView(generic.ObjectEditView):
+    queryset = models.ContractAssignement.objects.all()
+    form = forms.ContractAssignementForm
+
+    def alter_object(self, instance, request, args, kwargs):
+        if not instance.pk:
+            # Assign the object based on URL kwargs
+            content_type = get_object_or_404(ContentType, pk=request.GET.get('content_type'))
+            instance.object = get_object_or_404(content_type.model_class(), pk=request.GET.get('object_id'))
+        return instance
+
+    def get_extra_addanother_params(self, request):
+        return {
+            'content_type': request.GET.get('content_type'),
+            'object_id': request.GET.get('object_id'),
+        }
+
+class ContractAssignementDeleteView(generic.ObjectDeleteView):
+    queryset = models.ContractAssignement.objects.all()
+
 # Contract views
 
 class ContractView(generic.ObjectView):
     queryset = models.Contract.objects.all()
 
     def get_extra_context(self, request, instance):
-        invoice_table = tables.InvoiceListTable(instance.invoices.all())
-        invoice_table.configure(request)
+        invoices_table = tables.InvoiceListTable(instance.invoices.all())
+        invoices_table.configure(request)
         circuit_table = tables.ContractCircuitListTable(instance.circuit.all())
         circuit_table.configure(request)
+        assignements_table = tables.ContractAssignementContractTable(instance.assignments.all())
+        assignements_table.configure(request)
 
         return {
-            'invoices_table': invoice_table,
+            'invoices_table': invoices_table,
             'circuit_table': circuit_table,
+            'assignements_table': assignements_table,
         }
 
 class ContractListView(generic.ObjectListView):

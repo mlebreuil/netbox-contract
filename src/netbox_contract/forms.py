@@ -5,7 +5,7 @@ from utilities.forms.fields import CommentField, DynamicModelChoiceField, Dynami
 from utilities.forms import CSVModelChoiceField, DatePicker,SlugField
 from extras.filters import TagFilter
 from circuits.models import Circuit
-from .models import Contract, Invoice, ServiceProvider, StatusChoices
+from .models import Contract, Invoice, ServiceProvider, StatusChoices, ContractAssignement
 
 class ContractForm(NetBoxModelForm):
     comments = CommentField()
@@ -174,3 +174,23 @@ class ServiceProviderBulkEditForm(NetBoxModelBulkEditForm):
         'comments',
     )
     model = ServiceProvider
+
+# ContractAssignement
+
+class ContractAssignementForm(NetBoxModelForm):
+    contract=DynamicModelChoiceField(
+        queryset=Contract.objects.all()
+    )
+    class Meta:
+        model = ContractAssignement
+        fields = ['content_type', 'object_id', 'contract','tags']
+        widgets = {
+            'content_type': forms.HiddenInput(),
+            'object_id': forms.HiddenInput(),
+        }
+
+class ContractAssignementFilterSetForm(NetBoxModelFilterSetForm):
+    model = ContractAssignement
+    contract=DynamicModelChoiceField(
+        queryset=Contract.objects.all()
+    )

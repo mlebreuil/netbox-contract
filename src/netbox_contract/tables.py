@@ -1,8 +1,58 @@
 import django_tables2 as tables
 
-from netbox.tables import NetBoxTable
+from netbox.tables import NetBoxTable, columns
 from circuits.models import Circuit
-from .models import Contract, Invoice, ServiceProvider
+from .models import ContractAssignement, Contract, Invoice, ServiceProvider
+
+class ContractAssignementListTable(NetBoxTable):
+    content_type = columns.ContentTypeColumn(
+        verbose_name='Object Type'
+    )
+    content_object = tables.Column(
+        linkify=True,
+        orderable=False
+    )
+    contract = tables.Column(
+        linkify=True
+    )
+    actions = columns.ActionsColumn(
+        actions=('edit', 'delete')
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = ContractAssignement
+        fields = ('pk', 'content_type', 'content_object', 'contract','contract__external_partie', 'actions')
+        default_columns = ('pk', 'content_type', 'content_object', 'contract','contract__external_partie')
+
+class ContractAssignementObjectTable(NetBoxTable):
+    contract = tables.Column(
+        linkify=True
+    )
+    actions = columns.ActionsColumn(
+        actions=('edit', 'delete')
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = ContractAssignement
+        fields = ('pk','contract','contract__external_partie','contract__status', 'actions')
+        default_columns = ('pk', 'contract','contract__external_partie','contract__status')
+
+class ContractAssignementContractTable(NetBoxTable):
+    content_type = columns.ContentTypeColumn(
+        verbose_name='Object Type'
+    )
+    content_object = tables.Column(
+        linkify=True,
+        orderable=False
+    )
+    actions = columns.ActionsColumn(
+        actions=('edit', 'delete')
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = ContractAssignement
+        fields = ('pk', 'content_type', 'content_object','actions')
+        default_columns = ('pk', 'content_type', 'content_object')
 
 class ContractListTable(NetBoxTable):
 
