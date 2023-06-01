@@ -1,8 +1,8 @@
 from django import forms
 import django_filters
-from netbox.forms import NetBoxModelForm, NetBoxModelFilterSetForm, NetBoxModelBulkEditForm, NetBoxModelCSVForm
-from utilities.forms.fields import CommentField, DynamicModelChoiceField, DynamicModelMultipleChoiceField, MultipleChoiceField
-from utilities.forms import CSVModelChoiceField, DatePicker,SlugField
+from netbox.forms import NetBoxModelForm, NetBoxModelFilterSetForm, NetBoxModelBulkEditForm, NetBoxModelImportForm
+from utilities.forms.fields import CommentField, DynamicModelChoiceField, DynamicModelMultipleChoiceField, MultipleChoiceField, CSVModelChoiceField, SlugField
+from utilities.forms.widgets import DatePicker
 from extras.filters import TagFilter
 from circuits.models import Circuit
 from .models import Contract, Invoice, ServiceProvider, StatusChoices, ContractAssignement
@@ -72,7 +72,7 @@ class InvoiceFilterSetForm(NetBoxModelFilterSetForm):
         required=False
     )
 
-class ContractCSVForm(NetBoxModelCSVForm):
+class ContractCSVForm(NetBoxModelImportForm):
     circuit = CSVModelChoiceField(
         queryset=Circuit.objects.all(),
         to_field_name='name',
@@ -114,7 +114,7 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
     )
     model = Contract
 
-class InvoiceCSVForm(NetBoxModelCSVForm):
+class InvoiceCSVForm(NetBoxModelImportForm):
     contracts = CSVModelChoiceField(
         queryset=Contract.objects.all(),
         to_field_name='name',
@@ -154,7 +154,7 @@ class ServiceProviderFilterSetForm(NetBoxModelFilterSetForm):
     model = ServiceProvider
     tag = TagFilter()
 
-class ServiceProviderCSVForm(NetBoxModelCSVForm):
+class ServiceProviderCSVForm(NetBoxModelImportForm):
     slug = SlugField()
     comments = CommentField()
     class Meta:
