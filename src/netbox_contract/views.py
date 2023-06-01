@@ -85,7 +85,7 @@ class ContractView(generic.ObjectView):
         invoices_table.configure(request)
         circuit_table = tables.ContractCircuitListTable(instance.circuit.all())
         circuit_table.configure(request)
-        assignements_table = tables.ContractAssignementListTable(instance.assignments.all())
+        assignements_table = tables.ContractAssignementContractTable(instance.assignments.all())
         assignements_table.configure(request)
 
         return {
