@@ -77,4 +77,8 @@ Add support contract assignement panel to devices.
 
 #### version 2.0.2
 
-Add support for Netbox 3.5 whcih become the minimum version supported to accoodate the removal of NetBoxModelCSVForm class (replaced by NetBoxModelImportForm) .
+Add support for Netbox 3.5 which become the minimum version supported to accomodate the removal of NetBoxModelCSVForm class (replaced by NetBoxModelImportForm) .
+
+#### version 2.0.3
+
+* [#60](https://github.com/mlebreuil/netbox-contract/issues/60) Update contract quick search to also filter on fields "External reference" and "Comments".

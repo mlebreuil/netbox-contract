@@ -10,9 +10,10 @@ class ContractFilterSet(NetBoxModelFilterSet):
         fields = ('id', 'external_partie', 'internal_partie', 'status','circuit')
 
     def search(self, queryset, name, value):
-        return queryset.filter( Q(name__icontains=value) 
-                               | Q(circuit__cid__icontains=value) 
-                               | Q(external_partie__name__icontains=value))
+        return queryset.filter( Q(name__icontains=value)
+                               | Q(external_partie__name__icontains=value)
+                               | Q(external_reference__icontains=value)
+                               | Q(comments__icontains=value))
 
 class InvoiceFilterSet(NetBoxModelFilterSet):
 
