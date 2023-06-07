@@ -1,4 +1,5 @@
 {% load render_table from django_tables2 %}
+{% if perms.netbox_contract.view_contract %}
 <div class="row">
     <div class="col col-md-12">
       <div class="card">
@@ -9,3 +10,4 @@
       </div>
     </div>
 </div>
+{% endif %}

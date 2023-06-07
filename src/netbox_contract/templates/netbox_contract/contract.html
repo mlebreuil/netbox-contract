@@ -111,6 +111,7 @@
       </div>
     </div>
   </div>
+  {% if perms.netbox_contract.view_invoice %}
   <div class="row">
     <div class="col col-md-12">
       <div class="card">
@@ -118,13 +119,16 @@
         <div class="card-body table-responsive">
           {% render_table invoices_table %}
         </div>
+        {% if perms.netbox_contract.add_invoice %}
         <div class="card-footer text-end noprint">
           <a href="{% url 'plugins:netbox_contract:invoice_add' %}?contracts={{ object.pk }}" class="btn btn-primary btn-sm">
               <i class="mdi mdi-plus-thick" aria-hidden="true"></i>
               Add an invoice
           </a>
-      </div>
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>
+  {% endif %}
 {% endblock content %}
