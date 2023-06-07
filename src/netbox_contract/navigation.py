@@ -9,7 +9,8 @@ contract_buttons = [
         link='plugins:netbox_contract:contract_add',
         title='Add',
         icon_class='mdi mdi-plus-thick',
-        color=ButtonColorChoices.GREEN
+        color=ButtonColorChoices.GREEN,
+        permissions=['netbox_contract.add_contract']
     )
 ]
 
@@ -18,7 +19,8 @@ invoice_buttons = [
         link='plugins:netbox_contract:invoice_add',
         title='Add',
         icon_class='mdi mdi-plus-thick',
-        color=ButtonColorChoices.GREEN
+        color=ButtonColorChoices.GREEN,
+        permissions=['netbox_contract.add_invoice']
     )
 ]
 
@@ -27,26 +29,30 @@ serviceprovider_buttons = [
         link='plugins:netbox_contract:serviceprovider_add',
         title='Add',
         icon_class='mdi mdi-plus-thick',
-        color=ButtonColorChoices.GREEN
+        color=ButtonColorChoices.GREEN,
+        permissions=['netbox_contract.add_serviceprovider']
     )
 ]
- 
+
 contract_menu_item = PluginMenuItem(
         link='plugins:netbox_contract:contract_list',
         link_text='Contracts',
-        buttons=contract_buttons
+        buttons=contract_buttons,
+        permissions=['netbox_contract.view_contract']
     )
 
 invoices_menu_item = PluginMenuItem(
         link='plugins:netbox_contract:invoice_list',
         link_text='Invoices',
-        buttons=invoice_buttons
+        buttons=invoice_buttons,
+        permissions=['netbox_contract.view_invoice']
     )
 
 service_provider_menu_item = PluginMenuItem(
         link='plugins:netbox_contract:serviceprovider_list',
         link_text='Service Providers',
-        buttons=serviceprovider_buttons
+        buttons=serviceprovider_buttons,
+        permissions=['netbox_contract.view_serviceprovider']
     )
 
 items = (contract_menu_item,invoices_menu_item,service_provider_menu_item)
