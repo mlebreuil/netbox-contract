@@ -54,8 +54,13 @@ service_provider_menu_item = PluginMenuItem(
         buttons=serviceprovider_buttons,
         permissions=['netbox_contract.view_serviceprovider']
     )
+contract_assignemnt_menu_item = PluginMenuItem(
+        link='plugins:netbox_contract:contractassignement_list',
+        link_text='Contract assignements',
+        permissions=['netbox_contract.view_contractassignement']
+    )
 
-items = (contract_menu_item,invoices_menu_item,service_provider_menu_item)
+items = (contract_menu_item,invoices_menu_item,service_provider_menu_item, contract_assignemnt_menu_item)
 
 if plugin_settings.get("top_level_menu"):
     menu = PluginMenu(
