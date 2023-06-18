@@ -73,6 +73,12 @@
               <th scope="row">Invoice frequency</th>
               <td>{{ object.invoice_frequency }}</td>
             </tr>
+            <tr>
+              <th scope="row">Parent</th>
+              <td>
+                <a href="{{ object.parent.get_absolute_url }}">{{ object.parent.name }}</a>
+              </td>
+            </tr>
             {% if object.documents %}
             <tr>
               <th scope="row">Documents</th>

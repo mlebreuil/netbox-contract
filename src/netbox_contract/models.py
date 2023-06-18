@@ -172,6 +172,13 @@ class Contract(NetBoxModel):
     comments = models.TextField(
         blank=True
     )
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        related_name='child',
+        null=True,
+        blank=True
+    )
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:contract', args=[self.pk])

@@ -17,12 +17,16 @@ class ContractForm(NetBoxModelForm):
     external_partie=DynamicModelChoiceField(
         queryset=ServiceProvider.objects.all()
     )
+    parent=DynamicModelChoiceField(
+        queryset=Contract.objects.all(),
+        required=False
+    )
 
     class Meta:
         model = Contract
         fields = ('name', 'external_partie', 'external_reference', 'internal_partie','tenant', 'status',
           'start_date', 'end_date','initial_term', 'renewal_term', 'currency','accounting_dimensions',
-          'mrc', 'nrc','invoice_frequency','circuit', 'documents', 'comments', 'tags')
+          'mrc', 'nrc','invoice_frequency','circuit','parent','documents', 'comments', 'tags')
 
         widgets = {
             'start_date': DatePicker(),
@@ -47,7 +51,7 @@ class InvoiceForm(NetBoxModelForm):
 
 class ContractFilterSetForm(NetBoxModelFilterSetForm):
     model = Contract
-    external_partie=DynamicModelMultipleChoiceField(
+    external_partie=DynamicModelChoiceField(
         queryset=ServiceProvider.objects.all(),
         required=False
     )
@@ -65,6 +69,10 @@ class ContractFilterSetForm(NetBoxModelFilterSetForm):
         queryset=Circuit.objects.all(),
         required=False
     )
+    parent=DynamicModelChoiceField(
+        queryset=Contract.objects.all(),
+        required=False
+    )
 
 class InvoiceFilterSetForm(NetBoxModelFilterSetForm):
     model = Invoice
@@ -77,7 +85,8 @@ class ContractCSVForm(NetBoxModelImportForm):
     circuit = CSVModelChoiceField(
         queryset=Circuit.objects.all(),
         to_field_name='name',
-        help_text='Related Circuit'
+        help_text='Related Circuit',
+        required=False
     )
 
     class Meta:
@@ -85,7 +94,7 @@ class ContractCSVForm(NetBoxModelImportForm):
         fields = [
             'name', 'external_partie', 'internal_partie','tenant', 'status',
             'start_date', 'initial_term', 'renewal_term', 'mrc', 'nrc',
-            'invoice_frequency', 'circuit'
+            'invoice_frequency', 'parent','circuit'
         ]
 
 class ContractBulkEditForm(NetBoxModelBulkEditForm):
@@ -93,9 +102,9 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
         max_length=100,
         required=True
     )
-    external_partie = forms.CharField(
-        max_length=30,
-        required=True
+    external_partie = DynamicModelChoiceField(
+        queryset=ServiceProvider.objects.all(),
+        required=False
     )
     external_reference=forms.CharField(
         max_length=100,
@@ -107,7 +116,12 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
     )
     comments = CommentField()
     circuit=DynamicModelChoiceField(
-        queryset=Circuit.objects.all()
+        queryset=Circuit.objects.all(),
+        required=False
+    )
+    parent = DynamicModelChoiceField(
+        queryset=Contract.objects.all(),
+        required=False
     )
 
     nullable_fields = (
