@@ -1,7 +1,8 @@
 from django import forms
+from django.contrib.contenttypes.models import ContentType
 import django_filters
 from netbox.forms import NetBoxModelForm, NetBoxModelFilterSetForm, NetBoxModelBulkEditForm, NetBoxModelImportForm
-from utilities.forms.fields import CommentField, DynamicModelChoiceField, DynamicModelMultipleChoiceField, MultipleChoiceField, CSVModelChoiceField, SlugField
+from utilities.forms.fields import CommentField, DynamicModelChoiceField, DynamicModelMultipleChoiceField, MultipleChoiceField, CSVModelChoiceField, SlugField, CSVContentTypeField
 from utilities.forms.widgets import DatePicker
 from extras.filters import TagFilter
 from circuits.models import Circuit
@@ -181,6 +182,7 @@ class ContractAssignementForm(NetBoxModelForm):
     contract=DynamicModelChoiceField(
         queryset=Contract.objects.all()
     )
+
     class Meta:
         model = ContractAssignement
         fields = ['content_type', 'object_id', 'contract','tags']
@@ -194,3 +196,16 @@ class ContractAssignementFilterSetForm(NetBoxModelFilterSetForm):
     contract=DynamicModelChoiceField(
         queryset=Contract.objects.all()
     )
+
+class ContractAssignementImportForm(NetBoxModelImportForm):
+    content_type = CSVContentTypeField(
+        queryset=ContentType.objects.all(),
+        help_text="Content Type in the form <app>.<model>"
+    )
+    contract = CSVModelChoiceField(
+        queryset=Contract.objects.all(),
+        help_text="Contract id"
+    )
+    class Meta:
+        model = ContractAssignement
+        fields = ['content_type', 'object_id', 'contract','tags']
