@@ -6,16 +6,17 @@ from utilities.forms.fields import CommentField, DynamicModelChoiceField, Dynami
 from utilities.forms.widgets import DatePicker
 from extras.filters import TagFilter
 from circuits.models import Circuit
+from tenancy.models import Tenant
 from .models import Contract, Invoice, ServiceProvider, StatusChoices, ContractAssignement
 
 class ContractForm(NetBoxModelForm):
     comments = CommentField()
-    circuit=DynamicModelMultipleChoiceField(
-        queryset=Circuit.objects.all(),
-        required=False
-    )
+
     external_partie=DynamicModelChoiceField(
         queryset=ServiceProvider.objects.all()
+    )
+    tenant=DynamicModelChoiceField(
+        queryset=Tenant.objects.all()
     )
     parent=DynamicModelChoiceField(
         queryset=Contract.objects.all(),
@@ -26,7 +27,7 @@ class ContractForm(NetBoxModelForm):
         model = Contract
         fields = ('name', 'external_partie', 'external_reference', 'internal_partie','tenant', 'status',
           'start_date', 'end_date','initial_term', 'renewal_term', 'currency','accounting_dimensions',
-          'mrc', 'nrc','invoice_frequency','circuit','parent','documents', 'comments', 'tags')
+          'mrc', 'nrc','invoice_frequency','parent','documents', 'comments', 'tags')
 
         widgets = {
             'start_date': DatePicker(),
@@ -53,6 +54,10 @@ class ContractFilterSetForm(NetBoxModelFilterSetForm):
     model = Contract
     external_partie=DynamicModelChoiceField(
         queryset=ServiceProvider.objects.all(),
+        required=False
+    )
+    tenant=DynamicModelChoiceField(
+        queryset=Tenant.objects.all(),
         required=False
     )
     external_reference=forms.CharField(
@@ -82,10 +87,21 @@ class InvoiceFilterSetForm(NetBoxModelFilterSetForm):
     )
 
 class ContractCSVForm(NetBoxModelImportForm):
-    circuit = CSVModelChoiceField(
-        queryset=Circuit.objects.all(),
+    external_partie = CSVModelChoiceField(
+        queryset=ServiceProvider.objects.all(),
         to_field_name='name',
-        help_text='Related Circuit',
+        help_text='Service provider name'
+    )
+    tenant = CSVModelChoiceField(
+        queryset=Tenant.objects.all(),
+        to_field_name='name',
+        help_text='Tenant name',
+        required=False
+    )
+    parent = CSVModelChoiceField(
+        queryset=Contract.objects.all(),
+        to_field_name='name',
+        help_text='Contract name',
         required=False
     )
 
@@ -93,8 +109,8 @@ class ContractCSVForm(NetBoxModelImportForm):
         model = Contract
         fields = [
             'name', 'external_partie', 'internal_partie','tenant', 'status',
-            'start_date', 'initial_term', 'renewal_term', 'mrc', 'nrc',
-            'invoice_frequency', 'parent','circuit'
+            'start_date', 'end_date','initial_term', 'renewal_term', 'mrc', 'nrc',
+            'invoice_frequency', 'parent'
         ]
 
 class ContractBulkEditForm(NetBoxModelBulkEditForm):

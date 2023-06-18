@@ -89,4 +89,6 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 * Add bulk update capability for contract assignement
 * [#63](https://github.com/mlebreuil/netbox-contract/issues/63) Correct an API issue on the invoice object.
 * [#64](https://github.com/mlebreuil/netbox-contract/issues/64) Add hierarchy to contract; New parent field created.
-
+* [#65](https://github.com/mlebreuil/netbox-contract/issues/65) Add end date to contact import form.
+* Removed the possibility of add or modify circuits to contracts. The field becomes read only and will be removed in next major release.
+* Make accounting dimensions optional.
