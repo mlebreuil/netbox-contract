@@ -83,3 +83,9 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 
 * [#60](https://github.com/mlebreuil/netbox-contract/issues/60) Update contract quick search to also filter on fields "External reference" and "Comments".
 * [#49](https://github.com/mlebreuil/netbox-contract/issues/49) Manage permissions.
+
+#### version 2.0.4
+
+* Add bulk update capability for contract assignement
+* [#63](https://github.com/mlebreuil/netbox-contract/issues/63) Correct an API issue on the invoice object.
+

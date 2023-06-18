@@ -9,7 +9,7 @@ class ContractViewSet(NetBoxModelViewSet):
 
 class InvoiceViewSet(NetBoxModelViewSet):
     queryset = models.Invoice.objects.prefetch_related(
-        'contract', 'tags'
+        'contracts', 'tags'
     )
     serializer_class = InvoiceSerializer
     filterset_class = filtersets.InvoiceFilterSet
