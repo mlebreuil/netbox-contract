@@ -145,7 +145,8 @@ class Contract(NetBoxModel):
         default=CurrencyChoices.CURRENCY_USD
     )
     accounting_dimensions = models.JSONField(
-        null=True
+        null=True,
+        blank=True
     )
     mrc = models.DecimalField(
         verbose_name = "Monthly recuring cost",
@@ -164,12 +165,19 @@ class Contract(NetBoxModel):
     )
     circuit = models.ManyToManyField(Circuit,
         related_name='contracts',
-        blank=True,
+        blank=True
     )
     documents = models.URLField(
         blank=True
     )
     comments = models.TextField(
+        blank=True
+    )
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        related_name='child',
+        null=True,
         blank=True
     )
 

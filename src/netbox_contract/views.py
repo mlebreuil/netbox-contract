@@ -60,7 +60,7 @@ class ContractAssignementEditView(generic.ObjectEditView):
     form = forms.ContractAssignementForm
 
     def alter_object(self, instance, request, args, kwargs):
-        if not instance.pk:
+        if not instance.pk and kwargs:
             # Assign the object based on URL kwargs
             content_type = get_object_or_404(ContentType, pk=request.GET.get('content_type'))
             instance.object = get_object_or_404(content_type.model_class(), pk=request.GET.get('object_id'))
@@ -74,6 +74,11 @@ class ContractAssignementEditView(generic.ObjectEditView):
 
 class ContractAssignementDeleteView(generic.ObjectDeleteView):
     queryset = models.ContractAssignement.objects.all()
+
+class ContractAssignementBulkImportView(generic.BulkImportView):
+    queryset = models.ContractAssignement.objects.all()
+    model_form = forms.ContractAssignementImportForm
+    table = tables.ContractAssignementListTable
 
 # Contract views
 

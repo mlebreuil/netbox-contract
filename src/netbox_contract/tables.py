@@ -63,13 +63,16 @@ class ContractListTable(NetBoxTable):
         linkify=True
     )
     circuit = tables.ManyToManyColumn()
+    parent = tables.Column(
+        linkify=True
+    )
 
     class Meta(NetBoxTable.Meta):
         model = Contract
         fields = ('pk', 'id', 'name', 'circuit', 'external_partie',
          'external_reference','internal_partie', 'status', 'mrc',
-         'comments', 'actions')
-        default_columns = ('name', 'status', 'circuit')
+         'parent','comments', 'actions')
+        default_columns = ('name', 'status', 'parent','circuit')
 
 class ContractListBottomTable(NetBoxTable):
     name = tables.Column(

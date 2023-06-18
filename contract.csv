@@ -1,0 +1,2 @@
+name,external_partie,internal_partie,tenant,status,start_date,end_date,mrc,nrc,invoice_frequency
+Contract10,ServiceProvider1,Nagra USA,Tenant1,Active,2023-06-01,2024-05-30,100,1000,1

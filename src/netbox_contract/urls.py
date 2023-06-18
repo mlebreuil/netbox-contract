@@ -45,6 +45,7 @@ urlpatterns = (
     # Contract assignements
     path('assignements/', views.ContractAssignementListView.as_view(), name='contractassignement_list'),
     path('assignements/add/', views.ContractAssignementEditView.as_view(), name='contractassignement_add'),
+    path('assignements/import/', views.ContractAssignementBulkImportView.as_view(), name='contractassignement_import'),
     path('assignements/<int:pk>/', views.ContractAssignementView.as_view(), name='contractassignement'),
     path('assignements/<int:pk>/edit/', views.ContractAssignementEditView.as_view(), name='contractassignement_edit'),
     path('assignements/<int:pk>/delete/', views.ContractAssignementDeleteView.as_view(), name='contractassignement_delete'),

@@ -50,11 +50,12 @@ class ContractSerializer(NetBoxModelSerializer):
     )
     circuit= NestedCircuitSerializer(many=True, required=False)
     external_partie = NestedServiceProviderSerializer(many=False)
+    parent = NestedContracSerializer(many=False, required=False)
 
     class Meta:
         model = Contract
         fields = (
-            'id', 'url','display', 'name', 'status', 'external_partie','internal_partie','circuit','comments',
+            'id', 'url','display', 'name', 'status', 'external_partie','internal_partie','parent','circuit','comments',
             'tags', 'custom_fields', 'created', 'last_updated',
         )
 
