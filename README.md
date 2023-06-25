@@ -92,3 +92,7 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 * [#65](https://github.com/mlebreuil/netbox-contract/issues/65) Add end date to contact import form.
 * Removed the possibility of add or modify circuits to contracts. The field becomes read only and will be removed in next major release.
 * Make accounting dimensions optional.
+
+#### version 2.0.5
+
+* [#75](https://github.com/mlebreuil/netbox-contract/issues/74) Fix contract assignement for service providers.
