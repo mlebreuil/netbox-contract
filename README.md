@@ -96,3 +96,4 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 #### version 2.0.5
 
 * [#75](https://github.com/mlebreuil/netbox-contract/issues/74) Fix contract assignement for service providers.
+* [#73](https://github.com/mlebreuil/netbox-contract/issues/73) Add comment field to contract import form
