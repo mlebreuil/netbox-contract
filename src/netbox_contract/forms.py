@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.contenttypes.models import ContentType
 import django_filters
 from netbox.forms import NetBoxModelForm, NetBoxModelFilterSetForm, NetBoxModelBulkEditForm, NetBoxModelImportForm
-from utilities.forms.fields import CommentField, DynamicModelChoiceField, DynamicModelMultipleChoiceField, MultipleChoiceField, CSVModelChoiceField, SlugField, CSVContentTypeField
+from utilities.forms.fields import CommentField, CSVChoiceField, DynamicModelChoiceField, DynamicModelMultipleChoiceField, MultipleChoiceField, CSVModelChoiceField, SlugField, CSVContentTypeField
 from utilities.forms.widgets import DatePicker
 from extras.filters import TagFilter
 from circuits.models import Circuit
@@ -98,6 +98,10 @@ class ContractCSVForm(NetBoxModelImportForm):
         help_text='Tenant name',
         required=False
     )
+    status = CSVChoiceField(
+        choices=StatusChoices,
+        help_text='Contract status'
+    )
     parent = CSVModelChoiceField(
         queryset=Contract.objects.all(),
         to_field_name='name',
@@ -108,9 +112,9 @@ class ContractCSVForm(NetBoxModelImportForm):
     class Meta:
         model = Contract
         fields = [
-            'name', 'external_partie', 'internal_partie','tenant', 'status',
+            'name', 'external_partie', 'internal_partie', 'external_reference','tenant', 'status',
             'start_date', 'end_date','initial_term', 'renewal_term', 'mrc', 'nrc',
-            'invoice_frequency', 'parent'
+            'invoice_frequency', 'documents', 'comments', 'parent'
         ]
 
 class ContractBulkEditForm(NetBoxModelBulkEditForm):
