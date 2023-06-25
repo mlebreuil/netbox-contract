@@ -57,6 +57,7 @@ class ContractAssignementListView(generic.ObjectListView):
     table = tables.ContractAssignementListTable
     filterset = filtersets.ContractAssignementFilterSet
     filterset_form = forms.ContractAssignementFilterSetForm
+    actions = ['import', 'export', ]
 
 class ContractAssignementEditView(generic.ObjectEditView):
     queryset = ContractAssignement.objects.all()
