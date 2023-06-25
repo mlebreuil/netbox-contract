@@ -34,8 +34,10 @@ class ContractAssignementObjectTable(NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = ContractAssignement
-        fields = ('pk','contract','contract__external_partie','contract__status', 'actions')
-        default_columns = ('pk', 'contract','contract__external_partie','contract__status')
+        fields = ('pk','contract','contract__external_partie','contract__status','contract__start_date',
+                  'contract__end_date','contract__mrc','contract__nrc', 'actions')
+        default_columns = ('pk', 'contract','contract__external_partie','contract__status','contract__start_date',
+                  'contract__end_date','contract__mrc','contract__nrc',)
 
 class ContractAssignementContractTable(NetBoxTable):
     content_type = columns.ContentTypeColumn(
@@ -43,7 +45,11 @@ class ContractAssignementContractTable(NetBoxTable):
     )
     content_object = tables.Column(
         linkify=True,
+        verbose_name='Object',
         orderable=False
+    )
+    content_object__status = tables.Column(
+        verbose_name='Status'
     )
     actions = columns.ActionsColumn(
         actions=('edit', 'delete')
@@ -51,8 +57,8 @@ class ContractAssignementContractTable(NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = ContractAssignement
-        fields = ('pk', 'content_type', 'content_object','actions')
-        default_columns = ('pk', 'content_type', 'content_object')
+        fields = ('pk', 'content_type', 'content_object','content_object__status','actions')
+        default_columns = ('pk', 'content_type', 'content_object','content_object__status')
 
 class ContractListTable(NetBoxTable):
 
