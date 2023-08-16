@@ -99,3 +99,6 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 * [#73](https://github.com/mlebreuil/netbox-contract/issues/73) Add comment field to contract import form
 * [#72](https://github.com/mlebreuil/netbox-contract/issues/72) Add fields to the contract assignement bottom tables
 * Remove the 'add' actions from the contract assignment list view
+
+#### version 2.0.6
+* [#80](https://github.com/mlebreuil/netbox-contract/issues/80) fFix missing fields in the API.
