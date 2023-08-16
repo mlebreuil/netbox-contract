@@ -1,7 +1,7 @@
 from drf_yasg.utils import swagger_serializer_method
 from rest_framework import serializers
 from django.contrib.auth.models import ContentType
-from circuits.api.nested_serializers import NestedCircuitSerializer
+from tenancy.api.nested_serializers import NestedTenantSerializer
 from netbox.api.serializers import NetBoxModelSerializer, WritableNestedSerializer
 from netbox.api.fields import ContentTypeField
 from netbox.constants import NESTED_SERIALIZER_PREFIX
@@ -48,15 +48,18 @@ class ContractSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_contract-api:contract-detail'
     )
-    circuit= NestedCircuitSerializer(many=True, required=False)
+    #circuit= NestedCircuitSerializer(many=True, required=False)
     external_partie = NestedServiceProviderSerializer(many=False)
     parent = NestedContracSerializer(many=False, required=False)
+    tenant= NestedTenantSerializer(many=False, required=False)
 
     class Meta:
         model = Contract
         fields = (
-            'id', 'url','display', 'name', 'status', 'external_partie','internal_partie','parent','circuit','comments',
-            'tags', 'custom_fields', 'created', 'last_updated',
+            'id', 'url','display', 'name', 'external_partie','external_reference', 'internal_partie',
+            'tenant','status','start_date','end_date','initial_term','renewal_term',
+            'currency','accounting_dimensions','mrc','nrc','invoice_frequency','comments',
+            'parent','tags', 'custom_fields', 'created', 'last_updated',
         )
 
 class InvoiceSerializer(NetBoxModelSerializer):
@@ -68,8 +71,10 @@ class InvoiceSerializer(NetBoxModelSerializer):
     class Meta:
         model = Invoice
         fields = (
-            'id', 'url', 'display', 'number', 'date', 'contracts', 'tags', 'custom_fields', 'created',
-            'last_updated',
+            'id', 'url', 'display', 'number', 'date', 'contracts',
+            'period_start','period_end','currency','accounting_dimensions',
+            'amount','comments',
+            'tags', 'custom_fields', 'created','last_updated',
         )
 
 class ServiceProviderSerializer(NetBoxModelSerializer):
