@@ -70,10 +70,6 @@ class ContractFilterSetForm(NetBoxModelFilterSetForm):
         choices=StatusChoices,
         required= False
     )
-    circuit = DynamicModelMultipleChoiceField(
-        queryset=Circuit.objects.all(),
-        required=False
-    )
     parent=DynamicModelChoiceField(
         queryset=Contract.objects.all(),
         required=False
@@ -112,9 +108,9 @@ class ContractCSVForm(NetBoxModelImportForm):
     class Meta:
         model = Contract
         fields = [
-            'name', 'external_partie', 'internal_partie', 'external_reference','tenant', 'status',
-            'start_date', 'end_date','initial_term', 'renewal_term', 'mrc', 'nrc',
-            'invoice_frequency', 'documents', 'comments', 'parent'
+            'name', 'external_partie', 'external_reference', 'internal_partie', 'tenant', 'status',
+            'start_date', 'end_date','initial_term', 'renewal_term', 'currency', 'accounting_dimensions',
+            'mrc', 'nrc','invoice_frequency', 'documents', 'comments', 'parent'
         ]
 
 class ContractBulkEditForm(NetBoxModelBulkEditForm):
@@ -159,8 +155,8 @@ class InvoiceCSVForm(NetBoxModelImportForm):
     class Meta:
         model = Invoice
         fields = [
-            'number', 'date', 'contracts','period_start', 'period_end',
-            'amount', 'tags'
+            'number','date','contracts','period_start', 'period_end',
+            'currency','accounting_dimensions','amount','documents','comments','tags'
         ]
 
 class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
