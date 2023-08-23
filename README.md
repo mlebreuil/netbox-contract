@@ -101,4 +101,7 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 * Remove the 'add' actions from the contract assignment list view
 
 #### version 2.0.6
-* [#80](https://github.com/mlebreuil/netbox-contract/issues/80) fFix missing fields in the API.
+* [#80](https://github.com/mlebreuil/netbox-contract/issues/80) Fix missing fields in the API.
+
+#### version 2.0.7
+* [#85](https://github.com/mlebreuil/netbox-contract/issues/85) Fix missing fields contract and invoice import and export forms.
