@@ -68,17 +68,16 @@ class ContractListTable(NetBoxTable):
     external_partie = tables.Column(
         linkify=True
     )
-    circuit = tables.ManyToManyColumn()
     parent = tables.Column(
         linkify=True
     )
 
     class Meta(NetBoxTable.Meta):
         model = Contract
-        fields = ('pk', 'id', 'name', 'circuit', 'external_partie',
-         'external_reference','internal_partie', 'status', 'mrc',
-         'parent','comments', 'actions')
-        default_columns = ('name', 'status', 'parent','circuit')
+        fields = ('pk', 'id','name', 'external_partie', 'external_reference', 'internal_partie', 'tenant', 'status',
+            'start_date', 'end_date','initial_term', 'renewal_term', 'currency', 'accounting_dimensions',
+            'mrc', 'nrc','invoice_frequency', 'documents', 'comments', 'parent','actions')
+        default_columns = ('name', 'status', 'parent')
 
 class ContractListBottomTable(NetBoxTable):
     name = tables.Column(
@@ -101,8 +100,8 @@ class InvoiceListTable(NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = Invoice
-        fields = ('pk', 'id', 'number', 'date', 'contracts', 'period_start',
-          'period_end', 'amount', 'actions')
+        fields = ('pk', 'id', 'number', 'date', 'contracts','period_start', 'period_end',
+                  'currency','accounting_dimensions','amount', 'documents','comments', 'actions')
         default_columns = ('number', 'date', 'contracts', 'period_start', 'period_end', 'amount')
 
 
