@@ -35,6 +35,7 @@ class CurrencyChoices(ChoiceSet):
         (CURRENCY_USD, 'USD'),
         ('eur', 'EUR'),
         ('chf', 'CHF'),
+        ('pln', 'PLN'),
     ]
 
 class ServiceProvider(NetBoxModel):
