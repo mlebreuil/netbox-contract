@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.contenttypes.models import ContentType
 import django_filters
 from netbox.forms import NetBoxModelForm, NetBoxModelFilterSetForm, NetBoxModelBulkEditForm, NetBoxModelImportForm
-from utilities.forms.fields import CommentField, CSVChoiceField, DynamicModelChoiceField, DynamicModelMultipleChoiceField, MultipleChoiceField, CSVModelChoiceField, SlugField, CSVContentTypeField
+from utilities.forms.fields import CommentField, CSVChoiceField, DynamicModelChoiceField, DynamicModelMultipleChoiceField, CSVModelChoiceField, SlugField, CSVContentTypeField
 from utilities.forms.widgets import DatePicker
 from extras.filters import TagFilter
 from circuits.models import Circuit
@@ -66,9 +66,9 @@ class ContractFilterSetForm(NetBoxModelFilterSetForm):
     internal_partie= forms.CharField(
         required=False
     )
-    status = MultipleChoiceField(
+    status = django_filters.MultipleChoiceField(
         choices=StatusChoices,
-        required= False
+        required=False
     )
     parent=DynamicModelChoiceField(
         queryset=Contract.objects.all(),
