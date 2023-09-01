@@ -66,7 +66,7 @@ class ContractFilterSetForm(NetBoxModelFilterSetForm):
     internal_partie= forms.CharField(
         required=False
     )
-    status = django_filters.MultipleChoiceField(
+    status = django_filters.MultipleChoiceFilter(
         choices=StatusChoices,
         required=False
     )
