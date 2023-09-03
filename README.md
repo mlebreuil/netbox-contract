@@ -117,3 +117,6 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 * [#85](https://github.com/mlebreuil/netbox-contract/issues/85) Fix missing fields contract and invoice import and export forms.
 
 #### version 2.0.8
+* [#91](https://github.com/mlebreuil/netbox-contract/issues/91) Replace deprecated ( in netbox version 3.6) MultipleChoiceField.  
+* [48](https://github.com/mlebreuil/netbox-contract/issues/48) Allow other plugin to inject visual in contract and invoice forms.  
+* [89] (https://github.com/mlebreuil/netbox-contract/issues/89) Add contract assignement to virtual machines.
