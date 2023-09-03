@@ -1,4 +1,5 @@
 {% extends 'generic/object.html' %}
+{% load plugins %}
 {% load render_table from django_tables2 %}
 {% block breadcrumbs %}
   {{ block.super }}
@@ -69,4 +70,5 @@
       {% include 'inc/panels/comments.html' %}
     </div>
   </div>
+{% plugin_right_page object %}
 {% endblock content %}
