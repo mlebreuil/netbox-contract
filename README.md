@@ -53,6 +53,16 @@ FIELD_CHOICES = {
         ('Nagravision SARL', 'Nagravision SARL', 'green'),
         ('Nagra USA', 'Nagra USA', 'green'),
         ('Nagra India', 'Nagra India', 'green'),
+    ),
+    'netbox_contract.Contract.currency': (
+        ('usd', 'USD'),
+        ('eur', 'EUR'),
+        ('chf', 'CHF'),
+        ('pln', 'PLN'),
+    ),
+    'netbox_contract.Contract.status': (
+        ('Active', 'Active', 'green'),
+        ('Cancled', 'Canceled', 'red'),
     )
 }
 
@@ -105,3 +115,5 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 
 #### version 2.0.7
 * [#85](https://github.com/mlebreuil/netbox-contract/issues/85) Fix missing fields contract and invoice import and export forms.
+
+#### version 2.0.8
