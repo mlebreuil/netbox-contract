@@ -17,7 +17,7 @@ class NestedServiceProviderSerializer(WritableNestedSerializer):
         model = ServiceProvider
         fields = ('id', 'url', 'display', 'name')
 
-class NestedContracSerializer(WritableNestedSerializer):
+class NestedContractSerializer(WritableNestedSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_contract-api:contract-detail'
     )
@@ -50,7 +50,7 @@ class ContractSerializer(NetBoxModelSerializer):
     )
     #circuit= NestedCircuitSerializer(many=True, required=False)
     external_partie = NestedServiceProviderSerializer(many=False)
-    parent = NestedContracSerializer(many=False, required=False)
+    parent = NestedContractSerializer(many=False, required=False)
     tenant= NestedTenantSerializer(many=False, required=False)
 
     class Meta:
@@ -66,7 +66,7 @@ class InvoiceSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_contract-api:invoice-detail'
     )
-    contracts = NestedContracSerializer(many=True, required=False)
+    contracts = NestedContractSerializer(many=True, required=False)
 
     class Meta:
         model = Invoice
@@ -95,7 +95,7 @@ class ContractAssignementSerializer(NetBoxModelSerializer):
         queryset=ContentType.objects.all()
     )
     content_object = serializers.SerializerMethodField(read_only=True)
-    contract = NestedContracSerializer()
+    contract = NestedContractSerializer()
 
     class Meta:
         model = ContractAssignement
