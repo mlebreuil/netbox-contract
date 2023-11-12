@@ -1,5 +1,7 @@
 from netbox.search import SearchIndex, register_search
-from .models import ServiceProvider, Contract, Invoice
+
+from .models import Contract, Invoice, ServiceProvider
+
 
 @register_search
 class ServiceProviderIndex(SearchIndex):
@@ -9,6 +11,7 @@ class ServiceProviderIndex(SearchIndex):
         ('comments', 5000),
     )
 
+
 @register_search
 class ContractIndex(SearchIndex):
     model = Contract
@@ -16,6 +19,7 @@ class ContractIndex(SearchIndex):
         ('name', 100),
         ('comments', 5000),
     )
+
 
 @register_search
 class InvoiceIndex(SearchIndex):

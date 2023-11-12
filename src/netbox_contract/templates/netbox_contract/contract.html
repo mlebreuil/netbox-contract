@@ -16,10 +16,14 @@
               <th scope="row">Name</th>
               <td>{{ object.name }}</td>
             </tr>
+                <tr>
+              <th scope="row">External partie type</th>
+              <td>{{ object.external_partie_object_type }}</td>
+            </tr>
             <tr>
               <th scope="row">External partie</th>
               <td>
-                <a href="{{ object.external_partie.get_absolute_url }}">{{ object.external_partie.name }}</a>
+                <a href="{{ object.external_partie_object.get_absolute_url }}">{{ object.external_partie_object.name }}</a>
               </td>
             </tr>
             <tr>

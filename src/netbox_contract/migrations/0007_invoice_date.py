@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ("netbox_contract", "0006_alter_contract_circuit"),
+        ('netbox_contract', '0006_alter_contract_circuit'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="invoice",
-            name="date",
+            model_name='invoice',
+            name='date',
             field=models.DateField(blank=True, null=True),
         ),
     ]
