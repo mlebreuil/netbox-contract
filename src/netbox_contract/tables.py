@@ -10,6 +10,7 @@ class ContractAssignementListTable(NetBoxTable):
     content_object = tables.Column(linkify=True, orderable=False)
     contract = tables.Column(linkify=True)
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
+    contract__external_partie_object = tables.Column(linkify=True)
 
     class Meta(NetBoxTable.Meta):
         model = ContractAssignement
@@ -18,7 +19,8 @@ class ContractAssignementListTable(NetBoxTable):
             'content_type',
             'content_object',
             'contract',
-            'contract__external_partie',
+            'contract__external_partie_object_type',
+            'contract__external_partie_object',
             'actions',
         )
         default_columns = (
@@ -26,20 +28,23 @@ class ContractAssignementListTable(NetBoxTable):
             'content_type',
             'content_object',
             'contract',
-            'contract__external_partie',
+            'contract__external_partie_object_type',
+            'contract__external_partie_object',
         )
 
 
 class ContractAssignementObjectTable(NetBoxTable):
     contract = tables.Column(linkify=True)
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
+    contract__external_partie_object = tables.Column(linkify=True)
 
     class Meta(NetBoxTable.Meta):
         model = ContractAssignement
         fields = (
             'pk',
             'contract',
-            'contract__external_partie',
+            'contract__external_partie_object_type',
+            'contract__external_partie_object',
             'contract__status',
             'contract__start_date',
             'contract__end_date',
@@ -50,7 +55,8 @@ class ContractAssignementObjectTable(NetBoxTable):
         default_columns = (
             'pk',
             'contract',
-            'contract__external_partie',
+            'contract__external_partie_object_type',
+            'contract__external_partie_object',
             'contract__status',
             'contract__start_date',
             'contract__end_date',
@@ -118,6 +124,7 @@ class ContractListTable(NetBoxTable):
 
 class ContractListBottomTable(NetBoxTable):
     name = tables.Column(linkify=True)
+    external_partie_object = tables.Column(linkify=True)
 
     class Meta(NetBoxTable.Meta):
         model = Contract
@@ -126,6 +133,7 @@ class ContractListBottomTable(NetBoxTable):
             'id',
             'name',
             'all_circuits',
+            'external_partie_object_type',
             'external_partie_object',
             'external_reference',
             'internal_partie',
@@ -134,7 +142,12 @@ class ContractListBottomTable(NetBoxTable):
             'comments',
             'actions',
         )
-        default_columns = ('name', 'external_partie_object', 'status')
+        default_columns = (
+            'name',
+            'external_partie_object_type',
+            'external_partie_object',
+            'status',
+        )
 
 
 class InvoiceListTable(NetBoxTable):

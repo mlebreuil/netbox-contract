@@ -7,12 +7,11 @@ from .models import Contract, ContractAssignement, Invoice, ServiceProvider
 class ContractFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = Contract
-        fields = ('id', 'external_partie', 'internal_partie', 'status', 'parent')
+        fields = ('id', 'internal_partie', 'status', 'parent')
 
     def search(self, queryset, name, value):
         return queryset.filter(
             Q(name__icontains=value)
-            | Q(external_partie__name__icontains=value)
             | Q(external_reference__icontains=value)
             | Q(comments__icontains=value)
         )

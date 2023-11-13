@@ -21,6 +21,7 @@ from utilities.forms.fields import (
 )
 from utilities.forms.widgets import DatePicker, HTMXSelect
 
+from .constants import SERVICE_PROVIDER_MODELS
 from .models import (
     Contract,
     ContractAssignement,
@@ -34,7 +35,8 @@ class ContractForm(NetBoxModelForm):
     comments = CommentField()
 
     external_partie_object_type = ContentTypeChoiceField(
-        queryset=ContentType.objects.filter(model__in=['serviceprovider', 'provider']),
+        queryset=ContentType.objects.all(),
+        limit_choices_to=SERVICE_PROVIDER_MODELS,
         widget=HTMXSelect(),
     )
     external_partie_object = forms.ModelChoiceField(queryset=None)
@@ -154,10 +156,13 @@ class InvoiceFilterSetForm(NetBoxModelFilterSetForm):
 
 
 class ContractCSVForm(NetBoxModelImportForm):
-    external_partie = CSVModelChoiceField(
-        queryset=ServiceProvider.objects.all(),
-        to_field_name='name',
-        help_text='Service provider name',
+    external_partie_object_type = CSVContentTypeField(
+        queryset=ContentType.objects.all(),
+        limit_choices_to=SERVICE_PROVIDER_MODELS,
+        help_text='service provider object type in the form <app>.<model>',
+    )
+    external_partie_object_id = forms.CharField(
+        help_text='service provider object name', label='external_partie_name'
     )
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
@@ -177,7 +182,8 @@ class ContractCSVForm(NetBoxModelImportForm):
         model = Contract
         fields = [
             'name',
-            'external_partie',
+            'external_partie_object_type',
+            'external_partie_object_id',
             'external_reference',
             'internal_partie',
             'tenant',
@@ -196,12 +202,20 @@ class ContractCSVForm(NetBoxModelImportForm):
             'parent',
         ]
 
+    def clean_external_partie_object_id(self):
+        name = self.cleaned_data.get('external_partie_object_id')
+        external_partie_object_type = self.cleaned_data.get(
+            'external_partie_object_type'
+        )
+        external_partie_object = external_partie_object_type.get_object_for_this_type(
+            name=name
+        )
+
+        return external_partie_object.id
+
 
 class ContractBulkEditForm(NetBoxModelBulkEditForm):
     name = forms.CharField(max_length=100, required=True)
-    external_partie = DynamicModelChoiceField(
-        queryset=ServiceProvider.objects.all(), required=False
-    )
     external_reference = forms.CharField(max_length=100, required=False)
     internal_partie = forms.CharField(max_length=30, required=True)
     comments = CommentField()

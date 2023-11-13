@@ -141,8 +141,6 @@ class ContractEditView(generic.ObjectEditView):
 
     def alter_object(self, obj, request, url_args, url_kwargs):
         """
-        When this method is called after a Get,
-        it initialize object fields from request data
         When this method is called after a Post,
         it is used here to set the external partie object id for exiting objects,
         In any case, this happens before the form is instanciated.
