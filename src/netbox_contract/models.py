@@ -98,7 +98,6 @@ class Contract(NetBoxModel):
     internal_partie = models.CharField(
         max_length=50,
         choices=InternalEntityChoices,
-        default=StatusChoices.STATUS_ACTIVE,
     )
     tenant = models.ForeignKey(
         to='tenancy.Tenant',

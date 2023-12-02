@@ -180,9 +180,7 @@ class ContractBulkImportView(generic.BulkImportView):
 
 
 class ContractBulkEditView(generic.BulkEditView):
-    queryset = Contract.objects.annotate(
-        count_circuits=count_related(Circuit, 'contracts')
-    )
+    queryset = Contract.objects.all()
     filterset = filtersets.ContractFilterSet
     table = tables.ContractListTable
     form = forms.ContractBulkEditForm

@@ -1,4 +1,3 @@
-from circuits.models import Circuit
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 from extras.filters import TagFilter
@@ -25,6 +24,7 @@ from .constants import SERVICE_PROVIDER_MODELS
 from .models import (
     Contract,
     ContractAssignement,
+    InternalEntityChoices,
     Invoice,
     ServiceProvider,
     StatusChoices,
@@ -215,11 +215,11 @@ class ContractCSVForm(NetBoxModelImportForm):
 
 
 class ContractBulkEditForm(NetBoxModelBulkEditForm):
-    name = forms.CharField(max_length=100, required=True)
+    name = forms.CharField(max_length=100, required=False)
+
     external_reference = forms.CharField(max_length=100, required=False)
-    internal_partie = forms.CharField(max_length=30, required=True)
-    comments = CommentField()
-    circuit = DynamicModelChoiceField(queryset=Circuit.objects.all(), required=False)
+    internal_partie = forms.ChoiceField(choices=InternalEntityChoices, required=False)
+    comments = CommentField(required=False)
     parent = DynamicModelChoiceField(queryset=Contract.objects.all(), required=False)
 
     nullable_fields = ('comments',)
