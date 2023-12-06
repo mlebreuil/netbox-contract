@@ -114,8 +114,6 @@ class ContractView(generic.ObjectView):
     def get_extra_context(self, request, instance):
         invoices_table = tables.InvoiceListTable(instance.invoices.all())
         invoices_table.configure(request)
-        circuit_table = tables.ContractCircuitListTable(instance.circuit.all())
-        circuit_table.configure(request)
         assignements_table = tables.ContractAssignementContractTable(
             instance.assignments.all()
         )
@@ -123,7 +121,6 @@ class ContractView(generic.ObjectView):
 
         return {
             'invoices_table': invoices_table,
-            'circuit_table': circuit_table,
             'assignements_table': assignements_table,
         }
 

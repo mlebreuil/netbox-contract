@@ -8,22 +8,6 @@ from . import tables
 from .models import ContractAssignement
 
 
-class CircuitContracts(PluginTemplateExtension):
-    model = 'circuits.circuit'
-
-    def full_width_page(self):
-        circuit = self.context['object']
-        table = tables.ContractListBottomTable(circuit.contracts.all())
-        table.configure(self.context['request'])
-
-        return self.render(
-            'contract_list_bottom.html',
-            extra_context={
-                'contracts_table': table,
-            },
-        )
-
-
 class CircuitContractAssignements(PluginTemplateExtension):
     model = 'circuits.circuit'
 
@@ -91,7 +75,6 @@ class VMContractAssignements(PluginTemplateExtension):
 
 
 template_extensions = [
-    CircuitContracts,
     CircuitContractAssignements,
     DeviceContractAssignements,
     VMContractAssignements,

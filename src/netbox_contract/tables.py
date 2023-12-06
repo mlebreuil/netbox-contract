@@ -1,5 +1,4 @@
 import django_tables2 as tables
-from circuits.models import Circuit
 from netbox.tables import NetBoxTable, columns
 
 from .models import Contract, ContractAssignement, Invoice, ServiceProvider
@@ -179,16 +178,6 @@ class InvoiceListTable(NetBoxTable):
             'period_end',
             'amount',
         )
-
-
-class ContractCircuitListTable(NetBoxTable):
-    cid = tables.Column(linkify=True)
-    provider = tables.Column(linkify=True)
-
-    class Meta(NetBoxTable.Meta):
-        model = Circuit
-        fields = ('pk', 'id', 'cid', 'provider', 'type', 'status')
-        default_columns = ('cid', 'provider', 'status')
 
 
 class ServiceProviderListTable(NetBoxTable):
