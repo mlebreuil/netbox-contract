@@ -31,3 +31,9 @@ zip-safe = false
 where = ["src"]
 include = ["*"]
 namespaces = false
+
+[tool.black]
+skip-string-normalization = true
+
+[tool.isort]
+profile = "black"

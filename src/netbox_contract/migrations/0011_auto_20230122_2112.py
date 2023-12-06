@@ -2,20 +2,21 @@
 
 from django.db import migrations
 
+
 def make_many_contracts(apps, schema_editor):
     """
-        Adds the Contract object in Invoice.contract to the
-        many-to-many relationship in Invoice.contracts
+    Adds the Contract object in Invoice.contract to the
+    many-to-many relationship in Invoice.contracts
     """
     Invoice = apps.get_model('netbox_contract', 'Invoice')
 
     for invoice in Invoice.objects.all():
         invoice.contracts.add(invoice.contract)
 
-class Migration(migrations.Migration):
 
+class Migration(migrations.Migration):
     dependencies = [
-        ("netbox_contract", "0010_invoice_contracts"),
+        ('netbox_contract', '0010_invoice_contracts'),
     ]
 
     operations = [
