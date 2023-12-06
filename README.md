@@ -123,3 +123,5 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 
 #### version 2.0.9
 * [42](https://github.com/mlebreuil/netbox-contract/issues/42) Allow the selection of either providers or Service providers as contract third partie.
+* Removed all reference to the direct assignement of circuits to contracts
+
