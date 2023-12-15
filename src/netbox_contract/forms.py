@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from extras.filters import TagFilter
 from netbox.forms import (
@@ -16,6 +17,7 @@ from utilities.forms.fields import (
     CSVModelChoiceField,
     DynamicModelChoiceField,
     DynamicModelMultipleChoiceField,
+    JSONField,
     SlugField,
 )
 from utilities.forms.widgets import DatePicker, HTMXSelect
@@ -30,6 +32,19 @@ from .models import (
     StatusChoices,
 )
 
+plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
+default_dimensions = plugin_settings.get('default_accounting_dimensions')
+
+
+class Dimensions(JSONField):
+    """
+    Custom wrapper around Netbox's JSONField
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.widget.attrs['placeholder'] = str(default_dimensions)
+
 
 class ContractForm(NetBoxModelForm):
     comments = CommentField()
@@ -42,10 +57,13 @@ class ContractForm(NetBoxModelForm):
     external_partie_object = forms.ModelChoiceField(queryset=None)
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all())
     parent = DynamicModelChoiceField(queryset=Contract.objects.all(), required=False)
+    accounting_dimensions = Dimensions()
 
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', None)
         super().__init__(*args, **kwargs)
+
+        # Initialize the external party object gfk
         if initial and 'external_partie_object_type' in initial:
             external_partie_object_type = ContentType.objects.get_for_id(
                 initial['external_partie_object_type']
@@ -79,6 +97,11 @@ class ContractForm(NetBoxModelForm):
                 'external_partie_object'
             ].queryset = ServiceProvider.objects.all()
             self.fields['external_partie_object'].initial = None
+
+        # initialize accounting dimentsions widget
+        # self.fields[
+        #         'accounting_dimensions'
+        #     ].widget.attrs['placeholder'] = '{"key": "value"}'
 
     class Meta:
         model = Contract
