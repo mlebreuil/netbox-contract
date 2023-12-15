@@ -118,10 +118,13 @@ class ContractView(generic.ObjectView):
             instance.assignments.all()
         )
         assignements_table.configure(request)
+        childs_table = tables.ContractListBottomTable(instance.childs.all())
+        childs_table.configure(request)
 
         return {
             'invoices_table': invoices_table,
             'assignements_table': assignements_table,
+            'childs_table': childs_table,
         }
 
 

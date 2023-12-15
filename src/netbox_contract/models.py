@@ -134,7 +134,7 @@ class Contract(NetBoxModel):
     documents = models.URLField(blank=True)
     comments = models.TextField(blank=True)
     parent = models.ForeignKey(
-        'self', on_delete=models.CASCADE, related_name='child', null=True, blank=True
+        'self', on_delete=models.CASCADE, related_name='childs', null=True, blank=True
     )
 
     def get_absolute_url(self):
