@@ -129,4 +129,8 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 #### version 2.0.9
 * [42](https://github.com/mlebreuil/netbox-contract/issues/42) Allow the selection of either providers or Service providers as contract third partie.
 * Removed all reference to the direct assignement of circuits to contracts
+* [88](https://github.com/mlebreuil/netbox-contract/issues/88) Add a placeholder value to the accounting dimensions jsonfield. This placeholder vale con be configured as part of the PLUGINS_CONFIG parameter in the configuration.py file (see above)
+* [89](https://github.com/mlebreuil/netbox-contract/issues/89) add the posibility to link contracts to sites and virtual machines.
+* [99](https://github.com/mlebreuil/netbox-contract/issues/99) list child contracts in on the parent view.
+
 
