@@ -131,7 +131,6 @@ class ContractListBottomTable(NetBoxTable):
             'pk',
             'id',
             'name',
-            'all_circuits',
             'external_partie_object_type',
             'external_partie_object',
             'external_reference',
