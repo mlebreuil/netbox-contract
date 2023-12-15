@@ -37,13 +37,18 @@ Customize the location of the plugin's menu:
 # configuration.py
 PLUGINS_CONFIG = {
     'netbox_contract': {
-        'top_level_menu': True
+        'top_level_menu': True,
+        'default_accounting_dimensions':{
+            "account": "", 
+            "project": "", 
+            "cost center": ""
+        }
     }
 }
 
 ```
 
-Customize the internal partie field.  
+Customize fields choices.  
 Internal partie reference the legal entity of your organization that is a partie to the contract.  
 
 ```python
@@ -117,3 +122,15 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 * [#85](https://github.com/mlebreuil/netbox-contract/issues/85) Fix missing fields contract and invoice import and export forms.
 
 #### version 2.0.8
+* [#91](https://github.com/mlebreuil/netbox-contract/issues/91) Replace deprecated ( in netbox version 3.6) MultipleChoiceField.  
+* [48](https://github.com/mlebreuil/netbox-contract/issues/48) Allow other plugin to inject visual in contract and invoice forms.  
+* [89] (https://github.com/mlebreuil/netbox-contract/issues/89) Add contract assignement to virtual machines.
+
+#### version 2.0.9
+* [42](https://github.com/mlebreuil/netbox-contract/issues/42) Allow the selection of either providers or Service providers as contract third partie.
+* Removed all reference to the direct assignement of circuits to contracts
+* [88](https://github.com/mlebreuil/netbox-contract/issues/88) Add a placeholder value to the accounting dimensions jsonfield. This placeholder vale con be configured as part of the PLUGINS_CONFIG parameter in the configuration.py file (see above)
+* [89](https://github.com/mlebreuil/netbox-contract/issues/89) add the posibility to link contracts to sites and virtual machines.
+* [99](https://github.com/mlebreuil/netbox-contract/issues/99) list child contracts in on the parent view.
+
+

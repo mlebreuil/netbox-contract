@@ -1,17 +1,24 @@
 from extras.plugins import PluginConfig
 
+
 class ContractsConfig(PluginConfig):
     name = 'netbox_contract'
     verbose_name = 'Netbox contract'
     description = 'Contract management plugin for Netbox'
-    version = '2.0.8'
+    version = '2.0.9'
     author = 'Marc Lebreuil'
     author_email = 'marc@famillelebreuil.net'
     base_url = 'contracts'
-    min_version = "3.5.0"
+    min_version = '3.5.0'
     required_settings = []
     default_settings = {
         'top_level_menu': False,
+        'default_accounting_dimensions': {
+            'account': '',
+            'project': '',
+            'cost center': '',
+        },
     }
+
 
 config = ContractsConfig

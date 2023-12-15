@@ -1,6 +1,6 @@
 [project]
 name = "netbox-contract"
-version = "2.0.8"
+version = "2.0.9"
 authors = [
   { name="Marc Lebreuil", email="marc@famillelebreuil.net" },
 ]
@@ -31,3 +31,9 @@ zip-safe = false
 where = ["src"]
 include = ["*"]
 namespaces = false
+
+[tool.black]
+skip-string-normalization = true
+
+[tool.isort]
+profile = "black"

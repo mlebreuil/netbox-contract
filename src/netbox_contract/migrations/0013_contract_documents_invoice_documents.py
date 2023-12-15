@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ("netbox_contract", "0012_remove_invoice_contract"),
+        ('netbox_contract', '0012_remove_invoice_contract'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="contract",
-            name="documents",
+            model_name='contract',
+            name='documents',
             field=models.URLField(blank=True),
         ),
         migrations.AddField(
-            model_name="invoice",
-            name="documents",
+            model_name='invoice',
+            name='documents',
             field=models.URLField(blank=True),
         ),
     ]

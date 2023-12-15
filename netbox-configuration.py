@@ -13,12 +13,12 @@ ALLOWED_HOSTS = ['127.0.0.1']
 # PostgreSQL database configuration. See the Django documentation for a complete list of available parameters:
 #   https://docs.djangoproject.com/en/stable/ref/settings/#databases
 DATABASE = {
-    'NAME': 'netbox',         # Database name
-    'USER': 'netbox',               # PostgreSQL username
-    'PASSWORD': 'J5brHrAXFLQSif0K',           # PostgreSQL password
-    'HOST': 'db',      # Database server
-    'PORT': '',               # Database port (leave blank for default)
-    'CONN_MAX_AGE': 300,      # Max database connection age
+    'NAME': 'netbox',  # Database name
+    'USER': 'netbox',  # PostgreSQL username
+    'PASSWORD': 'J5brHrAXFLQSif0K',  # PostgreSQL password
+    'HOST': 'db',  # Database server
+    'PORT': '',  # Database port (leave blank for default)
+    'CONN_MAX_AGE': 300,  # Max database connection age
 }
 
 # Redis database settings. Redis is used for caching and for queuing background tasks such as webhook events. A separate
@@ -50,7 +50,7 @@ REDIS = {
         # Set this to True to skip TLS certificate verification
         # This can expose the connection to attacks, be careful
         # 'INSECURE_SKIP_TLS_VERIFY': False,
-    }
+    },
 }
 
 # This key is used for secure generation of random numbers and strings. It must never be exposed outside of this file.
@@ -103,7 +103,7 @@ CORS_ORIGIN_REGEX_WHITELIST = [
 # on a production system.
 DEBUG = True
 
-DEVELOPER=True
+DEVELOPER = True
 
 # Email settings
 EMAIL = {
