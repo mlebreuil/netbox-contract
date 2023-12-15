@@ -13,6 +13,11 @@ class ContractsConfig(PluginConfig):
     required_settings = []
     default_settings = {
         'top_level_menu': False,
+        'default_accounting_dimensions': {
+            'account': '',
+            'project': '',
+            'cost center': '',
+        },
     }
 
 

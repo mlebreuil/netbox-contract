@@ -37,13 +37,18 @@ Customize the location of the plugin's menu:
 # configuration.py
 PLUGINS_CONFIG = {
     'netbox_contract': {
-        'top_level_menu': True
+        'top_level_menu': True,
+        'default_accounting_dimensions':{
+            "account": "", 
+            "project": "", 
+            "cost center": ""
+        }
     }
 }
 
 ```
 
-Customize the internal partie field.  
+Customize fields choices.  
 Internal partie reference the legal entity of your organization that is a partie to the contract.  
 
 ```python
