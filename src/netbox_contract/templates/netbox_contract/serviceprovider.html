@@ -1,4 +1,7 @@
 {% extends 'generic/object.html' %}
+{% load static %}
+{% load helpers %}
+{% load i18n %}
 
 {% block content %}
   <div class="row mb-3">
@@ -31,7 +34,6 @@
       {% include 'inc/panels/custom_fields.html' %}
       {% include 'inc/panels/comments.html' %}
       {% include 'inc/panels/tags.html' %}
-      {% include 'contact_assignements_bottom.html' %}
     </div>
   </div>
 {% endblock content %}
