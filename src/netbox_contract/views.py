@@ -115,6 +115,7 @@ class ContractAssignementBulkImportView(generic.BulkImportView):
 # Contract views
 
 
+@register_model_view(Contract)
 class ContractView(generic.ObjectView):
     queryset = Contract.objects.all()
 
@@ -204,6 +205,7 @@ class ContractBulkDeleteView(generic.BulkDeleteView):
 # Invoice views
 
 
+@register_model_view(Invoice)
 class InvoiceView(generic.ObjectView):
     queryset = Invoice.objects.all()
 
