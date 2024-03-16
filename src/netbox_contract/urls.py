@@ -1,5 +1,6 @@
-from django.urls import path
+from django.urls import include, path
 from netbox.views.generic import ObjectChangeLogView
+from utilities.urls import get_model_urls
 
 from . import models, views
 
@@ -74,7 +75,11 @@ urlpatterns = (
         views.ContractBulkDeleteView.as_view(),
         name='contract_bulk_delete',
     ),
-    path('contracts/<int:pk>/', views.ContractView.as_view(), name='contract'),
+    path(
+        'contracts/<int:pk>/',
+        include(get_model_urls('netbox_contract', 'contract')),
+        name='contract',
+    ),
     path(
         'contracts/<int:pk>/edit/',
         views.ContractEditView.as_view(),
@@ -105,7 +110,11 @@ urlpatterns = (
         views.InvoiceBulkDeleteView.as_view(),
         name='invoice_bulk_delete',
     ),
-    path('invoices/<int:pk>/', views.InvoiceView.as_view(), name='invoice'),
+    path(
+        'invoices/<int:pk>/',
+        include(get_model_urls('netbox_contract', 'invoice')),
+        name='invoice',
+    ),
     path(
         'invoices/<int:pk>/edit/', views.InvoiceEditView.as_view(), name='invoice_edit'
     ),
