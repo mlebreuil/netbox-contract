@@ -7,13 +7,20 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404, render
 from netbox.views import generic
 from netbox.views.generic.utils import get_prerequisite_model
+from tenancy.views import ObjectContactsView
 from utilities.forms import restrict_form_fields
 from utilities.utils import count_related, normalize_querydict
+from utilities.views import register_model_view
 
 from . import filtersets, forms, tables
-from .models import Contract, ContractAssignement, Invoice, ServiceProvider
+from .models import Contract, ContractAssignment, Invoice, ServiceProvider
 
 # ServiceProvider views
+
+
+@register_model_view(ServiceProvider, 'contacts')
+class ServiceProviderContactsView(ObjectContactsView):
+    queryset = ServiceProvider.objects.all()
 
 
 class ServiceProviderView(generic.ObjectView):
@@ -55,27 +62,27 @@ class ServiceProviderBulkDeleteView(generic.BulkDeleteView):
     table = tables.ServiceProviderListTable
 
 
-# Contract assignement view
+# Contract assignment view
 
 
-class ContractAssignementView(generic.ObjectView):
-    queryset = ContractAssignement.objects.all()
+class ContractAssignmentView(generic.ObjectView):
+    queryset = ContractAssignment.objects.all()
 
 
-class ContractAssignementListView(generic.ObjectListView):
-    queryset = ContractAssignement.objects.all()
-    table = tables.ContractAssignementListTable
-    filterset = filtersets.ContractAssignementFilterSet
-    filterset_form = forms.ContractAssignementFilterSetForm
+class ContractAssignmentListView(generic.ObjectListView):
+    queryset = ContractAssignment.objects.all()
+    table = tables.ContractAssignmentListTable
+    filterset = filtersets.ContractAssignmentFilterSet
+    filterset_form = forms.ContractAssignmentFilterSetForm
     actions = [
         'import',
         'export',
     ]
 
 
-class ContractAssignementEditView(generic.ObjectEditView):
-    queryset = ContractAssignement.objects.all()
-    form = forms.ContractAssignementForm
+class ContractAssignmentEditView(generic.ObjectEditView):
+    queryset = ContractAssignment.objects.all()
+    form = forms.ContractAssignmentForm
 
     def alter_object(self, instance, request, args, kwargs):
         if not instance.pk and kwargs:
@@ -95,35 +102,36 @@ class ContractAssignementEditView(generic.ObjectEditView):
         }
 
 
-class ContractAssignementDeleteView(generic.ObjectDeleteView):
-    queryset = ContractAssignement.objects.all()
+class ContractAssignmentDeleteView(generic.ObjectDeleteView):
+    queryset = ContractAssignment.objects.all()
 
 
-class ContractAssignementBulkImportView(generic.BulkImportView):
-    queryset = ContractAssignement.objects.all()
-    model_form = forms.ContractAssignementImportForm
-    table = tables.ContractAssignementListTable
+class ContractAssignmentBulkImportView(generic.BulkImportView):
+    queryset = ContractAssignment.objects.all()
+    model_form = forms.ContractAssignmentImportForm
+    table = tables.ContractAssignmentListTable
 
 
 # Contract views
 
 
+@register_model_view(Contract)
 class ContractView(generic.ObjectView):
     queryset = Contract.objects.all()
 
     def get_extra_context(self, request, instance):
         invoices_table = tables.InvoiceListTable(instance.invoices.all())
         invoices_table.configure(request)
-        assignements_table = tables.ContractAssignementContractTable(
+        assignments_table = tables.ContractAssignmentContractTable(
             instance.assignments.all()
         )
-        assignements_table.configure(request)
+        assignments_table.configure(request)
         childs_table = tables.ContractListBottomTable(instance.childs.all())
         childs_table.configure(request)
 
         return {
             'invoices_table': invoices_table,
-            'assignements_table': assignements_table,
+            'assignments_table': assignments_table,
             'childs_table': childs_table,
         }
 
@@ -197,6 +205,7 @@ class ContractBulkDeleteView(generic.BulkDeleteView):
 # Invoice views
 
 
+@register_model_view(Invoice)
 class InvoiceView(generic.ObjectView):
     queryset = Invoice.objects.all()
 

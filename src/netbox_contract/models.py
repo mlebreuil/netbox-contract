@@ -57,7 +57,7 @@ class ServiceProvider(NetBoxModel):
         return reverse('plugins:netbox_contract:serviceprovider', args=[self.pk])
 
 
-class ContractAssignement(NetBoxModel):
+class ContractAssignment(NetBoxModel):
     content_type = models.ForeignKey(to=ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveBigIntegerField()
     content_object = GenericForeignKey(ct_field='content_type', fk_field='object_id')
@@ -73,7 +73,7 @@ class ContractAssignement(NetBoxModel):
         ]
 
     def get_absolute_url(self):
-        return reverse('plugins:netbox_contract:contractassignement', args=[self.pk])
+        return reverse('plugins:netbox_contract:contractassignment', args=[self.pk])
 
 
 class Contract(NetBoxModel):

@@ -1,5 +1,6 @@
-from django.urls import path
+from django.urls import include, path
 from netbox.views.generic import ObjectChangeLogView
+from utilities.urls import get_model_urls
 
 from . import models, views
 
@@ -51,6 +52,11 @@ urlpatterns = (
         name='serviceprovider_changelog',
         kwargs={'model': models.ServiceProvider},
     ),
+    path(
+        'serviceproviders/<int:pk>/contacts/',
+        views.ServiceProviderContactsView.as_view(),
+        name='serviceprovider_contacts',
+    ),
     # Contracts
     path('contracts/', views.ContractListView.as_view(), name='contract_list'),
     path('contracts/add/', views.ContractEditView.as_view(), name='contract_add'),
@@ -69,7 +75,11 @@ urlpatterns = (
         views.ContractBulkDeleteView.as_view(),
         name='contract_bulk_delete',
     ),
-    path('contracts/<int:pk>/', views.ContractView.as_view(), name='contract'),
+    path(
+        'contracts/<int:pk>/',
+        include(get_model_urls('netbox_contract', 'contract')),
+        name='contract',
+    ),
     path(
         'contracts/<int:pk>/edit/',
         views.ContractEditView.as_view(),
@@ -100,7 +110,11 @@ urlpatterns = (
         views.InvoiceBulkDeleteView.as_view(),
         name='invoice_bulk_delete',
     ),
-    path('invoices/<int:pk>/', views.InvoiceView.as_view(), name='invoice'),
+    path(
+        'invoices/<int:pk>/',
+        include(get_model_urls('netbox_contract', 'invoice')),
+        name='invoice',
+    ),
     path(
         'invoices/<int:pk>/edit/', views.InvoiceEditView.as_view(), name='invoice_edit'
     ),
@@ -115,41 +129,41 @@ urlpatterns = (
         name='invoice_changelog',
         kwargs={'model': models.Invoice},
     ),
-    # Contract assignements
+    # Contract assignments
     path(
-        'assignements/',
-        views.ContractAssignementListView.as_view(),
-        name='contractassignement_list',
+        'assignments/',
+        views.ContractAssignmentListView.as_view(),
+        name='contractassignment_list',
     ),
     path(
-        'assignements/add/',
-        views.ContractAssignementEditView.as_view(),
-        name='contractassignement_add',
+        'assignments/add/',
+        views.ContractAssignmentEditView.as_view(),
+        name='contractassignment_add',
     ),
     path(
-        'assignements/import/',
-        views.ContractAssignementBulkImportView.as_view(),
-        name='contractassignement_import',
+        'assignments/import/',
+        views.ContractAssignmentBulkImportView.as_view(),
+        name='contractassignment_import',
     ),
     path(
-        'assignements/<int:pk>/',
-        views.ContractAssignementView.as_view(),
-        name='contractassignement',
+        'assignments/<int:pk>/',
+        views.ContractAssignmentView.as_view(),
+        name='contractassignment',
     ),
     path(
-        'assignements/<int:pk>/edit/',
-        views.ContractAssignementEditView.as_view(),
-        name='contractassignement_edit',
+        'assignments/<int:pk>/edit/',
+        views.ContractAssignmentEditView.as_view(),
+        name='contractassignment_edit',
     ),
     path(
-        'assignements/<int:pk>/delete/',
-        views.ContractAssignementDeleteView.as_view(),
-        name='contractassignement_delete',
+        'assignments/<int:pk>/delete/',
+        views.ContractAssignmentDeleteView.as_view(),
+        name='contractassignment_delete',
     ),
     path(
-        'assignements/<int:pk>/changelog/',
+        'assignments/<int:pk>/changelog/',
         ObjectChangeLogView.as_view(),
-        name='contractassignement_changelog',
-        kwargs={'model': models.ContractAssignement},
+        name='contractassignment_changelog',
+        kwargs={'model': models.ContractAssignment},
     ),
 )

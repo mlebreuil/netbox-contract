@@ -7,7 +7,7 @@ from rest_framework import serializers
 from tenancy.api.nested_serializers import NestedTenantSerializer
 from utilities.api import get_serializer_for_model
 
-from ..models import Contract, ContractAssignement, Invoice, ServiceProvider
+from ..models import Contract, ContractAssignment, Invoice, ServiceProvider
 
 
 class NestedServiceProviderSerializer(WritableNestedSerializer):
@@ -40,13 +40,13 @@ class NestedInvoiceSerializer(WritableNestedSerializer):
         fields = ('id', 'url', 'display', 'number')
 
 
-class NestedContractAssignementSerializer(WritableNestedSerializer):
+class NestedContractAssignmentSerializer(WritableNestedSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_contract-api:ContractAssignement-detail'
+        view_name='plugins-api:netbox_contract-api:ContractAssignment-detail'
     )
 
     class Meta:
-        model = ContractAssignement
+        model = ContractAssignment
         fields = ('id', 'url', 'display', 'contract', 'content_object')
 
 
@@ -137,16 +137,16 @@ class ServiceProviderSerializer(NetBoxModelSerializer):
         )
 
 
-class ContractAssignementSerializer(NetBoxModelSerializer):
+class ContractAssignmentSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_contract-api:contractassignement-detail'
+        view_name='plugins-api:netbox_contract-api:contractassignment-detail'
     )
     content_type = ContentTypeField(queryset=ContentType.objects.all())
     content_object = serializers.SerializerMethodField(read_only=True)
     contract = NestedContractSerializer()
 
     class Meta:
-        model = ContractAssignement
+        model = ContractAssignment
         fields = [
             'id',
             'url',
