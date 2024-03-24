@@ -3,17 +3,17 @@
 <div class="row">
     <div class="col col-md-12">
       <div class="card">
-        <h5 class="card-header">Contracts Assignements</h5>
-        {% if assignements_table %}
+        <h5 class="card-header">Contracts Assignments</h5>
+        {% if assignments_table %}
         <div class="card-body table-responsive">
-          {% render_table assignements_table %}
+          {% render_table assignments_table %}
         </div>
         {% endif %}
-        {% if perms.netbox_contract.add_contractassignement %}
+        {% if perms.netbox_contract.add_contractassignment %}
         <div class="card-footer text-end noprint">
-          <a href="{% url 'plugins:netbox_contract:contractassignement_add' %}?content_type={{ object|content_type_id }}&object_id={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-primary btn-sm">
+          <a href="{% url 'plugins:netbox_contract:contractassignment_add' %}?content_type={{ object|content_type_id }}&object_id={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-primary btn-sm">
               <i class="mdi mdi-plus-thick" aria-hidden="true"></i>
-              Add assignement
+              Add assignment
           </a>
         </div>
         {% endif %}

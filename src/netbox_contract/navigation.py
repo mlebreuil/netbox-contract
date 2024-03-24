@@ -55,9 +55,9 @@ service_provider_menu_item = PluginMenuItem(
     permissions=['netbox_contract.view_serviceprovider'],
 )
 contract_assignemnt_menu_item = PluginMenuItem(
-    link='plugins:netbox_contract:contractassignement_list',
-    link_text='Contract assignements',
-    permissions=['netbox_contract.view_contractassignement'],
+    link='plugins:netbox_contract:contractassignment_list',
+    link_text='Contract assignments',
+    permissions=['netbox_contract.view_contractassignment'],
 )
 
 items = (

@@ -1,7 +1,7 @@
 from django.db.models import Q
 from netbox.filtersets import NetBoxModelFilterSet
 
-from .models import Contract, ContractAssignement, Invoice, ServiceProvider
+from .models import Contract, ContractAssignment, Invoice, ServiceProvider
 
 
 class ContractFilterSet(NetBoxModelFilterSet):
@@ -37,9 +37,9 @@ class ServiceProviderFilterSet(NetBoxModelFilterSet):
         return queryset.filter(name__icontains=value)
 
 
-class ContractAssignementFilterSet(NetBoxModelFilterSet):
+class ContractAssignmentFilterSet(NetBoxModelFilterSet):
     class Meta:
-        model = ContractAssignement
+        model = ContractAssignment
         fields = ('id', 'contract')
 
     def search(self, queryset, name, value):

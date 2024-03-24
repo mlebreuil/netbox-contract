@@ -1,10 +1,10 @@
 import django_tables2 as tables
 from netbox.tables import NetBoxTable, columns
 
-from .models import Contract, ContractAssignement, Invoice, ServiceProvider
+from .models import Contract, ContractAssignment, Invoice, ServiceProvider
 
 
-class ContractAssignementListTable(NetBoxTable):
+class ContractAssignmentListTable(NetBoxTable):
     content_type = columns.ContentTypeColumn(verbose_name='Object Type')
     content_object = tables.Column(linkify=True, orderable=False)
     contract = tables.Column(linkify=True)
@@ -12,7 +12,7 @@ class ContractAssignementListTable(NetBoxTable):
     contract__external_partie_object = tables.Column(linkify=True)
 
     class Meta(NetBoxTable.Meta):
-        model = ContractAssignement
+        model = ContractAssignment
         fields = (
             'pk',
             'content_type',
@@ -32,13 +32,13 @@ class ContractAssignementListTable(NetBoxTable):
         )
 
 
-class ContractAssignementObjectTable(NetBoxTable):
+class ContractAssignmentObjectTable(NetBoxTable):
     contract = tables.Column(linkify=True)
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
     contract__external_partie_object = tables.Column(linkify=True)
 
     class Meta(NetBoxTable.Meta):
-        model = ContractAssignement
+        model = ContractAssignment
         fields = (
             'pk',
             'contract',
@@ -64,14 +64,14 @@ class ContractAssignementObjectTable(NetBoxTable):
         )
 
 
-class ContractAssignementContractTable(NetBoxTable):
+class ContractAssignmentContractTable(NetBoxTable):
     content_type = columns.ContentTypeColumn(verbose_name='Object Type')
     content_object = tables.Column(linkify=True, verbose_name='Object', orderable=False)
     content_object__status = tables.Column(verbose_name='Status')
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
 
     class Meta(NetBoxTable.Meta):
-        model = ContractAssignement
+        model = ContractAssignment
         fields = (
             'pk',
             'content_type',

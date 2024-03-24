@@ -2,7 +2,7 @@ from netbox.api.viewsets import NetBoxModelViewSet
 
 from .. import filtersets, models
 from .serializers import (
-    ContractAssignementSerializer,
+    ContractAssignmentSerializer,
     ContractSerializer,
     InvoiceSerializer,
     ServiceProviderSerializer,
@@ -25,6 +25,6 @@ class ServiceProviderViewSet(NetBoxModelViewSet):
     serializer_class = ServiceProviderSerializer
 
 
-class ContractAssignementViewSet(NetBoxModelViewSet):
-    queryset = models.ContractAssignement.objects.prefetch_related('contract', 'tags')
-    serializer_class = ContractAssignementSerializer
+class ContractAssignmentViewSet(NetBoxModelViewSet):
+    queryset = models.ContractAssignment.objects.prefetch_related('contract', 'tags')
+    serializer_class = ContractAssignmentSerializer
