@@ -134,3 +134,5 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 * [99](https://github.com/mlebreuil/netbox-contract/issues/99) list child contracts in on the parent view.
 #### version 2.0.10
 * [107](https://github.com/mlebreuil/netbox-contract/issues/107) Add the contacts tab to the service provider detail view.
+* [111](https://github.com/mlebreuil/netbox-contract/issues/111) Correct assignment spelling.
+

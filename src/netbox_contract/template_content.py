@@ -5,100 +5,92 @@ from extras.plugins import PluginTemplateExtension
 from virtualization.models import VirtualMachine
 
 from . import tables
-from .models import ContractAssignement
+from .models import ContractAssignment
 
 
-class CircuitContractAssignements(PluginTemplateExtension):
+class CircuitContractAssignments(PluginTemplateExtension):
     model = 'circuits.circuit'
 
     def full_width_page(self):
         circuit = self.context['object']
         circuit_type = ContentType.objects.get_for_model(Circuit)
-        contract_assignements = ContractAssignement.objects.filter(
+        contract_assignments = ContractAssignment.objects.filter(
             content_type__pk=circuit_type.id, object_id=circuit.id
         )
-        assignements_table = tables.ContractAssignementObjectTable(
-            contract_assignements
-        )
-        assignements_table.configure(self.context['request'])
+        assignments_table = tables.ContractAssignmentObjectTable(contract_assignments)
+        assignments_table.configure(self.context['request'])
 
         return self.render(
-            'contract_assignements_bottom.html',
+            'contract_assignments_bottom.html',
             extra_context={
-                'assignements_table': assignements_table,
+                'assignments_table': assignments_table,
             },
         )
 
 
-class DeviceContractAssignements(PluginTemplateExtension):
+class DeviceContractAssignments(PluginTemplateExtension):
     model = 'dcim.device'
 
     def full_width_page(self):
         device = self.context['object']
         device_type = ContentType.objects.get_for_model(Device)
-        contract_assignements = ContractAssignement.objects.filter(
+        contract_assignments = ContractAssignment.objects.filter(
             content_type__pk=device_type.id, object_id=device.id
         )
-        assignements_table = tables.ContractAssignementObjectTable(
-            contract_assignements
-        )
-        assignements_table.configure(self.context['request'])
+        assignments_table = tables.ContractAssignmentObjectTable(contract_assignments)
+        assignments_table.configure(self.context['request'])
 
         return self.render(
-            'contract_assignements_bottom.html',
+            'contract_assignments_bottom.html',
             extra_context={
-                'assignements_table': assignements_table,
+                'assignments_table': assignments_table,
             },
         )
 
 
-class VMContractAssignements(PluginTemplateExtension):
+class VMContractAssignments(PluginTemplateExtension):
     model = 'virtualization.virtualmachine'
 
     def full_width_page(self):
         vm = self.context['object']
         vm_type = ContentType.objects.get_for_model(VirtualMachine)
-        contract_assignements = ContractAssignement.objects.filter(
+        contract_assignments = ContractAssignment.objects.filter(
             content_type__pk=vm_type.id, object_id=vm.id
         )
-        assignements_table = tables.ContractAssignementObjectTable(
-            contract_assignements
-        )
-        assignements_table.configure(self.context['request'])
+        assignments_table = tables.ContractAssignmentObjectTable(contract_assignments)
+        assignments_table.configure(self.context['request'])
 
         return self.render(
-            'contract_assignements_bottom.html',
+            'contract_assignments_bottom.html',
             extra_context={
-                'assignements_table': assignements_table,
+                'assignments_table': assignments_table,
             },
         )
 
 
-class SiteContractAssignements(PluginTemplateExtension):
+class SiteContractAssignments(PluginTemplateExtension):
     model = 'dcim.site'
 
     def full_width_page(self):
         site = self.context['object']
         site_type = ContentType.objects.get_for_model(Site)
-        contract_assignements = ContractAssignement.objects.filter(
+        contract_assignments = ContractAssignment.objects.filter(
             content_type__pk=site_type.id, object_id=site.id
         )
-        assignements_table = tables.ContractAssignementObjectTable(
-            contract_assignements
-        )
-        assignements_table.configure(self.context['request'])
+        assignments_table = tables.ContractAssignmentObjectTable(contract_assignments)
+        assignments_table.configure(self.context['request'])
 
         return self.render(
-            'contract_assignements_bottom.html',
+            'contract_assignments_bottom.html',
             extra_context={
-                'assignements_table': assignements_table,
+                'assignments_table': assignments_table,
             },
         )
 
 
 template_extensions = [
-    CircuitContractAssignements,
-    DeviceContractAssignements,
-    VMContractAssignements,
-    SiteContractAssignements,
+    CircuitContractAssignments,
+    DeviceContractAssignments,
+    VMContractAssignments,
+    SiteContractAssignments,
 ]

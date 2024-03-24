@@ -25,7 +25,7 @@ from utilities.forms.widgets import DatePicker, HTMXSelect
 from .constants import SERVICE_PROVIDER_MODELS
 from .models import (
     Contract,
-    ContractAssignement,
+    ContractAssignment,
     InternalEntityChoices,
     Invoice,
     ServiceProvider,
@@ -314,14 +314,14 @@ class ServiceProviderBulkEditForm(NetBoxModelBulkEditForm):
     model = ServiceProvider
 
 
-# ContractAssignement
+# ContractAssignment
 
 
-class ContractAssignementForm(NetBoxModelForm):
+class ContractAssignmentForm(NetBoxModelForm):
     contract = DynamicModelChoiceField(queryset=Contract.objects.all())
 
     class Meta:
-        model = ContractAssignement
+        model = ContractAssignment
         fields = ['content_type', 'object_id', 'contract', 'tags']
         widgets = {
             'content_type': forms.HiddenInput(),
@@ -329,12 +329,12 @@ class ContractAssignementForm(NetBoxModelForm):
         }
 
 
-class ContractAssignementFilterSetForm(NetBoxModelFilterSetForm):
-    model = ContractAssignement
+class ContractAssignmentFilterSetForm(NetBoxModelFilterSetForm):
+    model = ContractAssignment
     contract = DynamicModelChoiceField(queryset=Contract.objects.all())
 
 
-class ContractAssignementImportForm(NetBoxModelImportForm):
+class ContractAssignmentImportForm(NetBoxModelImportForm):
     content_type = CSVContentTypeField(
         queryset=ContentType.objects.all(),
         help_text='Content Type in the form <app>.<model>',
@@ -344,5 +344,5 @@ class ContractAssignementImportForm(NetBoxModelImportForm):
     )
 
     class Meta:
-        model = ContractAssignement
+        model = ContractAssignment
         fields = ['content_type', 'object_id', 'contract', 'tags']
