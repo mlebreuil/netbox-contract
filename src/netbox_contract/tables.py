@@ -89,8 +89,9 @@ class ContractAssignmentContractTable(NetBoxTable):
 
 class ContractListTable(NetBoxTable):
     name = tables.Column(linkify=True)
-    external_partie_object = tables.Column(linkify=True)
+    external_partie_object = tables.Column(verbose_name='External partie', linkify=True)
     parent = tables.Column(linkify=True)
+    yrc = tables.Column(verbose_name='Yerly recuring costs')
 
     class Meta(NetBoxTable.Meta):
         model = Contract
@@ -111,6 +112,7 @@ class ContractListTable(NetBoxTable):
             'currency',
             'accounting_dimensions',
             'mrc',
+            'yrc',
             'nrc',
             'invoice_frequency',
             'documents',

@@ -14,6 +14,7 @@ class ContractFilterSet(NetBoxModelFilterSet):
             Q(name__icontains=value)
             | Q(external_reference__icontains=value)
             | Q(comments__icontains=value)
+            | Q(status__iexact='Active')
         )
 
 

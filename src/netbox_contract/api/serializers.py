@@ -54,10 +54,11 @@ class ContractSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_contract-api:contract-detail'
     )
-    # circuit= NestedCircuitSerializer(many=True, required=False)
-    external_partie = NestedServiceProviderSerializer(many=False)
+    yrc = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     parent = NestedContractSerializer(many=False, required=False)
     tenant = NestedTenantSerializer(many=False, required=False)
+    external_partie_object_type = ContentTypeField(queryset=ContentType.objects.all())
+    external_partie_object = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Contract
@@ -66,7 +67,9 @@ class ContractSerializer(NetBoxModelSerializer):
             'url',
             'display',
             'name',
-            'external_partie',
+            'external_partie_object_type',
+            'external_partie_object_id',
+            'external_partie_object',
             'external_reference',
             'internal_partie',
             'tenant',
@@ -78,6 +81,7 @@ class ContractSerializer(NetBoxModelSerializer):
             'currency',
             'accounting_dimensions',
             'mrc',
+            'yrc',
             'nrc',
             'invoice_frequency',
             'comments',
@@ -87,6 +91,15 @@ class ContractSerializer(NetBoxModelSerializer):
             'created',
             'last_updated',
         )
+
+    @swagger_serializer_method(serializer_or_field=serializers.JSONField)
+    def get_external_partie_object(self, instance):
+        serializer = get_serializer_for_model(
+            instance.external_partie_object_type.model_class(),
+            prefix=NESTED_SERIALIZER_PREFIX,
+        )
+        context = {'request': self.context['request']}
+        return serializer(instance.external_partie_object, context=context).data
 
 
 class InvoiceSerializer(NetBoxModelSerializer):

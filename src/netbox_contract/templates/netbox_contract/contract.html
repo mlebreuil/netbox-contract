@@ -38,37 +38,53 @@
               <th scope="row">Internal partie</th>
               <td>{{ object.internal_partie }}</td>
             </tr>
+            {% if not 'tenant' in hidden_fields %}
             <tr>
               <th scope="row">Tenant</th>
               <td>{{ object.tenant }}</td>
             </tr>
+            {% endif %}
+            {% if not 'start_date' in hidden_fields %}
             <tr>
               <th scope="row">Start date</th>
               <td>{{ object.start_date }}</td>
             </tr>
+            {% endif %}
+            {% if not 'end_date' in hidden_fields %}
             <tr>
               <th scope="row">End date</th>
               <td>{{ object.end_date }}</td>
             </tr>
+            {% endif %}
+            {% if not 'initial_term' in hidden_fields %}
             <tr>
               <th scope="row">Initial term</th>
               <td>{{ object.initial_term }}</td>
             </tr>
+            {% endif %}
+            {% if not 'renewal_term' in hidden_fields %}
             <tr>
               <th scope="row">Renewal term</th>
               <td>{{ object.renewal_term }}</td>
             </tr>
+            {% endif %}
             <tr>
               <th scope="row">Currency</th>
               <td>{{ object.currency }}</td>
             </tr>
+            {% if not 'accounting_dimensions' in hidden_fields %}
             <tr>
               <th scope="row">Accounting dimensions</th>
               <td>{{ object.accounting_dimensions }}</td>
             </tr>
+            {% endif %}
             <tr>
               <th scope="row">Monthly recuring costs</th>
               <td>{{ object.mrc }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Yearly recuring costs</th>
+              <td>{{ object.yrc }}</td>
             </tr>
             <tr>
               <th scope="row">Non recuring costs</th>
@@ -78,12 +94,14 @@
               <th scope="row">Invoice frequency</th>
               <td>{{ object.invoice_frequency }}</td>
             </tr>
+            {% if not 'parent' in hidden_fields %}
             <tr>
               <th scope="row">Parent</th>
               <td>
                 <a href="{{ object.parent.get_absolute_url }}">{{ object.parent.name }}</a>
               </td>
             </tr>
+            {% endif %}
             {% if object.documents %}
             <tr>
               <th scope="row">Documents</th>

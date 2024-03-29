@@ -30,8 +30,9 @@ PLUGINS = [
 ]
 ```
 
-Customize the location of the plugin's menu:
+### Customize the plugin
 
+The following configurationitems can be set:
 
 ```python
 # configuration.py
@@ -42,13 +43,23 @@ PLUGINS_CONFIG = {
             "account": "", 
             "project": "", 
             "cost center": ""
-        }
+        },
+        'mandatory_contract_fields': ['accounting_dimensions'],
+        'hidden_contract_fields': [],
+        'mandatory_invoice_fields': ['accounting_dimensions'],
+        'hidden_invoice_fields': [],
     }
 }
 
 ```
 
-Customize fields choices.  
+* top_level_menu : If "Contracts" appears under the "Plugins" menu item or on its own
+* default_accounting_dimensions: The accounting dimensions which will appear in the field' background when empty.
+* mandatory_contract_fields, mandatory_invoice_fields: Fields which are not required by default and can be set as such. The list of fields is at the bottom of the contract import form.
+* hidden_contract_fields, hidden_invoice_fields: List of fields to be hidden. Fields should not be required to be hidden.
+
+### Customize the plugin fields choices
+
 Internal partie reference the legal entity of your organization that is a partie to the contract.  
 
 ```python
@@ -135,4 +146,9 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 #### version 2.0.10
 * [107](https://github.com/mlebreuil/netbox-contract/issues/107) Add the contacts tab to the service provider detail view.
 * [111](https://github.com/mlebreuil/netbox-contract/issues/111) Correct assignment spelling.
+#### version 2.0.11
+* [115](https://github.com/mlebreuil/netbox-contract/issues/115) API correction for contract external partie
+* [117](https://github.com/mlebreuil/netbox-contract/issues/117) Tenant and accounting dimensions optional
+* [119](https://github.com/mlebreuil/netbox-contract/issues/119) Add a Yearly recuring cost, read only, calculated field for contract
+* [15](https://github.com/mlebreuil/netbox-contract/issues/105) AQuick serach limited to active contracts
 

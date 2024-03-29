@@ -2,8 +2,10 @@ from datetime import date, timedelta
 
 from circuits.models import Circuit
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import F
 from django.shortcuts import get_object_or_404, render
 from netbox.views import generic
 from netbox.views.generic.utils import get_prerequisite_model
@@ -14,6 +16,8 @@ from utilities.views import register_model_view
 
 from . import filtersets, forms, tables
 from .models import Contract, ContractAssignment, Invoice, ServiceProvider
+
+plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 
 # ServiceProvider views
 
@@ -117,7 +121,7 @@ class ContractAssignmentBulkImportView(generic.BulkImportView):
 
 @register_model_view(Contract)
 class ContractView(generic.ObjectView):
-    queryset = Contract.objects.all()
+    queryset = Contract.objects.annotate(yrc=F('mrc') * 12)
 
     def get_extra_context(self, request, instance):
         invoices_table = tables.InvoiceListTable(instance.invoices.all())
@@ -129,7 +133,10 @@ class ContractView(generic.ObjectView):
         childs_table = tables.ContractListBottomTable(instance.childs.all())
         childs_table.configure(request)
 
+        hidden_fields = plugin_settings.get('hidden_contract_fields')
+
         return {
+            'hidden_fields': hidden_fields,
             'invoices_table': invoices_table,
             'assignments_table': assignments_table,
             'childs_table': childs_table,
@@ -137,7 +144,7 @@ class ContractView(generic.ObjectView):
 
 
 class ContractListView(generic.ObjectListView):
-    queryset = Contract.objects.all()
+    queryset = Contract.objects.annotate(yrc=F('mrc') * 12)
     table = tables.ContractListTable
     filterset = filtersets.ContractFilterSet
     filterset_form = forms.ContractFilterSetForm
@@ -212,8 +219,10 @@ class InvoiceView(generic.ObjectView):
     def get_extra_context(self, request, instance):
         contracts_table = tables.ContractListTable(instance.contracts.all())
         contracts_table.configure(request)
+        hidden_fields = plugin_settings.get('hidden_invoice_fields')
 
         return {
+            'hidden_fields': hidden_fields,
             'contracts_table': contracts_table,
         }
 
