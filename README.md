@@ -137,4 +137,5 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 * [111](https://github.com/mlebreuil/netbox-contract/issues/111) Correct assignment spelling.
 #### version 2.0.10
 * [115](https://github.com/mlebreuil/netbox-contract/issues/115) API correction for contract external partie
+* [117](https://github.com/mlebreuil/netbox-contract/issues/117) Tenant and accounting dimensions optional
 

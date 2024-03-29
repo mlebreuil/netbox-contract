@@ -55,9 +55,9 @@ class ContractForm(NetBoxModelForm):
         widget=HTMXSelect(),
     )
     external_partie_object = forms.ModelChoiceField(queryset=None)
-    tenant = DynamicModelChoiceField(queryset=Tenant.objects.all())
+    tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
     parent = DynamicModelChoiceField(queryset=Contract.objects.all(), required=False)
-    accounting_dimensions = Dimensions()
+    accounting_dimensions = Dimensions(required=False)
 
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', None)
