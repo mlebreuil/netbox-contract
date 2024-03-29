@@ -78,13 +78,6 @@ class ContractAssignment(NetBoxModel):
 
 class Contract(NetBoxModel):
     name = models.CharField(max_length=100)
-    external_partie = models.ForeignKey(
-        to=ServiceProvider,
-        on_delete=models.CASCADE,
-        related_name='contracts',
-        blank=True,
-        null=True,
-    )
 
     external_partie_object_type = models.ForeignKey(
         to=ContentType, on_delete=models.CASCADE, blank=True, null=True
