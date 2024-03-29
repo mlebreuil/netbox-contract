@@ -55,9 +55,9 @@ class ContractForm(NetBoxModelForm):
         widget=HTMXSelect(),
     )
     external_partie_object = forms.ModelChoiceField(queryset=None)
-    tenant = DynamicModelChoiceField(queryset=Tenant.objects.all())
+    tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
     parent = DynamicModelChoiceField(queryset=Contract.objects.all(), required=False)
-    accounting_dimensions = Dimensions()
+    accounting_dimensions = Dimensions(required=False)
 
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', None)
@@ -103,6 +103,15 @@ class ContractForm(NetBoxModelForm):
         #         'accounting_dimensions'
         #     ].widget.attrs['placeholder'] = '{"key": "value"}'
 
+        # Initialise fields settings
+        mandatory_fields = plugin_settings.get('mandatory_contract_fields')
+        for field in mandatory_fields:
+            self.fields[field].required = True
+        hidden_fields = plugin_settings.get('hidden_contract_fields')
+        for field in hidden_fields:
+            if not self.fields[field].required:
+                self.fields[field].widget = forms.HiddenInput()
+
     class Meta:
         model = Contract
         fields = (
@@ -138,6 +147,19 @@ class InvoiceForm(NetBoxModelForm):
     contracts = DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(), required=False
     )
+    accounting_dimensions = Dimensions(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Initialise fields settings
+        mandatory_fields = plugin_settings.get('mandatory_invoice_fields')
+        for field in mandatory_fields:
+            self.fields[field].required = True
+        hidden_fields = plugin_settings.get('hidden_invoice_fields')
+        for field in hidden_fields:
+            if not self.fields[field].required:
+                self.fields[field].widget = forms.HiddenInput()
 
     class Meta:
         model = Invoice

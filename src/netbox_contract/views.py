@@ -2,6 +2,7 @@ from datetime import date, timedelta
 
 from circuits.models import Circuit
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404, render
@@ -14,6 +15,8 @@ from utilities.views import register_model_view
 
 from . import filtersets, forms, tables
 from .models import Contract, ContractAssignment, Invoice, ServiceProvider
+
+plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 
 # ServiceProvider views
 
@@ -129,7 +132,10 @@ class ContractView(generic.ObjectView):
         childs_table = tables.ContractListBottomTable(instance.childs.all())
         childs_table.configure(request)
 
+        hidden_fields = plugin_settings.get('hidden_contract_fields')
+
         return {
+            'hidden_fields': hidden_fields,
             'invoices_table': invoices_table,
             'assignments_table': assignments_table,
             'childs_table': childs_table,
@@ -212,8 +218,10 @@ class InvoiceView(generic.ObjectView):
     def get_extra_context(self, request, instance):
         contracts_table = tables.ContractListTable(instance.contracts.all())
         contracts_table.configure(request)
+        hidden_fields = plugin_settings.get('hidden_invoice_fields')
 
         return {
+            'hidden_fields': hidden_fields,
             'contracts_table': contracts_table,
         }
 
