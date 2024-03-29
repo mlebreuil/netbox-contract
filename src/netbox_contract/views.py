@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import F
 from django.shortcuts import get_object_or_404, render
 from netbox.views import generic
 from netbox.views.generic.utils import get_prerequisite_model
@@ -120,7 +121,7 @@ class ContractAssignmentBulkImportView(generic.BulkImportView):
 
 @register_model_view(Contract)
 class ContractView(generic.ObjectView):
-    queryset = Contract.objects.all()
+    queryset = Contract.objects.annotate(yrc=F('mrc') * 12)
 
     def get_extra_context(self, request, instance):
         invoices_table = tables.InvoiceListTable(instance.invoices.all())
@@ -143,7 +144,7 @@ class ContractView(generic.ObjectView):
 
 
 class ContractListView(generic.ObjectListView):
-    queryset = Contract.objects.all()
+    queryset = Contract.objects.annotate(yrc=F('mrc') * 12)
     table = tables.ContractListTable
     filterset = filtersets.ContractFilterSet
     filterset_form = forms.ContractFilterSetForm

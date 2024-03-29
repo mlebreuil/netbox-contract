@@ -149,4 +149,5 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 #### version 2.0.10
 * [115](https://github.com/mlebreuil/netbox-contract/issues/115) API correction for contract external partie
 * [117](https://github.com/mlebreuil/netbox-contract/issues/117) Tenant and accounting dimensions optional
+* [119](https://github.com/mlebreuil/netbox-contract/issues/119) Add a Yearly recuring cost, read only, calculated field for contract
 

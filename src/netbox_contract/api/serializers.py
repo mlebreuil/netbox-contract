@@ -54,6 +54,7 @@ class ContractSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_contract-api:contract-detail'
     )
+    yrc = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     parent = NestedContractSerializer(many=False, required=False)
     tenant = NestedTenantSerializer(many=False, required=False)
     external_partie_object_type = ContentTypeField(queryset=ContentType.objects.all())
@@ -80,6 +81,7 @@ class ContractSerializer(NetBoxModelSerializer):
             'currency',
             'accounting_dimensions',
             'mrc',
+            'yrc',
             'nrc',
             'invoice_frequency',
             'comments',

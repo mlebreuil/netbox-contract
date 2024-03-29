@@ -1,3 +1,4 @@
+from django.db.models import F
 from netbox.api.viewsets import NetBoxModelViewSet
 
 from .. import filtersets, models
@@ -10,7 +11,9 @@ from .serializers import (
 
 
 class ContractViewSet(NetBoxModelViewSet):
-    queryset = models.Contract.objects.prefetch_related('parent', 'circuit', 'tags')
+    queryset = models.Contract.objects.prefetch_related(
+        'parent', 'circuit', 'tags'
+    ).annotate(yrc=F('mrc') * 12)
     serializer_class = ContractSerializer
 
 
