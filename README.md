@@ -146,8 +146,9 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 #### version 2.0.10
 * [107](https://github.com/mlebreuil/netbox-contract/issues/107) Add the contacts tab to the service provider detail view.
 * [111](https://github.com/mlebreuil/netbox-contract/issues/111) Correct assignment spelling.
-#### version 2.0.10
+#### version 2.0.11
 * [115](https://github.com/mlebreuil/netbox-contract/issues/115) API correction for contract external partie
 * [117](https://github.com/mlebreuil/netbox-contract/issues/117) Tenant and accounting dimensions optional
 * [119](https://github.com/mlebreuil/netbox-contract/issues/119) Add a Yearly recuring cost, read only, calculated field for contract
+* [15](https://github.com/mlebreuil/netbox-contract/issues/105) AQuick serach limited to active contracts
 
