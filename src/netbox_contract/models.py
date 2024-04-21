@@ -1,4 +1,3 @@
-from circuits.models import Circuit
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -62,7 +61,7 @@ class ContractAssignment(NetBoxModel):
     object_id = models.PositiveBigIntegerField()
     content_object = GenericForeignKey(ct_field='content_type', fk_field='object_id')
     contract = models.ForeignKey(
-        to='Contract', on_delete=models.PROTECT, related_name='assignments'
+        to='Contract', on_delete=models.CASCADE, related_name='assignments'
     )
     clone_fields = ('content_type', 'object_id', 'contract')
 
@@ -123,7 +122,6 @@ class Contract(NetBoxModel):
     invoice_frequency = models.IntegerField(
         help_text='The frequency of invoices in month', default=1
     )
-    circuit = models.ManyToManyField(Circuit, related_name='contracts', blank=True)
     documents = models.URLField(blank=True)
     comments = models.TextField(blank=True)
     parent = models.ForeignKey(
