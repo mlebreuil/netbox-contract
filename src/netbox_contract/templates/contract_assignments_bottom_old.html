@@ -5,7 +5,9 @@
       <div class="card">
         <h5 class="card-header">Contracts Assignments</h5>
         {% if assignments_table %}
+        <div class="card-body table-responsive">
           {% render_table assignments_table %}
+        </div>
         {% endif %}
         {% if perms.netbox_contract.add_contractassignment %}
         <div class="card-footer text-end noprint">

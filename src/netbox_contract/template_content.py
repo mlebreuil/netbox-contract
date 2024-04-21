@@ -1,7 +1,7 @@
 from circuits.models import Circuit
 from dcim.models import Device, Site
 from django.contrib.contenttypes.models import ContentType
-from extras.plugins import PluginTemplateExtension
+from netbox.plugins import PluginTemplateExtension
 from virtualization.models import VirtualMachine
 
 from . import tables

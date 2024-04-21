@@ -78,10 +78,12 @@ class ContractAssignmentListView(generic.ObjectListView):
     table = tables.ContractAssignmentListTable
     filterset = filtersets.ContractAssignmentFilterSet
     filterset_form = forms.ContractAssignmentFilterSetForm
-    actions = [
-        'import',
-        'export',
-    ]
+    actions = {
+        'import': {'add'},
+        'export': set(),
+        'bulk_edit': {'change'},
+        'bulk_delete': {'delete'},
+    }
 
 
 class ContractAssignmentEditView(generic.ObjectEditView):

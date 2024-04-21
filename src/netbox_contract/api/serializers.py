@@ -38,6 +38,7 @@ class NestedInvoiceSerializer(WritableNestedSerializer):
     class Meta:
         model = Invoice
         fields = ('id', 'url', 'display', 'number')
+        brief_fields = ('id', 'url', 'display', 'number')
 
 
 class NestedContractAssignmentSerializer(WritableNestedSerializer):
@@ -48,6 +49,7 @@ class NestedContractAssignmentSerializer(WritableNestedSerializer):
     class Meta:
         model = ContractAssignment
         fields = ('id', 'url', 'display', 'contract', 'content_object')
+        brief_fields = ('id', 'url', 'display', 'contract', 'content_object')
 
 
 class ContractSerializer(NetBoxModelSerializer):
@@ -91,6 +93,14 @@ class ContractSerializer(NetBoxModelSerializer):
             'created',
             'last_updated',
         )
+        brief_fields = (
+            'id',
+            'url',
+            'display',
+            'name',
+            'external_partie_object',
+            'status',
+        )
 
     @swagger_serializer_method(serializer_or_field=serializers.JSONField)
     def get_external_partie_object(self, instance):
@@ -128,6 +138,7 @@ class InvoiceSerializer(NetBoxModelSerializer):
             'created',
             'last_updated',
         )
+        brief_fields = ('id', 'url', 'display', 'number', 'contracts')
 
 
 class ServiceProviderSerializer(NetBoxModelSerializer):
@@ -148,6 +159,7 @@ class ServiceProviderSerializer(NetBoxModelSerializer):
             'created',
             'last_updated',
         )
+        brief_fields = ('id', 'url', 'display', 'name')
 
 
 class ContractAssignmentSerializer(NetBoxModelSerializer):
@@ -160,7 +172,7 @@ class ContractAssignmentSerializer(NetBoxModelSerializer):
 
     class Meta:
         model = ContractAssignment
-        fields = [
+        fields = (
             'id',
             'url',
             'display',
@@ -170,7 +182,8 @@ class ContractAssignmentSerializer(NetBoxModelSerializer):
             'contract',
             'created',
             'last_updated',
-        ]
+        )
+        brief_fields = ('id', 'url', 'display', 'content_object', 'contract')
 
     @swagger_serializer_method(serializer_or_field=serializers.JSONField)
     def get_content_object(self, instance):
