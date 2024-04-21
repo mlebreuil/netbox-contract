@@ -152,4 +152,6 @@ Add support for Netbox 3.5 which become the minimum version supported to accomod
 * [119](https://github.com/mlebreuil/netbox-contract/issues/119) Add a Yearly recuring cost, read only, calculated field for contract
 * [15](https://github.com/mlebreuil/netbox-contract/issues/105) Quick serach limited to active contracts
 #### version 2.0.12
-* [123](https://github.com/mlebreuil/netbox-contract/issues/123) oreoare teh Pugin to [Netbox 4.0 migration](https://docs.netbox.dev/en/feature/plugins/development/migration-v4/).
+* [123](https://github.com/mlebreuil/netbox-contract/issues/123) prepare plugin to [Netbox 4.0 migration](https://docs.netbox.dev/en/feature/plugins/development/migration-v4/).
+* [125](https://github.com/mlebreuil/netbox-contract/issues/125) Cleanup direct reference to Circuits in the Contract model. Correct database inconsistencies related to the ContractAssignment object renaming.
+

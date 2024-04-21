@@ -11,13 +11,12 @@
             </tr>
             <tr>
               <th scope="row">Object</th>
-              <td>{{ object.object_id }}</td>
+              <td><a href="{{ object.content_object.get_absolute_url }}">{{ object.content_object.name }}</a></td>
             </tr>
             <tr>
               <th scope="row">Contract</th>
-              <td>{{ object.contract }}</td>
+              <td><a href="{{ object.contract.get_absolute_url }}">{{ object.contract.name }}</a></td>
             </tr>
-            {% endif %}
           </table>
       </div>
       {% include 'inc/panels/tags.html' %}
