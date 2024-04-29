@@ -13,8 +13,8 @@ class ContractFilterSet(NetBoxModelFilterSet):
         return queryset.filter(
             Q(name__icontains=value)
             | Q(external_reference__icontains=value)
-            | Q(comments__icontains=value)
-            | Q(status__iexact='Active')
+            | Q(comments__icontains=value),
+            Q(status__iexact='Active')
         )
 
 
@@ -25,7 +25,8 @@ class InvoiceFilterSet(NetBoxModelFilterSet):
 
     def search(self, queryset, name, value):
         return queryset.filter(
-            Q(number__icontains=value) | Q(contracts__name__icontains=value)
+            Q(number__icontains=value) 
+            | Q(contracts__name__icontains=value)
         )
 
 
