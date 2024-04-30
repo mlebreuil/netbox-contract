@@ -3,6 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import reverse
 from netbox.models import NetBoxModel
+from netbox.models.features import ContactsMixin
 from utilities.choices import ChoiceSet
 
 
@@ -39,7 +40,7 @@ class CurrencyChoices(ChoiceSet):
     ]
 
 
-class ServiceProvider(NetBoxModel):
+class ServiceProvider(ContactsMixin, NetBoxModel):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
     contacts = GenericRelation(to='tenancy.ContactAssignment')
