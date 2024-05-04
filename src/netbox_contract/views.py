@@ -1,6 +1,5 @@
 from datetime import date, timedelta
 
-from circuits.models import Circuit
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -11,7 +10,7 @@ from netbox.views import generic
 from netbox.views.generic.utils import get_prerequisite_model
 from tenancy.views import ObjectContactsView
 from utilities.forms import restrict_form_fields
-from utilities.utils import count_related, normalize_querydict
+from utilities.utils import normalize_querydict
 from utilities.views import register_model_view
 
 from . import filtersets, forms, tables
@@ -78,10 +77,12 @@ class ContractAssignmentListView(generic.ObjectListView):
     table = tables.ContractAssignmentListTable
     filterset = filtersets.ContractAssignmentFilterSet
     filterset_form = forms.ContractAssignmentFilterSetForm
-    actions = [
-        'import',
-        'export',
-    ]
+    actions = {
+        'import': {'add'},
+        'export': set(),
+        'bulk_edit': {'change'},
+        'bulk_delete': {'delete'},
+    }
 
 
 class ContractAssignmentEditView(generic.ObjectEditView):
@@ -202,9 +203,7 @@ class ContractBulkEditView(generic.BulkEditView):
 
 
 class ContractBulkDeleteView(generic.BulkDeleteView):
-    queryset = Contract.objects.annotate(
-        count_circuits=count_related(Circuit, 'contracts')
-    )
+    queryset = Contract.objects.all()
     filterset = filtersets.ContractFilterSet
     table = tables.ContractListTable
 

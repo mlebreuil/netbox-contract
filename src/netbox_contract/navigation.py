@@ -1,6 +1,5 @@
 from django.conf import settings
-from extras.plugins import PluginMenu, PluginMenuButton, PluginMenuItem
-from utilities.choices import ButtonColorChoices
+from netbox.plugins import PluginMenu, PluginMenuButton, PluginMenuItem
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 
@@ -9,7 +8,6 @@ contract_buttons = [
         link='plugins:netbox_contract:contract_add',
         title='Add',
         icon_class='mdi mdi-plus-thick',
-        color=ButtonColorChoices.GREEN,
         permissions=['netbox_contract.add_contract'],
     )
 ]
@@ -19,7 +17,6 @@ invoice_buttons = [
         link='plugins:netbox_contract:invoice_add',
         title='Add',
         icon_class='mdi mdi-plus-thick',
-        color=ButtonColorChoices.GREEN,
         permissions=['netbox_contract.add_invoice'],
     )
 ]
@@ -29,7 +26,6 @@ serviceprovider_buttons = [
         link='plugins:netbox_contract:serviceprovider_add',
         title='Add',
         icon_class='mdi mdi-plus-thick',
-        color=ButtonColorChoices.GREEN,
         permissions=['netbox_contract.add_serviceprovider'],
     )
 ]
