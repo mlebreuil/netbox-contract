@@ -2,13 +2,6 @@
 
 ## [Unreleased]
 
-## Version 2.1
-
-### Version 2.1.0
-
-* Setup the documentation on Github pages
-* Automate the creation of PiPY packages from releases with Github Actions
-* Automate the creation of the release notes from CHANGELOG.md
 
 ## Version 2
 
