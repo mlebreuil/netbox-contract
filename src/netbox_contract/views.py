@@ -10,7 +10,7 @@ from netbox.views import generic
 from netbox.views.generic.utils import get_prerequisite_model
 from tenancy.views import ObjectContactsView
 from utilities.forms import restrict_form_fields
-from utilities.utils import normalize_querydict
+from utilities.querydict import normalize_querydict
 from utilities.views import register_model_view
 
 from . import filtersets, forms, tables
