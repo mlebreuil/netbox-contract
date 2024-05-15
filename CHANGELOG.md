@@ -5,6 +5,10 @@
 
 ## Version 2
 
+### Version 2.1.0
+
+* Netbox v4 compatibility. Netbox4.0.2 become a minimum requirement 
+
 ### Version 2.0.14
 
 * [127](https://github.com/mlebreuil/netbox-contract/issues/127) Fix contract filtering

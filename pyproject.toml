@@ -1,12 +1,12 @@
 [project]
 name = "netbox-contract"
-version = "2.0.15"
+version = "2.1.0"
 authors = [
   { name="Marc Lebreuil", email="marc@famillelebreuil.net" },
 ]
 description = "Contract management plugin for Netbox"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     'python-dateutil',
 ]
