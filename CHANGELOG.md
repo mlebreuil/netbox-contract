@@ -5,7 +5,7 @@
 
 ## Version 2
 
-### Version 2.1.1
+### Version 2.1.2
 
 * [127](https://github.com/mlebreuil/netbox-contract/issues/135) Fix service provider creation issue
 * Fix contract assignement issue
