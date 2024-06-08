@@ -1,4 +1,4 @@
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import reverse
@@ -43,7 +43,6 @@ class CurrencyChoices(ChoiceSet):
 class ServiceProvider(ContactsMixin, NetBoxModel):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
-    contacts = GenericRelation(to='tenancy.ContactAssignment')
     portal_url = models.URLField(blank=True, verbose_name='Portal URL')
     comments = models.TextField(blank=True)
 

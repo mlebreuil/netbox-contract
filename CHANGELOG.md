@@ -5,6 +5,11 @@
 
 ## Version 2
 
+### Version 2.1.2
+
+* [127](https://github.com/mlebreuil/netbox-contract/issues/135) Fix service provider creation issue
+* Fix contract assignement issue
+
 ### Version 2.1.0
 
 * Netbox v4 compatibility. Netbox4.0.2 become a minimum requirement 
