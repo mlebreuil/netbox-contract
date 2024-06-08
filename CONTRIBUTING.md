@@ -49,10 +49,7 @@ For each new feature or bug fix a branch is created from the corresponding issue
 
 ## Setup your development environment
 
-```bash
-python -m pip install pre-commit
-pre-commit install
-```
+
 1. [Install Netbox](https://github.com/netbox-community/netbox/blob/develop/docs/installation/).
 Make sure taht at the Netbox installtion step you follow the "Option B: Clone the Git Repository"
 
@@ -74,11 +71,20 @@ Make sure taht at the Netbox installtion step you follow the "Option B: Clone th
 5. Add the plugin to NetBox virtual environment:
 
     ```
-    $ python3 -m pip install -e netbox-contract
+    $ cd  netbox-contract
+    $ python3 -m pip install -e .
     ```
 
-5. Update the Netbox configuration ans run the database migrations as mentionned in the plugin installation steps.  
-6. Create a branch for local development:
+6. install pre-commit:
+
+    ```bash
+    python -m pip install pre-commit
+    pre-commit install
+    ```
+
+6. Update the Netbox configuration and run the database migrations as mentionned in the plugin installation steps.
+
+7. Create a branch for local development:
 
     ```
     $ git checkout -b name-of-your-bugfix-or-feature
@@ -86,7 +92,7 @@ Make sure taht at the Netbox installtion step you follow the "Option B: Clone th
 
     Make your changes locally.
 
-7. You can test your changes using the django development server:
+8. You can test your changes using the django development server:
 
     ```
     $ python3 netbox/netbox/manage.py runserver 0.0.0.0:8000 --insecure
@@ -94,7 +100,7 @@ Make sure taht at the Netbox installtion step you follow the "Option B: Clone th
 
     Connect to the name or IP of the server (as defined in ALLOWED_HOSTS) on port 8000; for example, http://127.0.0.1:8000/.
 
-7. Commit your changes and push your branch to GitHub:
+9. Commit your changes and push your branch to GitHub:
 
     ```
     $ git add .
@@ -102,7 +108,24 @@ Make sure taht at the Netbox installtion step you follow the "Option B: Clone th
     $ git push origin name-of-your-bugfix-or-feature
     ```
 
-7. Submit a pull request through the GitHub website.
+10. Submit a pull request through the GitHub website.
+
+## Model changes
+
+Create the migrations:  
+
+```bash
+source netbox/venv/bin/activate
+python3 netbox/netbox/manage.py makemigrations netbox_contract --dry-run
+python3 netbox/netbox/manage.py makemigrations netbox_contract
+```
+
+Apply the migrations:  
+
+```bash
+source netbox/venv/bin/activate
+python3 netbox/netbox/manage.py migrate
+```
 
 ## Pull Request Guidelines
 
