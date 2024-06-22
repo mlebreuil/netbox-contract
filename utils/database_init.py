@@ -11,13 +11,16 @@ conn.set_isolation_level(autocommit)
 # Open a cursor to perform database operations
 cur = conn.cursor()
 
-# Execute a query
-cur.execute('DROP DATABASE netbox;')
-cur.execute('DROP USER netbox;')
+# The below 2 lines are required if the database already exists
+# cur.execute('DROP DATABASE netbox;')
+# cur.execute('DROP USER netbox;')
+
 cur.execute('CREATE DATABASE netbox;')
 cur.execute("CREATE USER netbox WITH PASSWORD 'J5brHrAXFLQSif0K';")
-cur.execute('GRANT ALL PRIVILEGES ON DATABASE netbox TO netbox;')
-cur.execute('ALTER USER netbox CREATEDB;')
+cur.execute('ALTER DATABASE netbox OWNER TO netbox;')
+
+# required on postgres v15 or later
+cur.execute('GRANT CREATE ON SCHEMA public TO netbox;')
 
 # Make the changes to the database persistent
 conn.commit()

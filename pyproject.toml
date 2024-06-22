@@ -9,6 +9,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     'python-dateutil',
+    'drf_yasg',
 ]
 classifiers = [
     "Programming Language :: Python :: 3",

@@ -57,7 +57,7 @@ REDIS = {
 # For optimal security, SECRET_KEY should be at least 50 characters in length and contain a mix of letters, numbers, and
 # symbols. NetBox will not run without this defined. For more information, see
 # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-SECRET_KEY
-SECRET_KEY = 'mNiCp)$_q^XKAPmaOARwu_ytW)Q$5ukOsHH#LqbOUQPeJu&fO!'
+SECRET_KEY = 'z(DvJ7Q0)8k)ch9xaQZueQxyfs&&gZ38-oe7jQh&0^KlPU^Yqc'
 
 
 #########################

@@ -2,24 +2,15 @@
 ## Configure the dev environment
 ### create the dev container
 
-Copy the .devcontainer
-File Save workspace as
+Create a netbox folder
+clone your fork of the netbox-contract repository 
+Copy the utils/.devcontainer folder to your root directory
 
-ctrl + shift + P
+Save the workspace definition file to the root of the netbox folder
+File > Save workspace as
+
+Press F1
 Dev Container: Rebuild container and reopen in container
-
-## Install Netbox
-
-Install netbox following the "Option B: Clone the Git Repository":  
-[netbox installtion doc](https://github.com/netbox-community/netbox/blob/develop/docs/installation/3-netbox.md)
-
-### Clone Netbox
-
-```bash
-mkdir netbox
-cd netbox
-git clone -b master --depth 1 https://github.com/netbox-community/netbox.git .
-```
 
 ### initialisze the database
 
@@ -33,9 +24,22 @@ pip install psycopg2
 Run the initialization script
 
 ```bash
-cd ..
-python3 database_init.py
+python3 netbox-contract/utils/database_init.py
 ```
+
+## Install Netbox
+ 
+[netbox installtion doc](https://netboxlabs.com/docs/netbox/en/stable/installation/3-netbox/)
+
+### Clone the netbox repository
+
+```bash
+mkdir netbox
+cd netbox
+git clone -b master --depth 1 https://github.com/netbox-community/netbox.git .
+```
+
+You do not need to create the Betbox system user
 
 ### generate secret key
 
@@ -43,12 +47,12 @@ python3 database_init.py
 python3 netbox/netbox/generate_secret_key.py
 ```
 
-update the netbox netbox-configuration.py with this secret key
+update the netbox-contract/utils/netbox-configuration.py with this secret key
 
 ### update netbox configuration
 
 ```
-cp netbox-configuration.py netbox/netbox/netbox/configuration.py
+sudo cp netbox-contract/utils/netbox-configuration.py netbox/netbox/netbox/configuration.py
 ```
 
 ### Run the Upgrade Script
@@ -77,9 +81,41 @@ python3 netbox/netbox/manage.py createsuperuser
 python3 netbox/netbox/manage.py runserver
 ```
 
-### Upgrade Netbox
+### Install the plugin
 
-Upgrade Netbox:  
+For development, install the plugin from the local file system:  
+
+ ```bash
+python3 -m pip install -e netbox-contract
+```
+
+Update netbox configuration to configure the plugin:
+
+```bash
+sudo cp netbox-contract/utils/netbox-configuration-final.py netbox/netbox/netbox/configuration.py
+```
+run database migrations:
+
+```bash
+python3 netbox/netbox/manage.py migrate
+```
+
+install pre-commit:  
+
+```bash
+cd netbox-contract
+python -m pip install pre-commit
+pre-commit install
+```
+
+Test the installation
+
+```bash
+cd ..
+python3 netbox/netbox/manage.py runserver
+```
+
+## Upgrade Netbox
 
 ```bash
 cd netbox
@@ -101,7 +137,7 @@ python -m pip install pre-commit
 pre-commit install
 ```
 
-### Backup and restore the db
+## Backup and restore the db
 
 ```bash
 pg_dump --username netbox --password --host db netbox > netbox.sql
@@ -113,37 +149,9 @@ Restore:
 psql --host=db --username=postgres --password -c 'drop database netbox'
 psql --host=db --username=postgres --password -c 'create database netbox'
 psql --host=db --username=postgres --password netbox < netbox.sql
-```
+```  
 
-## contracts plugin
-
-### Development environment
-
-Convention to adhere to:  
-Netbox [Style Guide](https://docs.netbox.dev/en/stable/development/style-guide/)  
-Django [Coding style](https://docs.djangoproject.com/en/4.2/internals/contributing/writing-code/coding-style/)  
-
-For this:  
-All files will be formated using the [black](https://black.readthedocs.io/en/stable/) auto-formatter.  
-Confiiguration is stored in pyproject.toml  
-
-[isort](https://github.com/PyCQA/isort#readme) is used to automate import sorting.  
-
-Linting and PEP8 style enforcement will be done with  [Flake8](https://flake8.pycqa.org/en/latest/) which is a wrapper arround:  
-- PyFlakes
-- pycodestyle
-- Ned Batchelder’s McCabe script
-Configuration is maintained in the .flake8 file (no support for pyproject.toml)
-
-The pre-commit Python framework is used to simplify the managment of pre-commit hooks:  
-Config is stored in .pre-commit-config.yaml   
-
-```bash
-python -m pip install pre-commit
-pre-commit install
-```
-
-### Model changes
+## Model changes
 
 Create the migrations:  
 
@@ -160,7 +168,7 @@ source netbox/venv/bin/activate
 python3 netbox/netbox/manage.py migrate
 ```
 
-### Generating the distribution archives
+## Generating the distribution archives
 
 Note: This part is now automated with Github Actions.  
 Each time a release is created, a new package is created.
@@ -197,7 +205,7 @@ python3 -m pip install --upgrade twine
 python3 -m twine upload dist/*
 ```
 
-### install the pluggin 
+## install the pluggin 
 
 For development install from local file system with the "editable" option:   
 
