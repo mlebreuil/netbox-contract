@@ -7,7 +7,7 @@ from rest_framework import serializers
 from tenancy.api.nested_serializers import NestedTenantSerializer
 from utilities.api import get_serializer_for_model
 
-from ..models import Contract, ContractAssignment, Invoice, ServiceProvider
+from ..models import Contract, ContractAssignment, Invoice, InvoiceLine, ServiceProvider
 
 
 class NestedServiceProviderSerializer(WritableNestedSerializer):
@@ -50,6 +50,17 @@ class NestedContractAssignmentSerializer(WritableNestedSerializer):
         model = ContractAssignment
         fields = ('id', 'url', 'display', 'contract', 'content_object')
         brief_fields = ('id', 'url', 'display', 'contract', 'content_object')
+
+
+class NestedInvoicelineSerializer(WritableNestedSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_contract-api:InvoiceLine-detail'
+    )
+
+    class Meta:
+        model = InvoiceLine
+        fields = ('id', 'url', 'display', 'invoice', 'amount')
+        brief_fields = ('id', 'url', 'display', 'invoice', 'amount')
 
 
 class ContractSerializer(NetBoxModelSerializer):
@@ -192,3 +203,26 @@ class ContractAssignmentSerializer(NetBoxModelSerializer):
         )
         context = {'request': self.context['request']}
         return serializer(instance.content_object, context=context).data
+
+
+class InvoiceLineSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_contract-api:invoiceline-detail'
+    )
+
+    class Meta:
+        model = InvoiceLine
+        fields = (
+            'id',
+            'url',
+            'display',
+            'invoice',
+            'amount',
+            'currency',
+            'comments',
+            'tags',
+            'custom_fields',
+            'created',
+            'last_updated',
+        )
+        brief_fields = ('invoice', 'amount', 'url', 'display', 'name')

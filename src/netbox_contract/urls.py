@@ -166,4 +166,41 @@ urlpatterns = (
         name='contractassignment_changelog',
         kwargs={'model': models.ContractAssignment},
     ),
+    # InvoiceLine
+    path(
+        'invoiceline/',
+        views.InvoiceLineListView.as_view(),
+        name='invoiceline_list',
+    ),
+    path(
+        'invoiceline/add/',
+        views.InvoiceLineEditView.as_view(),
+        name='invoiceline_add',
+    ),
+    path(
+        'invoiceline/import/',
+        views.InvoiceLineBulkImportView.as_view(),
+        name='invoiceline_import',
+    ),
+    path(
+        'invoiceline/<int:pk>/',
+        views.InvoiceLineView.as_view(),
+        name='invoiceline',
+    ),
+    path(
+        'invoiceline/<int:pk>/edit/',
+        views.InvoiceLineEditView.as_view(),
+        name='invoiceline_edit',
+    ),
+    path(
+        'invoiceline/<int:pk>/delete/',
+        views.InvoiceLineDeleteView.as_view(),
+        name='invoiceline_delete',
+    ),
+    path(
+        'invoiceline/<int:pk>/changelog/',
+        ObjectChangeLogView.as_view(),
+        name='invoiceline_changelog',
+        kwargs={'model': models.InvoiceLine},
+    ),
 )

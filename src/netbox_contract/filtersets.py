@@ -1,7 +1,7 @@
 from django.db.models import Q
 from netbox.filtersets import NetBoxModelFilterSet
 
-from .models import Contract, ContractAssignment, Invoice, ServiceProvider
+from .models import Contract, ContractAssignment, Invoice, InvoiceLine, ServiceProvider
 
 
 class ContractFilterSet(NetBoxModelFilterSet):
@@ -14,7 +14,7 @@ class ContractFilterSet(NetBoxModelFilterSet):
             Q(name__icontains=value)
             | Q(external_reference__icontains=value)
             | Q(comments__icontains=value),
-            Q(status__iexact='Active')
+            Q(status__iexact='Active'),
         )
 
 
@@ -25,8 +25,7 @@ class InvoiceFilterSet(NetBoxModelFilterSet):
 
     def search(self, queryset, name, value):
         return queryset.filter(
-            Q(number__icontains=value) 
-            | Q(contracts__name__icontains=value)
+            Q(number__icontains=value) | Q(contracts__name__icontains=value)
         )
 
 
@@ -46,3 +45,14 @@ class ContractAssignmentFilterSet(NetBoxModelFilterSet):
 
     def search(self, queryset, name, value):
         return queryset.filter(Q(contract__name__icontains=value))
+
+
+class InvoiceLineFilterSet(NetBoxModelFilterSet):
+    class Meta:
+        model = InvoiceLine
+        fields = ('id', 'invoice')
+
+    def search(self, queryset, name, value):
+        return queryset.filter(
+            Q(comments__icontains=value) | Q(invoice__name__icontains=value)
+        )

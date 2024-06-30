@@ -169,3 +169,25 @@ class Invoice(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:invoice', args=[self.pk])
+
+    @property
+    def total_invoicelines_amount(self):
+        """
+        Calculates the total amount for all related InvoiceLines.
+        """
+        return sum(invoiceline.amount for invoiceline in self.invoicelines.all())
+
+
+class InvoiceLine(NetBoxModel):
+    invoice = models.ForeignKey(
+        to='Invoice', on_delete=models.CASCADE, related_name='invoicelines'
+    )
+    currency = models.CharField(
+        max_length=3, choices=CurrencyChoices, default=CurrencyChoices.CURRENCY_USD
+    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    accounting_dimensions = models.JSONField(null=True)
+    comments = models.TextField(blank=True)
+
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_contract:invoiceline', args=[self.pk])

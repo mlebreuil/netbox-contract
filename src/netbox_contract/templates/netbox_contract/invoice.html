@@ -53,7 +53,25 @@
                 </td>
             </tr>
             {% endif %}
+            <tr>
+              <th scope="row">Invoice lines total</th>
+                <td>{{ object.total_invoicelines_amount }}</td>
+              </tr>
           </table>
+      </div>
+      <div class="row">
+        <div class="col col-md-12">
+          <div class="card">
+            <h5 class="card-header">Lines</h5>
+              {% render_table invoicelines_table %}
+              <div class="card-footer text-end noprint">
+                <a href="{% url 'plugins:netbox_contract:invoiceline_add' %}?invoice={{ object.pk }}" class="btn btn-primary">
+                    <i class="mdi mdi-plus-thick" aria-hidden="true"></i>
+                    Add an invoice line
+                </a>
+              </div>
+          </div>
+        </div>
       </div>
       <div class="row">
         <div class="col col-md-12">

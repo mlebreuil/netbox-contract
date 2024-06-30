@@ -14,7 +14,7 @@ from utilities.querydict import normalize_querydict
 from utilities.views import register_model_view
 
 from . import filtersets, forms, tables
-from .models import Contract, ContractAssignment, Invoice, ServiceProvider
+from .models import Contract, ContractAssignment, Invoice, InvoiceLine, ServiceProvider
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 
@@ -218,11 +218,14 @@ class InvoiceView(generic.ObjectView):
     def get_extra_context(self, request, instance):
         contracts_table = tables.ContractListTable(instance.contracts.all())
         contracts_table.configure(request)
+        invoicelines_table = tables.InvoiceLineListTable(instance.invoicelines.all())
+        invoicelines_table.configure(request)
         hidden_fields = plugin_settings.get('hidden_invoice_fields')
 
         return {
             'hidden_fields': hidden_fields,
             'contracts_table': contracts_table,
+            'invoicelines_table': invoicelines_table,
         }
 
 
@@ -313,3 +316,79 @@ class InvoiceBulkDeleteView(generic.BulkDeleteView):
     queryset = Invoice.objects.all()
     filterset = filtersets.InvoiceFilterSet
     table = tables.InvoiceListTable
+
+
+# InvoiceLine
+
+
+class InvoiceLineView(generic.ObjectView):
+    queryset = InvoiceLine.objects.all()
+
+
+class InvoiceLineListView(generic.ObjectListView):
+    queryset = InvoiceLine.objects.all()
+    table = tables.InvoiceLineListTable
+    filterset = filtersets.InvoiceLineFilterSet
+    filterset_form = forms.InvoiceLineFilterSetForm
+
+
+class InvoiceLineEditView(generic.ObjectEditView):
+    queryset = InvoiceLine.objects.all()
+    form = forms.InvoiceLineForm
+
+    def get(self, request, *args, **kwargs):
+        """
+        GET request handler
+            Overrides the ObjectEditView function to include form initialization
+            with data from the parent invoice object
+
+        Args:
+            request: The current request
+        """
+        obj = self.get_object(**kwargs)
+        obj = self.alter_object(obj, request, args, kwargs)
+        model = self.queryset.model
+
+        initial_data = normalize_querydict(request.GET)
+        if 'invoice' in initial_data.keys():
+            invoice = Invoice.objects.get(pk=initial_data['invoice'])
+            initial_data['amount'] = invoice.amount - invoice.total_invoicelines_amount
+
+        form = self.form(instance=obj, initial=initial_data)
+        restrict_form_fields(form, request.user)
+
+        return render(
+            request,
+            self.template_name,
+            {
+                'model': model,
+                'object': obj,
+                'form': form,
+                'return_url': self.get_return_url(request, obj),
+                'prerequisite_model': get_prerequisite_model(self.queryset),
+                **self.get_extra_context(request, obj),
+            },
+        )
+
+
+class InvoiceLineDeleteView(generic.ObjectDeleteView):
+    queryset = InvoiceLine.objects.all()
+
+
+class InvoiceLineBulkImportView(generic.BulkImportView):
+    queryset = InvoiceLine.objects.all()
+    model_form = forms.InvoiceLineImportForm
+    table = tables.InvoiceLineListTable
+
+
+class InvoiceLineBulkEditView(generic.BulkEditView):
+    queryset = InvoiceLine.objects.annotate()
+    filterset = filtersets.InvoiceLineFilterSet
+    table = tables.InvoiceLineListTable
+    form = forms.InvoiceLineBulkEditForm
+
+
+class InvoiceLineBulkDeleteView(generic.BulkDeleteView):
+    queryset = InvoiceLine.objects.annotate()
+    filterset = filtersets.InvoiceLineFilterSet
+    table = tables.InvoiceLineListTable

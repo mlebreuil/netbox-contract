@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from extras.filters import TagFilter
 from netbox.forms import (
     NetBoxModelBulkEditForm,
@@ -28,6 +29,7 @@ from .models import (
     ContractAssignment,
     InternalEntityChoices,
     Invoice,
+    InvoiceLine,
     ServiceProvider,
     StatusChoices,
 )
@@ -44,6 +46,9 @@ class Dimensions(JSONField):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.widget.attrs['placeholder'] = str(default_dimensions)
+
+
+# Contract
 
 
 class ContractForm(NetBoxModelForm):
@@ -143,46 +148,6 @@ class ContractForm(NetBoxModelForm):
         }
 
 
-class InvoiceForm(NetBoxModelForm):
-    contracts = DynamicModelMultipleChoiceField(
-        queryset=Contract.objects.all(), required=False
-    )
-    accounting_dimensions = Dimensions(required=False)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Initialise fields settings
-        mandatory_fields = plugin_settings.get('mandatory_invoice_fields')
-        for field in mandatory_fields:
-            self.fields[field].required = True
-        hidden_fields = plugin_settings.get('hidden_invoice_fields')
-        for field in hidden_fields:
-            if not self.fields[field].required:
-                self.fields[field].widget = forms.HiddenInput()
-
-    class Meta:
-        model = Invoice
-        fields = (
-            'number',
-            'date',
-            'contracts',
-            'period_start',
-            'period_end',
-            'currency',
-            'accounting_dimensions',
-            'amount',
-            'documents',
-            'comments',
-            'tags',
-        )
-        widgets = {
-            'date': DatePicker(),
-            'period_start': DatePicker(),
-            'period_end': DatePicker(),
-        }
-
-
 class ContractFilterSetForm(NetBoxModelFilterSetForm):
     model = Contract
 
@@ -191,13 +156,6 @@ class ContractFilterSetForm(NetBoxModelFilterSetForm):
     internal_partie = forms.CharField(required=False)
     status = forms.ChoiceField(choices=StatusChoices, required=False)
     parent = DynamicModelChoiceField(queryset=Contract.objects.all(), required=False)
-
-
-class InvoiceFilterSetForm(NetBoxModelFilterSetForm):
-    model = Invoice
-    contracts = DynamicModelMultipleChoiceField(
-        queryset=Contract.objects.all(), required=False
-    )
 
 
 class ContractCSVForm(NetBoxModelImportForm):
@@ -269,6 +227,56 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
 
     nullable_fields = ('comments',)
     model = Contract
+
+
+# Invoice
+
+
+class InvoiceForm(NetBoxModelForm):
+    contracts = DynamicModelMultipleChoiceField(
+        queryset=Contract.objects.all(), required=False
+    )
+    accounting_dimensions = Dimensions(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Initialise fields settings
+        mandatory_fields = plugin_settings.get('mandatory_invoice_fields')
+        for field in mandatory_fields:
+            self.fields[field].required = True
+        hidden_fields = plugin_settings.get('hidden_invoice_fields')
+        for field in hidden_fields:
+            if not self.fields[field].required:
+                self.fields[field].widget = forms.HiddenInput()
+
+    class Meta:
+        model = Invoice
+        fields = (
+            'number',
+            'date',
+            'contracts',
+            'period_start',
+            'period_end',
+            'currency',
+            'accounting_dimensions',
+            'amount',
+            'documents',
+            'comments',
+            'tags',
+        )
+        widgets = {
+            'date': DatePicker(),
+            'period_start': DatePicker(),
+            'period_end': DatePicker(),
+        }
+
+
+class InvoiceFilterSetForm(NetBoxModelFilterSetForm):
+    model = Invoice
+    contracts = DynamicModelMultipleChoiceField(
+        queryset=Contract.objects.all(), required=False
+    )
 
 
 class InvoiceCSVForm(NetBoxModelImportForm):
@@ -368,3 +376,72 @@ class ContractAssignmentImportForm(NetBoxModelImportForm):
     class Meta:
         model = ContractAssignment
         fields = ['content_type', 'object_id', 'contract', 'tags']
+
+
+# InvoiceLine
+
+
+class InvoiceLineForm(NetBoxModelForm):
+    invoice = DynamicModelChoiceField(queryset=Invoice.objects.all())
+    accounting_dimensions = Dimensions(required=False)
+
+    def clean(self):
+        super().clean()
+        amount = self.cleaned_data.get('amount')
+        invoice = self.cleaned_data.get('invoice')
+        if self.instance is None:
+            if amount and amount > invoice.amount - invoice.total_invoicelines_amount:
+                raise ValidationError(
+                    'Sum of invoice line amount greater than invoice amount'
+                )
+        else:
+            if amount > (
+                invoice.amount
+                - invoice.total_invoicelines_amount
+                + self.instance.amount
+            ):
+                raise ValidationError(
+                    'Sum of invoice line amount greater than invoice amount'
+                )
+
+    class Meta:
+        model = InvoiceLine
+        fields = [
+            'invoice',
+            'currency',
+            'amount',
+            'accounting_dimensions',
+            'comments',
+            'tags',
+        ]
+
+
+class InvoiceLineFilterSetForm(NetBoxModelFilterSetForm):
+    model = InvoiceLine
+    invoice = DynamicModelChoiceField(queryset=Invoice.objects.all())
+
+
+class InvoiceLineImportForm(NetBoxModelImportForm):
+    invoice = CSVModelChoiceField(
+        queryset=Invoice.objects.all(),
+        to_field_name='number',
+        help_text='Invoice number',
+    )
+
+    class Meta:
+        model = InvoiceLine
+        fields = [
+            'invoice',
+            'currency',
+            'amount',
+            'accounting_dimensions',
+            'comments',
+            'tags',
+        ]
+
+
+class InvoiceLineBulkEditForm(NetBoxModelBulkEditForm):
+    invoice = DynamicModelMultipleChoiceField(
+        queryset=Invoice.objects.all(), required=False
+    )
+    model = InvoiceLine
