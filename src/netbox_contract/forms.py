@@ -389,17 +389,17 @@ class InvoiceLineForm(NetBoxModelForm):
         super().clean()
         amount = self.cleaned_data.get('amount')
         invoice = self.cleaned_data.get('invoice')
-        if self.instance is None:
-            if amount and amount > invoice.amount - invoice.total_invoicelines_amount:
-                raise ValidationError(
-                    'Sum of invoice line amount greater than invoice amount'
-                )
-        else:
-            if amount > (
+        if self.instance.pk is not None:
+            if amount and amount > (
                 invoice.amount
                 - invoice.total_invoicelines_amount
                 + self.instance.amount
             ):
+                raise ValidationError(
+                    'Sum of invoice line amount greater than invoice amount'
+                )
+        else:
+            if amount and amount > invoice.amount - invoice.total_invoicelines_amount:
                 raise ValidationError(
                     'Sum of invoice line amount greater than invoice amount'
                 )
