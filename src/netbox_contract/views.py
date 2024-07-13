@@ -14,7 +14,14 @@ from utilities.querydict import normalize_querydict
 from utilities.views import register_model_view
 
 from . import filtersets, forms, tables
-from .models import Contract, ContractAssignment, Invoice, InvoiceLine, ServiceProvider
+from .models import (
+    AccountingDimension,
+    Contract,
+    ContractAssignment,
+    Invoice,
+    InvoiceLine,
+    ServiceProvider,
+)
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 
@@ -392,3 +399,45 @@ class InvoiceLineBulkDeleteView(generic.BulkDeleteView):
     queryset = InvoiceLine.objects.annotate()
     filterset = filtersets.InvoiceLineFilterSet
     table = tables.InvoiceLineListTable
+
+
+# Accounting dimension
+
+
+class AccountingDimensionView(generic.ObjectView):
+    queryset = AccountingDimension.objects.all()
+
+
+class AccountingDimensionListView(generic.ObjectListView):
+    queryset = AccountingDimension.objects.all()
+    table = tables.AccountingDimensionListTable
+    filterset = filtersets.AccountingDimensionFilterSet
+    filterset_form = forms.AccountingDimensionFilterSetForm
+
+
+class AccountingDimensionEditView(generic.ObjectEditView):
+    queryset = AccountingDimension.objects.all()
+    form = forms.AccountingDimensionForm
+
+
+class AccountingDimensionDeleteView(generic.ObjectDeleteView):
+    queryset = AccountingDimension.objects.all()
+
+
+class AccountingDimensionBulkImportView(generic.BulkImportView):
+    queryset = AccountingDimension.objects.all()
+    model_form = forms.AccountingDimensionImportForm
+    table = tables.AccountingDimensionListTable
+
+
+class AccountingDimensionBulkEditView(generic.BulkEditView):
+    queryset = AccountingDimension.objects.annotate()
+    filterset = filtersets.AccountingDimensionFilterSet
+    table = tables.AccountingDimensionListTable
+    form = forms.AccountingDimensionBulkEditForm
+
+
+class AccountingDimensionBulkDeleteView(generic.BulkDeleteView):
+    queryset = AccountingDimension.objects.annotate()
+    filterset = filtersets.AccountingDimensionFilterSet
+    table = tables.AccountingDimensionListTable

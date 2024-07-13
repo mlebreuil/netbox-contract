@@ -30,6 +30,14 @@ invoiceline_buttons = [
     )
 ]
 
+accountingdimension_buttons = [
+    PluginMenuButton(
+        link='plugins:netbox_contract:accountingdimension_add',
+        title='Add',
+        icon_class='mdi mdi-plus-thick',
+        permissions=['netbox_contract.add_invoice'],
+    )
+]
 
 serviceprovider_buttons = [
     PluginMenuButton(
@@ -61,6 +69,13 @@ invoicelines_menu_item = PluginMenuItem(
     permissions=['netbox_contract.view_invoice'],
 )
 
+accounting_dimensions_menu_item = PluginMenuItem(
+    link='plugins:netbox_contract:accountingdimension_list',
+    link_text='Accounting dimensions',
+    buttons=accountingdimension_buttons,
+    permissions=['netbox_contract.view_invoice'],
+)
+
 service_provider_menu_item = PluginMenuItem(
     link='plugins:netbox_contract:serviceprovider_list',
     link_text='Service Providers',
@@ -77,6 +92,7 @@ items = (
     contract_menu_item,
     invoices_menu_item,
     invoicelines_menu_item,
+    accounting_dimensions_menu_item,
     service_provider_menu_item,
     contract_assignemnt_menu_item,
 )

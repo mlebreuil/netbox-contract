@@ -1,7 +1,14 @@
 import django_tables2 as tables
 from netbox.tables import NetBoxTable, columns
 
-from .models import Contract, ContractAssignment, Invoice, InvoiceLine, ServiceProvider
+from .models import (
+    AccountingDimension,
+    Contract,
+    ContractAssignment,
+    Invoice,
+    InvoiceLine,
+    ServiceProvider,
+)
 
 
 class ContractAssignmentListTable(NetBoxTable):
@@ -192,6 +199,7 @@ class ServiceProviderListTable(NetBoxTable):
 
 class InvoiceLineListTable(NetBoxTable):
     invoice = tables.Column(linkify=True)
+    accounting_dimensions = tables.ManyToManyColumn(linkify=True)
 
     class Meta(NetBoxTable.Meta):
         model = InvoiceLine
@@ -204,9 +212,26 @@ class InvoiceLineListTable(NetBoxTable):
             'comments',
         )
         default_columns = (
+            'pk',
             'invoice',
             'amount',
             'currency',
             'accounting_dimensions',
+            'comments',
+        )
+
+
+class AccountingDimensionListTable(NetBoxTable):
+    class Meta(NetBoxTable.Meta):
+        model = AccountingDimension
+        fields = (
+            'pk',
+            'name',
+            'value',
+            'comments',
+        )
+        default_columns = (
+            'name',
+            'value',
             'comments',
         )

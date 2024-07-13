@@ -40,6 +40,22 @@ class CurrencyChoices(ChoiceSet):
     ]
 
 
+class AccountingDimension(NetBoxModel):
+    name = models.CharField(max_length=20)
+    value = models.CharField(max_length=20)
+    comments = models.TextField(blank=True)
+
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_contract:accountingdimension', args=[self.pk])
+
+    @property
+    def dimension(self):
+        return ''.join([self.name, ':', self.value])
+
+    def __str__(self):
+        return self.dimension
+
+
 class ServiceProvider(ContactsMixin, NetBoxModel):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
@@ -186,7 +202,9 @@ class InvoiceLine(NetBoxModel):
         max_length=3, choices=CurrencyChoices, default=CurrencyChoices.CURRENCY_USD
     )
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    accounting_dimensions = models.JSONField(null=True)
+    accounting_dimensions = models.ManyToManyField(
+        AccountingDimension, related_name='invoicelines', blank=True
+    )
     comments = models.TextField(blank=True)
 
     def get_absolute_url(self):

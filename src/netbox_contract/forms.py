@@ -25,6 +25,7 @@ from utilities.forms.widgets import DatePicker, HTMXSelect
 
 from .constants import SERVICE_PROVIDER_MODELS
 from .models import (
+    AccountingDimension,
     Contract,
     ContractAssignment,
     InternalEntityChoices,
@@ -383,7 +384,9 @@ class ContractAssignmentImportForm(NetBoxModelImportForm):
 
 class InvoiceLineForm(NetBoxModelForm):
     invoice = DynamicModelChoiceField(queryset=Invoice.objects.all())
-    accounting_dimensions = Dimensions(required=False)
+    accounting_dimensions = forms.ModelMultipleChoiceField(
+        queryset=AccountingDimension.objects.all(), required=False
+    )
 
     def clean(self):
         super().clean()
@@ -404,6 +407,15 @@ class InvoiceLineForm(NetBoxModelForm):
                     'Sum of invoice line amount greater than invoice amount'
                 )
 
+        # check for duplicate dimensions
+        dimensions = self.cleaned_data.get('accounting_dimensions')
+        dimensions_names = []
+        for dimension in dimensions:
+            if dimension.name in dimensions_names:
+                raise ValidationError('duplicate accounting dimension')
+            else:
+                dimensions_names.append(dimension.name)
+
     class Meta:
         model = InvoiceLine
         fields = [
@@ -419,6 +431,9 @@ class InvoiceLineForm(NetBoxModelForm):
 class InvoiceLineFilterSetForm(NetBoxModelFilterSetForm):
     model = InvoiceLine
     invoice = DynamicModelChoiceField(queryset=Invoice.objects.all())
+    accounting_dimensions = DynamicModelMultipleChoiceField(
+        queryset=AccountingDimension.objects.all()
+    )
 
 
 class InvoiceLineImportForm(NetBoxModelImportForm):
@@ -426,6 +441,10 @@ class InvoiceLineImportForm(NetBoxModelImportForm):
         queryset=Invoice.objects.all(),
         to_field_name='number',
         help_text='Invoice number',
+    )
+    accounting_dimensions = CSVModelChoiceField(
+        queryset=AccountingDimension.objects.all(),
+        help_text='accounting dimention in the form name, value',
     )
 
     class Meta:
@@ -441,7 +460,41 @@ class InvoiceLineImportForm(NetBoxModelImportForm):
 
 
 class InvoiceLineBulkEditForm(NetBoxModelBulkEditForm):
-    invoice = DynamicModelMultipleChoiceField(
-        queryset=Invoice.objects.all(), required=False
+    invoice = DynamicModelChoiceField(queryset=Invoice.objects.all(), required=False)
+    accounting_dimensions = DynamicModelMultipleChoiceField(
+        queryset=AccountingDimension.objects.all(), required=False
     )
     model = InvoiceLine
+
+
+# AccountingDimension
+
+
+class AccountingDimensionForm(NetBoxModelForm):
+    class Meta:
+        model = AccountingDimension
+        fields = [
+            'name',
+            'value',
+            'comments',
+            'tags',
+        ]
+
+
+class AccountingDimensionFilterSetForm(NetBoxModelFilterSetForm):
+    model = AccountingDimension
+
+
+class AccountingDimensionImportForm(NetBoxModelImportForm):
+    class Meta:
+        model = AccountingDimension
+        fields = [
+            'name',
+            'value',
+            'comments',
+            'tags',
+        ]
+
+
+class AccountingDimensionBulkEditForm(NetBoxModelBulkEditForm):
+    model = AccountingDimension

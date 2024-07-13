@@ -3,6 +3,7 @@ from netbox.api.viewsets import NetBoxModelViewSet
 
 from .. import filtersets, models
 from .serializers import (
+    AccountingDimensionSerializer,
     ContractAssignmentSerializer,
     ContractSerializer,
     InvoiceLineSerializer,
@@ -37,3 +38,8 @@ class ContractAssignmentViewSet(NetBoxModelViewSet):
 class InvoiceLineViewSet(NetBoxModelViewSet):
     queryset = models.InvoiceLine.objects.prefetch_related('invoice', 'tags')
     serializer_class = InvoiceLineSerializer
+
+
+class AccountingDimensionViewSet(NetBoxModelViewSet):
+    queryset = models.AccountingDimension.objects.prefetch_related('tags')
+    serializer_class = AccountingDimensionSerializer

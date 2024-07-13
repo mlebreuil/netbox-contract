@@ -203,4 +203,41 @@ urlpatterns = (
         name='invoiceline_changelog',
         kwargs={'model': models.InvoiceLine},
     ),
+    # AccountingDimension
+    path(
+        'accountingdimension/',
+        views.AccountingDimensionListView.as_view(),
+        name='accountingdimension_list',
+    ),
+    path(
+        'accountingdimension/add/',
+        views.AccountingDimensionEditView.as_view(),
+        name='accountingdimension_add',
+    ),
+    path(
+        'accountingdimension/import/',
+        views.AccountingDimensionBulkImportView.as_view(),
+        name='accountingdimension_import',
+    ),
+    path(
+        'accountingdimension/<int:pk>/',
+        views.AccountingDimensionView.as_view(),
+        name='accountingdimension',
+    ),
+    path(
+        'accountingdimension/<int:pk>/edit/',
+        views.AccountingDimensionEditView.as_view(),
+        name='accountingdimension_edit',
+    ),
+    path(
+        'accountingdimension/<int:pk>/delete/',
+        views.AccountingDimensionDeleteView.as_view(),
+        name='accountingdimension_delete',
+    ),
+    path(
+        'accountingdimension/<int:pk>/changelog/',
+        ObjectChangeLogView.as_view(),
+        name='accountingdimension_changelog',
+        kwargs={'model': models.AccountingDimension},
+    ),
 )

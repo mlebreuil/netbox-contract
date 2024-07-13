@@ -1,6 +1,6 @@
 from netbox.search import SearchIndex
 
-from .models import Contract, Invoice, InvoiceLine, ServiceProvider
+from .models import AccountingDimension, Contract, Invoice, InvoiceLine, ServiceProvider
 
 
 class ServiceProviderIndex(SearchIndex):
@@ -35,4 +35,18 @@ class InvoiceLineIndex(SearchIndex):
     )
 
 
-indexes = [ServiceProviderIndex, ContractIndex, InvoiceIndex, InvoiceLineIndex]
+class AccountingDimensionIndex(SearchIndex):
+    model = AccountingDimension
+    fields = (
+        ('name', 20),
+        ('value', 20),
+    )
+
+
+indexes = [
+    ServiceProviderIndex,
+    ContractIndex,
+    InvoiceIndex,
+    InvoiceLineIndex,
+    AccountingDimensionIndex,
+]
