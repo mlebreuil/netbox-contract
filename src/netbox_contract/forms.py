@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from extras.filters import TagFilter
 from netbox.forms import (
     NetBoxModelBulkEditForm,
@@ -63,6 +63,9 @@ class ContractForm(NetBoxModelForm):
     external_partie_object = forms.ModelChoiceField(queryset=None)
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
     parent = DynamicModelChoiceField(queryset=Contract.objects.all(), required=False)
+    invoice_template = DynamicModelChoiceField(
+        queryset=Invoice.objects.filter(template=True), required=False
+    )
     accounting_dimensions = Dimensions(required=False)
 
     def __init__(self, *args, **kwargs):
@@ -104,11 +107,6 @@ class ContractForm(NetBoxModelForm):
             ].queryset = ServiceProvider.objects.all()
             self.fields['external_partie_object'].initial = None
 
-        # initialize accounting dimentsions widget
-        # self.fields[
-        #         'accounting_dimensions'
-        #     ].widget.attrs['placeholder'] = '{"key": "value"}'
-
         # Initialise fields settings
         mandatory_fields = plugin_settings.get('mandatory_contract_fields')
         for field in mandatory_fields:
@@ -133,6 +131,7 @@ class ContractForm(NetBoxModelForm):
             'initial_term',
             'renewal_term',
             'currency',
+            'invoice_template',
             'accounting_dimensions',
             'mrc',
             'nrc',
@@ -181,6 +180,12 @@ class ContractCSVForm(NetBoxModelImportForm):
         help_text='Contract name',
         required=False,
     )
+    invoice_template = CSVModelChoiceField(
+        queryset=Invoice.objects.filter(template=True),
+        to_field_name='number',
+        help_text='Invoice template number',
+        required=False,
+    )
 
     class Meta:
         model = Contract
@@ -225,6 +230,9 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
     internal_partie = forms.ChoiceField(choices=InternalEntityChoices, required=False)
     comments = CommentField(required=False)
     parent = DynamicModelChoiceField(queryset=Contract.objects.all(), required=False)
+    invoice_template = DynamicModelChoiceField(
+        queryset=Invoice.objects.filter(template=True), required=False
+    )
 
     nullable_fields = ('comments',)
     model = Contract
@@ -251,12 +259,76 @@ class InvoiceForm(NetBoxModelForm):
             if not self.fields[field].required:
                 self.fields[field].widget = forms.HiddenInput()
 
+    def clean(self):
+        super().clean()
+
+        # template checks
+        if self.cleaned_data['template']:
+            # Check that there is only one invoice template per contract
+            contracts = self.cleaned_data['contracts']
+            for contract in contracts:
+                for invoice in contract.invoices.all():
+                    if invoice.template and invoice.pk != self.instance.pk:
+                        raise ValidationError(
+                            'Only one invoice template allowed per contract'
+                        )
+
+            # Prefix the invoice name with _template
+            self.cleaned_data['number'] = '_template_' + self.cleaned_data['number']
+
+    def save(self, *args, **kwargs):
+        is_new = not bool(self.instance.pk)
+
+        instance = super().save(*args, **kwargs)
+
+        if is_new and not self.cleaned_data['template']:
+            contracts = self.cleaned_data['contracts']
+
+            for contract in contracts:
+                try:
+                    template_exists = True
+                    invoice_template = Invoice.objects.get(
+                        template=True, contracts=contract
+                    )
+                except ObjectDoesNotExist:
+                    template_exists = False
+
+                if template_exists:
+                    first = True
+                    for line in invoice_template.invoicelines.all():
+                        dimensions = line.accounting_dimensions.all()
+                        line.pk = None
+                        line.id = None
+                        line._state.adding = True
+                        line.invoice = self.instance
+
+                        # adjust the first invoice line amount
+                        amount = self.cleaned_data['amount']
+                        if (
+                            first
+                            and amount != invoice_template.total_invoicelines_amount
+                        ):
+                            line.amount = (
+                                line.amount
+                                + amount
+                                - invoice_template.total_invoicelines_amount
+                            )
+
+                        line.save()
+
+                        for dimension in dimensions:
+                            line.accounting_dimensions.add(dimension)
+                        first = False
+
+        return instance
+
     class Meta:
         model = Invoice
         fields = (
             'number',
             'date',
             'contracts',
+            'template',
             'period_start',
             'period_end',
             'currency',
@@ -293,6 +365,7 @@ class InvoiceCSVForm(NetBoxModelImportForm):
             'number',
             'date',
             'contracts',
+            'template',
             'period_start',
             'period_end',
             'currency',
@@ -390,27 +463,11 @@ class InvoiceLineForm(NetBoxModelForm):
 
     def clean(self):
         super().clean()
-        amount = self.cleaned_data.get('amount')
-        invoice = self.cleaned_data.get('invoice')
-        if self.instance.pk is not None:
-            if amount and amount > (
-                invoice.amount
-                - invoice.total_invoicelines_amount
-                + self.instance.amount
-            ):
-                raise ValidationError(
-                    'Sum of invoice line amount greater than invoice amount'
-                )
-        else:
-            if amount and amount > invoice.amount - invoice.total_invoicelines_amount:
-                raise ValidationError(
-                    'Sum of invoice line amount greater than invoice amount'
-                )
 
         # check for duplicate dimensions
-        dimensions = self.cleaned_data.get('accounting_dimensions')
+        accounting_dimensions = self.cleaned_data['accounting_dimensions']
         dimensions_names = []
-        for dimension in dimensions:
+        for dimension in accounting_dimensions:
             if dimension.name in dimensions_names:
                 raise ValidationError('duplicate accounting dimension')
             else:

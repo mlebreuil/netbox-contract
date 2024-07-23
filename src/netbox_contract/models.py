@@ -1,5 +1,6 @@
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from netbox.models import NetBoxModel
@@ -128,6 +129,13 @@ class Contract(NetBoxModel):
     currency = models.CharField(
         max_length=3, choices=CurrencyChoices, default=CurrencyChoices.CURRENCY_USD
     )
+    invoice_template = models.ForeignKey(
+        to='Invoice',
+        on_delete=models.CASCADE,
+        related_name='contract',
+        blank=True,
+        null=True,
+    )
     accounting_dimensions = models.JSONField(null=True, blank=True)
     mrc = models.DecimalField(
         verbose_name='Monthly recuring cost', max_digits=10, decimal_places=2
@@ -161,14 +169,15 @@ class Contract(NetBoxModel):
 
 class Invoice(NetBoxModel):
     number = models.CharField(max_length=100)
+    template = models.BooleanField(blank=True, null=True, default=False)
     date = models.DateField(blank=True, null=True)
     contracts = models.ManyToManyField(
         Contract,
         related_name='invoices',
         blank=True,
     )
-    period_start = models.DateField()
-    period_end = models.DateField()
+    period_start = models.DateField(blank=True, null=True)
+    period_end = models.DateField(blank=True, null=True)
     currency = models.CharField(
         max_length=3, choices=CurrencyChoices, default=CurrencyChoices.CURRENCY_USD
     )
@@ -209,3 +218,23 @@ class InvoiceLine(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:invoiceline', args=[self.pk])
+
+    def clean(self):
+        super().clean()
+        # Check that the sum of the invoice line amount is not greater the invoice amount
+        amount = self.amount
+        invoice = self.invoice
+        is_new = not bool(self.pk)
+        if is_new:
+            if amount > (invoice.amount - invoice.total_invoicelines_amount):
+                raise ValidationError(
+                    'Sum of invoice line amount greater than invoice amount'
+                )
+        else:
+            previous_amount = self.__class__.objects.get(pk=self.pk).amount
+            if amount > (
+                invoice.amount - invoice.total_invoicelines_amount + previous_amount
+            ):
+                raise ValidationError(
+                    'Sum of invoice line amount greater than invoice amount'
+                )

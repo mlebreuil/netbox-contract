@@ -226,6 +226,7 @@ class InvoiceView(generic.ObjectView):
         contracts_table = tables.ContractListTable(instance.contracts.all())
         contracts_table.configure(request)
         invoicelines_table = tables.InvoiceLineListTable(instance.invoicelines.all())
+        invoicelines_table.columns.hide('invoice')
         invoicelines_table.configure(request)
         hidden_fields = plugin_settings.get('hidden_invoice_fields')
 
