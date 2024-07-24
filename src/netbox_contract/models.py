@@ -129,13 +129,6 @@ class Contract(NetBoxModel):
     currency = models.CharField(
         max_length=3, choices=CurrencyChoices, default=CurrencyChoices.CURRENCY_USD
     )
-    invoice_template = models.ForeignKey(
-        to='Invoice',
-        on_delete=models.CASCADE,
-        related_name='contract',
-        blank=True,
-        null=True,
-    )
     accounting_dimensions = models.JSONField(null=True, blank=True)
     mrc = models.DecimalField(
         verbose_name='Monthly recuring cost', max_digits=10, decimal_places=2

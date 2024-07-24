@@ -63,9 +63,6 @@ class ContractForm(NetBoxModelForm):
     external_partie_object = forms.ModelChoiceField(queryset=None)
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
     parent = DynamicModelChoiceField(queryset=Contract.objects.all(), required=False)
-    invoice_template = DynamicModelChoiceField(
-        queryset=Invoice.objects.filter(template=True), required=False
-    )
     accounting_dimensions = Dimensions(required=False)
 
     def __init__(self, *args, **kwargs):
@@ -131,7 +128,6 @@ class ContractForm(NetBoxModelForm):
             'initial_term',
             'renewal_term',
             'currency',
-            'invoice_template',
             'accounting_dimensions',
             'mrc',
             'nrc',
@@ -180,12 +176,6 @@ class ContractCSVForm(NetBoxModelImportForm):
         help_text='Contract name',
         required=False,
     )
-    invoice_template = CSVModelChoiceField(
-        queryset=Invoice.objects.filter(template=True),
-        to_field_name='number',
-        help_text='Invoice template number',
-        required=False,
-    )
 
     class Meta:
         model = Contract
@@ -230,9 +220,6 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
     internal_partie = forms.ChoiceField(choices=InternalEntityChoices, required=False)
     comments = CommentField(required=False)
     parent = DynamicModelChoiceField(queryset=Contract.objects.all(), required=False)
-    invoice_template = DynamicModelChoiceField(
-        queryset=Invoice.objects.filter(template=True), required=False
-    )
 
     nullable_fields = ('comments',)
     model = Contract
