@@ -5,7 +5,7 @@ class ContractsConfig(PluginConfig):
     name = 'netbox_contract'
     verbose_name = 'Netbox contract'
     description = 'Contract management plugin for Netbox'
-    version = '2.1.2'
+    version = '2.2.0'
     author = 'Marc Lebreuil'
     author_email = 'marc@famillelebreuil.net'
     base_url = 'contracts'

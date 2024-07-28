@@ -1,6 +1,6 @@
 [project]
 name = "netbox-contract"
-version = "2.1.2"
+version = "2.2.0"
 authors = [
   { name="Marc Lebreuil", email="marc@famillelebreuil.net" },
 ]
@@ -9,6 +9,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     'python-dateutil',
+    'drf_yasg',
 ]
 classifiers = [
     "Programming Language :: Python :: 3",

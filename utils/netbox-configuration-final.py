@@ -57,7 +57,7 @@ REDIS = {
 # For optimal security, SECRET_KEY should be at least 50 characters in length and contain a mix of letters, numbers, and
 # symbols. NetBox will not run without this defined. For more information, see
 # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-SECRET_KEY
-SECRET_KEY = 'mNiCp)$_q^XKAPmaOARwu_ytW)Q$5ukOsHH#LqbOUQPeJu&fO!'
+SECRET_KEY = 'z(DvJ7Q0)8k)ch9xaQZueQxyfs&&gZ38-oe7jQh&0^KlPU^Yqc'
 
 
 #########################
@@ -169,16 +169,26 @@ LOGIN_TIMEOUT = None
 METRICS_ENABLED = False
 
 # Enable installed plugins. Add the name of each plugin to the list.
-PLUGINS = []
+PLUGINS = [
+    'netbox_contract',
+]
 
 # Plugins configuration settings. These settings are used by various plugins that the user may have installed.
 # Each key in the dictionary is the name of an installed plugin and its value is a dictionary of settings.
-# PLUGINS_CONFIG = {
-#     'my_plugin': {
-#         'foo': 'bar',
-#         'buzz': 'bazz'
-#     }
-# }
+PLUGINS_CONFIG = {
+    'netbox_contract': {
+        'top_level_menu': True,
+        'default_accounting_dimensions': {
+            'account': '',
+            'project': '',
+            'cost center': '',
+        },
+        'mandatory_contract_fields': ['accounting_dimensions'],
+        'hidden_contract_fields': [],
+        'mandatory_invoice_fields': ['accounting_dimensions'],
+        'hidden_invoice_fields': [],
+    }
+}
 
 # Remote authentication support
 REMOTE_AUTH_ENABLED = False

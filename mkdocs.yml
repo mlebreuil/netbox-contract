@@ -4,6 +4,10 @@ repo_url: https://github.com/mlebreuil/netbox-contract
 repo_name: netbox-contract
 nav:
   - Home: index.md
+  - Contract: contract.md
+  - Invoice: invoice.md
+  - Invoice line: invoice_line.md
+  - Accounting dimensions: accounting_dimensions.md
   - Contributing: contributing.md
   - Changelog: changelog.md
 theme:
