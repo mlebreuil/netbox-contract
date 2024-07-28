@@ -5,6 +5,10 @@
 
 ## Version 2
 
+### Version 2.2.0
+
+* [140](https://github.com/mlebreuil/netbox-contract/issues/140) Add the "Invoice line" and "Accounting dimension" models. In order to simplify invoices creation, it is possible to selsct one invoice as the template for each contract; Its accounting lines will automatically be copied to the new invoices for the contract. The amount of the first line will be updated so that the sum of the amount for each invoice line match the invoice amount.
+
 ### Version 2.1.2
 
 * [127](https://github.com/mlebreuil/netbox-contract/issues/135) Fix service provider creation issue

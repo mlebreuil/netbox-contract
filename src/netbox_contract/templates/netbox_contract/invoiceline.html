@@ -1,0 +1,42 @@
+{% extends 'generic/object.html' %}
+{% load plugins %}
+{% load render_table from django_tables2 %}
+{% block breadcrumbs %}
+  {{ block.super }}
+  <li class="breadcrumb-item">
+    <a href="{% url 'plugins:netbox_contract:invoiceline_list' %}?invoice={{ invoice.pk }}">{{ invoice.number }}</a>
+  </li>
+{% endblock %}
+{% block content %}
+  <div class="row mb-3">
+    <div class="col col-md-6">
+      <div class="card">
+        <h5 class="card-header">Invoice Lines</h5>
+          <table class="table table-hover attr-table">
+            <tr>
+              <th scope="row">Invoice</th>
+              <td>
+                <a href="{{ object.invoice.get_absolute_url }}">{{ object.invoice.number }}</a>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Amount</th>
+              <td>{{ object.amount }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Currency</th>
+              <td>{{ object.currency }}</td>
+            </tr>
+            <tr>
+              <th scope="row">Accounting dimentions</th>
+              <td>{{ object.accounting_dimensions }}</td>
+            </tr>
+          </table>
+      </div>
+      {% include 'inc/panels/custom_fields.html' %}
+      {% include 'inc/panels/tags.html' %}
+      {% include 'inc/panels/comments.html' %}
+    </div>
+  </div>
+{% plugin_right_page object %}
+{% endblock content %}

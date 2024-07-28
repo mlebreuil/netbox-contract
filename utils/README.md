@@ -39,7 +39,7 @@ cd netbox
 git clone -b master --depth 1 https://github.com/netbox-community/netbox.git .
 ```
 
-You do not need to create the Betbox system user
+You do not need to create the Netbox system user
 
 ### generate secret key
 
@@ -52,20 +52,13 @@ update the netbox-contract/utils/netbox-configuration.py with this secret key
 ### update netbox configuration
 
 ```
-sudo cp netbox-contract/utils/netbox-configuration.py netbox/netbox/netbox/configuration.py
+cp netbox-contract/utils/netbox-configuration.py netbox/netbox/netbox/configuration.py
 ```
 
 ### Run the Upgrade Script
 
 ```bash
-sudo netbox/upgrade.sh
-```
-
-Chnage the ownership of the creaed virtual environment
-
-```bash
-cd netbox
-sudo chown -R vscode:vscode venv
+netbox/upgrade.sh
 ```
 
 ### Create a Super User
@@ -86,14 +79,10 @@ python3 netbox/netbox/manage.py runserver
 For development, install the plugin from the local file system:  
 
  ```bash
+python3 -m pip uninstall netbox-contract
 python3 -m pip install -e netbox-contract
 ```
 
-Update netbox configuration to configure the plugin:
-
-```bash
-sudo cp netbox-contract/utils/netbox-configuration-final.py netbox/netbox/netbox/configuration.py
-```
 run database migrations:
 
 ```bash
@@ -104,7 +93,7 @@ install pre-commit:
 
 ```bash
 cd netbox-contract
-python -m pip install pre-commit
+python3 -m pip install pre-commit
 pre-commit install
 ```
 
@@ -119,15 +108,9 @@ python3 netbox/netbox/manage.py runserver
 
 ```bash
 cd netbox
-sudo git checkout master
-sudo git pull origin master
-sudo ./upgrade.sh
-```
-
-Change the owner of virtual environment:
-
-```bash
-sudo chown -R vscode:vscode venv
+git checkout master
+git pull origin master
+./upgrade.sh
 ```
 
 Reinstall the pluggin from the local filesystem (see below). 

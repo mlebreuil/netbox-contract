@@ -1,5 +1,6 @@
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from netbox.models import NetBoxModel
@@ -38,6 +39,22 @@ class CurrencyChoices(ChoiceSet):
         ('eur', 'EUR'),
         ('chf', 'CHF'),
     ]
+
+
+class AccountingDimension(NetBoxModel):
+    name = models.CharField(max_length=20)
+    value = models.CharField(max_length=20)
+    comments = models.TextField(blank=True)
+
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_contract:accountingdimension', args=[self.pk])
+
+    @property
+    def dimension(self):
+        return ''.join([self.name, ':', self.value])
+
+    def __str__(self):
+        return self.dimension
 
 
 class ServiceProvider(ContactsMixin, NetBoxModel):
@@ -145,14 +162,15 @@ class Contract(NetBoxModel):
 
 class Invoice(NetBoxModel):
     number = models.CharField(max_length=100)
+    template = models.BooleanField(blank=True, null=True, default=False)
     date = models.DateField(blank=True, null=True)
     contracts = models.ManyToManyField(
         Contract,
         related_name='invoices',
         blank=True,
     )
-    period_start = models.DateField()
-    period_end = models.DateField()
+    period_start = models.DateField(blank=True, null=True)
+    period_end = models.DateField(blank=True, null=True)
     currency = models.CharField(
         max_length=3, choices=CurrencyChoices, default=CurrencyChoices.CURRENCY_USD
     )
@@ -169,3 +187,47 @@ class Invoice(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:invoice', args=[self.pk])
+
+    @property
+    def total_invoicelines_amount(self):
+        """
+        Calculates the total amount for all related InvoiceLines.
+        """
+        return sum(invoiceline.amount for invoiceline in self.invoicelines.all())
+
+
+class InvoiceLine(NetBoxModel):
+    invoice = models.ForeignKey(
+        to='Invoice', on_delete=models.CASCADE, related_name='invoicelines'
+    )
+    currency = models.CharField(
+        max_length=3, choices=CurrencyChoices, default=CurrencyChoices.CURRENCY_USD
+    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    accounting_dimensions = models.ManyToManyField(
+        AccountingDimension, related_name='invoicelines', blank=True
+    )
+    comments = models.TextField(blank=True)
+
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_contract:invoiceline', args=[self.pk])
+
+    def clean(self):
+        super().clean()
+        # Check that the sum of the invoice line amount is not greater the invoice amount
+        amount = self.amount
+        invoice = self.invoice
+        is_new = not bool(self.pk)
+        if is_new:
+            if amount > (invoice.amount - invoice.total_invoicelines_amount):
+                raise ValidationError(
+                    'Sum of invoice line amount greater than invoice amount'
+                )
+        else:
+            previous_amount = self.__class__.objects.get(pk=self.pk).amount
+            if amount > (
+                invoice.amount - invoice.total_invoicelines_amount + previous_amount
+            ):
+                raise ValidationError(
+                    'Sum of invoice line amount greater than invoice amount'
+                )
