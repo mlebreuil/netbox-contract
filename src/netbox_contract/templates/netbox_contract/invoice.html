@@ -20,9 +20,14 @@
               <td>{{ object.number }}</td>
             </tr>
             <tr>
+              <th scope="row">Template</th>
+              <td>{{ object.template }}</td>
+            </tr>
+            <tr>
               <th scope="row">Date</th>
               <td>{{ object.date }}</td>
             </tr>
+            {% if not object.template %}
             <tr>
               <th scope="row">Period start</th>
               <td>{{ object.period_start }}</td>
@@ -31,6 +36,7 @@
               <th scope="row">Period end</th>
               <td>{{ object.period_end }}</td>
             </tr>
+            {% endif %}
             <tr>
               <th scope="row">Currency</th>
               <td>{{ object.currency }}</td>
