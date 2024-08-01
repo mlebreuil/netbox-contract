@@ -4,7 +4,8 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import F
+from django.db.models import Case, F, When
+from django.db.models.functions import Round
 from django.shortcuts import get_object_or_404, render
 from netbox.views import generic
 from netbox.views.generic.utils import get_prerequisite_model
@@ -129,7 +130,12 @@ class ContractAssignmentBulkImportView(generic.BulkImportView):
 
 @register_model_view(Contract)
 class ContractView(generic.ObjectView):
-    queryset = Contract.objects.annotate(yrc=F('mrc') * 12)
+    queryset = Contract.objects.annotate(
+        calculated_rc=Round(
+            Case(When(yrc__gt=0, then=F('yrc') / 12), default=F('mrc') * 12),
+            precision=2,
+        )
+    )
 
     def get_extra_context(self, request, instance):
         invoices_table = tables.InvoiceListTable(instance.invoices.all())
@@ -152,7 +158,12 @@ class ContractView(generic.ObjectView):
 
 
 class ContractListView(generic.ObjectListView):
-    queryset = Contract.objects.annotate(yrc=F('mrc') * 12)
+    queryset = Contract.objects.annotate(
+        calculated_rc=Round(
+            Case(When(yrc__gt=0, then=F('yrc') / 12), default=F('mrc') * 12),
+            precision=2,
+        )
+    )
     table = tables.ContractListTable
     filterset = filtersets.ContractFilterSet
     filterset_form = forms.ContractFilterSetForm
@@ -267,7 +278,9 @@ class InvoiceEditView(generic.ObjectEditView):
             contract = Contract.objects.get(pk=initial_data['contracts'])
 
             try:
-                last_invoice = contract.invoices.latest('period_end')
+                last_invoice = contract.invoices.filter(template=False).latest(
+                    'period_end'
+                )
                 new_period_start = last_invoice.period_end + timedelta(days=1)
             except ObjectDoesNotExist:
                 if contract.start_date:
@@ -281,7 +294,16 @@ class InvoiceEditView(generic.ObjectEditView):
                 new_period_end = new_period_start + delta - timedelta(days=1)
                 initial_data['period_end'] = new_period_end
 
-            initial_data['amount'] = contract.mrc * contract.invoice_frequency
+            if contract.yrc:
+                if contract.invoice_frequency == 12:
+                    initial_data['amount'] = contract.yrc
+                else:
+                    initial_data['amount'] = round(
+                        contract.yrc / 12 * contract.invoice_frequency, 2
+                    )
+            else:
+                initial_data['amount'] = contract.mrc * contract.invoice_frequency
+
             initial_data['currency'] = contract.currency
             if contract.accounting_dimensions:
                 initial_data['accounting_dimensions'] = contract.accounting_dimensions

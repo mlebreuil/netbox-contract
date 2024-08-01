@@ -130,8 +130,19 @@ class Contract(NetBoxModel):
         max_length=3, choices=CurrencyChoices, default=CurrencyChoices.CURRENCY_USD
     )
     accounting_dimensions = models.JSONField(null=True, blank=True)
+    yrc = models.DecimalField(
+        verbose_name='yearly recuring cost',
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
     mrc = models.DecimalField(
-        verbose_name='Monthly recuring cost', max_digits=10, decimal_places=2
+        verbose_name='Monthly recuring cost',
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
     )
     nrc = models.DecimalField(
         verbose_name='None recuring cost', default=0, max_digits=10, decimal_places=2
