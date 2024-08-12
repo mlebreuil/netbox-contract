@@ -142,16 +142,18 @@
   <div class="row">
     <div class="col col-md-12">
       <div class="card">
-        <h5 class="card-header">Invoices</h5>
-          {% render_table invoices_table %}
-        {% if perms.netbox_contract.add_invoice %}
-        <div class="card-footer text-end noprint">
-          <a href="{% url 'plugins:netbox_contract:invoice_add' %}?contracts={{ object.pk }}" class="btn btn-primary">
+        <h5 class="card-header">
+          Invoices
+          {% if perms.netbox_contract.add_invoice %}
+          <div class="card-actions">
+            <a href="{% url 'plugins:netbox_contract:invoice_add' %}?contracts={{ object.pk }}" class="btn btn-ghost-primary btn-sm">
               <i class="mdi mdi-plus-thick" aria-hidden="true"></i>
               Add an invoice
           </a>
-        </div>
-        {% endif %}
+          </div>
+          {% endif %}
+        </h5>
+          {% render_table invoices_table %}
       </div>
     </div>
   </div>

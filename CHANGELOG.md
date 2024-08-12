@@ -9,6 +9,7 @@
 
 * [142](https://github.com/mlebreuil/netbox-contract/issues/142) Gives the option to enter contract yearly recuring costs instead of only monthly recuring costs.
 Corresponding value is used to calculate the invoices amount without rounding approximations.
+* [148](https://github.com/mlebreuil/netbox-contract/issues/148) Update tables format to match the new Netbox UI design.
 
 ### Version 2.2.0
 
