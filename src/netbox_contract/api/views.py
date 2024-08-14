@@ -1,4 +1,5 @@
-from django.db.models import F
+from django.db.models import Case, F, When
+from django.db.models.functions import Round
 from netbox.api.viewsets import NetBoxModelViewSet
 
 from .. import filtersets, models
@@ -14,7 +15,10 @@ from .serializers import (
 
 class ContractViewSet(NetBoxModelViewSet):
     queryset = models.Contract.objects.prefetch_related('parent', 'tags').annotate(
-        yrc=F('mrc') * 12
+        calculated_rc=Round(
+            Case(When(yrc__gt=0, then=F('yrc') / 12), default=F('mrc') * 12),
+            precision=2,
+        )
     )
     serializer_class = ContractSerializer
 

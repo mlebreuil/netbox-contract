@@ -42,14 +42,15 @@ class ContractAssignmentListTable(NetBoxTable):
 class ContractAssignmentObjectTable(NetBoxTable):
     contract = tables.Column(linkify=True)
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
-    contract__external_partie_object = tables.Column(linkify=True)
+    contract__external_partie_object = tables.Column(
+        verbose_name='Partner', linkify=True
+    )
 
     class Meta(NetBoxTable.Meta):
         model = ContractAssignment
         fields = (
             'pk',
             'contract',
-            'contract__external_partie_object_type',
             'contract__external_partie_object',
             'contract__status',
             'contract__start_date',
