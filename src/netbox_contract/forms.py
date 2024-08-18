@@ -555,4 +555,6 @@ class AccountingDimensionImportForm(NetBoxModelImportForm):
 
 
 class AccountingDimensionBulkEditForm(NetBoxModelBulkEditForm):
+    name = forms.CharField(max_length=20, required=False)
+    value = forms.CharField(max_length=20, required=False)
     model = AccountingDimension
