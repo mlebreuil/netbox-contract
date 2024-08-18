@@ -66,8 +66,15 @@ class NestedInvoicelineSerializer(WritableNestedSerializer):
 
     class Meta:
         model = InvoiceLine
-        fields = ('id', 'url', 'display', 'invoice', 'amount')
-        brief_fields = ('id', 'url', 'display', 'invoice', 'amount')
+        fields = ('id', 'url', 'display', 'invoice', 'accounting_dimensions', 'amount')
+        brief_fields = (
+            'id',
+            'url',
+            'display',
+            'invoice',
+            'accounting_dimensions',
+            'amount',
+        )
 
 
 class NestedAccountingDimensionSerializer(WritableNestedSerializer):
@@ -227,6 +234,10 @@ class InvoiceLineSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_contract-api:invoiceline-detail'
     )
+    invoice = NestedInvoiceSerializer(many=False, required=False)
+    accounting_dimensions = NestedAccountingDimensionSerializer(
+        many=True, required=False
+    )
 
     class Meta:
         model = InvoiceLine
@@ -237,13 +248,21 @@ class InvoiceLineSerializer(NetBoxModelSerializer):
             'invoice',
             'amount',
             'currency',
+            'accounting_dimensions',
             'comments',
             'tags',
             'custom_fields',
             'created',
             'last_updated',
         )
-        brief_fields = ('invoice', 'amount', 'url', 'display', 'name')
+        brief_fields = (
+            'invoice',
+            'accounting_dimensions',
+            'amount',
+            'url',
+            'display',
+            'name',
+        )
 
 
 class AccountingDimensionSerializer(NetBoxModelSerializer):
