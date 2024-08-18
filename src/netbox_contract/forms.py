@@ -26,6 +26,7 @@ from utilities.forms.widgets import DatePicker, HTMXSelect
 from .constants import SERVICE_PROVIDER_MODELS
 from .models import (
     AccountingDimension,
+    AccountingDimensionStatusChoices,
     Contract,
     ContractAssignment,
     InternalEntityChoices,
@@ -488,10 +489,7 @@ class InvoiceLineForm(NetBoxModelForm):
 
 class InvoiceLineFilterSetForm(NetBoxModelFilterSetForm):
     model = InvoiceLine
-    invoice = DynamicModelChoiceField(queryset=Invoice.objects.all())
-    accounting_dimensions = DynamicModelMultipleChoiceField(
-        queryset=AccountingDimension.objects.all()
-    )
+    invoice = DynamicModelChoiceField(queryset=Invoice.objects.all(), required=False)
 
 
 class InvoiceLineImportForm(NetBoxModelImportForm):
@@ -543,6 +541,10 @@ class AccountingDimensionForm(NetBoxModelForm):
 
 class AccountingDimensionFilterSetForm(NetBoxModelFilterSetForm):
     model = AccountingDimension
+
+    name = forms.CharField(required=False)
+    value = forms.CharField(required=False)
+    status = forms.ChoiceField(choices=AccountingDimensionStatusChoices, required=False)
 
 
 class AccountingDimensionImportForm(NetBoxModelImportForm):
