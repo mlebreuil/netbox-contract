@@ -26,6 +26,7 @@ from utilities.forms.widgets import DatePicker, HTMXSelect
 from .constants import SERVICE_PROVIDER_MODELS
 from .models import (
     AccountingDimension,
+    AccountingDimensionStatusChoices,
     Contract,
     ContractAssignment,
     InternalEntityChoices,
@@ -147,7 +148,7 @@ class ContractForm(NetBoxModelForm):
     def clean(self):
         super().clean()
 
-        if self.cleaned_data['mrc'] and self.cleaned_data['mrc']:
+        if self.cleaned_data['mrc'] and self.cleaned_data['yrc']:
             raise ValidationError(
                 'you should set monthly OR yearly recuring costs not both'
             )
@@ -488,10 +489,7 @@ class InvoiceLineForm(NetBoxModelForm):
 
 class InvoiceLineFilterSetForm(NetBoxModelFilterSetForm):
     model = InvoiceLine
-    invoice = DynamicModelChoiceField(queryset=Invoice.objects.all())
-    accounting_dimensions = DynamicModelMultipleChoiceField(
-        queryset=AccountingDimension.objects.all()
-    )
+    invoice = DynamicModelChoiceField(queryset=Invoice.objects.all(), required=False)
 
 
 class InvoiceLineImportForm(NetBoxModelImportForm):
@@ -502,7 +500,8 @@ class InvoiceLineImportForm(NetBoxModelImportForm):
     )
     accounting_dimensions = CSVModelChoiceField(
         queryset=AccountingDimension.objects.all(),
-        help_text='accounting dimention in the form name, value',
+        to_field_name='id',
+        help_text='accounting dimension id',
     )
 
     class Meta:
@@ -534,6 +533,7 @@ class AccountingDimensionForm(NetBoxModelForm):
         fields = [
             'name',
             'value',
+            'status',
             'comments',
             'tags',
         ]
@@ -542,17 +542,26 @@ class AccountingDimensionForm(NetBoxModelForm):
 class AccountingDimensionFilterSetForm(NetBoxModelFilterSetForm):
     model = AccountingDimension
 
+    name = forms.CharField(required=False)
+    value = forms.CharField(required=False)
+    status = forms.ChoiceField(choices=AccountingDimensionStatusChoices, required=False)
+
 
 class AccountingDimensionImportForm(NetBoxModelImportForm):
+    status = CSVChoiceField(choices=StatusChoices, help_text='Contract status')
+
     class Meta:
         model = AccountingDimension
         fields = [
             'name',
             'value',
+            'status',
             'comments',
             'tags',
         ]
 
 
 class AccountingDimensionBulkEditForm(NetBoxModelBulkEditForm):
+    name = forms.CharField(max_length=20, required=False)
+    value = forms.CharField(max_length=20, required=False)
     model = AccountingDimension

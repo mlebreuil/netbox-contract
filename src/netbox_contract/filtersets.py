@@ -61,7 +61,7 @@ class InvoiceLineFilterSet(NetBoxModelFilterSet):
 
     def search(self, queryset, name, value):
         return queryset.filter(
-            Q(comments__icontains=value) | Q(invoice__name__icontains=value)
+            Q(comments__icontains=value) | Q(invoice__number__icontains=value)
         )
 
 
@@ -71,6 +71,4 @@ class AccountingDimensionFilterSet(NetBoxModelFilterSet):
         fields = ('name', 'value')
 
     def search(self, queryset, name, value):
-        return queryset.filter(
-            Q(comments__icontains=value) | Q(invoice__name__icontains=value)
-        )
+        return queryset.filter(Q(comments__icontains=value) | Q(name__icontains=value))

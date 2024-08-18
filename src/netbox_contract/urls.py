@@ -183,6 +183,16 @@ urlpatterns = (
         name='invoiceline_import',
     ),
     path(
+        'invoiceline/edit/',
+        views.InvoiceLineBulkEditView.as_view(),
+        name='invoiceline_bulk_edit',
+    ),
+    path(
+        'invoiceline/delete/',
+        views.InvoiceLineBulkDeleteView.as_view(),
+        name='invoiceline_bulk_delete',
+    ),
+    path(
         'invoiceline/<int:pk>/',
         views.InvoiceLineView.as_view(),
         name='invoiceline',
@@ -218,6 +228,16 @@ urlpatterns = (
         'accountingdimension/import/',
         views.AccountingDimensionBulkImportView.as_view(),
         name='accountingdimension_import',
+    ),
+    path(
+        'accountingdimension/edit/',
+        views.AccountingDimensionBulkEditView.as_view(),
+        name='accountingdimension_bulk_edit',
+    ),
+    path(
+        'accountingdimension/delete/',
+        views.AccountingDimensionBulkDeleteView.as_view(),
+        name='accountingdimension_bulk_delete',
     ),
     path(
         'accountingdimension/<int:pk>/',
