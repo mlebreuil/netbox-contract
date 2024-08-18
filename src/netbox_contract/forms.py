@@ -502,7 +502,8 @@ class InvoiceLineImportForm(NetBoxModelImportForm):
     )
     accounting_dimensions = CSVModelChoiceField(
         queryset=AccountingDimension.objects.all(),
-        help_text='accounting dimention in the form name, value',
+        to_field_name='id',
+        help_text='accounting dimension id',
     )
 
     class Meta:
