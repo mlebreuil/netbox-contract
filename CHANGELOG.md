@@ -5,6 +5,10 @@
 
 ## Version 2
 
+### Version 2.2.2
+
+* [154](https://github.com/mlebreuil/netbox-contract/issues/154) Fix edit and delete bulk operations on dimensions and invoice lines.
+
 ### Version 2.2.1
 
 * [142](https://github.com/mlebreuil/netbox-contract/issues/142) Gives the option to enter contract yearly recuring costs instead of only monthly recuring costs.
