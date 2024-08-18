@@ -535,6 +535,7 @@ class AccountingDimensionForm(NetBoxModelForm):
         fields = [
             'name',
             'value',
+            'status',
             'comments',
             'tags',
         ]
@@ -545,11 +546,14 @@ class AccountingDimensionFilterSetForm(NetBoxModelFilterSetForm):
 
 
 class AccountingDimensionImportForm(NetBoxModelImportForm):
+    status = CSVChoiceField(choices=StatusChoices, help_text='Contract status')
+
     class Meta:
         model = AccountingDimension
         fields = [
             'name',
             'value',
+            'status',
             'comments',
             'tags',
         ]
