@@ -50,7 +50,7 @@ class NestedInvoiceSerializer(WritableNestedSerializer):
 
 class NestedContractAssignmentSerializer(WritableNestedSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_contract-api:ContractAssignment-detail'
+        view_name='plugins-api:netbox_contract-api:contractassignment-detail'
     )
 
     class Meta:
@@ -61,7 +61,7 @@ class NestedContractAssignmentSerializer(WritableNestedSerializer):
 
 class NestedInvoicelineSerializer(WritableNestedSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_contract-api:InvoiceLine-detail'
+        view_name='plugins-api:netbox_contract-api:invoiceline-detail'
     )
 
     class Meta:
@@ -79,7 +79,7 @@ class NestedInvoicelineSerializer(WritableNestedSerializer):
 
 class NestedAccountingDimensionSerializer(WritableNestedSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_contract-api:AccountingDimension-detail'
+        view_name='plugins-api:netbox_contract-api:accountingdimension-detail'
     )
 
     class Meta:

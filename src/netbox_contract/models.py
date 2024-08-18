@@ -239,9 +239,7 @@ class InvoiceLine(NetBoxModel):
         max_length=3, choices=CurrencyChoices, default=CurrencyChoices.CURRENCY_USD
     )
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    accounting_dimensions = models.ManyToManyField(
-        AccountingDimension, related_name='invoicelines', blank=True
-    )
+    accounting_dimensions = models.ManyToManyField(AccountingDimension, blank=True)
     comments = models.TextField(blank=True)
 
     def get_absolute_url(self):
