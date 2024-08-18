@@ -8,6 +8,8 @@
 ### Version 2.2.2
 
 * [154](https://github.com/mlebreuil/netbox-contract/issues/154) Fix edit and delete bulk operations on dimensions and invoice lines.
+* [153](https://github.com/mlebreuil/netbox-contract/issues/153) Enforce uniquness of accounting dimensions.
+* Adds a status ( Active or Inactive ) to accounitng dimensions.
 
 ### Version 2.2.1
 

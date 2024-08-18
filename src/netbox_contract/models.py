@@ -20,6 +20,18 @@ class StatusChoices(ChoiceSet):
     ]
 
 
+class AccountingDimensionStatusChoices(ChoiceSet):
+    key = 'AccountingDimension.status'
+
+    STATUS_ACTIVE = 'Active'
+    STATUS_INACTIVE = 'Inactive'
+
+    CHOICES = [
+        (STATUS_ACTIVE, 'Active', 'green'),
+        (STATUS_INACTIVE, 'Inactive', 'red'),
+    ]
+
+
 class InternalEntityChoices(ChoiceSet):
     key = 'Contract.internal_partie'
 
@@ -44,6 +56,11 @@ class CurrencyChoices(ChoiceSet):
 class AccountingDimension(NetBoxModel):
     name = models.CharField(max_length=20)
     value = models.CharField(max_length=20)
+    status = models.CharField(
+        max_length=50,
+        choices=AccountingDimensionStatusChoices,
+        default=StatusChoices.STATUS_ACTIVE,
+    )
     comments = models.TextField(blank=True)
 
     def get_absolute_url(self):
@@ -55,6 +72,13 @@ class AccountingDimension(NetBoxModel):
 
     def __str__(self):
         return self.dimension
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'value'], name='unique_accounting_dimension'
+            )
+        ]
 
 
 class ServiceProvider(ContactsMixin, NetBoxModel):
