@@ -16,6 +16,7 @@ from utilities.forms.fields import (
     CSVChoiceField,
     CSVContentTypeField,
     CSVModelChoiceField,
+    CSVModelMultipleChoiceField,
     DynamicModelChoiceField,
     DynamicModelMultipleChoiceField,
     JSONField,
@@ -459,7 +460,7 @@ class ContractAssignmentImportForm(NetBoxModelImportForm):
 
 class InvoiceLineForm(NetBoxModelForm):
     invoice = DynamicModelChoiceField(queryset=Invoice.objects.all())
-    accounting_dimensions = forms.ModelMultipleChoiceField(
+    accounting_dimensions = DynamicModelMultipleChoiceField(
         queryset=AccountingDimension.objects.all(), required=False
     )
 
@@ -490,6 +491,9 @@ class InvoiceLineForm(NetBoxModelForm):
 class InvoiceLineFilterSetForm(NetBoxModelFilterSetForm):
     model = InvoiceLine
     invoice = DynamicModelChoiceField(queryset=Invoice.objects.all(), required=False)
+    accounting_dimensions = DynamicModelChoiceField(
+        queryset=AccountingDimension.objects.all(), required=False
+    )
 
 
 class InvoiceLineImportForm(NetBoxModelImportForm):
@@ -498,7 +502,7 @@ class InvoiceLineImportForm(NetBoxModelImportForm):
         to_field_name='number',
         help_text='Invoice number',
     )
-    accounting_dimensions = CSVModelChoiceField(
+    accounting_dimensions = CSVModelMultipleChoiceField(
         queryset=AccountingDimension.objects.all(),
         to_field_name='id',
         help_text='accounting dimension id',

@@ -5,6 +5,10 @@
 
 ## Version 2
 
+### Version 2.2.3
+
+* Fix accounting dimensions access through Dynamic Object Fields 
+
 ### Version 2.2.2
 
 * [154](https://github.com/mlebreuil/netbox-contract/issues/154) Fix edit and delete bulk operations on dimensions and invoice lines.
