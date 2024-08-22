@@ -7,7 +7,9 @@
 
 ### Version 2.2.3
 
-* Fix accounting dimensions access through Dynamic Object Fields 
+* Fix accounting dimensions access through Dynamic Object Fields
+* Fix invoice creation from contract. 
+* Add scripts to convert accounting dimensions in the json fields of contract and invoices to invoice template, invoicelines and dimensions objects.
 
 ### Version 2.2.2
 
