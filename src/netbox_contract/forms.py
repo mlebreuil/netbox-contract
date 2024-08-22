@@ -241,6 +241,10 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
 
 
 class InvoiceForm(NetBoxModelForm):
+    number = forms.CharField(
+        max_length=100,
+        help_text='Invoice template name will be overriden to _invoice_template_contract name',
+    )
     contracts = DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(), required=False
     )
