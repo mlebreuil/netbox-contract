@@ -5,6 +5,12 @@
 
 ## Version 2
 
+### Version 2.2.3
+
+* Fix accounting dimensions access through Dynamic Object Fields
+* Fix invoice creation from contract. 
+* Add scripts to convert accounting dimensions in the json fields of contract and invoices to invoice template, invoicelines and dimensions objects.
+
 ### Version 2.2.2
 
 * [154](https://github.com/mlebreuil/netbox-contract/issues/154) Fix edit and delete bulk operations on dimensions and invoice lines.

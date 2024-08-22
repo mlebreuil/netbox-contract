@@ -278,7 +278,7 @@ class InvoiceEditView(generic.ObjectEditView):
             contract = Contract.objects.get(pk=initial_data['contracts'])
 
             try:
-                last_invoice = contract.invoices.filter(template=False).latest(
+                last_invoice = contract.invoices.exclude(template=True).latest(
                     'period_end'
                 )
                 new_period_start = last_invoice.period_end + timedelta(days=1)
