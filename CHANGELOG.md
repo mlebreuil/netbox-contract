@@ -7,7 +7,8 @@
 
 ### Version 2.2.4
 
-* [165](https://github.com/mlebreuil/netbox-contract/issues/160) Add more fields to the invoice and contract bulk edit forms.
+* [161](https://github.com/mlebreuil/netbox-contract/issues/161) Chnage the invoice block title if the invoice is a template.
+* [160](https://github.com/mlebreuil/netbox-contract/issues/160) Add more fields to the invoice and contract bulk edit forms.
 * [165](https://github.com/mlebreuil/netbox-contract/issues/165) Fix Invoice and invoiceline creation through api. 
 
 ### Version 2.2.3
