@@ -5,6 +5,10 @@
 
 ## Version 2
 
+### Version 2.2.4
+
+* [165](https://github.com/mlebreuil/netbox-contract/issues/165) Fix Invoice and invoiceline creation through api. 
+
 ### Version 2.2.3
 
 * Fix accounting dimensions access through Dynamic Object Fields
