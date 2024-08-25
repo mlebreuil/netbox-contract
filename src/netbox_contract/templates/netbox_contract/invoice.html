@@ -13,15 +13,15 @@
   <div class="row mb-3">
     <div class="col col-md-6">
       <div class="card">
-        <h5 class="card-header">Invoices</h5>
+        {% if object.template %}
+        <h5 class="card-header">Invoice template</h5>
+        {% else %}
+        <h5 class="card-header">Invoice</h5>
+        {% endif %}
           <table class="table table-hover attr-table">
             <tr>
               <th scope="row">Number</th>
               <td>{{ object.number }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Template</th>
-              <td>{{ object.template }}</td>
             </tr>
             <tr>
               <th scope="row">Date</th>
