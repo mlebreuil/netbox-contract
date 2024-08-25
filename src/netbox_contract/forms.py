@@ -30,6 +30,7 @@ from .models import (
     AccountingDimensionStatusChoices,
     Contract,
     ContractAssignment,
+    CurrencyChoices,
     InternalEntityChoices,
     Invoice,
     InvoiceLine,
@@ -227,13 +228,17 @@ class ContractCSVForm(NetBoxModelImportForm):
 
 class ContractBulkEditForm(NetBoxModelBulkEditForm):
     name = forms.CharField(max_length=100, required=False)
-
     external_reference = forms.CharField(max_length=100, required=False)
     internal_partie = forms.ChoiceField(choices=InternalEntityChoices, required=False)
+    tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
+    accounting_dimensions = Dimensions(required=False)
     comments = CommentField(required=False)
     parent = DynamicModelChoiceField(queryset=Contract.objects.all(), required=False)
 
-    nullable_fields = ('comments',)
+    nullable_fields = (
+        'accounting_dimensions',
+        'comments',
+    )
     model = Contract
 
 
@@ -386,9 +391,23 @@ class InvoiceCSVForm(NetBoxModelImportForm):
 
 class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
     number = forms.CharField(max_length=100, required=True)
+    template = forms.BooleanField(required=False)
+    date = forms.DateField(required=False)
     contracts = DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(), required=False
     )
+    period_start = forms.DateField(required=False)
+    period_end = forms.DateField(required=False)
+    currency = forms.ChoiceField(choices=CurrencyChoices, required=False)
+    accounting_dimensions = Dimensions(required=False)
+    amount = forms.DecimalField(max_digits=10, decimal_places=2, required=False)
+    documents = forms.URLField(required=False)
+    comments = CommentField()
+    nullable_fields = (
+        'accounting_dimensions',
+        'comments',
+    )
+
     model = Invoice
 
 
