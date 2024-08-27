@@ -32,6 +32,10 @@ class NestedContractSerializer(WritableNestedSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_contract-api:contract-detail'
     )
+    yrc = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    tenant = NestedTenantSerializer(many=False, required=False)
+    external_partie_object_type = ContentTypeField(queryset=ContentType.objects.all())
+    external_partie_object = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Contract
@@ -58,8 +62,16 @@ class NestedContractSerializer(WritableNestedSerializer):
             'nrc',
             'invoice_frequency',
             'comments',
-            'parent',
         )
+
+    @swagger_serializer_method(serializer_or_field=serializers.JSONField)
+    def get_external_partie_object(self, instance):
+        serializer = get_serializer_for_model(
+            instance.external_partie_object_type.model_class(),
+            prefix=NESTED_SERIALIZER_PREFIX,
+        )
+        context = {'request': self.context['request']}
+        return serializer(instance.external_partie_object, context=context).data
 
 
 class NestedInvoiceSerializer(WritableNestedSerializer):

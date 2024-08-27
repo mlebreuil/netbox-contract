@@ -120,6 +120,27 @@
     <div class="col col-md-6">
       {% include 'inc/panels/tags.html' %}
       {% include 'inc/panels/comments.html' %}
+      {% if invoice_template %}
+      <div class="card">
+        <h5 class="card-header">
+          Invoice template
+        </h5>
+        <table class="table table-hover attr-table">
+          <tr>
+            <th scope="row">Currency</th>
+            <td>{{ invoice_template.currency }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Total amount</th>
+            <td>{{ invoice_template.total_invoicelines_amount }}</td>
+          </tr>
+        </table>
+        <h5 class="card-header">
+          Invoice template lines
+        </h5>
+          {% render_table invoicelines_table %}
+      </div>
+      {% endif %}
     </div>
   </div>
   <div class="row">
@@ -130,6 +151,7 @@
       </div>
     </div>
   </div>
+  {% if childs_table %}
   <div class="row">
     <div class="col col-md-12">
       <div class="card">
@@ -138,6 +160,7 @@
       </div>
     </div>
   </div>
+  {% endif %}
   {% if perms.netbox_contract.view_invoice %}
   <div class="row">
     <div class="col col-md-12">
