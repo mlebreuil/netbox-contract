@@ -127,6 +127,12 @@
         </h5>
         <table class="table table-hover attr-table">
           <tr>
+            <th scope="row">Number</th>
+            <td>
+              <a href="{{ invoice_template.get_absolute_url }}">{{  invoice_template.number }}</a>
+            </td>
+          </tr>
+          <tr>
             <th scope="row">Currency</th>
             <td>{{ invoice_template.currency }}</td>
           </tr>
