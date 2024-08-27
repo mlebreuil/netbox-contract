@@ -5,6 +5,13 @@
 
 ## Version 2
 
+### Version 2.2.4
+
+* [166](https://github.com/mlebreuil/netbox-contract/issues/166) Review the Contract view to include invoice template details and lines.
+* [161](https://github.com/mlebreuil/netbox-contract/issues/161) Change the invoice block title if the invoice is a template.
+* [160](https://github.com/mlebreuil/netbox-contract/issues/160) Add more fields to the invoice and contract bulk edit forms.
+* [165](https://github.com/mlebreuil/netbox-contract/issues/165) Fix Invoice and invoiceline creation through api. 
+
 ### Version 2.2.3
 
 * Fix accounting dimensions access through Dynamic Object Fields
