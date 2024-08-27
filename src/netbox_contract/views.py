@@ -138,20 +138,38 @@ class ContractView(generic.ObjectView):
     )
 
     def get_extra_context(self, request, instance):
-        invoices_table = tables.InvoiceListTable(instance.invoices.all())
+        invoices_table = tables.InvoiceListTable(
+            instance.invoices.exclude(template=True)
+        )
+        invoices_table.columns.hide('contracts')
         invoices_table.configure(request)
         assignments_table = tables.ContractAssignmentContractTable(
             instance.assignments.all()
         )
+        invoice_template = instance.invoices.filter(template=True).first()
+        if invoice_template:
+            invoicelines_table = tables.InvoiceLineListTable(
+                invoice_template.invoicelines.all()
+            )
+            invoicelines_table.columns.hide('invoice')
+            invoicelines_table.columns.hide('currency')
+            invoicelines_table.configure(request)
+        else:
+            invoicelines_table = None
         assignments_table.configure(request)
-        childs_table = tables.ContractListBottomTable(instance.childs.all())
-        childs_table.configure(request)
+        if instance.childs.all():
+            childs_table = tables.ContractListBottomTable(instance.childs.all())
+            childs_table.configure(request)
+        else:
+            childs_table = None
 
         hidden_fields = plugin_settings.get('hidden_contract_fields')
 
         return {
             'hidden_fields': hidden_fields,
             'invoices_table': invoices_table,
+            'invoice_template': invoice_template,
+            'invoicelines_table': invoicelines_table,
             'assignments_table': assignments_table,
             'childs_table': childs_table,
         }
