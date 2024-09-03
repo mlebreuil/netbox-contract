@@ -1,3 +1,4 @@
+import django_filters
 from django.db.models import Q
 from netbox.filtersets import NetBoxModelFilterSet
 
@@ -8,13 +9,16 @@ from .models import (
     Invoice,
     InvoiceLine,
     ServiceProvider,
+    StatusChoices,
 )
 
 
 class ContractFilterSet(NetBoxModelFilterSet):
+    status = django_filters.MultipleChoiceFilter(choices=StatusChoices, null_value=None)
+
     class Meta:
         model = Contract
-        fields = ('id', 'internal_partie', 'status', 'parent')
+        fields = ('id', 'name', 'internal_partie', 'external_reference', 'parent')
 
     def search(self, queryset, name, value):
         return queryset.filter(
@@ -28,7 +32,7 @@ class ContractFilterSet(NetBoxModelFilterSet):
 class InvoiceFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = Invoice
-        fields = ('id', 'contracts')
+        fields = ('id', 'number', 'template', 'contracts')
 
     def search(self, queryset, name, value):
         return queryset.filter(
