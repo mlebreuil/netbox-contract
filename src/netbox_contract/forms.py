@@ -509,6 +509,12 @@ class InvoiceLineForm(NetBoxModelForm):
             else:
                 dimensions_names.append(dimension.name)
 
+        # Make sure mandatory dimensions are present
+        mandatory_dimensions = plugin_settings.get('mandatory_dimensions')
+        for dimension in mandatory_dimensions:
+            if dimension not in dimensions_names:
+                raise ValidationError(f'dimension {dimension} missing')
+
     class Meta:
         model = InvoiceLine
         fields = [
