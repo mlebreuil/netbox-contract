@@ -46,10 +46,11 @@ PLUGINS_CONFIG = {
             "project": "", 
             "cost center": ""
         },
-        'mandatory_contract_fields': ['accounting_dimensions'],
+        'mandatory_contract_fields': [],
         'hidden_contract_fields': [],
-        'mandatory_invoice_fields': ['accounting_dimensions'],
+        'mandatory_invoice_fields': [],
         'hidden_invoice_fields': [],
+        'mandatory_dimensions': [],
     }
 }
 

@@ -22,6 +22,7 @@ class ContractsConfig(PluginConfig):
         'hidden_contract_fields': [],
         'mandatory_invoice_fields': [],
         'hidden_invoice_fields': [],
+        'mandatory_dimensions': [],
     }
 
 
