@@ -25,7 +25,8 @@ Refer to the readme file for more information.
 > [!WARNING]
 > Accounting dimensions used to be set with a simple json field. Although the field is still available, it is recommended to add dimensions through invoice lines. You will find in the script folder a file which can be imported as netbox custom scripts module which contains a script to perform the migration. You wil need to adjust the script to your needs.
 
-![Accounting dimensions](img/accrounting_dimensions.png "accounting dimensions")
+
+![Accounting dimensions](img/accounting_dimensions.png "accounting dimensions")
 
 - name: The name of the accounting dimensions (Account, Project, Entity ...)
 - value: The value for this dimension.

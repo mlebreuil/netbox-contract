@@ -1,6 +1,6 @@
 # Invoice
 
-New invoices shold be created from the corresponding contract. Most of their fields will be derived from the contract invoice template. An invoice template is an invoice object which "Template" field is set to true. There can be only one invoice per contract.
+New invoices shoold be created from the corresponding contract. Most of their fields will be derived from the contract invoice template. An invoice template is an invoice object which "Template" field is set to true. There can be only one invoice per contract.
 Each invoice will be linked to one or more invoice line.
 
 ![Invoice](img/invoice.png "invoice")
