@@ -5,7 +5,7 @@ class ContractsConfig(PluginConfig):
     name = 'netbox_contract'
     verbose_name = 'Netbox contract'
     description = 'Contract management plugin for Netbox'
-    version = '2.2.4'
+    version = '2.2.5'
     author = 'Marc Lebreuil'
     author_email = 'marc@famillelebreuil.net'
     base_url = 'contracts'
@@ -22,6 +22,7 @@ class ContractsConfig(PluginConfig):
         'hidden_contract_fields': [],
         'mandatory_invoice_fields': [],
         'hidden_invoice_fields': [],
+        'mandatory_dimensions': [],
     }
 
 
