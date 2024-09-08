@@ -2,7 +2,6 @@ from django import forms
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from extras.filters import TagFilter
 from netbox.forms import (
     NetBoxModelBulkEditForm,
     NetBoxModelFilterSetForm,
@@ -10,6 +9,7 @@ from netbox.forms import (
     NetBoxModelImportForm,
 )
 from tenancy.models import Tenant
+from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import (
     CommentField,
     ContentTypeChoiceField,
@@ -21,6 +21,7 @@ from utilities.forms.fields import (
     DynamicModelMultipleChoiceField,
     JSONField,
     SlugField,
+    TagFilterField,
 )
 from utilities.forms.widgets import DatePicker, HTMXSelect
 
@@ -161,9 +162,11 @@ class ContractFilterSetForm(NetBoxModelFilterSetForm):
 
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False)
     external_reference = forms.CharField(required=False)
-    internal_partie = forms.CharField(required=False)
+    internal_partie = forms.ChoiceField(choices=InternalEntityChoices, required=False)
     status = forms.ChoiceField(choices=StatusChoices, required=False)
+    currency = forms.ChoiceField(choices=CurrencyChoices, required=False)
     parent = DynamicModelChoiceField(queryset=Contract.objects.all(), required=False)
+    tag = TagFilterField(model)
 
 
 class ContractCSVForm(NetBoxModelImportForm):
@@ -359,9 +362,15 @@ class InvoiceForm(NetBoxModelForm):
 
 class InvoiceFilterSetForm(NetBoxModelFilterSetForm):
     model = Invoice
+    number = forms.CharField(required=False)
+    template = forms.NullBooleanField(
+        required=False, widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES)
+    )
+    currency = forms.ChoiceField(choices=CurrencyChoices, required=False)
     contracts = DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(), required=False
     )
+    tag = TagFilterField(model)
 
 
 class InvoiceCSVForm(NetBoxModelImportForm):
@@ -425,7 +434,8 @@ class ServiceProviderForm(NetBoxModelForm):
 
 class ServiceProviderFilterSetForm(NetBoxModelFilterSetForm):
     model = ServiceProvider
-    tag = TagFilter()
+    name = forms.CharField(required=False)
+    tag = TagFilterField(model)
 
 
 class ServiceProviderCSVForm(NetBoxModelImportForm):
@@ -514,9 +524,11 @@ class InvoiceLineForm(NetBoxModelForm):
 class InvoiceLineFilterSetForm(NetBoxModelFilterSetForm):
     model = InvoiceLine
     invoice = DynamicModelChoiceField(queryset=Invoice.objects.all(), required=False)
-    accounting_dimensions = DynamicModelChoiceField(
+    accounting_dimensions = DynamicModelMultipleChoiceField(
         queryset=AccountingDimension.objects.all(), required=False
     )
+    currency = forms.ChoiceField(choices=CurrencyChoices, required=False)
+    tag = TagFilterField(model)
 
 
 class InvoiceLineImportForm(NetBoxModelImportForm):

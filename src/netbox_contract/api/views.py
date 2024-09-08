@@ -21,6 +21,7 @@ class ContractViewSet(NetBoxModelViewSet):
         )
     )
     serializer_class = ContractSerializer
+    filterset_class = filtersets.ContractFilterSet
 
 
 class InvoiceViewSet(NetBoxModelViewSet):
@@ -44,6 +45,7 @@ class InvoiceLineViewSet(NetBoxModelViewSet):
         'invoice', 'accounting_dimensions', 'tags'
     )
     serializer_class = InvoiceLineSerializer
+    filterset_class = filtersets.InvoiceLineFilterSet
 
 
 class AccountingDimensionViewSet(NetBoxModelViewSet):

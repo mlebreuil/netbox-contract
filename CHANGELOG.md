@@ -8,6 +8,7 @@
 ### Version 2.2.5
 
 * [178](https://github.com/mlebreuil/netbox-contract/issues/178) Add the possibility to filter on invoice number, and contract name through the API.
+* Generally improve filtering options
 
 ### Version 2.2.4
 
