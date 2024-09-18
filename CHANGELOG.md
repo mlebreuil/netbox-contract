@@ -5,6 +5,10 @@
 
 ## Version 2
 
+### Version 2.2.7
+
+* fix migration dependency
+
 ### Version 2.2.6
 
 * [186](https://github.com/mlebreuil/netbox-contract/issues/186) Code compatibility fix for Netbox 4.1
