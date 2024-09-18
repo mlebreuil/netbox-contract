@@ -8,7 +8,7 @@ def update_changed_object_type(apps, schema_editor):
     Update the Change Log related object type to match
     renamed contract_assignment type
     """
-    ObjectChange = apps.get_model('extras', 'ObjectChange')
+    ObjectChange = apps.get_model('core', 'ObjectChange')
     ContentType = apps.get_model('contenttypes', 'ContentType')
     ct = ContentType.objects.get(
         app_label='netbox_contract', model='contractassignment'

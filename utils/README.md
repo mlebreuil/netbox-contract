@@ -82,6 +82,11 @@ For development, install the plugin from the local file system:
 python3 -m pip uninstall netbox-contract
 python3 -m pip install -e netbox-contract
 ```
+Update the configuration:
+
+```
+cp netbox-contract/utils/netbox-configuration-final.py netbox/netbox/netbox/configuration.py
+```
 
 run database migrations:
 
