@@ -52,6 +52,7 @@ class CurrencyChoices(ChoiceSet):
         ('chf', 'CHF'),
     ]
 
+CURRENCY_DEFAULT = CurrencyChoices.CHOICES[0][0]
 
 class AccountingDimension(NetBoxModel):
     name = models.CharField(max_length=20)
@@ -151,7 +152,7 @@ class Contract(NetBoxModel):
         help_text='In month', default=12, blank=True, null=True
     )
     currency = models.CharField(
-        max_length=3, choices=CurrencyChoices, default=CurrencyChoices.CURRENCY_USD
+        max_length=3, choices=CurrencyChoices, default=CURRENCY_DEFAULT
     )
     accounting_dimensions = models.JSONField(null=True, blank=True)
     yrc = models.DecimalField(
@@ -207,7 +208,7 @@ class Invoice(NetBoxModel):
     period_start = models.DateField(blank=True, null=True)
     period_end = models.DateField(blank=True, null=True)
     currency = models.CharField(
-        max_length=3, choices=CurrencyChoices, default=CurrencyChoices.CURRENCY_USD
+        max_length=3, choices=CurrencyChoices, default=CURRENCY_DEFAULT
     )
     accounting_dimensions = models.JSONField(null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -236,7 +237,7 @@ class InvoiceLine(NetBoxModel):
         to='Invoice', on_delete=models.CASCADE, related_name='invoicelines'
     )
     currency = models.CharField(
-        max_length=3, choices=CurrencyChoices, default=CurrencyChoices.CURRENCY_USD
+        max_length=3, choices=CurrencyChoices, default=CURRENCY_DEFAULT
     )
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     accounting_dimensions = models.ManyToManyField(AccountingDimension, blank=True)
