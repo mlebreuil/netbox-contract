@@ -8,6 +8,7 @@
 ### Version 2.2.8
 
 * [167](https://github.com/mlebreuil/netbox-contract/issues/167) Add selector to object dynamic selection box.
+* [193](https://github.com/mlebreuil/netbox-contract/pull/193) Set the first currency in the choiceset as default currency.
 
 ### Version 2.2.7
 
