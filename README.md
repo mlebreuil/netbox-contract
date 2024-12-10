@@ -57,13 +57,14 @@ PLUGINS_CONFIG = {
 ```
 
 * top_level_menu : If "Contracts" appears under the "Plugins" menu item or on its own
-* default_accounting_dimensions: The accounting dimensions which will appear in the field' background when empty.
+* default_accounting_dimensions: The accounting dimensions which will appear in the field' background when empty. Note that accounting dimensions are now managed as individual objects. The use of this field is deprecated.  
 * mandatory_contract_fields, mandatory_invoice_fields: Fields which are not required by default and can be set as such. The list of fields is at the bottom of the contract import form.
 * hidden_contract_fields, hidden_invoice_fields: List of fields to be hidden. Fields should not be required to be hidden.
 
 ### Customize the plugin fields choices
 
 Internal partie reference the legal entity of your organization that is a partie to the contract.  
+The first currency will also be the default currency for contracts.  
 
 ```python
 # configuration.py
