@@ -164,6 +164,7 @@ class ContractForm(NetBoxModelForm):
 class ContractFilterForm(NetBoxModelFilterSetForm):
     model = Contract
 
+    name = forms.CharField(required=False)
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(), required=False, selector=True
     )

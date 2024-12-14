@@ -125,6 +125,24 @@ EXEMPT_VIEW_PERMISSIONS = [
     # 'ipam.prefix',
 ]
 
+FIELD_CHOICES = {
+    'netbox_contract.Contract.internal_partie': (
+        ('InternalPartie1', 'Internalpartie1', 'green'),
+        ('InternalPartie2', 'Internalpartie2', 'green'),
+        ('InternalPartie3', 'Internalpartie3', 'green'),
+    ),
+    'netbox_contract.Contract.currency': (
+        ('eur', 'EUR'),
+        ('usd', 'USD'),
+        ('chf', 'CHF'),
+        ('pln', 'PLN'),
+    ),
+    'netbox_contract.Contract.status': (
+        ('Active', 'Active', 'green'),
+        ('Cancled', 'Canceled', 'red'),
+    ),
+}
+
 # HTTP proxies NetBox should use when sending outbound HTTP requests (e.g. for webhooks).
 # HTTP_PROXIES = {
 #     'http': 'http://10.10.1.10:3128',
