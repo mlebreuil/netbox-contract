@@ -135,6 +135,7 @@ class ContractForm(NetBoxModelForm):
             'end_date',
             'initial_term',
             'renewal_term',
+            'notice_period',
             'currency',
             'accounting_dimensions',
             'yrc',
