@@ -58,13 +58,19 @@
             {% if not 'initial_term' in hidden_fields %}
             <tr>
               <th scope="row">Initial term</th>
-              <td>{{ object.initial_term }}</td>
+              <td>{{ object.initial_term }} month</td>
             </tr>
             {% endif %}
             {% if not 'renewal_term' in hidden_fields %}
             <tr>
               <th scope="row">Renewal term</th>
-              <td>{{ object.renewal_term }}</td>
+              <td>{{ object.renewal_term }} month</td>
+            </tr>
+            {% endif %}
+            {% if not 'notice_period' in hidden_fields %}
+            <tr>
+              <th scope="row">Notice period</th>
+              <td>{{ object.notice_period }} days</td>
             </tr>
             {% endif %}
             <tr>

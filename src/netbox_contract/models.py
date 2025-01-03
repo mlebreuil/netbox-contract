@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
@@ -52,7 +54,9 @@ class CurrencyChoices(ChoiceSet):
         ('chf', 'CHF'),
     ]
 
+
 CURRENCY_DEFAULT = CurrencyChoices.CHOICES[0][0]
+
 
 class AccountingDimension(NetBoxModel):
     name = models.CharField(max_length=20)
@@ -151,6 +155,9 @@ class Contract(NetBoxModel):
     renewal_term = models.IntegerField(
         help_text='In month', default=12, blank=True, null=True
     )
+    notice_period = models.IntegerField(
+        help_text='Contract notice period. Default to 90 days', default=90
+    )
     currency = models.CharField(
         max_length=3, choices=CurrencyChoices, default=CURRENCY_DEFAULT
     )
@@ -191,6 +198,10 @@ class Contract(NetBoxModel):
                 fields=['external_partie_object_type', 'external_partie_object_id']
             ),
         ]
+
+    @property
+    def notice_date(self):
+        return self.end_date - timedelta(days=self.notice_period)
 
     def __str__(self):
         return self.name
