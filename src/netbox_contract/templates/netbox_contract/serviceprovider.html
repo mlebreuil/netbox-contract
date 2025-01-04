@@ -2,23 +2,22 @@
 {% load static %}
 {% load helpers %}
 {% load i18n %}
-
 {% block content %}
   <div class="row mb-3">
     <div class="col col-md-6">
       <div class="card">
-        <h5 class="card-header">Service Provider</h5>
+        <h5 class="card-header">{% trans "Service provider" %}</h5>
           <table class="table table-hover attr-table">
             <tr>
-              <th scope="row">Name</th>
+              <th scope="row">{% trans "Name" %}</th>
               <td>{{ object.name }}</td>
             </tr>
             <tr>
-              <th scope="row">slug</th>
+              <th scope="row">{% trans "slug" %}</th>
               <td>{{ object.slug }}</td>
             </tr>
             <tr>
-              <th scope="row">portal_url</th>
+              <th scope="row">{% trans "Portal url" %}</th>
               <td>
                 {% if object.portal_url %}
                     <a href="{{ object.portal_url }}">{{ object.portal_url }}</a>

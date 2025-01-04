@@ -5,6 +5,17 @@
 
 ## Version 2
 
+### Version 2.2.8
+
+* [198](https://github.com/mlebreuil/netbox-contract/issues/198) Add internationalization support and french translation.
+* [196](https://github.com/mlebreuil/netbox-contract/issues/196) Add notice field to contract. Add an example custom script to report contract nearing cancelation notice.
+* minor fix and cleanup
+
+### Version 2.2.8
+
+* [167](https://github.com/mlebreuil/netbox-contract/issues/167) Add selector to object dynamic selection box.
+* [193](https://github.com/mlebreuil/netbox-contract/pull/193) Set the first currency in the choiceset as default currency.
+
 ### Version 2.2.7
 
 * fix migration dependency

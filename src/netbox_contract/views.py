@@ -42,7 +42,7 @@ class ServiceProviderListView(generic.ObjectListView):
     queryset = ServiceProvider.objects.all()
     table = tables.ServiceProviderListTable
     filterset = filtersets.ServiceProviderFilterSet
-    filterset_form = forms.ServiceProviderFilterSetForm
+    filterset_form = forms.ServiceProviderFilterForm
 
 
 class ServiceProviderEditView(generic.ObjectEditView):
@@ -84,7 +84,7 @@ class ContractAssignmentListView(generic.ObjectListView):
     queryset = ContractAssignment.objects.all()
     table = tables.ContractAssignmentListTable
     filterset = filtersets.ContractAssignmentFilterSet
-    filterset_form = forms.ContractAssignmentFilterSetForm
+    filterset_form = forms.ContractAssignmentFilterForm
     actions = {
         'import': {'add'},
         'export': set(),
@@ -184,7 +184,7 @@ class ContractListView(generic.ObjectListView):
     )
     table = tables.ContractListTable
     filterset = filtersets.ContractFilterSet
-    filterset_form = forms.ContractFilterSetForm
+    filterset_form = forms.ContractFilterForm
 
 
 class ContractEditView(generic.ObjectEditView):
@@ -270,7 +270,7 @@ class InvoiceListView(generic.ObjectListView):
     queryset = Invoice.objects.all()
     table = tables.InvoiceListTable
     filterset = filtersets.InvoiceFilterSet
-    filterset_form = forms.InvoiceFilterSetForm
+    filterset_form = forms.InvoiceFilterForm
 
 
 class InvoiceEditView(generic.ObjectEditView):
@@ -377,7 +377,7 @@ class InvoiceLineListView(generic.ObjectListView):
     queryset = InvoiceLine.objects.all()
     table = tables.InvoiceLineListTable
     filterset = filtersets.InvoiceLineFilterSet
-    filterset_form = forms.InvoiceLineFilterSetForm
+    filterset_form = forms.InvoiceLineFilterForm
 
 
 class InvoiceLineEditView(generic.ObjectEditView):
@@ -453,7 +453,7 @@ class AccountingDimensionListView(generic.ObjectListView):
     queryset = AccountingDimension.objects.all()
     table = tables.AccountingDimensionListTable
     filterset = filtersets.AccountingDimensionFilterSet
-    filterset_form = forms.AccountingDimensionFilterSetForm
+    filterset_form = forms.AccountingDimensionFilterForm
 
 
 class AccountingDimensionEditView(generic.ObjectEditView):

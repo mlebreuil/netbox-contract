@@ -1,6 +1,7 @@
 {% extends 'generic/object.html' %}
 {% load plugins %}
 {% load render_table from django_tables2 %}
+{% load i18n %}
 {% block breadcrumbs %}
   {{ block.super }}
   <li class="breadcrumb-item"><a href="{% url 'plugins:netbox_contract:contract_list' %}?external_partie={{ object.external_partie.pk }}">{{ object.external_partie }}</a></li>
@@ -9,97 +10,103 @@
   <div class="row mb-3">
     <div class="col col-md-6">
       <div class="card">
-        <h5 class="card-header">Contract</h5>
+        <h5 class="card-header">{% trans "Contract" %}</h5>
           <table class="table table-hover attr-table">
             <tr>
-              <th scope="row">Name</th>
+              <th scope="row">{% trans "Name" %}</th>
               <td>{{ object.name }}</td>
             </tr>
-                <tr>
-              <th scope="row">External partie type</th>
+            <tr>
+              <th scope="row">{% trans "External partie type" %}</th>
               <td>{{ object.external_partie_object_type }}</td>
             </tr>
             <tr>
-              <th scope="row">External partie</th>
+              <th scope="row">{% trans "External partie" %}</th>
               <td>
                 <a href="{{ object.external_partie_object.get_absolute_url }}">{{ object.external_partie_object.name }}</a>
               </td>
             </tr>
             <tr>
-              <th scope="row">Status</th>
+              <th scope="row">{% trans "Status" %}</th>
               <td>{{ object.status }}</td>
             </tr>
             <tr>
-              <th scope="row">External reference</th>
+              <th scope="row">{% trans "External reference" %}</th>
               <td>{{ object.external_reference }}</td>
             </tr>
             <tr>
-              <th scope="row">Internal partie</th>
+              <th scope="row">{% trans "Internal partie" %}</th>
               <td>{{ object.internal_partie }}</td>
             </tr>
             {% if not 'tenant' in hidden_fields %}
             <tr>
-              <th scope="row">Tenant</th>
+              <th scope="row">{% trans "Tenant" %}</th>
               <td>{{ object.tenant }}</td>
             </tr>
             {% endif %}
             {% if not 'start_date' in hidden_fields %}
             <tr>
-              <th scope="row">Start date</th>
+              <th scope="row">{% trans "Start date" %}</th>
               <td>{{ object.start_date }}</td>
             </tr>
             {% endif %}
             {% if not 'end_date' in hidden_fields %}
             <tr>
-              <th scope="row">End date</th>
+              <th scope="row">{% trans "End date" %}</th>
               <td>{{ object.end_date }}</td>
             </tr>
             {% endif %}
             {% if not 'initial_term' in hidden_fields %}
             <tr>
-              <th scope="row">Initial term</th>
-              <td>{{ object.initial_term }}</td>
+              <th scope="row">{% trans "Initial term" %}</th>
+              <td>{{ object.initial_term }} {% trans "month" %}</td>
             </tr>
             {% endif %}
             {% if not 'renewal_term' in hidden_fields %}
             <tr>
-              <th scope="row">Renewal term</th>
-              <td>{{ object.renewal_term }}</td>
+              <th scope="row">{% trans "Renewal term" %}</th>
+              <td>{{ object.renewal_term }} {% trans "month" %}</td>
+            </tr>
+            {% endif %}
+            {% if not 'notice_period' in hidden_fields %}
+            <tr>
+              <th scope="row">{% trans "Notice period" %}</th>
+              <td>{{ object.notice_period }} {% trans "days" %}</td>
             </tr>
             {% endif %}
             <tr>
-              <th scope="row">Currency</th>
+              <th scope="row">{% trans "Currency" %}</th>
               <td>{{ object.currency }}</td>
             </tr>
             {% if not 'accounting_dimensions' in hidden_fields %}
             <tr>
-              <th scope="row">Accounting dimensions</th>
+              <th scope="row">{% trans "Accounting dimensions" %}</th>
               <td>{{ object.accounting_dimensions }}</td>
             </tr>
             {% endif %}
             <tr>
-              <th scope="row">Monthly recuring costs</th>
+              <th scope="row">{% trans "Monthly recuring costs" %}</th>
               <td>{{ object.mrc }}</td>
             </tr>
             <tr>
-              <th scope="row">Yearly recuring costs</th>
+              <th scope="row">{% trans "Yearly recuring costs" %}</th>
               <td>{{ object.yrc }}</td>
             </tr>
             <tr>
-              <th scope="row">calculated corresponding Yearly or Monthly value</th>
+              <th scope="row">{% trans "calculated corresponding Yearly or Monthly value" %}</th>
               <td>{{ object.calculated_rc }}</td>
             </tr>
             <tr>
-              <th scope="row">Non recuring costs</th>
+              <th scope="row">{% trans "Non recuring costs" %}</th>
               <td>{{ object.nrc }}</td>
             </tr>
             <tr>
-              <th scope="row">Invoice frequency</th>
+              <th scope="row">{% trans "Invoice frequency" %}</th>
               <td>{{ object.invoice_frequency }}</td>
             </tr>
             {% if not 'parent' in hidden_fields %}
             <tr>
-              <th scope="row">Parent</th>
+              <th scope="row">{% trans "Parent" %}</th>
               <td>
                 <a href="{{ object.parent.get_absolute_url }}">{{ object.parent.name }}</a>
               </td>
@@ -107,9 +114,9 @@
             {% endif %}
             {% if object.documents %}
             <tr>
-              <th scope="row">Documents</th>
+              <th scope="row">{% trans "Documents" %}</th>
                 <td>
-                  <a href="{{ object.documents }}" target="_blank">Documents</a>
+                  <a href="{{ object.documents }}" target="_blank">{% trans "Documents" %}</a>
                 </td>
             </tr>
             {% endif %}
@@ -123,26 +130,26 @@
       {% if invoice_template %}
       <div class="card">
         <h5 class="card-header">
-          Invoice template
+          {% trans "Invoice template" %}
         </h5>
         <table class="table table-hover attr-table">
           <tr>
-            <th scope="row">Number</th>
+            <th scope="row">{% trans "Number" %}</th>
             <td>
               <a href="{{ invoice_template.get_absolute_url }}">{{  invoice_template.number }}</a>
             </td>
           </tr>
           <tr>
-            <th scope="row">Currency</th>
+            <th scope="row">{% trans "Currency" %}</th>
             <td>{{ invoice_template.currency }}</td>
           </tr>
           <tr>
-            <th scope="row">Total amount</th>
+            <th scope="row">{% trans "Total amount" %}</th>
             <td>{{ invoice_template.total_invoicelines_amount }}</td>
           </tr>
         </table>
         <h5 class="card-header">
-          Invoice template lines
+          {% trans "Invoice template lines" %}
         </h5>
           {% render_table invoicelines_table %}
       </div>
@@ -152,7 +159,7 @@
   <div class="row">
     <div class="col col-md-12">
       <div class="card">
-        <h5 class="card-header">Assignments</h5>
+        <h5 class="card-header">{% trans "Assignments" %}</h5>
           {% render_table assignments_table %}
       </div>
     </div>
@@ -161,7 +168,7 @@
   <div class="row">
     <div class="col col-md-12">
       <div class="card">
-        <h5 class="card-header">childs</h5>
+        <h5 class="card-header">{% trans "childs" %}</h5>
           {% render_table childs_table %}
       </div>
     </div>
@@ -172,12 +179,12 @@
     <div class="col col-md-12">
       <div class="card">
         <h5 class="card-header">
-          Invoices
+          {% trans "Invoices" %}
           {% if perms.netbox_contract.add_invoice %}
           <div class="card-actions">
             <a href="{% url 'plugins:netbox_contract:invoice_add' %}?contracts={{ object.pk }}" class="btn btn-ghost-primary btn-sm">
               <i class="mdi mdi-plus-thick" aria-hidden="true"></i>
-              Add an invoice
+              {% trans "Add an invoice" %}
           </a>
           </div>
           {% endif %}
