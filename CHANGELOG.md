@@ -5,7 +5,7 @@
 
 ## Version 2
 
-### Version 2.2.8
+### Version 2.2.9
 
 * [198](https://github.com/mlebreuil/netbox-contract/issues/198) Add internationalization support and french translation.
 * [196](https://github.com/mlebreuil/netbox-contract/issues/196) Add notice field to contract. Add an example custom script to report contract nearing cancelation notice.
