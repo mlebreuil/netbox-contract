@@ -5,6 +5,9 @@
 
 ## Version 2
 
+### Version 2.3.0
+
+
 ### Version 2.2.10
 
 * [198](https://github.com/mlebreuil/netbox-contract/issues/198) Add internationalization support and french translation.

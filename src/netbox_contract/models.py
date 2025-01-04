@@ -205,7 +205,7 @@ class Contract(NetBoxModel):
         null=True,
         blank=True,
         verbose_name=_('accounting dimensions'),
-        help_text=_('This field is deprecated and will be removed in version 3'),
+        help_text=_('This field is deprecated and will be removed in version 2.3'),
     )
     yrc = models.DecimalField(
         verbose_name=_('yearly recuring cost'),

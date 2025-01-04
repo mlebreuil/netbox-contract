@@ -44,7 +44,7 @@ plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 default_dimensions = plugin_settings.get('default_accounting_dimensions')
 
 # Dimensions
-# Deprecated. To be removed in version 3.0
+# Deprecated. To be removed in version 2.3.0
 
 
 class Dimensions(JSONField):
