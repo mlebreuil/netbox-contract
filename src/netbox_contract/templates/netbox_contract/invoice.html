@@ -1,6 +1,7 @@
 {% extends 'generic/object.html' %}
 {% load plugins %}
 {% load render_table from django_tables2 %}
+{% load i18n %}
 {% block breadcrumbs %}
   {{ block.super }}
   <li class="breadcrumb-item">
@@ -14,53 +15,53 @@
     <div class="col col-md-6">
       <div class="card">
         {% if object.template %}
-        <h5 class="card-header">Invoice template</h5>
+        <h5 class="card-header">{% trans "Invoice template" %}</h5>
         {% else %}
-        <h5 class="card-header">Invoice</h5>
+        <h5 class="card-header">{% trans "Invoice" %}</h5>
         {% endif %}
           <table class="table table-hover attr-table">
             <tr>
-              <th scope="row">Number</th>
+              <th scope="row">{% trans "Number" %}</th>
               <td>{{ object.number }}</td>
             </tr>
             <tr>
-              <th scope="row">Date</th>
+              <th scope="row">{% trans "Date" %}</th>
               <td>{{ object.date }}</td>
             </tr>
             {% if not object.template %}
             <tr>
-              <th scope="row">Period start</th>
+              <th scope="row">{% trans "Period start" %}</th>
               <td>{{ object.period_start }}</td>
             </tr>
             <tr>
-              <th scope="row">Period end</th>
+              <th scope="row">{% trans "Period end" %}</th>
               <td>{{ object.period_end }}</td>
             </tr>
             {% endif %}
             <tr>
-              <th scope="row">Currency</th>
+              <th scope="row">{% trans "Currency" %}</th>
               <td>{{ object.currency }}</td>
             </tr>
             {% if not 'accounting_dimensions' in hidden_fields %}
             <tr>
-              <th scope="row">Accounting dimensions</th>
+              <th scope="row">{% trans "Accounting dimensions" %}</th>
               <td>{{ object.accounting_dimensions }}</td>
             </tr>
             {% endif %}
             <tr>
-              <th scope="row">Amount</th>
+              <th scope="row">{% trans "Amount" %}</th>
               <td>{{ object.amount }}</td>
             </tr>
             {% if object.documents %}
             <tr>
-              <th scope="row">Documents</th>
+              <th scope="row">{% trans "Documents" %}</th>
                 <td>
-                  <a href="{{ object.documents }}" target="_blank">Documents</a>
+                  <a href="{{ object.documents }}" target="_blank">{% trans "Documents" %}</a>
                 </td>
             </tr>
             {% endif %}
             <tr>
-              <th scope="row">Invoice lines total</th>
+              <th scope="row">{% trans "Invoice lines total" %}</th>
                 <td>{{ object.total_invoicelines_amount }}</td>
               </tr>
           </table>
@@ -73,10 +74,10 @@
       <div class="col col-md-12">
         <div class="card">
           <h5 class="card-header">
-            Invoice lines
+            {% trans "Invoice lines" %}
             <div class="card-actions">
               <a href="{% url 'plugins:netbox_contract:invoiceline_add' %}?invoice={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
-                <i class="mdi mdi-plus-thick" aria-hidden="true"></i> Add a line
+                <i class="mdi mdi-plus-thick" aria-hidden="true"></i> {% trans "Add a line" %}
               </a>
             </div>
           </h5>
@@ -87,7 +88,7 @@
     <div class="row">
       <div class="col col-md-12">
         <div class="card">
-          <h5 class="card-header">Contracts</h5>
+          <h5 class="card-header">{% trans "Contracts" %}</h5>
             {% render_table contracts_table %}
         </div>
       </div>

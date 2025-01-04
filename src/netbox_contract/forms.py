@@ -2,6 +2,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.utils.translation import gettext_lazy as _
 from netbox.forms import (
     NetBoxModelBulkEditForm,
     NetBoxModelFilterSetForm,
@@ -42,6 +43,9 @@ from .models import (
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 default_dimensions = plugin_settings.get('default_accounting_dimensions')
 
+# Dimensions
+# Deprecated. To be removed in version 3.0
+
 
 class Dimensions(JSONField):
     """
@@ -57,21 +61,27 @@ class Dimensions(JSONField):
 
 
 class ContractForm(NetBoxModelForm):
-    comments = CommentField()
+    comments = CommentField(label=_('Comments'))
 
     external_partie_object_type = ContentTypeChoiceField(
         queryset=ContentType.objects.all(),
         limit_choices_to=SERVICE_PROVIDER_MODELS,
         widget=HTMXSelect(),
+        label=_('External partie object type'),
     )
-    external_partie_object = forms.ModelChoiceField(queryset=None)
+    external_partie_object = forms.ModelChoiceField(
+        queryset=None, label=_('External partie object')
+    )
     tenant = DynamicModelChoiceField(
-        queryset=Tenant.objects.all(), required=False, selector=True
+        queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant')
     )
     parent = DynamicModelChoiceField(
-        queryset=Contract.objects.all(), required=False, selector=True
+        queryset=Contract.objects.all(),
+        required=False,
+        selector=True,
+        label=_('Parent'),
     )
-    accounting_dimensions = Dimensions(required=False)
+    accounting_dimensions = Dimensions(required=False, label=_('Accounting dimensions'))
 
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', None)
@@ -166,14 +176,21 @@ class ContractFilterForm(NetBoxModelFilterSetForm):
     model = Contract
 
     tenant = DynamicModelChoiceField(
-        queryset=Tenant.objects.all(), required=False, selector=True
+        queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant')
     )
-    external_reference = forms.CharField(required=False)
-    internal_partie = forms.ChoiceField(choices=InternalEntityChoices, required=False)
-    status = forms.ChoiceField(choices=StatusChoices, required=False)
-    currency = forms.ChoiceField(choices=CurrencyChoices, required=False)
+    external_reference = forms.CharField(required=False, label=_('External reference'))
+    internal_partie = forms.ChoiceField(
+        choices=InternalEntityChoices, required=False, label=_('Internal partie')
+    )
+    status = forms.ChoiceField(choices=StatusChoices, required=False, label=_('Status'))
+    currency = forms.ChoiceField(
+        choices=CurrencyChoices, required=False, label=_('Currency')
+    )
     parent = DynamicModelChoiceField(
-        queryset=Contract.objects.all(), required=False, selector=True
+        queryset=Contract.objects.all(),
+        required=False,
+        selector=True,
+        label=_('Parent'),
     )
     tag = TagFilterField(model)
 
@@ -185,20 +202,24 @@ class ContractCSVForm(NetBoxModelImportForm):
         help_text='service provider object type in the form <app>.<model>',
     )
     external_partie_object_id = forms.CharField(
-        help_text='service provider object name', label='external_partie_name'
+        help_text='service provider object name', label=_('External partie name')
     )
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
         to_field_name='name',
         help_text='Tenant name',
         required=False,
+        label=_('Tenant'),
     )
-    status = CSVChoiceField(choices=StatusChoices, help_text='Contract status')
+    status = CSVChoiceField(
+        choices=StatusChoices, help_text='Contract status', label=_('Status')
+    )
     parent = CSVModelChoiceField(
         queryset=Contract.objects.all(),
         to_field_name='name',
         help_text='Contract name',
         required=False,
+        label=_('Parent'),
     )
 
     class Meta:
@@ -239,20 +260,23 @@ class ContractCSVForm(NetBoxModelImportForm):
 
 
 class ContractBulkEditForm(NetBoxModelBulkEditForm):
-    name = forms.CharField(max_length=100, required=False)
-    external_reference = forms.CharField(max_length=100, required=False)
-    internal_partie = forms.ChoiceField(choices=InternalEntityChoices, required=False)
-    tenant = DynamicModelChoiceField(
-        queryset=Tenant.objects.all(),
-        required=False,
-        selector=True,
+    name = forms.CharField(max_length=100, required=False, label=_('Name'))
+    external_reference = forms.CharField(
+        max_length=100, required=False, label=_('External reference')
     )
-    accounting_dimensions = Dimensions(required=False)
-    comments = CommentField(required=False)
+    internal_partie = forms.ChoiceField(
+        choices=InternalEntityChoices, required=False, label=_('Internal partie')
+    )
+    tenant = DynamicModelChoiceField(
+        queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant')
+    )
+    accounting_dimensions = Dimensions(required=False, label=_('Accounting dimensions'))
+    comments = CommentField(required=False, label=_('Comments'))
     parent = DynamicModelChoiceField(
         queryset=Contract.objects.all(),
         required=False,
         selector=True,
+        label=_('Parent'),
     )
 
     nullable_fields = (
@@ -269,11 +293,15 @@ class InvoiceForm(NetBoxModelForm):
     number = forms.CharField(
         max_length=100,
         help_text='Invoice template name will be overriden to _invoice_template_contract name',
+        label=_('Number'),
     )
     contracts = DynamicModelMultipleChoiceField(
-        queryset=Contract.objects.all(), required=False, selector=True
+        queryset=Contract.objects.all(),
+        required=False,
+        selector=True,
+        label=_('Contracts'),
     )
-    accounting_dimensions = Dimensions(required=False)
+    accounting_dimensions = Dimensions(required=False, label=_('Accounting dimensions'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -379,15 +407,23 @@ class InvoiceForm(NetBoxModelForm):
 
 class InvoiceFilterForm(NetBoxModelFilterSetForm):
     model = Invoice
-    number = forms.CharField(required=False)
-    template = forms.NullBooleanField(
-        required=False, widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES)
+    number = forms.CharField(
+        required=False,
+        label=_('Number'),
     )
-    currency = forms.ChoiceField(choices=CurrencyChoices, required=False)
+    template = forms.NullBooleanField(
+        required=False,
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_('Template'),
+    )
+    currency = forms.ChoiceField(
+        choices=CurrencyChoices, required=False, label=_('Currency')
+    )
     contracts = DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(),
         required=False,
         selector=True,
+        label=_('Contracts'),
     )
     tag = TagFilterField(model)
 
@@ -397,6 +433,7 @@ class InvoiceCSVForm(NetBoxModelImportForm):
         queryset=Contract.objects.all(),
         to_field_name='name',
         help_text='Related Contracts',
+        label=_('Contracts'),
     )
 
     class Meta:
@@ -418,21 +455,52 @@ class InvoiceCSVForm(NetBoxModelImportForm):
 
 
 class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
-    number = forms.CharField(max_length=100, required=True)
-    template = forms.BooleanField(required=False)
-    date = forms.DateField(required=False)
+    number = forms.CharField(max_length=100, required=True, label=_('Number'))
+    template = forms.BooleanField(
+        required=False,
+        label=_('Template'),
+        help_text=_('Wether this invoice is a template or not'),
+    )
+    date = forms.DateField(
+        required=False,
+        label=_('Date'),
+    )
     contracts = DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(),
         required=False,
         selector=True,
     )
-    period_start = forms.DateField(required=False)
-    period_end = forms.DateField(required=False)
-    currency = forms.ChoiceField(choices=CurrencyChoices, required=False)
-    accounting_dimensions = Dimensions(required=False)
-    amount = forms.DecimalField(max_digits=10, decimal_places=2, required=False)
-    documents = forms.URLField(required=False)
-    comments = CommentField()
+    period_start = forms.DateField(
+        required=False,
+        label=_('Period start'),
+    )
+    period_end = forms.DateField(
+        required=False,
+        label=_('Period end'),
+    )
+    currency = forms.ChoiceField(
+        choices=CurrencyChoices,
+        required=False,
+        label=_('Currency'),
+    )
+    accounting_dimensions = Dimensions(
+        required=False,
+        label=_('Accounting dimensions'),
+    )
+    amount = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        required=False,
+        label=_('Amount'),
+    )
+    documents = forms.URLField(
+        required=False,
+        label=_('Documents'),
+        help_text=_('URL to the contract documents'),
+    )
+    comments = CommentField(
+        label=_('Comments'),
+    )
     nullable_fields = (
         'accounting_dimensions',
         'comments',
@@ -445,8 +513,8 @@ class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
 
 
 class ServiceProviderForm(NetBoxModelForm):
-    slug = SlugField()
-    comments = CommentField()
+    slug = SlugField(label=_('Slug'))
+    comments = CommentField(label=_('Comments'))
 
     class Meta:
         model = ServiceProvider
@@ -455,13 +523,13 @@ class ServiceProviderForm(NetBoxModelForm):
 
 class ServiceProviderFilterForm(NetBoxModelFilterSetForm):
     model = ServiceProvider
-    name = forms.CharField(required=False)
+    name = forms.CharField(required=False, label=_('Name'))
     tag = TagFilterField(model)
 
 
 class ServiceProviderCSVForm(NetBoxModelImportForm):
-    slug = SlugField()
-    comments = CommentField()
+    slug = SlugField(label=_('Slug'))
+    comments = CommentField(label=_('Comments'))
 
     class Meta:
         model = ServiceProvider
@@ -469,8 +537,8 @@ class ServiceProviderCSVForm(NetBoxModelImportForm):
 
 
 class ServiceProviderBulkEditForm(NetBoxModelBulkEditForm):
-    name = forms.CharField(max_length=100, required=True)
-    comments = CommentField()
+    name = forms.CharField(max_length=100, required=True, label=_('Name'))
+    comments = CommentField(label=_('Comments'))
     nullable_fields = ('comments',)
     model = ServiceProvider
 
@@ -479,7 +547,9 @@ class ServiceProviderBulkEditForm(NetBoxModelBulkEditForm):
 
 
 class ContractAssignmentForm(NetBoxModelForm):
-    contract = DynamicModelChoiceField(queryset=Contract.objects.all(), selector=True)
+    contract = DynamicModelChoiceField(
+        queryset=Contract.objects.all(), selector=True, label=_('Contract')
+    )
 
     class Meta:
         model = ContractAssignment
@@ -495,6 +565,7 @@ class ContractAssignmentFilterForm(NetBoxModelFilterSetForm):
     contract = DynamicModelChoiceField(
         queryset=Contract.objects.all(),
         selector=True,
+        label=_('Contract'),
     )
 
 
@@ -502,9 +573,12 @@ class ContractAssignmentImportForm(NetBoxModelImportForm):
     content_type = CSVContentTypeField(
         queryset=ContentType.objects.all(),
         help_text='Content Type in the form <app>.<model>',
+        label=_('Content type'),
     )
     contract = CSVModelChoiceField(
-        queryset=Contract.objects.all(), help_text='Contract id'
+        queryset=Contract.objects.all(),
+        help_text='Contract id',
+        label=_('Contract'),
     )
 
     class Meta:
@@ -516,9 +590,16 @@ class ContractAssignmentImportForm(NetBoxModelImportForm):
 
 
 class InvoiceLineForm(NetBoxModelForm):
-    invoice = DynamicModelChoiceField(queryset=Invoice.objects.all(), selector=True)
+    invoice = DynamicModelChoiceField(
+        queryset=Invoice.objects.all(),
+        selector=True,
+        label=_('Invoice'),
+    )
     accounting_dimensions = DynamicModelMultipleChoiceField(
-        queryset=AccountingDimension.objects.all(), required=False, selector=True
+        queryset=AccountingDimension.objects.all(),
+        required=False,
+        selector=True,
+        label=_('Accounting dimensions'),
     )
 
     def clean(self):
@@ -557,13 +638,19 @@ class InvoiceLineFilterForm(NetBoxModelFilterSetForm):
         queryset=Invoice.objects.all(),
         required=False,
         selector=True,
+        label=_('Invoice'),
     )
     accounting_dimensions = DynamicModelMultipleChoiceField(
         queryset=AccountingDimension.objects.all(),
         required=False,
         selector=True,
+        label=_('Accounting dimensions'),
     )
-    currency = forms.ChoiceField(choices=CurrencyChoices, required=False)
+    currency = forms.ChoiceField(
+        choices=CurrencyChoices,
+        required=False,
+        label=_('Currency'),
+    )
     tag = TagFilterField(model)
 
 
@@ -572,11 +659,13 @@ class InvoiceLineImportForm(NetBoxModelImportForm):
         queryset=Invoice.objects.all(),
         to_field_name='number',
         help_text='Invoice number',
+        label=_('Invoice'),
     )
     accounting_dimensions = CSVModelMultipleChoiceField(
         queryset=AccountingDimension.objects.all(),
         to_field_name='id',
         help_text='accounting dimension id',
+        label=_('Accounting dimensions'),
     )
 
     class Meta:
@@ -597,6 +686,7 @@ class InvoiceLineBulkEditForm(NetBoxModelBulkEditForm):
         queryset=AccountingDimension.objects.all(),
         required=False,
         selector=True,
+        label=_('Accounting dimensions'),
     )
     model = InvoiceLine
 
@@ -619,9 +709,13 @@ class AccountingDimensionForm(NetBoxModelForm):
 class AccountingDimensionFilterForm(NetBoxModelFilterSetForm):
     model = AccountingDimension
 
-    name = forms.CharField(required=False)
-    value = forms.CharField(required=False)
-    status = forms.ChoiceField(choices=AccountingDimensionStatusChoices, required=False)
+    name = forms.CharField(required=False, label=_('Name'))
+    value = forms.CharField(required=False, label=_('Value'))
+    status = forms.ChoiceField(
+        choices=AccountingDimensionStatusChoices,
+        required=False,
+        label=_('Status'),
+    )
 
 
 class AccountingDimensionImportForm(NetBoxModelImportForm):
@@ -639,6 +733,6 @@ class AccountingDimensionImportForm(NetBoxModelImportForm):
 
 
 class AccountingDimensionBulkEditForm(NetBoxModelBulkEditForm):
-    name = forms.CharField(max_length=20, required=False)
-    value = forms.CharField(max_length=20, required=False)
+    name = forms.CharField(max_length=20, required=False, label=_('Name'))
+    value = forms.CharField(max_length=20, required=False, label=_('Value'))
     model = AccountingDimension

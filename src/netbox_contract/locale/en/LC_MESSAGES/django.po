@@ -1,0 +1,499 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-04 16:10+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: forms.py:63 forms.py:275 forms.py:499 forms.py:514 forms.py:529 forms.py:542
+msgid "Comments"
+msgstr ""
+
+#: forms.py:69
+msgid "External partie object type"
+msgstr ""
+
+#: forms.py:71
+msgid "External partie object"
+msgstr ""
+
+#: forms.py:73 forms.py:173 forms.py:199 forms.py:267
+#: templates/netbox_contract/contract.html:43
+msgid "Tenant"
+msgstr ""
+
+#: forms.py:76 forms.py:180 forms.py:211 forms.py:281
+#: templates/netbox_contract/contract.html:109
+msgid "Parent"
+msgstr ""
+
+#: forms.py:78 forms.py:271 forms.py:303 forms.py:485 forms.py:601 forms.py:646
+#: forms.py:667 forms.py:688 navigation.py:75
+#: templates/netbox_contract/contract.html:83
+#: templates/netbox_contract/invoice.html:47
+#: templates/netbox_contract/invoiceline.html:32
+msgid "Accounting dimensions"
+msgstr ""
+
+#: forms.py:175 forms.py:256 templates/netbox_contract/contract.html:34
+msgid "External reference"
+msgstr ""
+
+#: forms.py:176 forms.py:261 templates/netbox_contract/contract.html:38
+msgid "Internal partie"
+msgstr ""
+
+#: forms.py:177 forms.py:204 forms.py:716
+#: templates/netbox_contract/accountingdimension.html:21
+#: templates/netbox_contract/contract.html:30
+msgid "Status"
+msgstr ""
+
+#: forms.py:178 forms.py:418 forms.py:481 forms.py:651
+#: templates/netbox_contract/contract.html:78
+#: templates/netbox_contract/contract.html:143
+#: templates/netbox_contract/invoice.html:42
+#: templates/netbox_contract/invoiceline.html:28
+msgid "Currency"
+msgstr ""
+
+#: forms.py:192
+msgid "External partie name"
+msgstr ""
+
+#: forms.py:252 forms.py:523 forms.py:540 forms.py:711 forms.py:735
+#: templates/netbox_contract/accountingdimension.html:13
+#: templates/netbox_contract/contract.html:16
+#: templates/netbox_contract/serviceprovider.html:12
+msgid "Name"
+msgstr ""
+
+#: forms.py:298 forms.py:411 forms.py:455
+#: templates/netbox_contract/contract.html:137
+#: templates/netbox_contract/invoice.html:24
+msgid "Number"
+msgstr ""
+
+#: forms.py:301 forms.py:423 forms.py:433 navigation.py:54 navigation.py:103
+#: templates/contract_list_bottom.html:6
+#: templates/netbox_contract/invoice.html:91
+msgid "Contracts"
+msgstr ""
+
+#: forms.py:416 forms.py:458
+msgid "Template"
+msgstr ""
+
+#: forms.py:459 models.py:331
+msgid "Wether this invoice is a template or not"
+msgstr ""
+
+#: forms.py:463 templates/netbox_contract/invoice.html:28
+msgid "Date"
+msgstr ""
+
+#: forms.py:472 templates/netbox_contract/invoice.html:33
+msgid "Period start"
+msgstr ""
+
+#: forms.py:476 templates/netbox_contract/invoice.html:37
+msgid "Period end"
+msgstr ""
+
+#: forms.py:491 templates/netbox_contract/invoice.html:52
+#: templates/netbox_contract/invoiceline.html:24
+msgid "Amount"
+msgstr ""
+
+#: forms.py:495 templates/netbox_contract/contract.html:117
+#: templates/netbox_contract/contract.html:119
+#: templates/netbox_contract/invoice.html:57
+#: templates/netbox_contract/invoice.html:59
+msgid "Documents"
+msgstr ""
+
+#: forms.py:496 models.py:285 models.py:372
+msgid "URL to the contract documents"
+msgstr ""
+
+#: forms.py:513 forms.py:528
+msgid "Slug"
+msgstr ""
+
+#: forms.py:551 forms.py:567 forms.py:580
+#: templates/netbox_contract/contract.html:13
+#: templates/netbox_contract/contractassignment.html:18
+msgid "Contract"
+msgstr ""
+
+#: forms.py:575
+msgid "Content type"
+msgstr ""
+
+#: forms.py:595 forms.py:640 forms.py:661
+#: templates/netbox_contract/invoice.html:20
+#: templates/netbox_contract/invoiceline.html:18
+msgid "Invoice"
+msgstr ""
+
+#: forms.py:712 forms.py:736
+#: templates/netbox_contract/accountingdimension.html:17
+msgid "Value"
+msgstr ""
+
+#: models.py:65
+msgid "dimension name"
+msgstr ""
+
+#: models.py:66
+msgid "Accounting dimension name. Ex: Department, Location, etc."
+msgstr ""
+
+#: models.py:70
+msgid "value"
+msgstr ""
+
+#: models.py:76 models.py:212
+msgid "status"
+msgstr ""
+
+#: models.py:80 models.py:120 models.py:289 models.py:376 models.py:423
+msgid "comments"
+msgstr ""
+
+#: models.py:100
+msgid "accounting dimension"
+msgstr ""
+
+#: models.py:101 models.py:252 models.py:362 models.py:419
+msgid "accounting dimensions"
+msgstr ""
+
+#: models.py:107 models.py:171
+msgid "name"
+msgstr ""
+
+#: models.py:112 templates/netbox_contract/serviceprovider.html:16
+msgid "slug"
+msgstr ""
+
+#: models.py:116
+msgid "portal URL"
+msgstr ""
+
+#: models.py:125
+msgid "service provider"
+msgstr ""
+
+#: models.py:126
+msgid "service providers"
+msgstr ""
+
+#: models.py:139
+msgid "content type"
+msgstr ""
+
+#: models.py:142
+msgid "object ID"
+msgstr ""
+
+#: models.py:152 models.py:310
+msgid "contract"
+msgstr ""
+
+#: models.py:161
+msgid "contract assignment"
+msgstr ""
+
+#: models.py:162
+msgid "contract assignments"
+msgstr ""
+
+#: models.py:178
+msgid "external partie object type"
+msgstr ""
+
+#: models.py:183
+msgid "external partie object ID"
+msgstr ""
+
+#: models.py:193
+msgid "external reference"
+msgstr ""
+
+#: models.py:198
+msgid "internal partie"
+msgstr ""
+
+#: models.py:206
+msgid "tenant"
+msgstr ""
+
+#: models.py:217
+msgid "start date"
+msgstr ""
+
+#: models.py:222
+msgid "end date"
+msgstr ""
+
+#: models.py:225 models.py:232
+msgid "In month"
+msgstr ""
+
+#: models.py:229
+msgid "initial term"
+msgstr ""
+
+#: models.py:236
+msgid "renewal term"
+msgstr ""
+
+#: models.py:239
+msgid "Contract notice period. Default to 90 days"
+msgstr ""
+
+#: models.py:241
+msgid "notice period"
+msgstr ""
+
+#: models.py:247 models.py:358 models.py:409
+msgid "currency"
+msgstr ""
+
+#: models.py:253
+msgid "This field is deprecated and will be removed in version 3"
+msgstr ""
+
+#: models.py:256
+msgid "yearly recuring cost"
+msgstr ""
+
+#: models.py:261
+msgid "Use either this field of the monthly recuring cost field"
+msgstr ""
+
+#: models.py:264
+msgid "monthly recuring cost"
+msgstr ""
+
+#: models.py:269
+msgid "Use either this field of the yearly recuring cost field"
+msgstr ""
+
+#: models.py:272
+msgid "none recuring cost"
+msgstr ""
+
+#: models.py:278
+msgid "The frequency of invoices in month"
+msgstr ""
+
+#: models.py:280
+msgid "invoice frequency"
+msgstr ""
+
+#: models.py:284 models.py:371
+msgid "documents"
+msgstr ""
+
+#: models.py:297
+msgid "parent"
+msgstr ""
+
+#: models.py:311 models.py:342
+msgid "contracts"
+msgstr ""
+
+#: models.py:324
+msgid "number"
+msgstr ""
+
+#: models.py:330
+msgid "template"
+msgstr ""
+
+#: models.py:336
+msgid "date"
+msgstr ""
+
+#: models.py:347
+msgid "period start"
+msgstr ""
+
+#: models.py:352
+msgid "period end"
+msgstr ""
+
+#: models.py:367 models.py:414
+msgid "amount"
+msgstr ""
+
+#: models.py:381 models.py:403
+msgid "invoice"
+msgstr ""
+
+#: models.py:382
+msgid "invoices"
+msgstr ""
+
+#: models.py:428
+msgid "invoice line"
+msgstr ""
+
+#: models.py:429
+msgid "invoice lines"
+msgstr ""
+
+#: navigation.py:10 navigation.py:19 navigation.py:28 navigation.py:37
+#: navigation.py:46
+msgid "Add"
+msgstr ""
+
+#: navigation.py:61 templates/netbox_contract/contract.html:182
+msgid "Invoices"
+msgstr ""
+
+#: navigation.py:68 templates/netbox_contract/invoice.html:77
+#: templates/netbox_contract/invoiceline.html:15
+msgid "Invoice lines"
+msgstr ""
+
+#: navigation.py:82
+msgid "Service providers"
+msgstr ""
+
+#: navigation.py:88 templates/contract_assignments_bottom.html:7
+msgid "Contracts assignments"
+msgstr ""
+
+#: templates/contract_assignments_bottom.html:12
+msgid "Add assignment"
+msgstr ""
+
+#: templates/netbox_contract/accountingdimension.html:10
+msgid "Accounting dimension"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:20
+msgid "External partie type"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:24
+msgid "External partie"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:49
+msgid "Start date"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:55
+msgid "End date"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:61
+msgid "Initial term"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:62
+#: templates/netbox_contract/contract.html:68
+msgid "month"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:67
+msgid "Renewal term"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:73
+msgid "Notice period"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:74
+msgid "days"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:88
+msgid "Monthly recuring costs"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:92
+msgid "Yearly recuring costs"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:96
+msgid "calculated corresponding Yearly or Monthly value"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:100
+msgid "Non recuring costs"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:104
+msgid "Invoice frequency"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:133
+#: templates/netbox_contract/invoice.html:18
+msgid "Invoice template"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:147
+msgid "Total amount"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:152
+msgid "Invoice template lines"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:162
+msgid "Assignments"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:171
+msgid "childs"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:187
+msgid "Add an invoice"
+msgstr ""
+
+#: templates/netbox_contract/contractassignment.html:7
+msgid "Contract assignment"
+msgstr ""
+
+#: templates/netbox_contract/contractassignment.html:10
+msgid "Model"
+msgstr ""
+
+#: templates/netbox_contract/contractassignment.html:14
+msgid "Object"
+msgstr ""
+
+#: templates/netbox_contract/invoice.html:64
+msgid "Invoice lines total"
+msgstr ""
+
+#: templates/netbox_contract/invoice.html:80
+msgid "Add a line"
+msgstr ""
+
+#: templates/netbox_contract/serviceprovider.html:9
+msgid "Service provider"
+msgstr ""
+
+#: templates/netbox_contract/serviceprovider.html:20
+msgid "Portal url"
+msgstr ""

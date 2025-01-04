@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from netbox.plugins import PluginMenu, PluginMenuButton, PluginMenuItem
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
@@ -6,7 +7,7 @@ plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 contract_buttons = [
     PluginMenuButton(
         link='plugins:netbox_contract:contract_add',
-        title='Add',
+        title=_('Add'),
         icon_class='mdi mdi-plus-thick',
         permissions=['netbox_contract.add_contract'],
     )
@@ -15,7 +16,7 @@ contract_buttons = [
 invoice_buttons = [
     PluginMenuButton(
         link='plugins:netbox_contract:invoice_add',
-        title='Add',
+        title=_('Add'),
         icon_class='mdi mdi-plus-thick',
         permissions=['netbox_contract.add_invoice'],
     )
@@ -24,7 +25,7 @@ invoice_buttons = [
 invoiceline_buttons = [
     PluginMenuButton(
         link='plugins:netbox_contract:invoiceline_add',
-        title='Add',
+        title=_('Add'),
         icon_class='mdi mdi-plus-thick',
         permissions=['netbox_contract.add_invoice'],
     )
@@ -33,7 +34,7 @@ invoiceline_buttons = [
 accountingdimension_buttons = [
     PluginMenuButton(
         link='plugins:netbox_contract:accountingdimension_add',
-        title='Add',
+        title=_('Add'),
         icon_class='mdi mdi-plus-thick',
         permissions=['netbox_contract.add_invoice'],
     )
@@ -42,7 +43,7 @@ accountingdimension_buttons = [
 serviceprovider_buttons = [
     PluginMenuButton(
         link='plugins:netbox_contract:serviceprovider_add',
-        title='Add',
+        title=_('Add'),
         icon_class='mdi mdi-plus-thick',
         permissions=['netbox_contract.add_serviceprovider'],
     )
@@ -50,41 +51,41 @@ serviceprovider_buttons = [
 
 contract_menu_item = PluginMenuItem(
     link='plugins:netbox_contract:contract_list',
-    link_text='Contracts',
+    link_text=_('Contracts'),
     buttons=contract_buttons,
     permissions=['netbox_contract.view_contract'],
 )
 
 invoices_menu_item = PluginMenuItem(
     link='plugins:netbox_contract:invoice_list',
-    link_text='Invoices',
+    link_text=_('Invoices'),
     buttons=invoice_buttons,
     permissions=['netbox_contract.view_invoice'],
 )
 
 invoicelines_menu_item = PluginMenuItem(
     link='plugins:netbox_contract:invoiceline_list',
-    link_text='Invoice lines',
+    link_text=_('Invoice lines'),
     buttons=invoiceline_buttons,
     permissions=['netbox_contract.view_invoice'],
 )
 
 accounting_dimensions_menu_item = PluginMenuItem(
     link='plugins:netbox_contract:accountingdimension_list',
-    link_text='Accounting dimensions',
+    link_text=_('Accounting dimensions'),
     buttons=accountingdimension_buttons,
     permissions=['netbox_contract.view_invoice'],
 )
 
 service_provider_menu_item = PluginMenuItem(
     link='plugins:netbox_contract:serviceprovider_list',
-    link_text='Service Providers',
+    link_text=_('Service providers'),
     buttons=serviceprovider_buttons,
     permissions=['netbox_contract.view_serviceprovider'],
 )
 contract_assignemnt_menu_item = PluginMenuItem(
     link='plugins:netbox_contract:contractassignment_list',
-    link_text='Contract assignments',
+    link_text=_('Contracts assignments'),
     permissions=['netbox_contract.view_contractassignment'],
 )
 
@@ -99,7 +100,7 @@ items = (
 
 if plugin_settings.get('top_level_menu'):
     menu = PluginMenu(
-        label='Contracts',
+        label=_('Contracts'),
         groups=(('Contracts', items),),
         icon_class='mdi mdi-file-sign',
     )
