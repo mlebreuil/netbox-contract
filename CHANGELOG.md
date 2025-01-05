@@ -5,6 +5,9 @@
 
 ## Version 2
 
+### Version 2.3.0
+
+
 ### Version 2.2.11
 
 * [202](https://github.com/mlebreuil/netbox-contract/issues/202) Fix django.template.exceptions when trying to open device detail.
