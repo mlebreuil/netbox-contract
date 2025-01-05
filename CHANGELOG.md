@@ -5,6 +5,10 @@
 
 ## Version 2
 
+### Version 2.2.11
+
+* [202](https://github.com/mlebreuil/netbox-contract/issues/202) Fix django.template.exceptions when trying to open device detail.
+
 ### Version 2.2.10
 
 * [198](https://github.com/mlebreuil/netbox-contract/issues/198) Add internationalization support and french translation.
