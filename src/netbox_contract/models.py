@@ -201,12 +201,6 @@ class Contract(NetBoxModel):
         default=CURRENCY_DEFAULT,
         verbose_name=_('currency'),
     )
-    accounting_dimensions = models.JSONField(
-        null=True,
-        blank=True,
-        verbose_name=_('accounting dimensions'),
-        help_text=_('This field is deprecated and will be removed in version 2.3'),
-    )
     yrc = models.DecimalField(
         verbose_name=_('yearly recuring cost'),
         max_digits=10,
@@ -289,9 +283,6 @@ class Invoice(NetBoxModel):
         choices=CurrencyChoices,
         default=CURRENCY_DEFAULT,
         verbose_name=_('currency'),
-    )
-    accounting_dimensions = models.JSONField(
-        null=True, verbose_name=_('accounting dimensions')
     )
     amount = models.DecimalField(
         max_digits=10, decimal_places=2, verbose_name=_('amount')

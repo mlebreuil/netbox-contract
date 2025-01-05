@@ -42,12 +42,6 @@
               <th scope="row">{% trans "Currency" %}</th>
               <td>{{ object.currency }}</td>
             </tr>
-            {% if not 'accounting_dimensions' in hidden_fields %}
-            <tr>
-              <th scope="row">{% trans "Accounting dimensions" %}</th>
-              <td>{{ object.accounting_dimensions }}</td>
-            </tr>
-            {% endif %}
             <tr>
               <th scope="row">{% trans "Amount" %}</th>
               <td>{{ object.amount }}</td>

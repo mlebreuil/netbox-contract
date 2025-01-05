@@ -20,7 +20,6 @@ from utilities.forms.fields import (
     CSVModelMultipleChoiceField,
     DynamicModelChoiceField,
     DynamicModelMultipleChoiceField,
-    JSONField,
     SlugField,
     TagFilterField,
 )
@@ -41,20 +40,6 @@ from .models import (
 )
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
-default_dimensions = plugin_settings.get('default_accounting_dimensions')
-
-# Dimensions
-# Deprecated. To be removed in version 2.3.0
-
-
-class Dimensions(JSONField):
-    """
-    Custom wrapper around Netbox's JSONField
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.widget.attrs['placeholder'] = str(default_dimensions)
 
 
 # Contract
@@ -81,7 +66,6 @@ class ContractForm(NetBoxModelForm):
         selector=True,
         label=_('Parent'),
     )
-    accounting_dimensions = Dimensions(required=False, label=_('Accounting dimensions'))
 
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial', None)
@@ -147,7 +131,6 @@ class ContractForm(NetBoxModelForm):
             'renewal_term',
             'notice_period',
             'currency',
-            'accounting_dimensions',
             'yrc',
             'mrc',
             'nrc',
@@ -237,7 +220,6 @@ class ContractCSVForm(NetBoxModelImportForm):
             'initial_term',
             'renewal_term',
             'currency',
-            'accounting_dimensions',
             'yrc',
             'mrc',
             'nrc',
@@ -270,7 +252,6 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
     tenant = DynamicModelChoiceField(
         queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant')
     )
-    accounting_dimensions = Dimensions(required=False, label=_('Accounting dimensions'))
     comments = CommentField(required=False, label=_('Comments'))
     parent = DynamicModelChoiceField(
         queryset=Contract.objects.all(),
@@ -279,10 +260,7 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
         label=_('Parent'),
     )
 
-    nullable_fields = (
-        'accounting_dimensions',
-        'comments',
-    )
+    nullable_fields = ('comments',)
     model = Contract
 
 
@@ -301,7 +279,6 @@ class InvoiceForm(NetBoxModelForm):
         selector=True,
         label=_('Contracts'),
     )
-    accounting_dimensions = Dimensions(required=False, label=_('Accounting dimensions'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -392,7 +369,6 @@ class InvoiceForm(NetBoxModelForm):
             'period_start',
             'period_end',
             'currency',
-            'accounting_dimensions',
             'amount',
             'documents',
             'comments',
@@ -446,7 +422,6 @@ class InvoiceCSVForm(NetBoxModelImportForm):
             'period_start',
             'period_end',
             'currency',
-            'accounting_dimensions',
             'amount',
             'documents',
             'comments',
@@ -483,10 +458,6 @@ class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         label=_('Currency'),
     )
-    accounting_dimensions = Dimensions(
-        required=False,
-        label=_('Accounting dimensions'),
-    )
     amount = forms.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -501,10 +472,7 @@ class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
     comments = CommentField(
         label=_('Comments'),
     )
-    nullable_fields = (
-        'accounting_dimensions',
-        'comments',
-    )
+    nullable_fields = ('comments',)
 
     model = Invoice
 
