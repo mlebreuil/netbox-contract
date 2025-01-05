@@ -7,6 +7,8 @@
 
 ### Version 2.3.0
 
+> [!WARNING]
+> Accounting dimension json field will be removed. It is deprecated since v2.2.0. Refer to the [documentation](https://mlebreuil.github.io/netbox-contract/accounting_dimensions/)
 
 ### Version 2.2.11
 
@@ -36,7 +38,7 @@
 * Generally improve filtering options
 * [178](https://github.com/mlebreuil/netbox-contract/issues/178) Add the possibility to filter on invoice number, and contract name through the API.
 * [176](https://github.com/mlebreuil/netbox-contract/issues/176) Order accounting dimensions in tables alphabetically.
-* [171](https://github.com/mlebreuil/netbox-contract/issues/171) It is now poaaible to define madatory accounting dimension by specifying their names in the 'mandatory_dimensions' list in the plugin settings. (see the "Customize the plugin" paragraph in the README.md file)
+* [171](https://github.com/mlebreuil/netbox-contract/issues/171) It is now possible to define madatory accounting dimension by specifying their names in the 'mandatory_dimensions' list in the plugin settings. (see the "Customize the plugin" paragraph in the README.md file)
 
 ### Version 2.2.4
 
