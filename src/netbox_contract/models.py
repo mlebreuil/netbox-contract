@@ -14,8 +14,8 @@ from utilities.choices import ChoiceSet
 class StatusChoices(ChoiceSet):
     key = 'Contract.status'
 
-    STATUS_ACTIVE = 'Active'
-    STATUS_CANCELED = 'Cancled'
+    STATUS_ACTIVE = 'active'
+    STATUS_CANCELED = 'canceled'
 
     CHOICES = [
         (STATUS_ACTIVE, 'Active', 'green'),
@@ -26,8 +26,8 @@ class StatusChoices(ChoiceSet):
 class AccountingDimensionStatusChoices(ChoiceSet):
     key = 'AccountingDimension.status'
 
-    STATUS_ACTIVE = 'Active'
-    STATUS_INACTIVE = 'Inactive'
+    STATUS_ACTIVE = 'active'
+    STATUS_INACTIVE = 'inactive'
 
     CHOICES = [
         (STATUS_ACTIVE, 'Active', 'green'),
@@ -84,6 +84,9 @@ class AccountingDimension(NetBoxModel):
     def __str__(self):
         return self.dimension
 
+    def get_status_color(self):
+        return AccountingDimensionStatusChoices.colors.get(self.status)
+    
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -243,6 +246,8 @@ class Contract(NetBoxModel):
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:contract', args=[self.pk])
 
+    def get_status_color(self):
+        return StatusChoices.colors.get(self.status)
     class Meta:
         ordering = ('name',)
         indexes = [
