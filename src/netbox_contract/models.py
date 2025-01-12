@@ -15,7 +15,7 @@ class StatusChoices(ChoiceSet):
     key = 'Contract.status'
 
     STATUS_ACTIVE = 'Active'
-    STATUS_CANCELED = 'Cancled'
+    STATUS_CANCELED = 'Canceled'
 
     CHOICES = [
         (STATUS_ACTIVE, 'Active', 'green'),
