@@ -82,7 +82,7 @@ FIELD_CHOICES = {
     ),
     'netbox_contract.Contract.status': (
         ('Active', 'Active', 'green'),
-        ('Cancled', 'Canceled', 'red'),
+        ('Canceled', 'Canceled', 'red'),
     )
 }
 
