@@ -28,7 +28,7 @@
             </tr>
             <tr>
               <th scope="row">{% trans "Status" %}</th>
-              <td>{{ object.status }}</td>
+              <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
             </tr>
             <tr>
               <th scope="row">{% trans "External reference" %}</th>
@@ -78,12 +78,6 @@
               <th scope="row">{% trans "Currency" %}</th>
               <td>{{ object.currency }}</td>
             </tr>
-            {% if not 'accounting_dimensions' in hidden_fields %}
-            <tr>
-              <th scope="row">{% trans "Accounting dimensions" %}</th>
-              <td>{{ object.accounting_dimensions }}</td>
-            </tr>
-            {% endif %}
             <tr>
               <th scope="row">{% trans "Monthly recuring costs" %}</th>
               <td>{{ object.mrc }}</td>

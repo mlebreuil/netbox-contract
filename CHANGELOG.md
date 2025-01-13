@@ -8,7 +8,12 @@
 ### Version 2.3.0
 
 > [!WARNING]
-> Accounting dimension json field will be removed. It is deprecated since v2.2.0. Refer to the [documentation](https://mlebreuil.github.io/netbox-contract/accounting_dimensions/)
+> Accounting dimension json field removed. It is deprecated since v2.2.0. Refer to the [documentation](https://mlebreuil.github.io/netbox-contract/accounting_dimensions/)
+
+* [206](https://github.com/mlebreuil/netbox-contract/issues/206) remove deprecated json accounting dimention field
+* Add background color to status
+* Script - fix check_contract_end with empty end date
+* minor fix
 
 ### Version 2.2.11
 
