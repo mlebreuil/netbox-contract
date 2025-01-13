@@ -100,6 +100,9 @@ class ContractListTable(NetBoxTable):
     external_partie_object = tables.Column(verbose_name='External partie', linkify=True)
     parent = tables.Column(linkify=True)
     yrc = tables.Column(verbose_name='Yerly recuring costs')
+    status = columns.ChoiceFieldColumn(
+        verbose_name=('Status'),
+    )
 
     class Meta(NetBoxTable.Meta):
         model = Contract
@@ -223,6 +226,9 @@ class InvoiceLineListTable(NetBoxTable):
 
 
 class AccountingDimensionListTable(NetBoxTable):
+    status = columns.ChoiceFieldColumn(
+        verbose_name=('Status'),
+    )
     class Meta(NetBoxTable.Meta):
         model = AccountingDimension
         fields = (
@@ -230,9 +236,11 @@ class AccountingDimensionListTable(NetBoxTable):
             'name',
             'value',
             'comments',
+            'status',
         )
         default_columns = (
             'name',
             'value',
             'comments',
+            'status',
         )
