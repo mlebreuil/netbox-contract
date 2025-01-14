@@ -136,6 +136,9 @@ class ContractListTable(NetBoxTable):
 class ContractListBottomTable(NetBoxTable):
     name = tables.Column(linkify=True)
     external_partie_object = tables.Column(linkify=True)
+    status = columns.ChoiceFieldColumn(
+        verbose_name=('Status'),
+    )
 
     class Meta(NetBoxTable.Meta):
         model = Contract
