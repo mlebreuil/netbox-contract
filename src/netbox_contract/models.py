@@ -248,6 +248,7 @@ class Contract(NetBoxModel):
 
     def get_status_color(self):
         return StatusChoices.colors.get(self.status)
+    
     class Meta:
         ordering = ('name',)
         indexes = [
