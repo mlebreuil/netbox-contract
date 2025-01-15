@@ -40,7 +40,7 @@
             {% endif %}
             <tr>
               <th scope="row">{% trans "Currency" %}</th>
-              <td>{{ object.currency }}</td>
+              <td>{{ object.get_currency_display  }}</td>
             </tr>
             <tr>
               <th scope="row">{% trans "Amount" %}</th>

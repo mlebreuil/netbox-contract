@@ -76,7 +76,7 @@
             {% endif %}
             <tr>
               <th scope="row">{% trans "Currency" %}</th>
-              <td>{{ object.currency }}</td>
+              <td>{{ object.get_currency_display  }}</td>
             </tr>
             <tr>
               <th scope="row">{% trans "Monthly recuring costs" %}</th>
@@ -135,7 +135,7 @@
           </tr>
           <tr>
             <th scope="row">{% trans "Currency" %}</th>
-            <td>{{ invoice_template.currency }}</td>
+            <td>{{ invoice_template.get_currency_display  }}</td>
           </tr>
           <tr>
             <th scope="row">{% trans "Total amount" %}</th>
