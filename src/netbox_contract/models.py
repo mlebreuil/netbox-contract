@@ -86,13 +86,9 @@ class AccountingDimension(NetBoxModel):
 
     def get_status_color(self):
         return AccountingDimensionStatusChoices.colors.get(self.status)
-    
+
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['name', 'value'], name='unique_accounting_dimension'
-            )
-        ]
+        constraints = [models.UniqueConstraint(fields=['name', 'value'], name='unique_accounting_dimension')]
         ordering = ('name', 'value')
         verbose_name = _('accounting dimension')
         verbose_name_plural = _('accounting dimensions')
@@ -117,9 +113,7 @@ class ServiceProvider(ContactsMixin, NetBoxModel):
 
 
 class ContractAssignment(NetBoxModel):
-    content_type = models.ForeignKey(
-        to=ContentType, on_delete=models.CASCADE, verbose_name=_('content type')
-    )
+    content_type = models.ForeignKey(to=ContentType, on_delete=models.CASCADE, verbose_name=_('content type'))
     object_id = models.PositiveBigIntegerField(verbose_name=_('object ID'))
     content_object = GenericForeignKey(ct_field='content_type', fk_field='object_id')
     contract = models.ForeignKey(
@@ -157,12 +151,8 @@ class Contract(NetBoxModel):
     external_partie_object = GenericForeignKey(
         ct_field='external_partie_object_type', fk_field='external_partie_object_id'
     )
-    external_reference = models.CharField(
-        max_length=100, blank=True, null=True, verbose_name=_('external reference')
-    )
-    internal_partie = models.CharField(
-        max_length=50, choices=InternalEntityChoices, verbose_name=_('internal partie')
-    )
+    external_reference = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('external reference'))
+    internal_partie = models.CharField(max_length=50, choices=InternalEntityChoices, verbose_name=_('internal partie'))
     tenant = models.ForeignKey(
         to='tenancy.Tenant',
         on_delete=models.PROTECT,
@@ -220,9 +210,7 @@ class Contract(NetBoxModel):
         null=True,
         help_text=_('Use either this field of the yearly recuring cost field'),
     )
-    nrc = models.DecimalField(
-        verbose_name=_('none recuring cost'), default=0, max_digits=10, decimal_places=2
-    )
+    nrc = models.DecimalField(verbose_name=_('none recuring cost'), default=0, max_digits=10, decimal_places=2)
     invoice_frequency = models.IntegerField(
         help_text=_('The frequency of invoices in month'),
         default=1,
@@ -248,13 +236,11 @@ class Contract(NetBoxModel):
 
     def get_status_color(self):
         return StatusChoices.colors.get(self.status)
-    
+
     class Meta:
         ordering = ('name',)
         indexes = [
-            models.Index(
-                fields=['external_partie_object_type', 'external_partie_object_id']
-            ),
+            models.Index(fields=['external_partie_object_type', 'external_partie_object_id']),
         ]
         verbose_name = _('contract')
         verbose_name_plural = _('contracts')
@@ -277,12 +263,8 @@ class Invoice(NetBoxModel):
         help_text=_('Wether this invoice is a template or not'),
     )
     date = models.DateField(blank=True, null=True, verbose_name=_('date'))
-    contracts = models.ManyToManyField(
-        Contract, related_name='invoices', blank=True, verbose_name=_('contracts')
-    )
-    period_start = models.DateField(
-        blank=True, null=True, verbose_name=_('period start')
-    )
+    contracts = models.ManyToManyField(Contract, related_name='invoices', blank=True, verbose_name=_('contracts'))
+    period_start = models.DateField(blank=True, null=True, verbose_name=_('period start'))
     period_end = models.DateField(blank=True, null=True, verbose_name=_('period end'))
     currency = models.CharField(
         max_length=3,
@@ -290,9 +272,7 @@ class Invoice(NetBoxModel):
         default=CURRENCY_DEFAULT,
         verbose_name=_('currency'),
     )
-    amount = models.DecimalField(
-        max_digits=10, decimal_places=2, verbose_name=_('amount')
-    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('amount'))
     documents = models.URLField(
         blank=True,
         verbose_name=_('documents'),
@@ -332,9 +312,7 @@ class InvoiceLine(NetBoxModel):
         default=CURRENCY_DEFAULT,
         verbose_name=_('currency'),
     )
-    amount = models.DecimalField(
-        max_digits=10, decimal_places=2, verbose_name=_('amount')
-    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('amount'))
     accounting_dimensions = models.ManyToManyField(
         AccountingDimension, blank=True, verbose_name=_('accounting dimensions')
     )
@@ -356,14 +334,8 @@ class InvoiceLine(NetBoxModel):
         is_new = not bool(self.pk)
         if is_new:
             if amount > (invoice.amount - invoice.total_invoicelines_amount):
-                raise ValidationError(
-                    'Sum of invoice line amount greater than invoice amount'
-                )
+                raise ValidationError('Sum of invoice line amount greater than invoice amount')
         else:
             previous_amount = self.__class__.objects.get(pk=self.pk).amount
-            if amount > (
-                invoice.amount - invoice.total_invoicelines_amount + previous_amount
-            ):
-                raise ValidationError(
-                    'Sum of invoice line amount greater than invoice amount'
-                )
+            if amount > (invoice.amount - invoice.total_invoicelines_amount + previous_amount):
+                raise ValidationError('Sum of invoice line amount greater than invoice amount')

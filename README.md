@@ -1,12 +1,27 @@
 # Contract pluggin
-## Overview
+
+NetBox plugin to manage contracts.
+
+
+* Free software: MIT
+* Documentation: https://mlebreuil.github.io/netbox-contract/
+
+## Features
+
 The pluggin adds contracts and invoices model to Netbox.  
-It allows to register contract with objects.  
-Add invoices to contracts. 
+It allows to link contract with objects.  
+And link invoice templates and invoices with contracts.  
+Invoice lines can be linked to each invoice / invoice template.  
+Accounitng dimentoins can be linked with invoice lines.  
 
-Check the [documentation](https://mlebreuil.github.io/netbox-contract/) for additional information 
+## Compatibility
 
-## Installation
+| NetBox Version | Plugin Version |
+|----------------|----------------|
+|     4.1        |      2.2       |
+|     4.2        |      2.3       |
+
+## Installing
 
 ### Activate venv
 To ensure our plugin is accessible to the NetBox installation, we first need to activate the Python [virtual environment](https://docs.python.org/3/library/venv.html) that was created when we installed NetBox. To do this, determine the virtual environment's path (this will be `/opt/netbox/venv/` if you use the documentation's defaults) and activate it:

@@ -133,7 +133,7 @@ Before you submit a pull request, check that it meets these guidelines:
 
 1. The pull request should include tests.
 2. If the pull request adds functionality, the docs should be updated. 
-3. The pull request should work for Python 3.8, 3.9, 3.10 and 3.11. Check [Actions](https://github.com/mlebreuil/netbox-contract/actions)
+3. The pull request should work for Python 3.10 and 3.11. Check [Actions](https://github.com/mlebreuil/netbox-contract/actions)
    and make sure that the tests pass for all supported Python versions.
 
 
