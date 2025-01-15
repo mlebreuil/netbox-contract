@@ -45,6 +45,9 @@ class ContractAssignmentObjectTable(NetBoxTable):
     contract__external_partie_object = tables.Column(
         verbose_name='Partner', linkify=True
     )
+    contract__status = columns.ChoiceFieldColumn(
+        verbose_name=('Status'),
+    )
 
     class Meta(NetBoxTable.Meta):
         model = ContractAssignment
@@ -75,7 +78,9 @@ class ContractAssignmentObjectTable(NetBoxTable):
 class ContractAssignmentContractTable(NetBoxTable):
     content_type = columns.ContentTypeColumn(verbose_name='Object Type')
     content_object = tables.Column(linkify=True, verbose_name='Object', orderable=False)
-    content_object__status = tables.Column(verbose_name='Status')
+    content_object__status = columns.ChoiceFieldColumn(
+        verbose_name=('Status'),
+    )
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
 
     class Meta(NetBoxTable.Meta):
