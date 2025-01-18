@@ -5,11 +5,11 @@ class ContractsConfig(PluginConfig):
     name = 'netbox_contract'
     verbose_name = 'Netbox contract'
     description = 'Contract management plugin for Netbox'
-    version = '2.3.0'
+    version = '2.3.1'
     author = 'Marc Lebreuil'
     author_email = 'marc@famillelebreuil.net'
     base_url = 'contracts'
-    min_version = '4.1.10'
+    min_version = '4.2.0'
     required_settings = []
     default_settings = {
         'top_level_menu': False,
