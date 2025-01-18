@@ -151,6 +151,7 @@ class Contract(NetBoxModel):
     external_partie_object = GenericForeignKey(
         ct_field='external_partie_object_type', fk_field='external_partie_object_id'
     )
+    external_partie_object.editable = True
     external_reference = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('external reference'))
     internal_partie = models.CharField(max_length=50, choices=InternalEntityChoices, verbose_name=_('internal partie'))
     tenant = models.ForeignKey(
