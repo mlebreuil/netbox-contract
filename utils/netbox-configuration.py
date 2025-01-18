@@ -1,3 +1,5 @@
+import os
+
 #########################
 #                       #
 #   Required settings   #
@@ -13,9 +15,9 @@ ALLOWED_HOSTS = ['127.0.0.1']
 # PostgreSQL database configuration. See the Django documentation for a complete list of available parameters:
 #   https://docs.djangoproject.com/en/stable/ref/settings/#databases
 DATABASE = {
-    'NAME': 'netbox',  # Database name
-    'USER': 'netbox',  # PostgreSQL username
-    'PASSWORD': 'J5brHrAXFLQSif0K',  # PostgreSQL password
+    'NAME': os.getenv('POSTGRES_DB'),  # Database name
+    'USER': os.getenv('POSTGRES_USER'),  # PostgreSQL username
+    'PASSWORD': os.getenv('POSTGRES_PASSWORD'),  # PostgreSQL password
     'HOST': 'db',  # Database server
     'PORT': '',  # Database port (leave blank for default)
     'CONN_MAX_AGE': 300,  # Max database connection age
@@ -31,12 +33,15 @@ REDIS = {
         # Comment out `HOST` and `PORT` lines and uncomment the following if using Redis Sentinel
         # 'SENTINELS': [('mysentinel.redis.example.com', 6379)],
         # 'SENTINEL_SERVICE': 'netbox',
+        'USERNAME': '',
         'PASSWORD': '',
         'DATABASE': 0,
         'SSL': False,
         # Set this to True to skip TLS certificate verification
         # This can expose the connection to attacks, be careful
         # 'INSECURE_SKIP_TLS_VERIFY': False,
+        # Set a path to a certificate authority, typically used with a self signed certificate.
+        # 'CA_CERT_PATH': '/etc/ssl/certs/ca.crt',
     },
     'caching': {
         'HOST': 'redis',
@@ -44,12 +49,15 @@ REDIS = {
         # Comment out `HOST` and `PORT` lines and uncomment the following if using Redis Sentinel
         # 'SENTINELS': [('mysentinel.redis.example.com', 6379)],
         # 'SENTINEL_SERVICE': 'netbox',
+        'USERNAME': '',
         'PASSWORD': '',
         'DATABASE': 1,
         'SSL': False,
         # Set this to True to skip TLS certificate verification
         # This can expose the connection to attacks, be careful
         # 'INSECURE_SKIP_TLS_VERIFY': False,
+        # Set a path to a certificate authority, typically used with a self signed certificate.
+        # 'CA_CERT_PATH': '/etc/ssl/certs/ca.crt',
     },
 }
 
@@ -57,7 +65,7 @@ REDIS = {
 # For optimal security, SECRET_KEY should be at least 50 characters in length and contain a mix of letters, numbers, and
 # symbols. NetBox will not run without this defined. For more information, see
 # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-SECRET_KEY
-SECRET_KEY = 'z(DvJ7Q0)8k)ch9xaQZueQxyfs&&gZ38-oe7jQh&0^KlPU^Yqc'
+SECRET_KEY = '@bN8Z6vykN7zOtz1$-ExJ)Ps%bwC+%U=oN*hZCE^CR9R4y@yYi'
 
 
 #########################

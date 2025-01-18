@@ -2,30 +2,33 @@
 ## Configure the dev environment
 ### create the dev container
 
-Create a netbox folder
-clone your fork of the netbox-contract repository 
-Copy the utils/.devcontainer folder to your root directory
+Create a netbox folder.  
+clone your fork of the netbox-contract repository. 
+Copy the utils/.devcontainer folder to your root directory.  
+Update the environment variables in the .devcontainer/env folder.  
 
 Save the workspace definition file to the root of the netbox folder
-File > Save workspace as
+File > Save workspace as  
 
 Press F1
 Dev Container: Rebuild container and reopen in container
 
-### initialisze the database
+### initialize the database
 
 Install database package.  
 postgresql python adapter [psycopg](https://www.psycopg.org/docs/install.html)  
 
 ```bash
-pip install psycopg2
+pip install -r netbox-contract/utils/requirements.txt
 ```
-
+If the db already exist and you want to start over from scratch uncomment the corresponding lines int he database_init.py file.  
 Run the initialization script
 
 ```bash
 python3 netbox-contract/utils/database_init.py
 ```
+
+If the db already exist and you want to start over from scratch uncomment the corresponding lines int he database_init.py file.  
 
 ## Install Netbox
  
@@ -50,6 +53,8 @@ python3 netbox/netbox/generate_secret_key.py
 update the netbox-contract/utils/netbox-configuration.py with this secret key
 
 ### update netbox configuration
+
+Update the configuration with your env variables.  
 
 ```
 cp netbox-contract/utils/netbox-configuration.py netbox/netbox/netbox/configuration.py
