@@ -10,6 +10,9 @@ format:
 lint:
 	flake8 $(sources) tests
 
+unittest:
+	python3 netbox/netbox/manage.py test netbox_contract.tests
+
 pre-commit:
 	pre-commit run --all-files
 

@@ -46,7 +46,7 @@ You do not need to create the Netbox system user
 
 ### generate secret key
 
-```
+```bash
 python3 netbox/netbox/generate_secret_key.py
 ```
 
@@ -56,7 +56,7 @@ update the netbox-contract/utils/netbox-configuration.py with this secret key
 
 Update the configuration with your env variables.  
 
-```
+```bash
 cp netbox-contract/utils/netbox-configuration.py netbox/netbox/netbox/configuration.py
 ```
 
@@ -89,7 +89,7 @@ python3 -m pip install -e netbox-contract
 ```
 Update the configuration:
 
-```
+```bash
 cp netbox-contract/utils/netbox-configuration-final.py netbox/netbox/netbox/configuration.py
 ```
 
