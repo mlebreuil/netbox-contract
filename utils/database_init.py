@@ -31,6 +31,9 @@ cur.execute(f'CREATE DATABASE {db};')
 cur.execute(f"CREATE USER netbox WITH PASSWORD '{password}';")
 cur.execute(f'ALTER DATABASE {db} OWNER TO {user};')
 
+# Required to run unittest as the django user need to create the test db
+cur.execute(f'ALTER ROLE {user} CREATEDB;')
+
 # Make the changes to the database persistent
 conn.commit()
 
