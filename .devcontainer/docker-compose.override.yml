@@ -16,4 +16,4 @@ services:
     ports:
       - "5432:5432" # In order to reach pg database from localhost
     volumes:
-      - ./netbox-demo-v4.2_contract-v2.3.sql:/docker-entrypoint-initdb.d/dump.sql
+      - ./netbox-demo-data/sql/netbox-demo-v4.2_contract-v2.3.sql:/docker-entrypoint-initdb.d/dump.sql
