@@ -19,7 +19,7 @@ The data is loaded from [netbox-demo-data](https://github.com/netbox-community/n
 1. Press `Ctrl+Shift+P` and select "Dev Containers: Open Folder in Container", then choose your netbox-contract folder
 2. Start the NetBox instance using: `make all`
 
-Your netbox instance will be served under `0.0.0.0:8000`, so it should now be available under `localhost:8000`.
+Your netbox instance will be served under `0.0.0.0:8000`, so it should now be available under `127.0.0:1:8000`.
 
 
 ## Aliases and Make Commands

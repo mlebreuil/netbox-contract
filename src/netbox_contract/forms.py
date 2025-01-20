@@ -3,6 +3,12 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.utils.translation import gettext_lazy as _
+from netbox.forms import (
+    NetBoxModelBulkEditForm,
+    NetBoxModelFilterSetForm,
+    NetBoxModelForm,
+    NetBoxModelImportForm,
+)
 from tenancy.models import Tenant
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import (
@@ -18,13 +24,6 @@ from utilities.forms.fields import (
     TagFilterField,
 )
 from utilities.forms.widgets import DatePicker, HTMXSelect
-
-from netbox.forms import (
-    NetBoxModelBulkEditForm,
-    NetBoxModelFilterSetForm,
-    NetBoxModelForm,
-    NetBoxModelImportForm,
-)
 
 from .constants import SERVICE_PROVIDER_MODELS
 from .models import (

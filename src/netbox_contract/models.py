@@ -6,10 +6,9 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from utilities.choices import ChoiceSet
-
 from netbox.models import NetBoxModel
 from netbox.models.features import ContactsMixin
+from utilities.choices import ChoiceSet
 
 
 class StatusChoices(ChoiceSet):

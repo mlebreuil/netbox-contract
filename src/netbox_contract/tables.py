@@ -1,5 +1,4 @@
 import django_tables2 as tables
-
 from netbox.tables import NetBoxTable, columns
 
 from .models import (
@@ -43,9 +42,7 @@ class ContractAssignmentListTable(NetBoxTable):
 class ContractAssignmentObjectTable(NetBoxTable):
     contract = tables.Column(linkify=True)
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
-    contract__external_partie_object = tables.Column(
-        verbose_name='Partner', linkify=True
-    )
+    contract__external_partie_object = tables.Column(verbose_name='Partner', linkify=True)
     contract__status = columns.ChoiceFieldColumn(
         verbose_name=('Status'),
     )

@@ -24,6 +24,7 @@ RUN usermod -aG sudo $USERNAME \
     && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
     && mkdir -p /opt/netbox/netbox/netbox-contract \
     && chown $USERNAME:$USERNAME /opt/netbox/netbox/netbox-contract \
+    && chown $USERNAME:$USERNAME /opt/netbox/netbox/static \
     && chown -R $USERNAME:$USERNAME /etc/netbox \
     && chown -R $USERNAME:$USERNAME /opt/unit \
     && chsh -s $(which zsh) $USERNAME

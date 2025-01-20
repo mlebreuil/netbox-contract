@@ -6,13 +6,14 @@ services:
       dockerfile: Dockerfile-plugin_dev
       context: .
     ports:
-      - "8000:8080"
+      - "8000:8000"
+      - "8080:8080"
     volumes:
       - ../:/opt/netbox/netbox/netbox-contract
       - ~/.gitconfig:/home/vscode/.gitconfig:z,ro
       - ~/.ssh:/home/vscode/.ssh
   postgres:
     ports:
-      - "${PG_PORT:-5432}:5432" # In order to reach pg database from localhost
+      - "5432:5432" # In order to reach pg database from localhost
     volumes:
-      - ./netbox-demo-data/sql/netbox-demo-v4.2.sql:/docker-entrypoint-initdb.d/dump.sql
+      - ./netbox-demo-v4.2_contract-v2.3.sql:/docker-entrypoint-initdb.d/dump.sql
