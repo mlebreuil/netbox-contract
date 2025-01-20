@@ -56,6 +56,11 @@ The following configurationitems can be set:
 PLUGINS_CONFIG = {
     'netbox_contract': {
         'top_level_menu': True,
+        'default_accounting_dimensions':{
+            "account": "", 
+            "project": "", 
+            "cost center": ""
+        },
         'mandatory_contract_fields': [],
         'hidden_contract_fields': [],
         'mandatory_invoice_fields': [],
@@ -80,8 +85,9 @@ The first currency will also be the default currency for contracts.
 # configuration.py
 FIELD_CHOICES = {
     'netbox_contract.Contract.internal_partie': (
-        ('entity1', 'Entity 1', 'green'),
-        ('entity2', 'Entity 2', 'yellow'),
+        ('Nagravision SARL', 'Nagravision SARL', 'green'),
+        ('Nagra USA', 'Nagra USA', 'green'),
+        ('Nagra India', 'Nagra India', 'green'),
     ),
     'netbox_contract.Contract.currency': (
         ('usd', 'USD'),

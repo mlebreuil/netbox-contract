@@ -5,10 +5,6 @@
 
 ## Version 2
 
-### Version 2.3.1
-
-* [219](https://github.com/mlebreuil/netbox-contract/issues/219) Fix - netbox 4.2 non editable field for gfk
-
 ### Version 2.3.0
 
 > [!WARNING]

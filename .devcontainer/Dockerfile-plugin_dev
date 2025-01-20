@@ -1,0 +1,50 @@
+ARG NETBOX_VARIANT=v4.2
+
+FROM netboxcommunity/netbox:${NETBOX_VARIANT}
+
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Install APT packages
+# hadolint ignore=DL3008
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends  curl git make openssh-client sudo wget zsh postgresql-client \
+    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
+# Install development & ide dependencies
+COPY requirements-dev.txt /tmp/pip-tmp/
+RUN /opt/netbox/venv/bin/python3 -m pip install --disable-pip-version-check --no-cache-dir -r /tmp/pip-tmp/requirements-dev.txt \
+   && rm -rf /tmp/*
+
+ARG USERNAME=ubuntu
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+RUN usermod -aG sudo $USERNAME \
+    && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
+    && mkdir -p /opt/netbox/netbox/netbox-contract \
+    && chown $USERNAME:$USERNAME /opt/netbox/netbox/netbox-contract \
+    && chown $USERNAME:$USERNAME /opt/netbox/netbox/static \
+    && chown -R $USERNAME:$USERNAME /etc/netbox \
+    && chown -R $USERNAME:$USERNAME /opt/unit \
+    && chsh -s $(which zsh) $USERNAME
+    
+USER $USERNAME
+
+SHELL ["/usr/bin/zsh", "-c"]
+# Add oh my zsh
+RUN wget --quiet https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
+
+
+COPY .zshrc /home/vscode/.zshrc
+
+
+WORKDIR /opt/netbox/netbox/netbox-contract
+
+# hadolint ignore=DL3002
+USER root
+
+COPY entrypoint-dev.sh /bin/entrypoint-dev.sh
+RUN chmod +x /bin/entrypoint-dev.sh
+
+CMD ["/bin/entrypoint-dev.sh"]

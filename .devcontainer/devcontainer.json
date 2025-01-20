@@ -1,0 +1,67 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.238.0/containers/python-3-postgres
+// Update the VARIANT arg in docker-compose.yml to pick a Python version
+{
+  "name": "NetBox Plugin Development",
+  "dockerComposeFile": ["docker-compose.yml", "docker-compose.override.yml"],
+  "service": "netbox",
+  //"workspaceMount": "source=${localWorkspaceFolder},target=/opt/netbox/netbox/netbox-contract,type=bind,consistency=cached",
+  "workspaceFolder": "/opt/netbox/netbox/netbox-contract",
+
+  "overrideCommand": false,
+
+  // Configure tool-specific properties.
+  "customizations": {
+    // Configure properties specific to VS Code.
+    "vscode": {
+      // Set *default* container specific settings.json values on container create.
+      "settings": {
+        "editor.experimental.stickyScroll.enabled": true,
+        //"[python]": {
+        //	"editor.codeActionsOnSave": {
+        //		"source.organizeImports": true
+        //	}
+        //},
+        "python.pythonPath": "/opt/netbox/venv/bin/python3",
+        "python.terminal.activateEnvironment": true,
+        "python.venvPath": "/opt/netbox/",
+        "files.exclude": {
+          "**/node_modules": true,
+          "build": true,
+          "dist": true,
+          "*egg*": true
+        }
+      },
+
+      // Add the IDs of extensions you want installed when the container is created.
+      "extensions": [
+        "batisteo.vscode-django",
+        "charliermarsh.ruff",
+        "codezombiech.gitignore",
+        "esbenp.prettier-vscode",
+        "ms-python.isort",
+        "ms-python.pylint",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-vscode.makefile-tools",
+        "mutantdino.resourcemonitor",
+        "oderwat.indent-rainbow",
+        "redhat.vscode-yaml",
+        "wholroyd.jinja",
+        "yzhang.markdown-all-in-one"
+      ]
+    }
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // This can be used to network with other containers or the host.
+  // "forwardPorts": [5000, 5432],
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // "postCreateCommand": "pip install --user -r requirements-dev.txt",
+
+  //"postAttachCommand": "source /opt/netbox/venv/bin/activate",
+
+  // Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+  "remoteUser": "ubuntu"
+}
