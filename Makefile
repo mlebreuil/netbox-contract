@@ -19,7 +19,7 @@ cleanup:
 
 # in VS Code Devcontianer
 
-.PHONY: precommit ## Run nbshell
+.PHONY: precommit ## Run precommit
 precommit:
 	- pre-commit run --all-files
 
@@ -53,7 +53,7 @@ runserver:
 start:
 	- cd /opt/netbox/netbox/ && /opt/netbox/docker-entrypoint.sh && /opt/netbox/launch-netbox.sh
 
-.PHONY: export_data # export data .sql file
+.PHONY: export_data ## export data .sql file
 export_data:
 	- PGPASSWORD=J5brHrAXFLQSif0K pg_dump -h postgres -U netbox netbox > netbox_export_data.sql
 
