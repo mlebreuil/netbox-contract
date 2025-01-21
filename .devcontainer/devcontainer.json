@@ -23,6 +23,7 @@
         //	}
         //},
         "python.pythonPath": "/opt/netbox/venv/bin/python3",
+        "python.analysis.extraPaths": ["/opt/netbox"],
         "python.terminal.activateEnvironment": true,
         "python.venvPath": "/opt/netbox/",
         "files.exclude": {
@@ -40,7 +41,6 @@
         "codezombiech.gitignore",
         "esbenp.prettier-vscode",
         "ms-python.isort",
-        "ms-python.pylint",
         "ms-python.python",
         "ms-python.vscode-pylance",
         "mutantdino.resourcemonitor",

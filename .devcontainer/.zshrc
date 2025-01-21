@@ -34,7 +34,8 @@ ZSH_THEME="robbyrussell"
 plugins=(common-aliases git git-auto-fetch git-extras jsontools pip)
 
 source $ZSH/oh-my-zsh.sh
-
+export PATH="/opt/netbox/netbox:$PATH"
+export PYTHONPATH="/opt/netbox/netbox:$PYTHONPATH"
 
 # Activate Python venv in terminal
 source /opt/netbox/venv/bin/activate
