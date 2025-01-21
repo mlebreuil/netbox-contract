@@ -47,7 +47,7 @@ collectstatic:
 
 .PHONY: runserver ## Start NetBox with runserver
 runserver:
-	- /opt/netbox/netbox/manage.py runserver 0.0.0.0:8000 --insecure
+	- ${NETBOX_MANAGE_PATH}/manage.py runserver 0.0.0.0:8000 --insecure
 
 .PHONY: start ## Start NetBox
 start:
@@ -55,7 +55,7 @@ start:
 
 .PHONY: export_data # export data .sql file
 export_data:
-	- PGPASSWORD=J5brHrAXFLQSif0K pg_dump -h postgres -U netbox netbox > netbox_$(date +%Y-%m-%d).sql
+	- PGPASSWORD=J5brHrAXFLQSif0K pg_dump -h postgres -U netbox netbox > netbox_export_data.sql
 
 .PHONY: all ## Run all PLUGIN DEV targets
 all: setup makemigrations migrate collectstatic runserver
