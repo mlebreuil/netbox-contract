@@ -19,6 +19,11 @@ cleanup:
 
 # in VS Code Devcontianer
 
+.PHONY: precommit ## Run nbshell
+precommit:
+	- pre-commit run --all-files
+
+
 .PHONY: nbshell ## Run nbshell
 nbshell:
 	${VENV_PY_PATH} ${NETBOX_MANAGE_PATH}/manage.py nbshell

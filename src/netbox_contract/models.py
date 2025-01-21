@@ -135,6 +135,9 @@ class ContractAssignment(NetBoxModel):
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:contractassignment', args=[self.pk])
 
+    def get_contract__status_color(self):
+        return StatusChoices.colors.get(self.contract.status)
+
 
 class Contract(NetBoxModel):
     name = models.CharField(max_length=100, verbose_name=_('name'))

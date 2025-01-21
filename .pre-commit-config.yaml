@@ -13,6 +13,11 @@ repos:
     - id: black
       args: [--line-length=120]
       language_version: python3
+      exclude: 
+        (?x)(
+          ^.devcontainer/configuration/|
+          ^src/netbox_contract/migrations/
+        )
 -   repo: https://github.com/PyCQA/isort
     rev: 5.12.0
     hooks:
@@ -21,6 +26,11 @@ repos:
     rev: 7.0.0
     hooks:
     - id: flake8
+      exclude: 
+        (?x)(
+          ^.devcontainer/configuration/|
+          ^src/netbox_contract/migrations/
+        )
 
 -   repo: https://github.com/mgedmin/check-manifest
     rev: "0.49"
