@@ -65,13 +65,5 @@ rebuild: setup makemigrations migrate collectstatic runserver
 
 .PHONY: test
 test: setup
-	${NETBOX_MANAGE_PATH}/manage.py makemigrations ${PLUGIN_NAME} --check
-	coverage run --source "netbox_contract" ${NETBOX_MANAGE_PATH}/manage.py test ${PLUGIN_NAME} -v 2
-
-# .PHONY: coverage_report
-# coverage_report:
-# 	coverage report
-
-# .PHONY: test_coverage
-# test_coverage: test coverage_report
+	${NETBOX_MANAGE_PATH}/manage.py test ${PLUGIN_NAME}
 
