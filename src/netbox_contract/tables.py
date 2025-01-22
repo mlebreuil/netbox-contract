@@ -207,7 +207,7 @@ class ServiceProviderListTable(NetBoxTable):
 
 class InvoiceLineListTable(NetBoxTable):
     invoice = tables.Column(linkify=True)
-    accounting_dimensions = tables.ManyToManyColumn(linkify=True, filter=lambda qs: qs.order_by('name'))
+    accounting_dimensions = tables.ManyToManyColumn(linkify_item=True, filter=lambda qs: qs.order_by('name'))
 
     class Meta(NetBoxTable.Meta):
         model = InvoiceLine
