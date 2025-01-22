@@ -230,6 +230,7 @@ class InvoiceLineListTable(NetBoxTable):
 
 
 class AccountingDimensionListTable(NetBoxTable):
+    name = tables.Column(linkify=True)
     status = columns.ChoiceFieldColumn(
         verbose_name=('Status'),
     )
