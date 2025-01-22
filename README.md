@@ -56,11 +56,6 @@ The following configurationitems can be set:
 PLUGINS_CONFIG = {
     'netbox_contract': {
         'top_level_menu': True,
-        'default_accounting_dimensions':{
-            "account": "", 
-            "project": "", 
-            "cost center": ""
-        },
         'mandatory_contract_fields': [],
         'hidden_contract_fields': [],
         'mandatory_invoice_fields': [],
