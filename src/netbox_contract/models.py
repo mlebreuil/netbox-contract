@@ -141,13 +141,13 @@ class ContractAssignment(NetBoxModel):
         return StatusChoices.colors.get(self.contract.status)
 
     def get_content_object__status_color(self):
-        if self.content_type.model == 'virtualmachine':
-            return VirtualMachineStatusChoices.colors.get(self.content_object.status)
-        elif self.content_type.model == 'device':
-            return DeviceStatusChoices.colors.get(self.content_object.status)
-        elif self.content_type.model == 'site':
-            return SiteStatusChoices.colors.get(self.content_object.status)
-        return StatusChoices.colors.get(self.content_object.status)
+        STATUS_MAPPING = {
+            'virtualmachine': VirtualMachineStatusChoices.colors,
+            'device': DeviceStatusChoices.colors,
+            'site': SiteStatusChoices.colors,
+        }
+        status_colors = STATUS_MAPPING.get(self.content_type.model, StatusChoices.colors)
+        return status_colors.get(self.content_object.status)
 
 
 class Contract(NetBoxModel):
