@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from dcim.choices import DeviceStatusChoices, SiteStatusChoices
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
@@ -9,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from netbox.models import NetBoxModel
 from netbox.models.features import ContactsMixin
 from utilities.choices import ChoiceSet
+from virtualization.choices import VirtualMachineStatusChoices
 
 
 class StatusChoices(ChoiceSet):
@@ -134,6 +136,18 @@ class ContractAssignment(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:contractassignment', args=[self.pk])
+
+    def get_contract__status_color(self):
+        return StatusChoices.colors.get(self.contract.status)
+
+    def get_content_object__status_color(self):
+        STATUS_MAPPING = {
+            'virtualmachine': VirtualMachineStatusChoices.colors,
+            'device': DeviceStatusChoices.colors,
+            'site': SiteStatusChoices.colors,
+        }
+        status_colors = STATUS_MAPPING.get(self.content_type.model, StatusChoices.colors)
+        return status_colors.get(self.content_object.status)
 
 
 class Contract(NetBoxModel):

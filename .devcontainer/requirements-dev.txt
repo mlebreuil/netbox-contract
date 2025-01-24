@@ -1,0 +1,6 @@
+pre-commit
+pycodestyle
+pydocstyle
+pylint-django
+ruff
+rich
