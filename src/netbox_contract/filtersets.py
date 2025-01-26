@@ -19,12 +19,8 @@ from .models import (
 
 class ContractFilterSet(NetBoxModelFilterSet, TenancyFilterSet):
     status = django_filters.MultipleChoiceFilter(choices=StatusChoices, null_value=None)
-    internal_partie = django_filters.MultipleChoiceFilter(
-        choices=InternalEntityChoices, null_value=None
-    )
-    currency = django_filters.MultipleChoiceFilter(
-        choices=CurrencyChoices, null_value=None
-    )
+    internal_partie = django_filters.MultipleChoiceFilter(choices=InternalEntityChoices, null_value=None)
+    currency = django_filters.MultipleChoiceFilter(choices=CurrencyChoices, null_value=None)
 
     class Meta:
         model = Contract
@@ -40,17 +36,13 @@ class ContractFilterSet(NetBoxModelFilterSet, TenancyFilterSet):
 
     def search(self, queryset, name, value):
         return queryset.filter(
-            Q(name__icontains=value)
-            | Q(external_reference__icontains=value)
-            | Q(comments__icontains=value),
+            Q(name__icontains=value) | Q(external_reference__icontains=value) | Q(comments__icontains=value),
             Q(status__iexact='Active'),
         )
 
 
 class InvoiceFilterSet(NetBoxModelFilterSet):
-    currency = django_filters.MultipleChoiceFilter(
-        choices=CurrencyChoices, null_value=None
-    )
+    currency = django_filters.MultipleChoiceFilter(choices=CurrencyChoices, null_value=None)
 
     class Meta:
         model = Invoice
@@ -66,9 +58,7 @@ class InvoiceFilterSet(NetBoxModelFilterSet):
         )
 
     def search(self, queryset, name, value):
-        return queryset.filter(
-            Q(number__icontains=value) | Q(contracts__name__icontains=value)
-        )
+        return queryset.filter(Q(number__icontains=value) | Q(contracts__name__icontains=value))
 
 
 class ServiceProviderFilterSet(NetBoxModelFilterSet):
@@ -90,24 +80,18 @@ class ContractAssignmentFilterSet(NetBoxModelFilterSet):
 
 
 class InvoiceLineFilterSet(NetBoxModelFilterSet):
-    currency = django_filters.MultipleChoiceFilter(
-        choices=CurrencyChoices, null_value=None
-    )
+    currency = django_filters.MultipleChoiceFilter(choices=CurrencyChoices, null_value=None)
 
     class Meta:
         model = InvoiceLine
         fields = ('id', 'invoice', 'accounting_dimensions')
 
     def search(self, queryset, name, value):
-        return queryset.filter(
-            Q(comments__icontains=value) | Q(invoice__number__icontains=value)
-        )
+        return queryset.filter(Q(comments__icontains=value) | Q(invoice__number__icontains=value))
 
 
 class AccountingDimensionFilterSet(NetBoxModelFilterSet):
-    status = django_filters.MultipleChoiceFilter(
-        choices=AccountingDimensionStatusChoices, null_value=None
-    )
+    status = django_filters.MultipleChoiceFilter(choices=AccountingDimensionStatusChoices, null_value=None)
 
     class Meta:
         model = AccountingDimension
