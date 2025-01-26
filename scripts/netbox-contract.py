@@ -20,9 +20,7 @@ AMOUNT_PRECEDENCE = (('invoice', 'Invoice'), ('dimensions', 'dimensions'))
 class update_expired_contract_status(Script):
     class Meta:
         name = 'Update expired contracts status'
-        description = (
-            "Update the status of contract with end date prior to today's date"
-        )
+        description = "Update the status of contract with end date prior to today's date"
         commit_default = False
 
     def run(self, data, commit):
@@ -58,9 +56,7 @@ class create_invoice_template(Script):
             self.log_info(f'Processing contract {contract.name}')
 
             # check if invoice template exist
-            invoice_template = Invoice.objects.filter(
-                template=True, contracts=contract
-            ).first()
+            invoice_template = Invoice.objects.filter(template=True, contracts=contract).first()
 
             if invoice_template:
                 self.log_info(f'Template already exists for {contract.name}')
@@ -82,9 +78,7 @@ class create_invoice_template(Script):
                 )
                 invoice_template.save()
                 invoice_template.contracts.add(contract)
-                self.log_info(
-                    f'Template {invoice_template.number} created for {contract.name}'
-                )
+                self.log_info(f'Template {invoice_template.number} created for {contract.name}')
 
         return '\n'.join(output)
 
@@ -92,9 +86,7 @@ class create_invoice_template(Script):
 class create_invoice_lines(Script):
     class Meta:
         name = 'Create invoice lines'
-        description = (
-            'Convert the Accounting dimensions json field in invoices to invoice lines'
-        )
+        description = 'Convert the Accounting dimensions json field in invoices to invoice lines'
         commit_default = False
 
     ignore = StringVar(
@@ -172,9 +164,7 @@ class create_invoice_lines(Script):
                     # Checking first the case "not exist" allow us to remove one indent level
                     # NOTE: This works fine because None is not a valid value in this case.
                     if not amount:
-                        self.log_warning(
-                            'Multiple lines or dimensions precedence and no amount for line'
-                        )
+                        self.log_warning('Multiple lines or dimensions precedence and no amount for line')
                         continue
                     # The try-except part is the same and can be extracted
                     if isinstance(amount, str):
@@ -183,9 +173,7 @@ class create_invoice_lines(Script):
                         amount = Decimal(line[line_amount_key])
                     except InvalidOperation:
                         self.log_warning(f'Wrong number format {line[line_amount_key]}')
-                        output.append(
-                            f'{invoice.number}: dimensions amount format to be updated'
-                        )
+                        output.append(f'{invoice.number}: dimensions amount format to be updated')
 
                 invoice_line = InvoiceLine(
                     invoice=invoice,
@@ -193,9 +181,7 @@ class create_invoice_lines(Script):
                     amount=amount,
                 )
                 invoice_line.save()
-                self.log_info(
-                    f'Invoice line {invoice_line.id} created for {invoice.number}'
-                )
+                self.log_info(f'Invoice line {invoice_line.id} created for {invoice.number}')
                 total_invoice_lines_amount = total_invoice_lines_amount + amount
 
                 # create and add dimensions
@@ -207,17 +193,11 @@ class create_invoice_lines(Script):
                             dimension.save()
                             dimensions[dimkey] = dimension
                         invoice_line.accounting_dimensions.add(dimensions[dimkey])
-                self.log_info(
-                    f'Accounting dimensions added to Invoice line {invoice_line.id}'
-                )
+                self.log_info(f'Accounting dimensions added to Invoice line {invoice_line.id}')
 
             if total_invoice_lines_amount != invoice.amount:
-                self.log_warning(
-                    'The total of invoice lines and invoice amount do not match.'
-                )
-                output.append(
-                    f'{invoice.number}: Sum of invoice lines amount to be checked'
-                )
+                self.log_warning('The total of invoice lines and invoice amount do not match.')
+                output.append(f'{invoice.number}: Sum of invoice lines amount to be checked')
 
         return '\n'.join(output)
 
@@ -280,9 +260,7 @@ class Check_contract_end(Script):
         contracts = Contract.objects.filter(status=StatusChoices.STATUS_ACTIVE)
         for contract in contracts:
             if contract.end_date is not None:
-                if contract.notice_date <= date.today() + timedelta(
-                    days=days_before_notice
-                ):
+                if contract.notice_date <= date.today() + timedelta(days=days_before_notice):
                     self.log_info(
                         f'Contract {contract} end date: {contract.end_date} - notice : {contract.notice_period} days'
                     )
