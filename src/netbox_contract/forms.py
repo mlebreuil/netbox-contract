@@ -10,6 +10,7 @@ from netbox.forms import (
     NetBoxModelImportForm,
 )
 from tenancy.models import Tenant
+from tenancy.forms import TenancyFilterForm
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import (
     CommentField,
@@ -134,10 +135,9 @@ class ContractForm(NetBoxModelForm):
             raise ValidationError('you should set monthly OR yearly recuring costs not both')
 
 
-class ContractFilterForm(NetBoxModelFilterSetForm):
+class ContractFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = Contract
 
-    tenant_id = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant'))
     external_reference = forms.CharField(required=False, label=_('External reference'))
     internal_partie = forms.ChoiceField(choices=InternalEntityChoices, required=False, label=_('Internal partie'))
     status = forms.ChoiceField(choices=StatusChoices, required=False, label=_('Status'))
