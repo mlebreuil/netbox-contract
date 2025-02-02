@@ -17,6 +17,8 @@ class ContractAssignmentListTable(NetBoxTable):
     contract = tables.Column(linkify=True)
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
     contract__external_partie_object = tables.Column(linkify=True)
+    tags = columns.TagColumn(url_name='plugins:netbox_contract:contractassignment_list')
+
 
     class Meta(NetBoxTable.Meta):
         model = ContractAssignment
@@ -108,6 +110,7 @@ class ContractListTable(NetBoxTable):
     status = columns.ChoiceFieldColumn(
         verbose_name=('Status'),
     )
+    tags = columns.TagColumn(url_name='plugins:netbox_contract:contract_list')
 
     class Meta(NetBoxTable.Meta):
         model = Contract
@@ -171,6 +174,7 @@ class ContractListBottomTable(NetBoxTable):
 class InvoiceListTable(NetBoxTable):
     contracts = tables.ManyToManyColumn(linkify=True)
     number = tables.Column(linkify=True)
+    tags = columns.TagColumn(url_name='plugins:netbox_contract:invoiceline_list')
 
     class Meta(NetBoxTable.Meta):
         model = Invoice
@@ -200,6 +204,7 @@ class InvoiceListTable(NetBoxTable):
 
 class ServiceProviderListTable(NetBoxTable):
     name = tables.Column(linkify=True)
+    tags = columns.TagColumn(url_name='plugins:netbox_contract:serviceprovider_list')
 
     class Meta(NetBoxTable.Meta):
         model = ServiceProvider
@@ -210,6 +215,7 @@ class ServiceProviderListTable(NetBoxTable):
 class InvoiceLineListTable(NetBoxTable):
     invoice = tables.Column(linkify=True)
     accounting_dimensions = tables.ManyToManyColumn(linkify_item=True, filter=lambda qs: qs.order_by('name'))
+    tags = columns.TagColumn(url_name='plugins:netbox_contract:invoiceline_list')
 
     class Meta(NetBoxTable.Meta):
         model = InvoiceLine
@@ -236,6 +242,7 @@ class AccountingDimensionListTable(NetBoxTable):
     status = columns.ChoiceFieldColumn(
         verbose_name=('Status'),
     )
+    tags = columns.TagColumn(url_name='plugins:netbox_contract:accountingdimension_list')
 
     class Meta(NetBoxTable.Meta):
         model = AccountingDimension
