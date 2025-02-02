@@ -100,12 +100,8 @@ class ContractAssignmentEditView(generic.ObjectEditView):
     def alter_object(self, instance, request, args, kwargs):
         if not instance.pk and kwargs:
             # Assign the object based on URL kwargs
-            content_type = get_object_or_404(
-                ContentType, pk=request.GET.get('content_type')
-            )
-            instance.object = get_object_or_404(
-                content_type.model_class(), pk=request.GET.get('object_id')
-            )
+            content_type = get_object_or_404(ContentType, pk=request.GET.get('content_type'))
+            instance.object = get_object_or_404(content_type.model_class(), pk=request.GET.get('object_id'))
         return instance
 
     def get_extra_addanother_params(self, request):
@@ -138,19 +134,13 @@ class ContractView(generic.ObjectView):
     )
 
     def get_extra_context(self, request, instance):
-        invoices_table = tables.InvoiceListTable(
-            instance.invoices.exclude(template=True)
-        )
+        invoices_table = tables.InvoiceListTable(instance.invoices.exclude(template=True))
         invoices_table.columns.hide('contracts')
         invoices_table.configure(request)
-        assignments_table = tables.ContractAssignmentContractTable(
-            instance.assignments.all()
-        )
+        assignments_table = tables.ContractAssignmentContractTable(instance.assignments.all())
         invoice_template = instance.invoices.filter(template=True).first()
         if invoice_template:
-            invoicelines_table = tables.InvoiceLineListTable(
-                invoice_template.invoicelines.all()
-            )
+            invoicelines_table = tables.InvoiceLineListTable(invoice_template.invoicelines.all())
             invoicelines_table.columns.hide('invoice')
             invoicelines_table.columns.hide('currency')
             invoicelines_table.configure(request)
@@ -208,14 +198,10 @@ class ContractEditView(generic.ObjectEditView):
             data = normalize_querydict(request.POST)
             obj.external_partie_object_id = data['external_partie_object']
             external_partie_object_type_id = data['external_partie_object_type']
-            obj.external_partie_object_type = ContentType.objects.get(
-                id=external_partie_object_type_id
-            )
+            obj.external_partie_object_type = ContentType.objects.get(id=external_partie_object_type_id)
             external_partie_object_type = obj.external_partie_object_type
-            obj.external_partie_object = (
-                external_partie_object_type.get_object_for_this_type(
-                    id=obj.external_partie_object_id
-                )
+            obj.external_partie_object = external_partie_object_type.get_object_for_this_type(
+                id=obj.external_partie_object_id
             )
 
         return obj
@@ -296,9 +282,7 @@ class InvoiceEditView(generic.ObjectEditView):
             contract = Contract.objects.get(pk=initial_data['contracts'])
 
             try:
-                last_invoice = contract.invoices.exclude(template=True).latest(
-                    'period_end'
-                )
+                last_invoice = contract.invoices.exclude(template=True).latest('period_end')
                 new_period_start = last_invoice.period_end + timedelta(days=1)
             except ObjectDoesNotExist:
                 if contract.start_date:
@@ -316,9 +300,7 @@ class InvoiceEditView(generic.ObjectEditView):
                 if contract.invoice_frequency == 12:
                     initial_data['amount'] = contract.yrc
                 else:
-                    initial_data['amount'] = round(
-                        contract.yrc / 12 * contract.invoice_frequency, 2
-                    )
+                    initial_data['amount'] = round(contract.yrc / 12 * contract.invoice_frequency, 2)
             else:
                 initial_data['amount'] = contract.mrc * contract.invoice_frequency
 
