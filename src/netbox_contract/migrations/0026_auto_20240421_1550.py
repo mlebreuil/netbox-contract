@@ -10,13 +10,9 @@ def update_changed_object_type(apps, schema_editor):
     """
     ObjectChange = apps.get_model('core', 'ObjectChange')
     ContentType = apps.get_model('contenttypes', 'ContentType')
-    ct = ContentType.objects.get(
-        app_label='netbox_contract', model='contractassignment'
-    )
+    ct = ContentType.objects.get(app_label='netbox_contract', model='contractassignment')
 
-    for change in ObjectChange.objects.filter(
-        changed_object_type__model='contractassignement'
-    ):
+    for change in ObjectChange.objects.filter(changed_object_type__model='contractassignement'):
         change.changed_object_type = ct
         change.save()
 
@@ -27,5 +23,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(update_changed_object_type),
+        # migrations.RunPython(update_changed_object_type),
     ]

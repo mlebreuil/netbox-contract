@@ -63,7 +63,7 @@ urlpatterns = (
     path(
         'contracts/import/',
         views.ContractBulkImportView.as_view(),
-        name='contract_import',
+        name='contract_bulk_import',
     ),
     path(
         'contracts/edit/',
@@ -99,12 +99,8 @@ urlpatterns = (
     # Contract invoices
     path('invoices/', views.InvoiceListView.as_view(), name='invoice_list'),
     path('invoices/add/', views.InvoiceEditView.as_view(), name='invoice_add'),
-    path(
-        'invoices/import/', views.InvoiceBulkImportView.as_view(), name='invoice_import'
-    ),
-    path(
-        'invoices/edit/', views.InvoiceBulkEditView.as_view(), name='invoice_bulk_edit'
-    ),
+    path('invoices/import/', views.InvoiceBulkImportView.as_view(), name='invoice_import'),
+    path('invoices/edit/', views.InvoiceBulkEditView.as_view(), name='invoice_bulk_edit'),
     path(
         'invoices/delete/',
         views.InvoiceBulkDeleteView.as_view(),
@@ -115,9 +111,7 @@ urlpatterns = (
         include(get_model_urls('netbox_contract', 'invoice')),
         name='invoice',
     ),
-    path(
-        'invoices/<int:pk>/edit/', views.InvoiceEditView.as_view(), name='invoice_edit'
-    ),
+    path('invoices/<int:pk>/edit/', views.InvoiceEditView.as_view(), name='invoice_edit'),
     path(
         'invoices/<int:pk>/delete/',
         views.InvoiceDeleteView.as_view(),

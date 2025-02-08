@@ -38,7 +38,7 @@ class AccountingDimensionStatusChoices(ChoiceSet):
 class InternalEntityChoices(ChoiceSet):
     key = 'Contract.internal_partie'
 
-    ENTITY = 'Default entity'
+    ENTITY = 'default_entity'
 
     CHOICES = [
         (ENTITY, 'Default entity', 'green'),

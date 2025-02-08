@@ -1,7 +1,6 @@
 from datetime import date
 
 from circuits.models import Provider
-from dcim.models import Device
 from django.contrib.contenttypes.models import ContentType
 from tenancy.models import Tenant
 from utilities.testing import ViewTestCases
@@ -12,9 +11,10 @@ from netbox_contract.models import (
     ServiceProvider,
     StatusChoices,
 )
+from netbox_contract.tests.custom import ModelViewTestCase
 
 
-class ContractTestCase(ViewTestCases.PrimaryObjectViewTestCase):
+class ContractTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCase):
     model = Contract
 
     @classmethod
@@ -30,7 +30,7 @@ class ContractTestCase(ViewTestCases.PrimaryObjectViewTestCase):
         contract1 = Contract.objects.create(
             name='Contract1',
             external_partie_object_type=ContentType.objects.get_for_model(Provider),
-            external_partie_object_id=Device.objects.get(slug='provider-a').id,
+            external_partie_object_id=Provider.objects.get(slug='provider-a').id,
             internal_partie=InternalEntityChoices.ENTITY,
             status=StatusChoices.STATUS_ACTIVE,
             start_date=date(2025, 1, 1),
@@ -41,7 +41,7 @@ class ContractTestCase(ViewTestCases.PrimaryObjectViewTestCase):
         contract2 = Contract.objects.create(
             name='Contract2',
             external_partie_object_type=ContentType.objects.get_for_model(Provider),
-            external_partie_object_id=Device.objects.get(slug='provider-a').id,
+            external_partie_object_id=Provider.objects.get(slug='provider-a').id,
             internal_partie=InternalEntityChoices.ENTITY,
             status=StatusChoices.STATUS_ACTIVE,
             start_date=date(2025, 1, 1),
@@ -52,7 +52,7 @@ class ContractTestCase(ViewTestCases.PrimaryObjectViewTestCase):
         contract3 = Contract.objects.create(
             name='Contract3',
             external_partie_object_type=ContentType.objects.get_for_model(Provider),
-            external_partie_object_id=Device.objects.get(slug='provider-a').id,
+            external_partie_object_id=Provider.objects.get(slug='provider-a').id,
             internal_partie=InternalEntityChoices.ENTITY,
             status=StatusChoices.STATUS_ACTIVE,
             start_date=date(2025, 1, 1),
@@ -63,7 +63,7 @@ class ContractTestCase(ViewTestCases.PrimaryObjectViewTestCase):
         cls.form_data = {
             'name': 'Contract X',
             'external_partie_object_type': ContentType.objects.get_for_model(Provider),
-            'external_partie_object_id': Device.objects.get(slug='provider-a').id,
+            'external_partie_object_id': Provider.objects.get(slug='provider-a').id,
             'external_reference': 'External Reference 1',
             'internal_partie': InternalEntityChoices.ENTITY,
             'tenant': Tenant.objects.get(name='Tenant 1').id,
@@ -94,5 +94,5 @@ class ContractTestCase(ViewTestCases.PrimaryObjectViewTestCase):
         )
 
         cls.bulk_edit_data = {
-            'description': 'New description',
+            'comment': 'New comment',
         }
