@@ -20,20 +20,18 @@ and "help wanted" is open to whoever wants to implement it.
 
 ## Coding conventions
  
-Netbox [Style Guide](https://docs.netbox.dev/en/stable/development/style-guide/)  
-Django [Coding style](https://docs.djangoproject.com/en/4.2/internals/contributing/writing-code/coding-style/)  
+Netbox [Style Guide](https://netboxlabs.com/docs/netbox/en/stable/development/style-guide/)  
+Django [Coding style](https://docs.djangoproject.com/en/stable/internals/contributing/writing-code/coding-style/)  
 
-For this:  
-All files will be formated using the [black](https://black.readthedocs.io/en/stable/) auto-formatter.  
-Configuration is stored in pyproject.toml  
+## linting
 
-[isort](https://github.com/PyCQA/isort#readme) is used to automate import sorting.  
+The [ruff](https://docs.astral.sh/ruff/) linter is used to enforce code style. A [pre-commit hook](./getting-started.md#3-enable-pre-commit-hooks) which runs this automatically is included with NetBox. To invoke `ruff` manually, run:
 
-Linting and PEP8 style enforcement will be done with  [Flake8](https://flake8.pycqa.org/en/latest/) which is a wrapper arround:  
-- PyFlakes
-- pycodestyle
-- Ned Batchelder’s McCabe script
-Configuration is maintained in the .flake8 file (no support for pyproject.toml)
+```
+python3 -m pip install ruff
+ruff check src/netbox_contract/
+```
+
 
 The pre-commit Python framework is used to simplify the managment of pre-commit hooks.  
 Config is stored in .pre-commit-config.yaml   
