@@ -1,29 +1,23 @@
-ci:
-  autoupdate_commit_msg: "chore: update pre-commit hooks"
-  autofix_commit_msg: "style: pre-commit fixes"
-
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
-    hooks:
-    -   id: double-quote-string-fixer
--   repo: https://github.com/psf/black
-    rev: 24.3.0
-    hooks:
-    - id: black
-      args: [--line-length=120]
-      language_version: python3
--   repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
-    hooks:
-      - id: isort
--   repo: https://github.com/pycqa/flake8
-    rev: 7.0.0
-    hooks:
-    - id: flake8
-
--   repo: https://github.com/mgedmin/check-manifest
-    rev: "0.49"
-    hooks:
-      - id: check-manifest
-        stages: [manual]
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.6.9
+  hooks:
+    - id: ruff
+      name: "Ruff linter"
+      args: [ src/netbox_contract/ ]
+- repo: local
+  hooks:
+    - id: django-check
+      name: "Django system check"
+      description: "Run Django's internal check for common problems"
+      entry: python ../netbox/netbox/manage.py check
+      language: system
+      pass_filenames: false
+      types: [python]
+    - id: django-makemigrations
+      name: "Django migrations check"
+      description: "Check for any missing Django migrations"
+      entry: python ../netbox/netbox/manage.py makemigrations --check
+      language: system
+      pass_filenames: false
+      types: [python]
