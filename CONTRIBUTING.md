@@ -29,7 +29,7 @@ The [ruff](https://docs.astral.sh/ruff/) linter is used to enforce code style. A
 
 ```
 python3 -m pip install ruff
-ruff check src/netbox_contract/
+ruff check netbox_contract/
 ```
 
 
