@@ -19,7 +19,6 @@ class ContractAssignmentListTable(NetBoxTable):
     contract__external_partie_object = tables.Column(linkify=True)
     tags = columns.TagColumn(url_name='plugins:netbox_contract:contractassignment_list')
 
-
     class Meta(NetBoxTable.Meta):
         model = ContractAssignment
         fields = (

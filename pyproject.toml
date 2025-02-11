@@ -1,3 +1,10 @@
+# See PEP 518 for the spec of this file
+# https://www.python.org/dev/peps/pep-0518/
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "netbox-contract"
 version = "2.3.1"
@@ -20,21 +27,3 @@ classifiers = [
 [project.urls]
 "Homepage" = "https://github.com/mlebreuil/netbox-contract"
 "Bug Tracker" = "https://github.com/mlebreuil/netbox-contract/issues"
-
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools]
-zip-safe = false
-
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["*"]
-namespaces = false
-
-[tool.black]
-skip-string-normalization = true
-
-[tool.isort]
-profile = "black"

@@ -12,6 +12,7 @@ from utilities.choices import ChoiceSet
 from dcim.choices import DeviceStatusChoices, SiteStatusChoices
 from virtualization.choices import VirtualMachineStatusChoices
 
+
 class StatusChoices(ChoiceSet):
     key = 'Contract.status'
 
