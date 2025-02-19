@@ -27,5 +27,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(update_changed_object_type),
+    #    migrations.RunPython(update_changed_object_type),
     ]

@@ -39,5 +39,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(migrate_external_partie, reverse_external_partie),
+    #    migrations.RunPython(migrate_external_partie, reverse_external_partie),
     ]
