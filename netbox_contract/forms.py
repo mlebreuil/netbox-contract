@@ -353,7 +353,7 @@ class InvoiceFilterForm(NetBoxModelFilterSetForm):
 
 
 class InvoiceCSVForm(NetBoxModelImportForm):
-    contracts = CSVModelChoiceField(
+    contracts = CSVModelMultipleChoiceField(
         queryset=Contract.objects.all(),
         to_field_name='name',
         help_text='Related Contracts',
@@ -378,7 +378,7 @@ class InvoiceCSVForm(NetBoxModelImportForm):
 
 
 class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
-    number = forms.CharField(max_length=100, required=True, label=_('Number'))
+    number = forms.CharField(max_length=100, required=False, label=_('Number'))
     template = forms.BooleanField(
         required=False,
         label=_('Template'),
@@ -578,6 +578,7 @@ class InvoiceLineImportForm(NetBoxModelImportForm):
     accounting_dimensions = CSVModelMultipleChoiceField(
         queryset=AccountingDimension.objects.all(),
         to_field_name='id',
+        required=False,
         help_text='accounting dimension id',
         label=_('Accounting dimensions'),
     )
@@ -602,6 +603,8 @@ class InvoiceLineBulkEditForm(NetBoxModelBulkEditForm):
         selector=True,
         label=_('Accounting dimensions'),
     )
+    comments = CommentField(label=_('Comments'))
+    nullable_fields = ('comments',)
     model = InvoiceLine
 
 

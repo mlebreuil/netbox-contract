@@ -8,6 +8,8 @@ from utilities.testing import ViewTestCases
 
 from netbox_contract.models import (
     Contract,
+    Invoice,
+    InvoiceLine,
     ServiceProvider,
     StatusChoices,
 )
@@ -97,10 +99,134 @@ class ContractTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCas
         )
 
         cls.csv_update_data = (
-            'id,name,comments',
-            f'{contract1.pk},Contract 1,First contract',
-            f'{contract2.pk},Contract 2,Second contract',
-            f'{contract3.pk},Contract 3,Third contract',
+            "id,name,comments",
+            f"{contract1.pk},Contract 1,First contract",
+            f"{contract2.pk},Contract 2,Second contract",
+            f"{contract3.pk},Contract 3,Third contract",
+        )
+
+        cls.bulk_edit_data = {
+            'comments': 'New comment',
+        }
+
+
+class InvoiceTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCase):
+    model = Invoice
+
+    @classmethod
+    def setUpTestData(cls):
+
+        # Create test provider
+        Provider.objects.create(name='Provider A', slug='provider-a')
+
+        # Create test Contract
+        contract1 = Contract.objects.create(
+            name='Contract1',
+            external_partie_object_type=ContentType.objects.get_for_model(Provider),
+            external_partie_object_id=Provider.objects.get(slug='provider-a').id,
+            internal_partie='default',
+            status=StatusChoices.STATUS_ACTIVE,
+            start_date=date(2025, 1, 1),
+            end_date=date(2025, 12, 31),
+            currency='usd',
+            mrc=Decimal(100),
+            invoice_frequency=1
+        )
+
+        # Create test invoices
+        invoices = Invoice.objects.bulk_create([
+            Invoice(number='Invoice1', template=False, date=date(2025, 1, 25),
+                    period_start=date(2025, 1, 1), period_end=date(2025, 1, 31),
+                    currency='usd', amount=Decimal(100)),
+            Invoice(number='Invoice2', template=False, date=date(2025, 2, 25),
+                    period_start=date(2025, 2, 1), period_end=date(2025, 2, 28),
+                    currency='usd', amount=Decimal(100)),
+            Invoice(number='Invoice3', template=False, date=date(2025, 3, 25),
+                    period_start=date(2025, 3, 1), period_end=date(2025, 3, 31),
+                    currency='usd', amount=Decimal(100))
+        ])
+
+        # associate invoices to contract
+        for invoice in invoices:
+            invoice.save()
+            invoice.contracts.add(contract1)
+
+        cls.form_data = {
+            'number': 'Invoice X',
+            'contracts': [contract1.pk],
+            'template': False,
+            'date': date(2025, 1, 25),
+            'period_start': date(2025, 1, 1),
+            'period_end': date(2025, 1, 31),
+            'currency': 'usd',
+            'amount': Decimal(100),
+        }
+
+        cls.csv_data = (
+            'number,contracts,currency,amount,date,template,period_start,period_end',
+            'invoice4,Contract1,usd,100,2025-04-25,False,2025-04-01,2025-04-30',
+            'invoice5,Contract1,usd,100,2025-05-25,False,2025-05-01,2025-05-31',
+            'invoice6,Contract1,usd,100,2025-06-25,False,2025-06-01,2025-06-30',
+        )
+
+        cls.csv_update_data = (
+            'id,number,comments',
+            f'{invoices[0].pk},Invoice-1,First invoice',
+            f'{invoices[1].pk},Invoice-2,Second invoice',
+            f'{invoices[2].pk},Invoice-3,Third invoice',
+        )
+
+        cls.bulk_edit_data = {
+            'comments': 'New comment',
+        }
+
+
+class InvoiceLineTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCase):
+    model = InvoiceLine
+
+    @classmethod
+    def setUpTestData(cls):
+
+        # Create test Invoices
+        invoices = Invoice.objects.bulk_create([
+            Invoice(number='Invoice1', template=False, date=date(2025, 1, 25),
+                    period_start=date(2025, 1, 1), period_end=date(2025, 1, 31),
+                    currency='usd', amount=Decimal(100)),
+            Invoice(number='Invoice2', template=False, date=date(2025, 2, 25),
+                    period_start=date(2025, 2, 1), period_end=date(2025, 2, 28),
+                    currency='usd', amount=Decimal(100)),
+            Invoice(number='Invoice3', template=False, date=date(2025, 3, 25),
+                    period_start=date(2025, 3, 1), period_end=date(2025, 3, 31),
+                    currency='usd', amount=Decimal(100))
+        ])
+
+        for invoice in invoices:
+            invoice.save()
+
+        invoice_lines = InvoiceLine.objects.bulk_create([
+            InvoiceLine(invoice=invoices[0], currency='usd', amount=Decimal(50)),
+            InvoiceLine(invoice=invoices[0], currency='usd', amount=Decimal(50)),
+        ])
+
+        for invoice_line in invoice_lines:
+            invoice_line.save()
+
+        cls.form_data = {
+            'invoice': invoices[1].pk,
+            'currency': 'usd',
+            'amount': Decimal(100),
+        }
+
+        cls.csv_data = (
+            'invoice,currency,amount',
+            'Invoice3,usd,50',
+            'Invoice3,usd,50'
+        )
+
+        cls.csv_update_data = (
+            'id,comments',
+            f'{invoice_lines[0].pk},First line',
+            f'{invoice_lines[1].pk},Second line',
         )
 
         cls.bulk_edit_data = {
