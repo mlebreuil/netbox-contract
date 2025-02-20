@@ -20,14 +20,36 @@ from .models import (
     Contract,
     ContractAssignment,
     Invoice,
+    ContractType,
     InvoiceLine,
     ServiceProvider,
 )
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 
-# ServiceProvider views
 
+# ContractType views
+
+
+class ContractTypeView(generic.ObjectView):
+    queryset = ContractType.objects.all()
+
+
+class ContractTypeListView(generic.ObjectListView):
+    queryset = ContractType.objects.all()
+    table = tables.ContractTypeListTable
+
+
+class ContractTypeEditView(generic.ObjectEditView):
+    queryset = ContractType.objects.all()
+    form = forms.ContractTypeForm
+
+
+class ContractTypeDeleteView(generic.ObjectDeleteView):
+    queryset = ContractType.objects.all()
+
+
+# ServiceProvider views
 
 @register_model_view(ServiceProvider, 'contacts')
 class ServiceProviderContactsView(ObjectContactsView):

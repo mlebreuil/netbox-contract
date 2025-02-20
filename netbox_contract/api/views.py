@@ -7,6 +7,7 @@ from .serializers import (
     AccountingDimensionSerializer,
     ContractAssignmentSerializer,
     ContractSerializer,
+    ContractTypeSerializer,
     InvoiceLineSerializer,
     InvoiceSerializer,
     ServiceProviderSerializer,
@@ -41,9 +42,7 @@ class ContractAssignmentViewSet(NetBoxModelViewSet):
 
 
 class InvoiceLineViewSet(NetBoxModelViewSet):
-    queryset = models.InvoiceLine.objects.prefetch_related(
-        'invoice', 'accounting_dimensions', 'tags'
-    )
+    queryset = models.InvoiceLine.objects.prefetch_related('invoice', 'accounting_dimensions', 'tags')
     serializer_class = InvoiceLineSerializer
     filterset_class = filtersets.InvoiceLineFilterSet
 
@@ -51,3 +50,7 @@ class InvoiceLineViewSet(NetBoxModelViewSet):
 class AccountingDimensionViewSet(NetBoxModelViewSet):
     queryset = models.AccountingDimension.objects.prefetch_related('tags')
     serializer_class = AccountingDimensionSerializer
+
+class ContractTypeViewSet(NetBoxModelViewSet):
+    queryset = models.ContractType.objects.prefetch_related('tags')
+    serializer_class = ContractTypeSerializer

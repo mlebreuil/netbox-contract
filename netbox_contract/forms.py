@@ -9,10 +9,11 @@ from netbox.forms import (
     NetBoxModelForm,
     NetBoxModelImportForm,
 )
-from tenancy.models import Tenant
 from tenancy.forms import TenancyFilterForm
+from tenancy.models import Tenant
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import (
+    ColorField,
     CommentField,
     ContentTypeChoiceField,
     CSVChoiceField,
@@ -32,6 +33,7 @@ from .models import (
     AccountingDimensionStatusChoices,
     Contract,
     ContractAssignment,
+    ContractType,
     CurrencyChoices,
     InternalEntityChoices,
     Invoice,
@@ -223,6 +225,22 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
 
     nullable_fields = ('comments',)
     model = Contract
+
+
+# ContractType
+
+
+class ContractTypeForm(NetBoxModelForm):
+    color = ColorField(label=_('Color'))
+
+    class Meta:
+        model = ContractType
+        fields = (
+            'name',
+            'description',
+            'color',
+            'tags',
+        )
 
 
 # Invoice
