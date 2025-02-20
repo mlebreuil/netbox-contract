@@ -270,4 +270,35 @@ urlpatterns = (
         name='accountingdimension_changelog',
         kwargs={'model': models.AccountingDimension},
     ),
+    path(
+        'contracttype/',
+        views.ContractTypeListView.as_view(),
+        name='contracttype_list',
+    ),
+    path(
+        'contracttype/add/',
+        views.ContractTypeEditView.as_view(),
+        name='contracttype_add',
+    ),
+    path(
+        'contracttype/<int:pk>/',
+        views.ContractTypeView.as_view(),
+        name='contracttype',
+    ),
+    path(
+        'contracttype/<int:pk>/edit/',
+        views.ContractTypeEditView.as_view(),
+        name='contracttype_edit',
+    ),
+    path(
+        'contracttype/<int:pk>/delete/',
+        views.ContractTypeDeleteView.as_view(),
+        name='contracttype_delete',
+    ),
+    path(
+        'contracttype/<int:pk>/changelog/',
+        ObjectChangeLogView.as_view(),
+        name='contracttype_changelog',
+        kwargs={'model': models.ContractType},
+    ),
 )

@@ -1,15 +1,17 @@
 from datetime import timedelta
 
+from dcim.choices import DeviceStatusChoices, SiteStatusChoices
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from netbox.choices import ColorChoices
 from netbox.models import NetBoxModel
 from netbox.models.features import ContactsMixin
 from utilities.choices import ChoiceSet
-from dcim.choices import DeviceStatusChoices, SiteStatusChoices
+from utilities.fields import ColorField
 from virtualization.choices import VirtualMachineStatusChoices
 
 
@@ -59,6 +61,26 @@ class CurrencyChoices(ChoiceSet):
 
 
 CURRENCY_DEFAULT = CurrencyChoices.CHOICES[0][0]
+
+
+class ContractType(NetBoxModel):
+    name = models.CharField(max_length=100, unique=True, verbose_name=_('name'))
+    description = models.TextField(blank=True, verbose_name=_('description'))
+    color = ColorField(default=ColorChoices.COLOR_GREY, verbose_name=_('color'))
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = _('contract type')
+        verbose_name_plural = _('contract types')
+
+    def __str__(self):
+        return self.name
+
+    def get_color(self):
+        return self.color
+
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_contract:contracttype', args=[self.pk])
 
 
 class AccountingDimension(NetBoxModel):

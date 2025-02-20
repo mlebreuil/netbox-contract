@@ -5,10 +5,23 @@ from .models import (
     AccountingDimension,
     Contract,
     ContractAssignment,
+    ContractType,
     Invoice,
     InvoiceLine,
     ServiceProvider,
 )
+
+
+class ContractTypeListTable(NetBoxTable):
+    name = tables.Column(linkify=True)
+    color = columns.ColorColumn()
+    actions = columns.ActionsColumn(actions=('edit', 'delete'))
+    tag = columns.TagColumn(url_name='plugins:netbox_contract:contracttype_list')
+
+    class Meta(NetBoxTable.Meta):
+        model = ContractType
+        fields = ('pk', 'id', 'name', 'description', 'color', 'actions')
+        default_columns = ('name', 'description', 'color')
 
 
 class ContractAssignmentListTable(NetBoxTable):
