@@ -1,4 +1,4 @@
-# Contract pluggin
+# Contract plugin
 
 NetBox plugin to manage contracts.
 
@@ -8,11 +8,11 @@ NetBox plugin to manage contracts.
 
 ## Features
 
-The pluggin adds contracts and invoices model to Netbox.  
+The plugin adds contracts and invoices model to NetBox.  
 It allows to link contract with objects.  
 And link invoice templates and invoices with contracts.  
 Invoice lines can be linked to each invoice / invoice template.  
-Accounitng dimentoins can be linked with invoice lines.  
+Accounting dimensions can be linked with invoice lines.  
 
 ## Compatibility
 
@@ -38,7 +38,7 @@ $ python3 -m pip install netbox-contract
 
 ### Configure NetBox
 
-Finally, we need to configure NetBox to enable our new plugin. Over in the NetBox installation path, open `netbox/netbox/configuration.py` and look for the `PLUGINS` parameter; this should be an empty list. (If it's not yet defined, go ahead and create it.) Add the name of our plugin to this list:
+Finally, we need to configure NetBox to enable our new plugin. In the NetBox installation directory, open `netbox/netbox/configuration.py` and locate the `PLUGINS` parameter; it should be an empty list. (If it's not yet defined, go ahead and create it.) Add the name of our plugin to this list:
 
 ```python
 # configuration.py
@@ -49,7 +49,7 @@ PLUGINS = [
 
 ### Customize the plugin
 
-The following configurationitems can be set:
+The following configuration items can be set:
 
 ```python
 # configuration.py
@@ -84,7 +84,7 @@ FIELD_CHOICES = {
         ('entity2', 'Entity 2', 'yellow'),
     ),
     'netbox_contract.Contract.currency': (
-        ('usd', 'USD'),
+        ('usd', 'USD'),  # 1st position is the default currency
         ('eur', 'EUR'),
         ('chf', 'CHF'),
         ('pln', 'PLN'),
