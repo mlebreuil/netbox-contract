@@ -84,7 +84,7 @@ FIELD_CHOICES = {
         ('entity2', 'Entity 2', 'yellow'),
     ),
     'netbox_contract.Contract.currency': (
-        ('usd', 'USD'),
+        ('usd', 'USD'),  # 1st position is the default currency
         ('eur', 'EUR'),
         ('chf', 'CHF'),
         ('pln', 'PLN'),
