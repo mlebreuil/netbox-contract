@@ -146,6 +146,16 @@ urlpatterns = (
         name='contractassignment_bulk_import',
     ),
     path(
+        'assignments/edit/',
+        views.ContractAssignmentBulkEditView.as_view(),
+        name='contractassignment_bulk_edit',
+    ),
+    path(
+        'assignments/delete/',
+        views.ContractAssignmentBulkDeleteView.as_view(),
+        name='contractassignment_bulk_delete',
+    ),
+    path(
         'assignments/<int:pk>/',
         views.ContractAssignmentView.as_view(),
         name='contractassignment',

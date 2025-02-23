@@ -1,0 +1,2 @@
+number,contracts,currency,amount,date,template,period_start,period_end
+invoice1,Contract1,usd,100,2025-04-25,False,2025-04-01,2025-04-30
