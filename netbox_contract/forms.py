@@ -10,6 +10,7 @@ from netbox.forms import (
     NetBoxModelImportForm,
 )
 from tenancy.models import Tenant
+from tenancy.forms import TenancyFilterForm
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import (
     CommentField,
@@ -25,7 +26,7 @@ from utilities.forms.fields import (
 )
 from utilities.forms.widgets import DatePicker, HTMXSelect
 
-from .constants import SERVICE_PROVIDER_MODELS
+from .constants import SERVICE_PROVIDER_MODELS, ASSIGNEMENT_MODELS
 from .models import (
     AccountingDimension,
     AccountingDimensionStatusChoices,
@@ -54,12 +55,8 @@ class ContractForm(NetBoxModelForm):
         widget=HTMXSelect(),
         label=_('External partie object type'),
     )
-    external_partie_object = forms.ModelChoiceField(
-        queryset=None, label=_('External partie object')
-    )
-    tenant = DynamicModelChoiceField(
-        queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant')
-    )
+    external_partie_object = forms.ModelChoiceField(queryset=None, label=_('External partie object'))
+    tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant'))
     parent = DynamicModelChoiceField(
         queryset=Contract.objects.all(),
         required=False,
@@ -73,37 +70,22 @@ class ContractForm(NetBoxModelForm):
 
         # Initialize the external party object gfk
         if initial and 'external_partie_object_type' in initial:
-            external_partie_object_type = ContentType.objects.get_for_id(
-                initial['external_partie_object_type']
-            )
+            external_partie_object_type = ContentType.objects.get_for_id(initial['external_partie_object_type'])
             external_partie_class = external_partie_object_type.model_class()
-            self.fields[
-                'external_partie_object'
-            ].queryset = external_partie_class.objects.all()
+            self.fields['external_partie_object'].queryset = external_partie_class.objects.all()
             if (
                 self.instance.external_partie_object_type
-                and self.instance.external_partie_object_type.id
-                == external_partie_object_type.id
+                and self.instance.external_partie_object_type.id == external_partie_object_type.id
             ):
-                self.fields[
-                    'external_partie_object'
-                ].initial = self.instance.external_partie_object
+                self.fields['external_partie_object'].initial = self.instance.external_partie_object
             else:
                 self.fields['external_partie_object'].initial = None
         elif self.instance.external_partie_object_type:
-            external_partie_class = (
-                self.instance.external_partie_object_type.model_class()
-            )
-            self.fields[
-                'external_partie_object'
-            ].queryset = external_partie_class.objects.all()
-            self.fields[
-                'external_partie_object'
-            ].initial = self.instance.external_partie_object
+            external_partie_class = self.instance.external_partie_object_type.model_class()
+            self.fields['external_partie_object'].queryset = external_partie_class.objects.all()
+            self.fields['external_partie_object'].initial = self.instance.external_partie_object
         else:
-            self.fields[
-                'external_partie_object'
-            ].queryset = ServiceProvider.objects.all()
+            self.fields['external_partie_object'].queryset = ServiceProvider.objects.all()
             self.fields['external_partie_object'].initial = None
 
         # Initialise fields settings
@@ -150,25 +132,16 @@ class ContractForm(NetBoxModelForm):
         super().clean()
 
         if self.cleaned_data['mrc'] and self.cleaned_data['yrc']:
-            raise ValidationError(
-                'you should set monthly OR yearly recuring costs not both'
-            )
+            raise ValidationError('you should set monthly OR yearly recuring costs not both')
 
 
-class ContractFilterForm(NetBoxModelFilterSetForm):
+class ContractFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = Contract
 
-    tenant = DynamicModelChoiceField(
-        queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant')
-    )
     external_reference = forms.CharField(required=False, label=_('External reference'))
-    internal_partie = forms.ChoiceField(
-        choices=InternalEntityChoices, required=False, label=_('Internal partie')
-    )
+    internal_partie = forms.ChoiceField(choices=InternalEntityChoices, required=False, label=_('Internal partie'))
     status = forms.ChoiceField(choices=StatusChoices, required=False, label=_('Status'))
-    currency = forms.ChoiceField(
-        choices=CurrencyChoices, required=False, label=_('Currency')
-    )
+    currency = forms.ChoiceField(choices=CurrencyChoices, required=False, label=_('Currency'))
     parent = DynamicModelChoiceField(
         queryset=Contract.objects.all(),
         required=False,
@@ -194,9 +167,7 @@ class ContractCSVForm(NetBoxModelImportForm):
         required=False,
         label=_('Tenant'),
     )
-    status = CSVChoiceField(
-        choices=StatusChoices, help_text='Contract status', label=_('Status')
-    )
+    status = CSVChoiceField(choices=StatusChoices, help_text='Contract status', label=_('Status'))
     parent = CSVModelChoiceField(
         queryset=Contract.objects.all(),
         to_field_name='name',
@@ -231,27 +202,17 @@ class ContractCSVForm(NetBoxModelImportForm):
 
     def clean_external_partie_object_id(self):
         name = self.cleaned_data.get('external_partie_object_id')
-        external_partie_object_type = self.cleaned_data.get(
-            'external_partie_object_type'
-        )
-        external_partie_object = external_partie_object_type.get_object_for_this_type(
-            name=name
-        )
+        external_partie_object_type = self.cleaned_data.get('external_partie_object_type')
+        external_partie_object = external_partie_object_type.get_object_for_this_type(name=name)
 
         return external_partie_object.id
 
 
 class ContractBulkEditForm(NetBoxModelBulkEditForm):
     name = forms.CharField(max_length=100, required=False, label=_('Name'))
-    external_reference = forms.CharField(
-        max_length=100, required=False, label=_('External reference')
-    )
-    internal_partie = forms.ChoiceField(
-        choices=InternalEntityChoices, required=False, label=_('Internal partie')
-    )
-    tenant = DynamicModelChoiceField(
-        queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant')
-    )
+    external_reference = forms.CharField(max_length=100, required=False, label=_('External reference'))
+    internal_partie = forms.ChoiceField(choices=InternalEntityChoices, required=False, label=_('Internal partie'))
+    tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant'))
     comments = CommentField(required=False, label=_('Comments'))
     parent = DynamicModelChoiceField(
         queryset=Contract.objects.all(),
@@ -302,9 +263,7 @@ class InvoiceForm(NetBoxModelForm):
             for contract in contracts:
                 for invoice in contract.invoices.all():
                     if invoice.template and invoice.pk != self.instance.pk:
-                        raise ValidationError(
-                            'Only one invoice template allowed per contract'
-                        )
+                        raise ValidationError('Only one invoice template allowed per contract')
 
             # Prefix the invoice name with _template
             self.cleaned_data['number'] = '_invoice_template_' + contract.name
@@ -324,9 +283,7 @@ class InvoiceForm(NetBoxModelForm):
             for contract in contracts:
                 try:
                     template_exists = True
-                    invoice_template = Invoice.objects.get(
-                        template=True, contracts=contract
-                    )
+                    invoice_template = Invoice.objects.get(template=True, contracts=contract)
                 except ObjectDoesNotExist:
                     template_exists = False
 
@@ -341,15 +298,8 @@ class InvoiceForm(NetBoxModelForm):
 
                         # adjust the first invoice line amount
                         amount = self.cleaned_data['amount']
-                        if (
-                            first
-                            and amount != invoice_template.total_invoicelines_amount
-                        ):
-                            line.amount = (
-                                line.amount
-                                + amount
-                                - invoice_template.total_invoicelines_amount
-                            )
+                        if first and amount != invoice_template.total_invoicelines_amount:
+                            line.amount = line.amount + amount - invoice_template.total_invoicelines_amount
 
                         line.save()
 
@@ -392,9 +342,7 @@ class InvoiceFilterForm(NetBoxModelFilterSetForm):
         widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
         label=_('Template'),
     )
-    currency = forms.ChoiceField(
-        choices=CurrencyChoices, required=False, label=_('Currency')
-    )
+    currency = forms.ChoiceField(choices=CurrencyChoices, required=False, label=_('Currency'))
     contracts = DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(),
         required=False,
@@ -405,7 +353,7 @@ class InvoiceFilterForm(NetBoxModelFilterSetForm):
 
 
 class InvoiceCSVForm(NetBoxModelImportForm):
-    contracts = CSVModelChoiceField(
+    contracts = CSVModelMultipleChoiceField(
         queryset=Contract.objects.all(),
         to_field_name='name',
         help_text='Related Contracts',
@@ -430,7 +378,7 @@ class InvoiceCSVForm(NetBoxModelImportForm):
 
 
 class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
-    number = forms.CharField(max_length=100, required=True, label=_('Number'))
+    number = forms.CharField(max_length=100, required=False, label=_('Number'))
     template = forms.BooleanField(
         required=False,
         label=_('Template'),
@@ -505,7 +453,7 @@ class ServiceProviderCSVForm(NetBoxModelImportForm):
 
 
 class ServiceProviderBulkEditForm(NetBoxModelBulkEditForm):
-    name = forms.CharField(max_length=100, required=True, label=_('Name'))
+    name = forms.CharField(max_length=100, required=False, label=_('Name'))
     comments = CommentField(label=_('Comments'))
     nullable_fields = ('comments',)
     model = ServiceProvider
@@ -515,23 +463,32 @@ class ServiceProviderBulkEditForm(NetBoxModelBulkEditForm):
 
 
 class ContractAssignmentForm(NetBoxModelForm):
-    contract = DynamicModelChoiceField(
-        queryset=Contract.objects.all(), selector=True, label=_('Contract')
+
+    content_type = ContentTypeChoiceField(
+        queryset=ContentType.objects.all(),
+        limit_choices_to=ASSIGNEMENT_MODELS,
+        label=_('object type'),
     )
+
+    contract = DynamicModelChoiceField(
+        queryset=Contract.objects.all(),
+        selector=True,
+        label=_('Contract'))
 
     class Meta:
         model = ContractAssignment
         fields = ['content_type', 'object_id', 'contract', 'tags']
-        widgets = {
-            'content_type': forms.HiddenInput(),
-            'object_id': forms.HiddenInput(),
-        }
+        # widgets = {
+        #     'content_type': forms.HiddenInput(),
+        #     'object_id': forms.HiddenInput(),
+        # }
 
 
 class ContractAssignmentFilterForm(NetBoxModelFilterSetForm):
     model = ContractAssignment
     contract = DynamicModelChoiceField(
         queryset=Contract.objects.all(),
+        required=False,
         selector=True,
         label=_('Contract'),
     )
@@ -540,6 +497,7 @@ class ContractAssignmentFilterForm(NetBoxModelFilterSetForm):
 class ContractAssignmentImportForm(NetBoxModelImportForm):
     content_type = CSVContentTypeField(
         queryset=ContentType.objects.all(),
+        limit_choices_to=ASSIGNEMENT_MODELS,
         help_text='Content Type in the form <app>.<model>',
         label=_('Content type'),
     )
@@ -552,6 +510,16 @@ class ContractAssignmentImportForm(NetBoxModelImportForm):
     class Meta:
         model = ContractAssignment
         fields = ['content_type', 'object_id', 'contract', 'tags']
+
+
+class ContractAssignmentBulkEditForm(NetBoxModelBulkEditForm):
+    contract = DynamicModelChoiceField(
+        queryset=Contract.objects.all(),
+        required=False,
+        selector=True,
+        label=_('Contract'),
+    )
+    model = ContractAssignment
 
 
 # InvoiceLine
@@ -632,6 +600,7 @@ class InvoiceLineImportForm(NetBoxModelImportForm):
     accounting_dimensions = CSVModelMultipleChoiceField(
         queryset=AccountingDimension.objects.all(),
         to_field_name='id',
+        required=False,
         help_text='accounting dimension id',
         label=_('Accounting dimensions'),
     )
@@ -656,6 +625,8 @@ class InvoiceLineBulkEditForm(NetBoxModelBulkEditForm):
         selector=True,
         label=_('Accounting dimensions'),
     )
+    comments = CommentField(label=_('Comments'))
+    nullable_fields = ('comments',)
     model = InvoiceLine
 
 
@@ -703,4 +674,6 @@ class AccountingDimensionImportForm(NetBoxModelImportForm):
 class AccountingDimensionBulkEditForm(NetBoxModelBulkEditForm):
     name = forms.CharField(max_length=20, required=False, label=_('Name'))
     value = forms.CharField(max_length=20, required=False, label=_('Value'))
+    comments = CommentField(label=_('Comments'))
+    nullable_fields = ('comments',)
     model = AccountingDimension

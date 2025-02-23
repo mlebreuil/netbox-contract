@@ -19,7 +19,7 @@ urlpatterns = (
     path(
         'serviceproviders/import/',
         views.ServiceProviderBulkImportView.as_view(),
-        name='serviceprovider_import',
+        name='serviceprovider_bulk_import',
     ),
     path(
         'serviceproviders/edit/',
@@ -63,7 +63,7 @@ urlpatterns = (
     path(
         'contracts/import/',
         views.ContractBulkImportView.as_view(),
-        name='contract_import',
+        name='contract_bulk_import',
     ),
     path(
         'contracts/edit/',
@@ -100,7 +100,7 @@ urlpatterns = (
     path('invoices/', views.InvoiceListView.as_view(), name='invoice_list'),
     path('invoices/add/', views.InvoiceEditView.as_view(), name='invoice_add'),
     path(
-        'invoices/import/', views.InvoiceBulkImportView.as_view(), name='invoice_import'
+        'invoices/import/', views.InvoiceBulkImportView.as_view(), name='invoice_bulk_import'
     ),
     path(
         'invoices/edit/', views.InvoiceBulkEditView.as_view(), name='invoice_bulk_edit'
@@ -143,7 +143,17 @@ urlpatterns = (
     path(
         'assignments/import/',
         views.ContractAssignmentBulkImportView.as_view(),
-        name='contractassignment_import',
+        name='contractassignment_bulk_import',
+    ),
+    path(
+        'assignments/edit/',
+        views.ContractAssignmentBulkEditView.as_view(),
+        name='contractassignment_bulk_edit',
+    ),
+    path(
+        'assignments/delete/',
+        views.ContractAssignmentBulkDeleteView.as_view(),
+        name='contractassignment_bulk_delete',
     ),
     path(
         'assignments/<int:pk>/',
@@ -180,7 +190,7 @@ urlpatterns = (
     path(
         'invoiceline/import/',
         views.InvoiceLineBulkImportView.as_view(),
-        name='invoiceline_import',
+        name='invoiceline_bulk_import',
     ),
     path(
         'invoiceline/edit/',
@@ -227,7 +237,7 @@ urlpatterns = (
     path(
         'accountingdimension/import/',
         views.AccountingDimensionBulkImportView.as_view(),
-        name='accountingdimension_import',
+        name='accountingdimension_bulk_import',
     ),
     path(
         'accountingdimension/edit/',

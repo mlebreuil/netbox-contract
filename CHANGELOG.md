@@ -5,6 +5,14 @@
 
 ## Version 2
 
+### Version 2.3.2
+
+* [234](https://github.com/mlebreuil/netbox-contract/issues/234) As part of the preparation of the [plugin for certification](https://github.com/netbox-community/netbox/wiki/Plugin-Certification-Program), this version includes standard Netbox unittest for model views. Correction to data import are also present as well.
+
+### Version 2.3.1
+
+* [219](https://github.com/mlebreuil/netbox-contract/issues/219) Fix - netbox 4.2 non editable field for gfk
+
 ### Version 2.3.0
 
 > [!WARNING]

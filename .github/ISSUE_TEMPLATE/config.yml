@@ -1,0 +1,9 @@
+# Reference: https://help.github.com/en/github/building-a-strong-community/configuring-issue-templates-for-your-repository#configuring-the-template-chooser
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Contributing Policy
+    url: https://github.com/mlebreuil/netbox-contract/blob/main/CONTRIBUTING.md
+    about: "Please read through our contributing policy before opening an issue or pull request."
+  - name: ❓ Discussion
+    url: https://github.com/mlebreuil/netbox-contract/discussions
+    about: "If you're just looking for help, try starting a discussion instead."

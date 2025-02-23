@@ -1,12 +1,27 @@
-# Contract pluggin
-## Overview
-The pluggin adds contracts and invoices model to Netbox.  
-It allows to register contract with objects.  
-Add invoices to contracts. 
+# Contract plugin
 
-Check the [documentation](https://mlebreuil.github.io/netbox-contract/) for additional information 
+NetBox plugin to manage contracts.
 
-## Installation
+
+* Free software: MIT
+* Documentation: https://mlebreuil.github.io/netbox-contract/
+
+## Features
+
+The plugin adds contracts and invoices model to NetBox.  
+It allows to link contract with objects.  
+And link invoice templates and invoices with contracts.  
+Invoice lines can be linked to each invoice / invoice template.  
+Accounting dimensions can be linked with invoice lines.  
+
+## Compatibility
+
+| NetBox Version | Plugin Version |
+|----------------|----------------|
+|     4.1        |      2.2       |
+|     4.2        |      2.3       |
+
+## Installing
 
 ### Activate venv
 To ensure our plugin is accessible to the NetBox installation, we first need to activate the Python [virtual environment](https://docs.python.org/3/library/venv.html) that was created when we installed NetBox. To do this, determine the virtual environment's path (this will be `/opt/netbox/venv/` if you use the documentation's defaults) and activate it:
@@ -23,7 +38,7 @@ $ python3 -m pip install netbox-contract
 
 ### Configure NetBox
 
-Finally, we need to configure NetBox to enable our new plugin. Over in the NetBox installation path, open `netbox/netbox/configuration.py` and look for the `PLUGINS` parameter; this should be an empty list. (If it's not yet defined, go ahead and create it.) Add the name of our plugin to this list:
+Finally, we need to configure NetBox to enable our new plugin. In the NetBox installation directory, open `netbox/netbox/configuration.py` and locate the `PLUGINS` parameter; it should be an empty list. (If it's not yet defined, go ahead and create it.) Add the name of our plugin to this list:
 
 ```python
 # configuration.py
@@ -34,18 +49,13 @@ PLUGINS = [
 
 ### Customize the plugin
 
-The following configurationitems can be set:
+The following configuration items can be set:
 
 ```python
 # configuration.py
 PLUGINS_CONFIG = {
     'netbox_contract': {
         'top_level_menu': True,
-        'default_accounting_dimensions':{
-            "account": "", 
-            "project": "", 
-            "cost center": ""
-        },
         'mandatory_contract_fields': [],
         'hidden_contract_fields': [],
         'mandatory_invoice_fields': [],
@@ -70,12 +80,11 @@ The first currency will also be the default currency for contracts.
 # configuration.py
 FIELD_CHOICES = {
     'netbox_contract.Contract.internal_partie': (
-        ('Nagravision SARL', 'Nagravision SARL', 'green'),
-        ('Nagra USA', 'Nagra USA', 'green'),
-        ('Nagra India', 'Nagra India', 'green'),
+        ('entity1', 'Entity 1', 'green'),
+        ('entity2', 'Entity 2', 'yellow'),
     ),
     'netbox_contract.Contract.currency': (
-        ('usd', 'USD'),
+        ('usd', 'USD'),  # 1st position is the default currency
         ('eur', 'EUR'),
         ('chf', 'CHF'),
         ('pln', 'PLN'),

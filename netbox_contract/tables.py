@@ -12,16 +12,18 @@ from .models import (
 
 
 class ContractAssignmentListTable(NetBoxTable):
+    id = tables.Column(linkify=True)
     content_type = columns.ContentTypeColumn(verbose_name='Object Type')
     content_object = tables.Column(linkify=True, orderable=False)
     contract = tables.Column(linkify=True)
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
     contract__external_partie_object = tables.Column(linkify=True)
+    tags = columns.TagColumn(url_name='plugins:netbox_contract:contractassignment_list')
 
     class Meta(NetBoxTable.Meta):
         model = ContractAssignment
         fields = (
-            'pk',
+            'id',
             'content_type',
             'content_object',
             'contract',
@@ -30,7 +32,7 @@ class ContractAssignmentListTable(NetBoxTable):
             'actions',
         )
         default_columns = (
-            'pk',
+            'id',
             'content_type',
             'content_object',
             'contract',
@@ -44,6 +46,9 @@ class ContractAssignmentObjectTable(NetBoxTable):
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
     contract__external_partie_object = tables.Column(
         verbose_name='Partner', linkify=True
+    )
+    contract__status = columns.ChoiceFieldColumn(
+        verbose_name=('Status'),
     )
 
     class Meta(NetBoxTable.Meta):
@@ -75,7 +80,9 @@ class ContractAssignmentObjectTable(NetBoxTable):
 class ContractAssignmentContractTable(NetBoxTable):
     content_type = columns.ContentTypeColumn(verbose_name='Object Type')
     content_object = tables.Column(linkify=True, verbose_name='Object', orderable=False)
-    content_object__status = tables.Column(verbose_name='Status')
+    content_object__status = columns.ChoiceFieldColumn(
+        verbose_name=('Status'),
+    )
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
 
     class Meta(NetBoxTable.Meta):
@@ -103,6 +110,7 @@ class ContractListTable(NetBoxTable):
     status = columns.ChoiceFieldColumn(
         verbose_name=('Status'),
     )
+    tags = columns.TagColumn(url_name='plugins:netbox_contract:contract_list')
 
     class Meta(NetBoxTable.Meta):
         model = Contract
@@ -136,6 +144,9 @@ class ContractListTable(NetBoxTable):
 class ContractListBottomTable(NetBoxTable):
     name = tables.Column(linkify=True)
     external_partie_object = tables.Column(linkify=True)
+    status = columns.ChoiceFieldColumn(
+        verbose_name=('Status'),
+    )
 
     class Meta(NetBoxTable.Meta):
         model = Contract
@@ -163,6 +174,7 @@ class ContractListBottomTable(NetBoxTable):
 class InvoiceListTable(NetBoxTable):
     contracts = tables.ManyToManyColumn(linkify=True)
     number = tables.Column(linkify=True)
+    tags = columns.TagColumn(url_name='plugins:netbox_contract:invoiceline_list')
 
     class Meta(NetBoxTable.Meta):
         model = Invoice
@@ -192,6 +204,7 @@ class InvoiceListTable(NetBoxTable):
 
 class ServiceProviderListTable(NetBoxTable):
     name = tables.Column(linkify=True)
+    tags = columns.TagColumn(url_name='plugins:netbox_contract:serviceprovider_list')
 
     class Meta(NetBoxTable.Meta):
         model = ServiceProvider
@@ -201,9 +214,8 @@ class ServiceProviderListTable(NetBoxTable):
 
 class InvoiceLineListTable(NetBoxTable):
     invoice = tables.Column(linkify=True)
-    accounting_dimensions = tables.ManyToManyColumn(
-        linkify=True, filter=lambda qs: qs.order_by('name')
-    )
+    accounting_dimensions = tables.ManyToManyColumn(linkify_item=True, filter=lambda qs: qs.order_by('name'))
+    tags = columns.TagColumn(url_name='plugins:netbox_contract:invoiceline_list')
 
     class Meta(NetBoxTable.Meta):
         model = InvoiceLine
@@ -226,9 +238,12 @@ class InvoiceLineListTable(NetBoxTable):
 
 
 class AccountingDimensionListTable(NetBoxTable):
+    name = tables.Column(linkify=True)
     status = columns.ChoiceFieldColumn(
         verbose_name=('Status'),
     )
+    tags = columns.TagColumn(url_name='plugins:netbox_contract:accountingdimension_list')
+
     class Meta(NetBoxTable.Meta):
         model = AccountingDimension
         fields = (

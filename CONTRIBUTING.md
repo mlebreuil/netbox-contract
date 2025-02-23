@@ -20,20 +20,18 @@ and "help wanted" is open to whoever wants to implement it.
 
 ## Coding conventions
  
-Netbox [Style Guide](https://docs.netbox.dev/en/stable/development/style-guide/)  
-Django [Coding style](https://docs.djangoproject.com/en/4.2/internals/contributing/writing-code/coding-style/)  
+Netbox [Style Guide](https://netboxlabs.com/docs/netbox/en/stable/development/style-guide/)  
+Django [Coding style](https://docs.djangoproject.com/en/stable/internals/contributing/writing-code/coding-style/)  
 
-For this:  
-All files will be formated using the [black](https://black.readthedocs.io/en/stable/) auto-formatter.  
-Configuration is stored in pyproject.toml  
+## linting
 
-[isort](https://github.com/PyCQA/isort#readme) is used to automate import sorting.  
+The [ruff](https://docs.astral.sh/ruff/) linter is used to enforce code style. A [pre-commit hook](./getting-started.md#3-enable-pre-commit-hooks) which runs this automatically is included with NetBox. To invoke `ruff` manually, run:
 
-Linting and PEP8 style enforcement will be done with  [Flake8](https://flake8.pycqa.org/en/latest/) which is a wrapper arround:  
-- PyFlakes
-- pycodestyle
-- Ned Batchelder’s McCabe script
-Configuration is maintained in the .flake8 file (no support for pyproject.toml)
+```
+python3 -m pip install ruff
+ruff check netbox_contract/
+```
+
 
 The pre-commit Python framework is used to simplify the managment of pre-commit hooks.  
 Config is stored in .pre-commit-config.yaml   
@@ -100,7 +98,13 @@ Make sure taht at the Netbox installtion step you follow the "Option B: Clone th
 
     Connect to the name or IP of the server (as defined in ALLOWED_HOSTS) on port 8000; for example, http://127.0.0.1:8000/.
 
-9. Commit your changes and push your branch to GitHub:
+9. Run unittest
+
+    ```
+    $ python3 netbox/netbox/manage.py test netbox_contract
+    ```
+
+10. Commit your changes and push your branch to GitHub:
 
     ```
     $ git add .
@@ -108,7 +112,7 @@ Make sure taht at the Netbox installtion step you follow the "Option B: Clone th
     $ git push origin name-of-your-bugfix-or-feature
     ```
 
-10. Submit a pull request through the GitHub website.
+1. Submit a pull request through the GitHub website.
 
 ## Model changes
 
@@ -133,7 +137,7 @@ Before you submit a pull request, check that it meets these guidelines:
 
 1. The pull request should include tests.
 2. If the pull request adds functionality, the docs should be updated. 
-3. The pull request should work for Python 3.8, 3.9, 3.10 and 3.11. Check [Actions](https://github.com/mlebreuil/netbox-contract/actions)
+3. The pull request should work for Python 3.10 and 3.11. Check [Actions](https://github.com/mlebreuil/netbox-contract/actions)
    and make sure that the tests pass for all supported Python versions.
 
 
