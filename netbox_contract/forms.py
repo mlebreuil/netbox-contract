@@ -27,7 +27,7 @@ from utilities.forms.fields import (
 )
 from utilities.forms.widgets import DatePicker, HTMXSelect
 
-from .constants import SERVICE_PROVIDER_MODELS
+from .constants import SERVICE_PROVIDER_MODELS, ASSIGNEMENT_MODELS
 from .models import (
     AccountingDimension,
     AccountingDimensionStatusChoices,
@@ -371,7 +371,7 @@ class InvoiceFilterForm(NetBoxModelFilterSetForm):
 
 
 class InvoiceCSVForm(NetBoxModelImportForm):
-    contracts = CSVModelChoiceField(
+    contracts = CSVModelMultipleChoiceField(
         queryset=Contract.objects.all(),
         to_field_name='name',
         help_text='Related Contracts',
@@ -396,7 +396,7 @@ class InvoiceCSVForm(NetBoxModelImportForm):
 
 
 class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
-    number = forms.CharField(max_length=100, required=True, label=_('Number'))
+    number = forms.CharField(max_length=100, required=False, label=_('Number'))
     template = forms.BooleanField(
         required=False,
         label=_('Template'),
@@ -471,7 +471,7 @@ class ServiceProviderCSVForm(NetBoxModelImportForm):
 
 
 class ServiceProviderBulkEditForm(NetBoxModelBulkEditForm):
-    name = forms.CharField(max_length=100, required=True, label=_('Name'))
+    name = forms.CharField(max_length=100, required=False, label=_('Name'))
     comments = CommentField(label=_('Comments'))
     nullable_fields = ('comments',)
     model = ServiceProvider
@@ -481,21 +481,32 @@ class ServiceProviderBulkEditForm(NetBoxModelBulkEditForm):
 
 
 class ContractAssignmentForm(NetBoxModelForm):
-    contract = DynamicModelChoiceField(queryset=Contract.objects.all(), selector=True, label=_('Contract'))
+
+    content_type = ContentTypeChoiceField(
+        queryset=ContentType.objects.all(),
+        limit_choices_to=ASSIGNEMENT_MODELS,
+        label=_('object type'),
+    )
+
+    contract = DynamicModelChoiceField(
+        queryset=Contract.objects.all(),
+        selector=True,
+        label=_('Contract'))
 
     class Meta:
         model = ContractAssignment
         fields = ['content_type', 'object_id', 'contract', 'tags']
-        widgets = {
-            'content_type': forms.HiddenInput(),
-            'object_id': forms.HiddenInput(),
-        }
+        # widgets = {
+        #     'content_type': forms.HiddenInput(),
+        #     'object_id': forms.HiddenInput(),
+        # }
 
 
 class ContractAssignmentFilterForm(NetBoxModelFilterSetForm):
     model = ContractAssignment
     contract = DynamicModelChoiceField(
         queryset=Contract.objects.all(),
+        required=False,
         selector=True,
         label=_('Contract'),
     )
@@ -504,6 +515,7 @@ class ContractAssignmentFilterForm(NetBoxModelFilterSetForm):
 class ContractAssignmentImportForm(NetBoxModelImportForm):
     content_type = CSVContentTypeField(
         queryset=ContentType.objects.all(),
+        limit_choices_to=ASSIGNEMENT_MODELS,
         help_text='Content Type in the form <app>.<model>',
         label=_('Content type'),
     )
@@ -516,6 +528,16 @@ class ContractAssignmentImportForm(NetBoxModelImportForm):
     class Meta:
         model = ContractAssignment
         fields = ['content_type', 'object_id', 'contract', 'tags']
+
+
+class ContractAssignmentBulkEditForm(NetBoxModelBulkEditForm):
+    contract = DynamicModelChoiceField(
+        queryset=Contract.objects.all(),
+        required=False,
+        selector=True,
+        label=_('Contract'),
+    )
+    model = ContractAssignment
 
 
 # InvoiceLine
@@ -596,6 +618,7 @@ class InvoiceLineImportForm(NetBoxModelImportForm):
     accounting_dimensions = CSVModelMultipleChoiceField(
         queryset=AccountingDimension.objects.all(),
         to_field_name='id',
+        required=False,
         help_text='accounting dimension id',
         label=_('Accounting dimensions'),
     )
@@ -620,6 +643,8 @@ class InvoiceLineBulkEditForm(NetBoxModelBulkEditForm):
         selector=True,
         label=_('Accounting dimensions'),
     )
+    comments = CommentField(label=_('Comments'))
+    nullable_fields = ('comments',)
     model = InvoiceLine
 
 
@@ -667,4 +692,6 @@ class AccountingDimensionImportForm(NetBoxModelImportForm):
 class AccountingDimensionBulkEditForm(NetBoxModelBulkEditForm):
     name = forms.CharField(max_length=20, required=False, label=_('Name'))
     value = forms.CharField(max_length=20, required=False, label=_('Value'))
+    comments = CommentField(label=_('Comments'))
+    nullable_fields = ('comments',)
     model = AccountingDimension

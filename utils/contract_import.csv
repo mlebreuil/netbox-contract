@@ -1,0 +1,2 @@
+name,external_partie_object_type,external_partie_object_id,internal_partie,tenant,status,start_date,end_date,currency,mrc,nrc,invoice_frequency
+Contract 1,netbox_contract.serviceprovider,Service Provider A,entity1,Tenant 1,active,2025-01-01,2025-12-31,usd,100,1000,1

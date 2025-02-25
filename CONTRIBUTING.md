@@ -98,7 +98,13 @@ Make sure taht at the Netbox installtion step you follow the "Option B: Clone th
 
     Connect to the name or IP of the server (as defined in ALLOWED_HOSTS) on port 8000; for example, http://127.0.0.1:8000/.
 
-9. Commit your changes and push your branch to GitHub:
+9. Run unittest
+
+    ```
+    $ python3 netbox/netbox/manage.py test netbox_contract
+    ```
+
+10. Commit your changes and push your branch to GitHub:
 
     ```
     $ git add .
@@ -106,7 +112,7 @@ Make sure taht at the Netbox installtion step you follow the "Option B: Clone th
     $ git push origin name-of-your-bugfix-or-feature
     ```
 
-10. Submit a pull request through the GitHub website.
+1. Submit a pull request through the GitHub website.
 
 ## Model changes
 

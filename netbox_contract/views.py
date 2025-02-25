@@ -107,12 +107,14 @@ class ContractAssignmentListView(generic.ObjectListView):
     table = tables.ContractAssignmentListTable
     filterset = filtersets.ContractAssignmentFilterSet
     filterset_form = forms.ContractAssignmentFilterForm
-    actions = {
-        'import': {'add'},
-        'export': set(),
-        'bulk_edit': {'change'},
-        'bulk_delete': {'delete'},
-    }
+    # actions = {
+    #     'import': {'add'},
+    #     'export': set(),
+    #     'edit': {'add'},
+    #     'delete' : {'delete'},
+    #     'bulk_edit': {'change'},
+    #     'bulk_delete': {'delete'},
+    # }
 
 
 class ContractAssignmentEditView(generic.ObjectEditView):
@@ -146,6 +148,18 @@ class ContractAssignmentBulkImportView(generic.BulkImportView):
     model_form = forms.ContractAssignmentImportForm
     table = tables.ContractAssignmentListTable
 
+
+class ContractAssignmentBulkEditView(generic.BulkEditView):
+    queryset = ContractAssignment.objects.annotate()
+    filterset = filtersets.ContractAssignmentFilterSet
+    table = tables.ContractAssignmentListTable
+    form = forms.ContractAssignmentBulkEditForm
+
+
+class ContractAssignmentBulkDeleteView(generic.BulkDeleteView):
+    queryset = ContractAssignment.objects.annotate()
+    filterset = filtersets.ContractAssignmentFilterSet
+    table = tables.ContractAssignmentListTable
 
 # Contract views
 

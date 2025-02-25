@@ -7,23 +7,39 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "netbox-contract"
-version = "2.3.1"
+version = "2.3.2"
 authors = [
   { name="Marc Lebreuil", email="marc@famillelebreuil.net" },
 ]
+
 description = "Contract management plugin for Netbox"
 readme = "README.md"
 requires-python = ">=3.10"
+
 dependencies = [
     'python-dateutil',
     'drf_yasg',
+    'Django',
 ]
+
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 
+[project.optional-dependencies]
+dev = ["check-manifest", "mkdocs", "mkdocs-material", "ruff"]
+test = ["coverage", "pytest", "pytest-cov"]
+
 [project.urls]
 "Homepage" = "https://github.com/mlebreuil/netbox-contract"
 "Bug Tracker" = "https://github.com/mlebreuil/netbox-contract/issues"
+
+[tool.setuptools]
+packages = [
+    "netbox_contract",
+]
+package-data = { "netbox_contract" = ["**/*", "templates/**"] }
+exclude-package-data = { netbox_contract = ["tests/*"] }
+license-files = ["LICENSE"]

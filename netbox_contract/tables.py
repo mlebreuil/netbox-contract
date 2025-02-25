@@ -25,6 +25,7 @@ class ContractTypeListTable(NetBoxTable):
 
 
 class ContractAssignmentListTable(NetBoxTable):
+    id = tables.Column(linkify=True)
     content_type = columns.ContentTypeColumn(verbose_name='Object Type')
     content_object = tables.Column(linkify=True, orderable=False)
     contract = tables.Column(linkify=True)
@@ -35,7 +36,7 @@ class ContractAssignmentListTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = ContractAssignment
         fields = (
-            'pk',
+            'id',
             'content_type',
             'content_object',
             'contract',
@@ -44,7 +45,7 @@ class ContractAssignmentListTable(NetBoxTable):
             'actions',
         )
         default_columns = (
-            'pk',
+            'id',
             'content_type',
             'content_object',
             'contract',

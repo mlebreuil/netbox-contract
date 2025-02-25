@@ -360,6 +360,7 @@ class AccountingDimensionSerializer(NetBoxModelSerializer):
         )
         brief_fields = ('id', 'name', 'value', 'url', 'display')
 
+
 class ContractTypeSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:contracttype-detail')
 
