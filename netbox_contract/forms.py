@@ -27,7 +27,7 @@ from utilities.forms.fields import (
 )
 from utilities.forms.widgets import DatePicker, HTMXSelect
 
-from .constants import SERVICE_PROVIDER_MODELS, ASSIGNEMENT_MODELS
+from .constants import ASSIGNEMENT_MODELS, SERVICE_PROVIDER_MODELS
 from .models import (
     AccountingDimension,
     AccountingDimensionStatusChoices,
@@ -64,6 +64,9 @@ class ContractForm(NetBoxModelForm):
         required=False,
         selector=True,
         label=_('Parent'),
+    )
+    contract_type = DynamicModelChoiceField(
+        queryset=ContractType.objects.all(), required=False, selector=True, label=_('Contract type')
     )
 
     def __init__(self, *args, **kwargs):
@@ -103,6 +106,7 @@ class ContractForm(NetBoxModelForm):
         model = Contract
         fields = (
             'name',
+            'contract_type',
             'external_partie_object_type',
             'external_partie_object',
             'external_reference',
