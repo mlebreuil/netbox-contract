@@ -17,6 +17,12 @@
               <td>{{ object.name }}</td>
             </tr>
             <tr>
+              <th scope="row">{% trans "Contract type" %}</th>
+              <td>
+                <a href="{{ object.contract_type.get_absolute_url }}">{{ object.contract_type.name }}</a>
+              </td>
+            </tr>
+            <tr>
               <th scope="row">{% trans "External partie type" %}</th>
               <td>{{ object.external_partie_object_type }}</td>
             </tr>
