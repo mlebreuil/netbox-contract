@@ -19,8 +19,8 @@ from .models import (
     AccountingDimension,
     Contract,
     ContractAssignment,
-    Invoice,
     ContractType,
+    Invoice,
     InvoiceLine,
     ServiceProvider,
 )
@@ -38,16 +38,32 @@ class ContractTypeView(generic.ObjectView):
 class ContractTypeListView(generic.ObjectListView):
     queryset = ContractType.objects.all()
     table = tables.ContractTypeListTable
-
+    filterset = filtersets.ContractTypeFilterSet
+    filterset_form = forms.ContractTypeFilterForm
 
 class ContractTypeEditView(generic.ObjectEditView):
     queryset = ContractType.objects.all()
     form = forms.ContractTypeForm
 
+class ContractTypeBulkImportView(generic.BulkImportView):
+    queryset = ContractType.objects.all()
+    model_form = forms.ContractTypeCSVForm
+    table = tables.ContractTypeListTable
+
+
+class ContractTypeBulkEditView(generic.BulkEditView):
+    queryset = ContractType.objects.annotate()
+    filterset = filtersets.ContractTypeFilterSet
+    table = tables.ContractTypeListTable
+    form = forms.ContractTypeBulkEditForm
 
 class ContractTypeDeleteView(generic.ObjectDeleteView):
     queryset = ContractType.objects.all()
 
+class ContractTypeBulkDeleteView(generic.BulkDeleteView):
+    queryset = ContractType.objects.annotate()
+    filterset = filtersets.ContractTypeFilterSet
+    table = tables.ContractTypeListTable
 
 # ServiceProvider views
 
