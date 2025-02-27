@@ -1,19 +1,21 @@
 from datetime import date
 from decimal import Decimal
 
-from django.contrib.contenttypes.models import ContentType
 from circuits.models import Circuit, CircuitType, Provider, ProviderAccount
-from dcim.models import Site, Device, DeviceType, DeviceRole, Manufacturer
+from dcim.models import Device, DeviceRole, DeviceType, Manufacturer, Site
+from django.contrib.contenttypes.models import ContentType
+from netbox.choices import ColorChoices
 from tenancy.models import Tenant
 from utilities.testing import ViewTestCases
 
 from netbox_contract.models import (
+    AccountingDimension,
     Contract,
+    ContractAssignment,
+    ContractType,
     Invoice,
     InvoiceLine,
-    AccountingDimension,
     ServiceProvider,
-    ContractAssignment,
     StatusChoices,
 )
 from netbox_contract.tests.custom import ModelViewTestCase
@@ -311,6 +313,41 @@ class ServiceProviderTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectView
             'comments': 'New comment',
         }
 
+class ContractTypeTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCase):
+    model = ContractType
+
+    @classmethod
+    def setUpTestData(cls):
+        # Create test contract types
+        contract_types = ContractType.objects.bulk_create([
+            ContractType(name='Contract Type 1', description='Description for type 1', color=ColorChoices.COLOR_BLUE),
+            ContractType(name='Contract Type 2', description='Description for type 2', color=ColorChoices.COLOR_RED),
+        ])
+
+        for contract_type in contract_types:
+            contract_type.save()
+
+        cls.form_data = {
+            'name': 'Contract Type 3',
+            'description': 'Description for type 3',
+            'color': ColorChoices.COLOR_GREEN,
+        }
+
+        cls.csv_data = (
+            'name,description,color',
+            'Contract Type 4,Description for type 4,' + str(ColorChoices.COLOR_YELLOW),
+            'Contract Type 5,Description for type 5,' + str(ColorChoices.COLOR_ORANGE)
+        )
+
+        cls.csv_update_data = (
+            'id,description',
+            f'{contract_types[0].pk},Updated description for type 1',
+            f'{contract_types[1].pk},Updated description for type 2',
+        )
+
+        cls.bulk_edit_data = {
+            'description': 'Updated bulk description',
+        }
 
 class ContractAssignmentTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCase):
     model = ContractAssignment

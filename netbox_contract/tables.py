@@ -16,7 +16,6 @@ class ContractTypeListTable(NetBoxTable):
     name = tables.Column(linkify=True)
     color = columns.ColorColumn()
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
-    tag = columns.TagColumn(url_name='plugins:netbox_contract:contracttype_list')
 
     class Meta(NetBoxTable.Meta):
         model = ContractType
