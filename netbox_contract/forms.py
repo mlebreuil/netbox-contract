@@ -246,6 +246,7 @@ class ContractTypeForm(NetBoxModelForm):
             'tags',
         )
 
+
 class ContractTypeCSVForm(NetBoxModelImportForm):
     name = forms.CharField(max_length=100, label=_('Name'))
     description = CommentField(label=_('Description'))
@@ -257,10 +258,11 @@ class ContractTypeCSVForm(NetBoxModelImportForm):
 
 
 class ContractTypeBulkEditForm(NetBoxModelBulkEditForm):
-    name = forms.CharField(max_length=100, required=False, label=_('Name'))
     description = CommentField(label=_('Description'))
     nullable_fields = ('comments',)
+    color = ColorField(label=_('Color'), required=False,)
     model = ContractType
+
 
 class ContractTypeFilterForm(NetBoxModelFilterSetForm):
     model = ContractType

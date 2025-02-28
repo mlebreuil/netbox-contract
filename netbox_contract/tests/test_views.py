@@ -313,6 +313,7 @@ class ServiceProviderTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectView
             'comments': 'New comment',
         }
 
+
 class ContractTypeTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCase):
     model = ContractType
 
@@ -348,6 +349,7 @@ class ContractTypeTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTes
         cls.bulk_edit_data = {
             'description': 'Updated bulk description',
         }
+
 
 class ContractAssignmentTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCase):
     model = ContractAssignment

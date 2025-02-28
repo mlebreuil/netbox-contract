@@ -159,7 +159,7 @@ class ContractListTable(NetBoxTable):
             'parent',
             'actions',
         )
-        default_columns = ('name', 'status','contract_type', 'parent')
+        default_columns = ('name', 'status', 'contract_type', 'parent')
 
 
 class ContractListBottomTable(NetBoxTable):

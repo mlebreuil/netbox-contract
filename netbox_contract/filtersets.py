@@ -80,6 +80,7 @@ class ServiceProviderFilterSet(NetBoxModelFilterSet):
     def search(self, queryset, name, value):
         return queryset.filter(name__icontains=value)
 
+
 class ContractTypeFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = ContractType

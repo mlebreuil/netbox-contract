@@ -41,9 +41,11 @@ class ContractTypeListView(generic.ObjectListView):
     filterset = filtersets.ContractTypeFilterSet
     filterset_form = forms.ContractTypeFilterForm
 
+
 class ContractTypeEditView(generic.ObjectEditView):
     queryset = ContractType.objects.all()
     form = forms.ContractTypeForm
+
 
 class ContractTypeBulkImportView(generic.BulkImportView):
     queryset = ContractType.objects.all()
@@ -57,8 +59,10 @@ class ContractTypeBulkEditView(generic.BulkEditView):
     table = tables.ContractTypeListTable
     form = forms.ContractTypeBulkEditForm
 
+
 class ContractTypeDeleteView(generic.ObjectDeleteView):
     queryset = ContractType.objects.all()
+
 
 class ContractTypeBulkDeleteView(generic.BulkDeleteView):
     queryset = ContractType.objects.annotate()
@@ -66,6 +70,7 @@ class ContractTypeBulkDeleteView(generic.BulkDeleteView):
     table = tables.ContractTypeListTable
 
 # ServiceProvider views
+
 
 @register_model_view(ServiceProvider, 'contacts')
 class ServiceProviderContactsView(ObjectContactsView):
