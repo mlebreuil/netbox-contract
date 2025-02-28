@@ -80,6 +80,7 @@ The first currency will also be the default currency for contracts.
 # configuration.py
 FIELD_CHOICES = {
     'netbox_contract.Contract.internal_partie': (
+        ('default', 'Default entity', 'green'),
         ('entity1', 'Entity 1', 'green'),
         ('entity2', 'Entity 2', 'yellow'),
     ),
