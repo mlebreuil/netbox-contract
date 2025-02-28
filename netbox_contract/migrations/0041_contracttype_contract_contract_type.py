@@ -21,7 +21,9 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
                 ('created', models.DateTimeField(auto_now_add=True, null=True)),
                 ('last_updated', models.DateTimeField(auto_now=True, null=True)),
-                ('custom_field_data', models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder)),
+                (
+                    'custom_field_data',
+                    models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder)),
                 ('name', models.CharField(max_length=100, unique=True)),
                 ('description', models.TextField(blank=True)),
                 ('color', utilities.fields.ColorField(default='9e9e9e', max_length=6)),
@@ -36,6 +38,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contract',
             name='contract_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='contracts', to='netbox_contract.contracttype'),
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name='contracts', to='netbox_contract.contracttype'
+            ),
         ),
     ]
