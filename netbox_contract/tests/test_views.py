@@ -32,10 +32,17 @@ class ContractTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCas
         # create test tenant
         Tenant.objects.create(name='Tenant 1', slug='tenant-1')
         ServiceProvider.objects.create(name='Service Provider A', slug='service-provider-a')
+        # Create test contract-ype
+        ContractType.objects.create(
+            name='Contract Type A',
+            description='Description for type A',
+            color=ColorChoices.COLOR_BLUE
+        )
 
         # Create three Contracts
         contract1 = Contract.objects.create(
             name='Contract1',
+            contract_type=ContractType.objects.get(name='Contract Type A'),
             external_partie_object_type=ContentType.objects.get_for_model(Provider),
             external_partie_object_id=Provider.objects.get(slug='provider-a').id,
             internal_partie='default',
