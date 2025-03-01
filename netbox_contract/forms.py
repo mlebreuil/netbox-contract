@@ -216,6 +216,12 @@ class ContractCSVForm(NetBoxModelImportForm):
 
 class ContractBulkEditForm(NetBoxModelBulkEditForm):
     name = forms.CharField(max_length=100, required=False, label=_('Name'))
+    contract_type = DynamicModelChoiceField(
+        queryset=ContractType.objects.all(),
+        required=False,
+        selector=True,
+        label=_('Contract Type')
+    )
     external_reference = forms.CharField(max_length=100, required=False, label=_('External reference'))
     internal_partie = forms.ChoiceField(choices=InternalEntityChoices, required=False, label=_('Internal partie'))
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant'))
