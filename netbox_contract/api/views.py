@@ -42,7 +42,9 @@ class ContractAssignmentViewSet(NetBoxModelViewSet):
 
 
 class InvoiceLineViewSet(NetBoxModelViewSet):
-    queryset = models.InvoiceLine.objects.prefetch_related('invoice', 'accounting_dimensions', 'tags')
+    queryset = models.InvoiceLine.objects.prefetch_related(
+        'invoice', 'accounting_dimensions', 'tags'
+    )
     serializer_class = InvoiceLineSerializer
     filterset_class = filtersets.InvoiceLineFilterSet
 

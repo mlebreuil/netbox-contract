@@ -19,7 +19,9 @@ from ..models import (
 
 
 class NestedContractSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:contract-detail')
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_contract-api:contract-detail'
+    )
     yrc = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     tenant = TenantSerializer(nested=True, required=False, allow_null=True)
     external_partie_object_type = ContentTypeField(queryset=ContentType.objects.all())
@@ -53,13 +55,19 @@ class NestedContractSerializer(WritableNestedSerializer):
 
     @swagger_serializer_method(serializer_or_field=serializers.JSONField)
     def get_external_partie_object(self, instance):
-        serializer = get_serializer_for_model(instance.external_partie_object_type.model_class())
+        serializer = get_serializer_for_model(
+            instance.external_partie_object_type.model_class()
+        )
         context = {'request': self.context['request']}
-        return serializer(instance.external_partie_object, nested=True, context=context).data
+        return serializer(
+            instance.external_partie_object, nested=True, context=context
+        ).data
 
 
 class NestedInvoiceSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:invoice-detail')
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_contract-api:invoice-detail'
+    )
 
     class Meta:
         model = Invoice
@@ -68,7 +76,9 @@ class NestedInvoiceSerializer(WritableNestedSerializer):
 
 
 class NestedAccountingDimensionSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:accountingdimension-detail')
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_contract-api:accountingdimension-detail'
+    )
 
     class Meta:
         model = AccountingDimension
@@ -77,7 +87,9 @@ class NestedAccountingDimensionSerializer(WritableNestedSerializer):
 
 
 class ContractSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:contract-detail')
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_contract-api:contract-detail'
+    )
     yrc = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     parent = NestedContractSerializer(many=False, required=False)
     tenant = TenantSerializer(nested=True, required=False, allow_null=True)
@@ -141,13 +153,19 @@ class ContractSerializer(NetBoxModelSerializer):
 
     @swagger_serializer_method(serializer_or_field=serializers.JSONField)
     def get_external_partie_object(self, instance):
-        serializer = get_serializer_for_model(instance.external_partie_object_type.model_class())
+        serializer = get_serializer_for_model(
+            instance.external_partie_object_type.model_class()
+        )
         context = {'request': self.context['request']}
-        return serializer(instance.external_partie_object, nested=True, context=context).data
+        return serializer(
+            instance.external_partie_object, nested=True, context=context
+        ).data
 
 
 class InvoiceSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:invoice-detail')
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_contract-api:invoice-detail'
+    )
     contracts = SerializedPKRelatedField(
         queryset=Contract.objects.all(),
         serializer=ContractSerializer,
@@ -200,7 +218,9 @@ class InvoiceSerializer(NetBoxModelSerializer):
             for contract in contracts:
                 for invoice in contract.invoices.all():
                     if invoice.template and invoice != self.instance:
-                        raise serializers.ValidationError('Only one invoice template allowed per contract')
+                        raise serializers.ValidationError(
+                            'Only one invoice template allowed per contract'
+                        )
 
             # Prefix the invoice name with _template
             data['number'] = '_invoice_template_' + contract.name
@@ -219,7 +239,9 @@ class InvoiceSerializer(NetBoxModelSerializer):
             for contract in contracts:
                 try:
                     template_exists = True
-                    invoice_template = Invoice.objects.get(template=True, contracts=contract)
+                    invoice_template = Invoice.objects.get(
+                        template=True, contracts=contract
+                    )
                 except ObjectDoesNotExist:
                     template_exists = False
 
@@ -234,8 +256,15 @@ class InvoiceSerializer(NetBoxModelSerializer):
 
                         # adjust the first invoice line amount
                         amount = validated_data['amount']
-                        if first and amount != invoice_template.total_invoicelines_amount:
-                            line.amount = line.amount + amount - invoice_template.total_invoicelines_amount
+                        if (
+                            first
+                            and amount != invoice_template.total_invoicelines_amount
+                        ):
+                            line.amount = (
+                                line.amount
+                                + amount
+                                - invoice_template.total_invoicelines_amount
+                            )
 
                         line.save()
 
@@ -247,7 +276,9 @@ class InvoiceSerializer(NetBoxModelSerializer):
 
 
 class ServiceProviderSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:serviceprovider-detail')
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_contract-api:serviceprovider-detail'
+    )
 
     class Meta:
         model = ServiceProvider
@@ -266,7 +297,9 @@ class ServiceProviderSerializer(NetBoxModelSerializer):
 
 
 class ContractAssignmentSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:contractassignment-detail')
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_contract-api:contractassignment-detail'
+    )
     content_type = ContentTypeField(queryset=ContentType.objects.all())
     content_object = serializers.SerializerMethodField(read_only=True)
     contract = NestedContractSerializer()
@@ -294,7 +327,9 @@ class ContractAssignmentSerializer(NetBoxModelSerializer):
 
 
 class InvoiceLineSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:invoiceline-detail')
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_contract-api:invoiceline-detail'
+    )
     invoice = NestedInvoiceSerializer(many=False, required=False)
     accounting_dimensions = SerializedPKRelatedField(
         queryset=AccountingDimension.objects.all(),
@@ -342,7 +377,9 @@ class InvoiceLineSerializer(NetBoxModelSerializer):
 
 
 class AccountingDimensionSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:accountingdimension-detail')
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_contract-api:accountingdimension-detail'
+    )
 
     class Meta:
         model = AccountingDimension
