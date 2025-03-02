@@ -5,10 +5,22 @@ from .models import (
     AccountingDimension,
     Contract,
     ContractAssignment,
+    ContractType,
     Invoice,
     InvoiceLine,
     ServiceProvider,
 )
+
+
+class ContractTypeListTable(NetBoxTable):
+    name = tables.Column(linkify=True)
+    color = columns.ColorColumn()
+    actions = columns.ActionsColumn(actions=('edit', 'delete'))
+
+    class Meta(NetBoxTable.Meta):
+        model = ContractType
+        fields = ('pk', 'id', 'name', 'description', 'color', 'actions')
+        default_columns = ('name', 'description', 'color')
 
 
 class ContractAssignmentListTable(NetBoxTable):
@@ -19,6 +31,7 @@ class ContractAssignmentListTable(NetBoxTable):
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
     contract__external_partie_object = tables.Column(linkify=True)
     tags = columns.TagColumn(url_name='plugins:netbox_contract:contractassignment_list')
+    contract__contract_type = columns.ColoredLabelColumn(verbose_name='Contract type')
 
     class Meta(NetBoxTable.Meta):
         model = ContractAssignment
@@ -27,6 +40,7 @@ class ContractAssignmentListTable(NetBoxTable):
             'content_type',
             'content_object',
             'contract',
+            'contract__contract_type',
             'contract__external_partie_object_type',
             'contract__external_partie_object',
             'actions',
@@ -36,6 +50,7 @@ class ContractAssignmentListTable(NetBoxTable):
             'content_type',
             'content_object',
             'contract',
+            'contract__contract_type',
             'contract__external_partie_object_type',
             'contract__external_partie_object',
         )
@@ -50,6 +65,8 @@ class ContractAssignmentObjectTable(NetBoxTable):
     contract__status = columns.ChoiceFieldColumn(
         verbose_name=('Status'),
     )
+    contract__contract_type = columns.ColoredLabelColumn(verbose_name='Contract type')
+    contract_type = tables.Column(linkify=True, verbose_name='Contract type')
 
     class Meta(NetBoxTable.Meta):
         model = ContractAssignment
@@ -58,6 +75,7 @@ class ContractAssignmentObjectTable(NetBoxTable):
             'contract',
             'contract__external_partie_object',
             'contract__status',
+            'contract__contract_type',
             'contract__start_date',
             'contract__end_date',
             'contract__mrc',
@@ -70,6 +88,7 @@ class ContractAssignmentObjectTable(NetBoxTable):
             'contract__external_partie_object_type',
             'contract__external_partie_object',
             'contract__status',
+            'contract__contract_type',
             'contract__start_date',
             'contract__end_date',
             'contract__mrc',
@@ -111,6 +130,7 @@ class ContractListTable(NetBoxTable):
         verbose_name=('Status'),
     )
     tags = columns.TagColumn(url_name='plugins:netbox_contract:contract_list')
+    contract_type = tables.Column(linkify=True, verbose_name='Contract type')
 
     class Meta(NetBoxTable.Meta):
         model = Contract
@@ -118,6 +138,7 @@ class ContractListTable(NetBoxTable):
             'pk',
             'id',
             'name',
+            'contract_type',
             'external_partie_object_type',
             'external_partie_object',
             'external_reference',
@@ -138,7 +159,7 @@ class ContractListTable(NetBoxTable):
             'parent',
             'actions',
         )
-        default_columns = ('name', 'status', 'parent')
+        default_columns = ('name', 'status', 'contract_type', 'parent')
 
 
 class ContractListBottomTable(NetBoxTable):

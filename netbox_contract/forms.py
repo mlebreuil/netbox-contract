@@ -9,10 +9,11 @@ from netbox.forms import (
     NetBoxModelForm,
     NetBoxModelImportForm,
 )
-from tenancy.models import Tenant
 from tenancy.forms import TenancyFilterForm
+from tenancy.models import Tenant
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import (
+    ColorField,
     CommentField,
     ContentTypeChoiceField,
     CSVChoiceField,
@@ -26,12 +27,13 @@ from utilities.forms.fields import (
 )
 from utilities.forms.widgets import DatePicker, HTMXSelect
 
-from .constants import SERVICE_PROVIDER_MODELS, ASSIGNEMENT_MODELS
+from .constants import ASSIGNEMENT_MODELS, SERVICE_PROVIDER_MODELS
 from .models import (
     AccountingDimension,
     AccountingDimensionStatusChoices,
     Contract,
     ContractAssignment,
+    ContractType,
     CurrencyChoices,
     InternalEntityChoices,
     Invoice,
@@ -62,6 +64,9 @@ class ContractForm(NetBoxModelForm):
         required=False,
         selector=True,
         label=_('Parent'),
+    )
+    contract_type = DynamicModelChoiceField(
+        queryset=ContractType.objects.all(), required=False, selector=True, label=_('Contract type')
     )
 
     def __init__(self, *args, **kwargs):
@@ -101,6 +106,7 @@ class ContractForm(NetBoxModelForm):
         model = Contract
         fields = (
             'name',
+            'contract_type',
             'external_partie_object_type',
             'external_partie_object',
             'external_reference',
@@ -175,11 +181,19 @@ class ContractCSVForm(NetBoxModelImportForm):
         required=False,
         label=_('Parent'),
     )
+    contract_type = CSVModelChoiceField(
+        queryset=ContractType.objects.all(),
+        to_field_name='name',
+        help_text='Contract type name',
+        required=False,
+        label=_('Contract type'),
+    )
 
     class Meta:
         model = Contract
         fields = [
             'name',
+            'contract_type',
             'external_partie_object_type',
             'external_partie_object_id',
             'external_reference',
@@ -210,6 +224,12 @@ class ContractCSVForm(NetBoxModelImportForm):
 
 class ContractBulkEditForm(NetBoxModelBulkEditForm):
     name = forms.CharField(max_length=100, required=False, label=_('Name'))
+    contract_type = DynamicModelChoiceField(
+        queryset=ContractType.objects.all(),
+        required=False,
+        selector=True,
+        label=_('Contract Type')
+    )
     external_reference = forms.CharField(max_length=100, required=False, label=_('External reference'))
     internal_partie = forms.ChoiceField(choices=InternalEntityChoices, required=False, label=_('Internal partie'))
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant'))
@@ -224,6 +244,44 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
     nullable_fields = ('comments',)
     model = Contract
 
+
+# ContractType
+
+
+class ContractTypeForm(NetBoxModelForm):
+    color = ColorField(label=_('Color'))
+
+    class Meta:
+        model = ContractType
+        fields = (
+            'name',
+            'description',
+            'color',
+            'tags',
+        )
+
+
+class ContractTypeCSVForm(NetBoxModelImportForm):
+    name = forms.CharField(max_length=100, label=_('Name'))
+    description = CommentField(label=_('Description'))
+    color = ColorField(label=_('Color'))
+
+    class Meta:
+        model = ContractType
+        fields = ['name', 'description', 'color']
+
+
+class ContractTypeBulkEditForm(NetBoxModelBulkEditForm):
+    description = CommentField(label=_('Description'))
+    nullable_fields = ('comments',)
+    color = ColorField(label=_('Color'), required=False,)
+    model = ContractType
+
+
+class ContractTypeFilterForm(NetBoxModelFilterSetForm):
+    model = ContractType
+    name = forms.CharField(required=False, label=_('Name'))
+    description = CommentField(label=_('Description'))
 
 # Invoice
 

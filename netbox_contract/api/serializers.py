@@ -11,6 +11,7 @@ from ..models import (
     AccountingDimension,
     Contract,
     ContractAssignment,
+    ContractType,
     Invoice,
     InvoiceLine,
     ServiceProvider,
@@ -395,3 +396,22 @@ class AccountingDimensionSerializer(NetBoxModelSerializer):
             'last_updated',
         )
         brief_fields = ('id', 'name', 'value', 'url', 'display')
+
+
+class ContractTypeSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:contracttype-detail')
+
+    class Meta:
+        model = ContractType
+        fields = (
+            'id',
+            'url',
+            'display',
+            'name',
+            'description',
+            'tags',
+            'custom_fields',
+            'created',
+            'last_updated',
+        )
+        brief_fields = ('id', 'name', 'description', 'url', 'display')

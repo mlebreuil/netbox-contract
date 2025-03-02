@@ -8,6 +8,7 @@ from .models import (
     AccountingDimensionStatusChoices,
     Contract,
     ContractAssignment,
+    ContractType,
     CurrencyChoices,
     InternalEntityChoices,
     Invoice,
@@ -75,6 +76,15 @@ class ServiceProviderFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = ServiceProvider
         fields = ('id', 'name')
+
+    def search(self, queryset, name, value):
+        return queryset.filter(name__icontains=value)
+
+
+class ContractTypeFilterSet(NetBoxModelFilterSet):
+    class Meta:
+        model = ContractType
+        fields = ('name', 'description', 'color')
 
     def search(self, queryset, name, value):
         return queryset.filter(name__icontains=value)
