@@ -82,6 +82,7 @@ class ContractTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCas
 
         cls.form_data = {
             'name': 'Contract X',
+            'contract_type': ContractType.objects.get(name='Contract Type A').pk,
             'external_partie_object_type': ContentType.objects.get_for_model(Provider).pk,
             'external_partie_object': Provider.objects.get(slug='provider-a').id,
             'external_reference': 'External Reference 1',
@@ -100,13 +101,13 @@ class ContractTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCas
         }
 
         cls.csv_data = (
-            'name,external_partie_object_type,external_partie_object_id,internal_partie,'
+            'name,contract_type,external_partie_object_type,external_partie_object_id,internal_partie,'
             'tenant,status,start_date,end_date,currency,mrc,nrc,invoice_frequency',
-            'Contract 4,netbox_contract.serviceprovider,Service Provider A,entity1,'
+            'Contract 4,Contract Type A,netbox_contract.serviceprovider,Service Provider A,entity1,'
             'Tenant 1,active,2025-01-01,2025-12-31,usd,100,1000,1',
-            'Contract 5,netbox_contract.serviceprovider,Service Provider A,entity1,'
+            'Contract 5,Contract Type A,netbox_contract.serviceprovider,Service Provider A,entity1,'
             'Tenant 1,active,2025-01-01,2025-12-31,usd,100,1000,1',
-            'Contract 6,netbox_contract.serviceprovider,Service Provider A,entity1,'
+            'Contract 6,Contract Type A,netbox_contract.serviceprovider,Service Provider A,entity1,'
             'Tenant 1,active,2025-01-01,2025-12-31,usd,100,1000,1'
         )
 
