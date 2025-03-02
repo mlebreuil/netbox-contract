@@ -181,11 +181,19 @@ class ContractCSVForm(NetBoxModelImportForm):
         required=False,
         label=_('Parent'),
     )
+    contract_type = CSVModelChoiceField(
+        queryset=ContractType.objects.all(),
+        to_field_name='name',
+        help_text='Contract type name',
+        required=False,
+        label=_('Contract type'),
+    )
 
     class Meta:
         model = Contract
         fields = [
             'name',
+            'contract_type',
             'external_partie_object_type',
             'external_partie_object_id',
             'external_reference',
