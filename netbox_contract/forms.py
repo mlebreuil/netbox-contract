@@ -144,6 +144,12 @@ class ContractForm(NetBoxModelForm):
 class ContractFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
     model = Contract
 
+    contract_type = DynamicModelChoiceField(
+        queryset=ContractType.objects.all(),
+        required=False,
+        selector=True,
+        label=_('Contract type'),
+    )
     external_reference = forms.CharField(required=False, label=_('External reference'))
     internal_partie = forms.ChoiceField(choices=InternalEntityChoices, required=False, label=_('Internal partie'))
     status = forms.ChoiceField(choices=StatusChoices, required=False, label=_('Status'))
