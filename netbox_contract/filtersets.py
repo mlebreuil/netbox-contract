@@ -26,12 +26,16 @@ class ContractFilterSet(NetBoxModelFilterSet, TenancyFilterSet):
     currency = django_filters.MultipleChoiceFilter(
         choices=CurrencyChoices, null_value=None
     )
+    contract_type = django_filters.ModelMultipleChoiceFilter(
+        field_name='contract_type__name', to_field_name='name', queryset=ContractType.objects.all()
+    )
 
     class Meta:
         model = Contract
         fields = (
             'id',
             'name',
+            'contract_type',
             'external_reference',
             'start_date',
             'end_date',
