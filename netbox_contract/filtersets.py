@@ -1,7 +1,7 @@
 import django_filters
 from django.db.models import Q
 from netbox.filtersets import NetBoxModelFilterSet
-from tenancy.filtersets import TenancyFilterSet
+from tenancy.filtersets import ContactModelFilterSet, TenancyFilterSet
 
 from .models import (
     AccountingDimension,
@@ -72,7 +72,7 @@ class InvoiceFilterSet(NetBoxModelFilterSet):
         )
 
 
-class ServiceProviderFilterSet(NetBoxModelFilterSet):
+class ServiceProviderFilterSet(ContactModelFilterSet, NetBoxModelFilterSet):
     class Meta:
         model = ServiceProvider
         fields = ('id', 'name')
