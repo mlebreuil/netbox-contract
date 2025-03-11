@@ -9,7 +9,7 @@ from netbox.forms import (
     NetBoxModelForm,
     NetBoxModelImportForm,
 )
-from tenancy.forms import TenancyFilterForm
+from tenancy.forms import ContactModelFilterForm, TenancyFilterForm
 from tenancy.models import Tenant
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import (
@@ -501,7 +501,7 @@ class ServiceProviderForm(NetBoxModelForm):
         fields = ('name', 'slug', 'portal_url', 'comments', 'tags')
 
 
-class ServiceProviderFilterForm(NetBoxModelFilterSetForm):
+class ServiceProviderFilterForm(ContactModelFilterForm, NetBoxModelFilterSetForm):
     model = ServiceProvider
     name = forms.CharField(required=False, label=_('Name'))
     tag = TagFilterField(model)
