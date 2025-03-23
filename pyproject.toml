@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "netbox-contract"
-version = "2.3.2"
+version = "2.3.3"
 authors = [
   { name="Marc Lebreuil", email="marc@famillelebreuil.net" },
 ]
