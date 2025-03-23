@@ -1,5 +1,6 @@
 import django_tables2 as tables
 from netbox.tables import NetBoxTable, columns
+from tenancy.tables import ContactsColumnMixin
 
 from .models import (
     AccountingDimension,
@@ -121,7 +122,7 @@ class ContractAssignmentContractTable(NetBoxTable):
         )
 
 
-class ContractListTable(NetBoxTable):
+class ContractListTable(ContactsColumnMixin, NetBoxTable):
     name = tables.Column(linkify=True)
     external_partie_object = tables.Column(verbose_name='External partie', linkify=True)
     parent = tables.Column(linkify=True)

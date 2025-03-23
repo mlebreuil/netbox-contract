@@ -232,6 +232,11 @@ class ContractView(generic.ObjectView):
         }
 
 
+@register_model_view(Contract, 'contacts')
+class ContractContactsView(ObjectContactsView):
+    queryset = Contract.objects.all()
+
+
 class ContractListView(generic.ObjectListView):
     queryset = Contract.objects.annotate(
         calculated_rc=Round(
