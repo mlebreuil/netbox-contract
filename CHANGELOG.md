@@ -7,7 +7,9 @@
 
 ### Version 2.3.3
 
-
+* [250](https://github.com/mlebreuil/netbox-contract/pull/250) Add contacts to contract.
+* [248](https://github.com/mlebreuil/netbox-contract/pull/248) Add contact filtering on service provider.
+* [245](https://github.com/mlebreuil/netbox-contract/pull/245) Add contract-type model.
 
 ### Version 2.3.2
 
