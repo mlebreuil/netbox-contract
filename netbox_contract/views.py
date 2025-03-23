@@ -231,6 +231,9 @@ class ContractView(generic.ObjectView):
             'childs_table': childs_table,
         }
 
+@register_model_view(Contract, 'contacts')
+class ContractContactsView(ObjectContactsView):
+    queryset = Contract.objects.all()
 
 class ContractListView(generic.ObjectListView):
     queryset = Contract.objects.annotate(

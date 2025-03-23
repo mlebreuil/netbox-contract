@@ -172,7 +172,7 @@ class ContractAssignment(NetBoxModel):
         return status_colors.get(self.content_object.status)
 
 
-class Contract(NetBoxModel):
+class Contract(ContactsMixin, NetBoxModel):
     name = models.CharField(max_length=100, verbose_name=_('name'))
     contract_type = models.ForeignKey(
         to='netbox_contract.ContractType',

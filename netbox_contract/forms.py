@@ -141,7 +141,7 @@ class ContractForm(NetBoxModelForm):
             raise ValidationError('you should set monthly OR yearly recuring costs not both')
 
 
-class ContractFilterForm(TenancyFilterForm, NetBoxModelFilterSetForm):
+class ContractFilterForm(ContactModelFilterForm, TenancyFilterForm, NetBoxModelFilterSetForm):
     model = Contract
 
     contract_type = DynamicModelChoiceField(
