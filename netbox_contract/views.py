@@ -9,7 +9,7 @@ from django.db.models.functions import Round
 from django.shortcuts import get_object_or_404, render
 from netbox.views import generic
 from netbox.views.generic.utils import get_prerequisite_model
-from tenancy.views import ObjectContactsView
+# from tenancy.views import ObjectContactsView
 from utilities.forms import restrict_form_fields
 from utilities.querydict import normalize_querydict
 from utilities.views import register_model_view
@@ -72,9 +72,9 @@ class ContractTypeBulkDeleteView(generic.BulkDeleteView):
 # ServiceProvider views
 
 
-@register_model_view(ServiceProvider, 'contacts')
-class ServiceProviderContactsView(ObjectContactsView):
-    queryset = ServiceProvider.objects.all()
+# @register_model_view(ServiceProvider, 'contacts')
+# class ServiceProviderContactsView(ObjectContactsView):
+#     queryset = ServiceProvider.objects.all()
 
 
 class ServiceProviderView(generic.ObjectView):
@@ -232,9 +232,9 @@ class ContractView(generic.ObjectView):
         }
 
 
-@register_model_view(Contract, 'contacts')
-class ContractContactsView(ObjectContactsView):
-    queryset = Contract.objects.all()
+# @register_model_view(Contract, 'contacts')
+# class ContractContactsView(ObjectContactsView):
+#     queryset = Contract.objects.all()
 
 
 class ContractListView(generic.ObjectListView):
