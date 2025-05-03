@@ -9,7 +9,7 @@ from .models import ContractAssignment
 
 
 class CircuitContractAssignments(PluginTemplateExtension):
-    model = 'circuits.circuit'
+    models = ['circuits.circuit']
 
     def full_width_page(self):
         circuit = self.context['object']
@@ -29,7 +29,7 @@ class CircuitContractAssignments(PluginTemplateExtension):
 
 
 class DeviceContractAssignments(PluginTemplateExtension):
-    model = 'dcim.device'
+    models = ['dcim.device']
 
     def full_width_page(self):
         device = self.context['object']
@@ -49,7 +49,7 @@ class DeviceContractAssignments(PluginTemplateExtension):
 
 
 class VMContractAssignments(PluginTemplateExtension):
-    model = 'virtualization.virtualmachine'
+    models = ['virtualization.virtualmachine']
 
     def full_width_page(self):
         vm = self.context['object']
@@ -69,7 +69,7 @@ class VMContractAssignments(PluginTemplateExtension):
 
 
 class SiteContractAssignments(PluginTemplateExtension):
-    model = 'dcim.site'
+    models = ['dcim.site']
 
     def full_width_page(self):
         site = self.context['object']

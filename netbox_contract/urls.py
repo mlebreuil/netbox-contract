@@ -52,11 +52,11 @@ urlpatterns = (
         name='serviceprovider_changelog',
         kwargs={'model': models.ServiceProvider},
     ),
-    path(
-        'serviceproviders/<int:pk>/contacts/',
-        views.ServiceProviderContactsView.as_view(),
-        name='serviceprovider_contacts',
-    ),
+    # path(
+    #     'serviceproviders/<int:pk>/contacts/',
+    #     views.ServiceProviderContactsView.as_view(),
+    #     name='serviceprovider_contacts',
+    # ),
     # Contracts
     path('contracts/', views.ContractListView.as_view(), name='contract_list'),
     path('contracts/add/', views.ContractEditView.as_view(), name='contract_add'),

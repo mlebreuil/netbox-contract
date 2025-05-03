@@ -5,6 +5,13 @@
 
 ## Version 2
 
+### Version 2.4.0
+
+> [!WARNING]
+> This version requires Netbox 4.3.0 or later
+
+* [253](https://github.com/mlebreuil/netbox-contract/pull/253) Implement Netbox 4.3 compatibility
+
 ### Version 2.3.3
 
 * [250](https://github.com/mlebreuil/netbox-contract/pull/250) Add contacts to contract.
