@@ -13,12 +13,12 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='contract',
-            name='external_partie_object_id',
+            name='external_party_object_id',
             field=models.PositiveBigIntegerField(blank=True, null=True),
         ),
         migrations.AddField(
             model_name='contract',
-            name='external_partie_object_type',
+            name='external_party_object_type',
             field=models.ForeignKey(
                 blank=True,
                 null=True,
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name='contract',
             index=models.Index(
-                fields=['external_partie_object_type', 'external_partie_object_id'],
+                fields=['external_party_object_type', 'external_party_object_id'],
                 name='netbox_cont_externa_6343fb_idx',
             ),
         ),

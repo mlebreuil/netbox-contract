@@ -40,7 +40,7 @@ class AccountingDimensionStatusChoices(ChoiceSet):
 
 
 class InternalEntityChoices(ChoiceSet):
-    key = 'Contract.internal_partie'
+    key = 'Contract.internal_party'
 
     ENTITY = 'Default entity'
 
@@ -182,22 +182,22 @@ class Contract(ContactsMixin, NetBoxModel):
         null=True,
         verbose_name=_('contract type'),
     )
-    external_partie_object_type = models.ForeignKey(
+    external_party_object_type = models.ForeignKey(
         to=ContentType,
         on_delete=models.CASCADE,
         blank=True,
         null=True,
-        verbose_name=_('external partie object type'),
+        verbose_name=_('external party object type'),
     )
-    external_partie_object_id = models.PositiveBigIntegerField(
-        blank=True, null=True, verbose_name=_('external partie object ID')
+    external_party_object_id = models.PositiveBigIntegerField(
+        blank=True, null=True, verbose_name=_('external party object ID')
     )
-    external_partie_object = GenericForeignKey(
-        ct_field='external_partie_object_type', fk_field='external_partie_object_id'
+    external_party_object = GenericForeignKey(
+        ct_field='external_party_object_type', fk_field='external_party_object_id'
     )
-    external_partie_object.editable = True
+    external_party_object.editable = True
     external_reference = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('external reference'))
-    internal_partie = models.CharField(max_length=50, choices=InternalEntityChoices, verbose_name=_('internal partie'))
+    internal_party = models.CharField(max_length=50, choices=InternalEntityChoices, verbose_name=_('internal party'))
     tenant = models.ForeignKey(
         to='tenancy.Tenant',
         on_delete=models.PROTECT,
@@ -285,7 +285,7 @@ class Contract(ContactsMixin, NetBoxModel):
     class Meta:
         ordering = ('name',)
         indexes = [
-            models.Index(fields=['external_partie_object_type', 'external_partie_object_id']),
+            models.Index(fields=['external_party_object_type', 'external_party_object_id']),
         ]
         verbose_name = _('contract')
         verbose_name_plural = _('contracts')

@@ -30,7 +30,7 @@ class ContractAssignmentListTable(NetBoxTable):
     content_object = tables.Column(linkify=True, orderable=False)
     contract = tables.Column(linkify=True)
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
-    contract__external_partie_object = tables.Column(linkify=True)
+    contract__external_party_object = tables.Column(linkify=True)
     tags = columns.TagColumn(url_name='plugins:netbox_contract:contractassignment_list')
     contract__contract_type = columns.ColoredLabelColumn(verbose_name='Contract type')
 
@@ -42,8 +42,8 @@ class ContractAssignmentListTable(NetBoxTable):
             'content_object',
             'contract',
             'contract__contract_type',
-            'contract__external_partie_object_type',
-            'contract__external_partie_object',
+            'contract__external_party_object_type',
+            'contract__external_party_object',
             'actions',
         )
         default_columns = (
@@ -52,15 +52,15 @@ class ContractAssignmentListTable(NetBoxTable):
             'content_object',
             'contract',
             'contract__contract_type',
-            'contract__external_partie_object_type',
-            'contract__external_partie_object',
+            'contract__external_party_object_type',
+            'contract__external_party_object',
         )
 
 
 class ContractAssignmentObjectTable(NetBoxTable):
     contract = tables.Column(linkify=True)
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
-    contract__external_partie_object = tables.Column(
+    contract__external_party_object = tables.Column(
         verbose_name='Partner', linkify=True
     )
     contract__status = columns.ChoiceFieldColumn(
@@ -74,7 +74,7 @@ class ContractAssignmentObjectTable(NetBoxTable):
         fields = (
             'pk',
             'contract',
-            'contract__external_partie_object',
+            'contract__external_party_object',
             'contract__status',
             'contract__contract_type',
             'contract__start_date',
@@ -86,8 +86,8 @@ class ContractAssignmentObjectTable(NetBoxTable):
         default_columns = (
             'pk',
             'contract',
-            'contract__external_partie_object_type',
-            'contract__external_partie_object',
+            'contract__external_party_object_type',
+            'contract__external_party_object',
             'contract__status',
             'contract__contract_type',
             'contract__start_date',
@@ -124,7 +124,7 @@ class ContractAssignmentContractTable(NetBoxTable):
 
 class ContractListTable(ContactsColumnMixin, NetBoxTable):
     name = tables.Column(linkify=True)
-    external_partie_object = tables.Column(verbose_name='External partie', linkify=True)
+    external_party_object = tables.Column(verbose_name='External party', linkify=True)
     parent = tables.Column(linkify=True)
     yrc = tables.Column(verbose_name='Yerly recuring costs')
     status = columns.ChoiceFieldColumn(
@@ -140,10 +140,10 @@ class ContractListTable(ContactsColumnMixin, NetBoxTable):
             'id',
             'name',
             'contract_type',
-            'external_partie_object_type',
-            'external_partie_object',
+            'external_party_object_type',
+            'external_party_object',
             'external_reference',
-            'internal_partie',
+            'internal_party',
             'tenant',
             'status',
             'start_date',
@@ -165,7 +165,7 @@ class ContractListTable(ContactsColumnMixin, NetBoxTable):
 
 class ContractListBottomTable(NetBoxTable):
     name = tables.Column(linkify=True)
-    external_partie_object = tables.Column(linkify=True)
+    external_party_object = tables.Column(linkify=True)
     status = columns.ChoiceFieldColumn(
         verbose_name=('Status'),
     )
@@ -176,10 +176,10 @@ class ContractListBottomTable(NetBoxTable):
             'pk',
             'id',
             'name',
-            'external_partie_object_type',
-            'external_partie_object',
+            'external_party_object_type',
+            'external_party_object',
             'external_reference',
-            'internal_partie',
+            'internal_party',
             'status',
             'mrc',
             'comments',
@@ -187,8 +187,8 @@ class ContractListBottomTable(NetBoxTable):
         )
         default_columns = (
             'name',
-            'external_partie_object_type',
-            'external_partie_object',
+            'external_party_object_type',
+            'external_party_object',
             'status',
         )
 

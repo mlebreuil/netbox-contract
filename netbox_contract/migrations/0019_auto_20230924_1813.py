@@ -3,7 +3,7 @@
 from django.db import migrations
 
 
-def migrate_external_partie(apps, schema_editor):
+def migrate_external_party(apps, schema_editor):
     """
     Migrate contract Service providers to the new model
     """
@@ -16,28 +16,28 @@ def migrate_external_partie(apps, schema_editor):
     )
 
     for contract in Contract.objects.all():
-        contract.external_partie_object_type = ServiceProviderType
-        contract.external_partie_object_id = contract.external_partie.id
+        contract.external_party_object_type = ServiceProviderType
+        contract.external_party_object_id = contract.external_party.id
         contract.save()
 
 
-def reverse_external_partie(apps, schema_editor):
+def reverse_external_party(apps, schema_editor):
     """
     Migrate contract Service providers to the new model
     """
     Contract = apps.get_model('netbox_contract', 'Contract')
 
     for contract in Contract.objects.all():
-        contract.external_partie_object_type = None
-        contract.external_partie_object_id = None
+        contract.external_party_object_type = None
+        contract.external_party_object_id = None
         contract.save()
 
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('netbox_contract', '0018_contract_external_partie_object_id_and_more'),
+        ('netbox_contract', '0018_contract_external_party_object_id_and_more'),
     ]
 
     operations = [
-    #    migrations.RunPython(migrate_external_partie, reverse_external_partie),
+    #    migrations.RunPython(migrate_external_party, reverse_external_party),
     ]

@@ -27,11 +27,11 @@ msgid "Comments"
 msgstr "Commentaires"
 
 #: forms.py:69
-msgid "External partie object type"
+msgid "External party object type"
 msgstr "Type de prestataire "
 
 #: forms.py:71
-msgid "External partie object"
+msgid "External party object"
 msgstr "Prestataire"
 
 #: forms.py:73 forms.py:173 forms.py:199 forms.py:267
@@ -57,7 +57,7 @@ msgid "External reference"
 msgstr "Reference externe"
 
 #: forms.py:176 forms.py:261 templates/netbox_contract/contract.html:38
-msgid "Internal partie"
+msgid "Internal party"
 msgstr "Entité interne"
 
 #: forms.py:177 forms.py:204 forms.py:716
@@ -75,7 +75,7 @@ msgid "Currency"
 msgstr "Devise"
 
 #: forms.py:192
-msgid "External partie name"
+msgid "External party name"
 msgstr "Nom du prestataire"
 
 #: forms.py:252 forms.py:523 forms.py:540 forms.py:711 forms.py:735
@@ -227,11 +227,11 @@ msgid "contract assignments"
 msgstr "objets du contrat"
 
 #: models.py:178
-msgid "external partie object type"
+msgid "external party object type"
 msgstr "type de prestataire "
 
 #: models.py:183
-msgid "external partie object ID"
+msgid "external party object ID"
 msgstr "identifiant du prestataire "
 
 #: models.py:193
@@ -239,7 +239,7 @@ msgid "external reference"
 msgstr "réference externe"
 
 #: models.py:198
-msgid "internal partie"
+msgid "internal party"
 msgstr "entité interne"
 
 #: models.py:206
@@ -393,11 +393,11 @@ msgid "Accounting dimension"
 msgstr "Dimension comptable"
 
 #: templates/netbox_contract/contract.html:20
-msgid "External partie type"
+msgid "External party type"
 msgstr "Type de prestataire "
 
 #: templates/netbox_contract/contract.html:24
-msgid "External partie"
+msgid "External party"
 msgstr "Prestataire"
 
 #: templates/netbox_contract/contract.html:49

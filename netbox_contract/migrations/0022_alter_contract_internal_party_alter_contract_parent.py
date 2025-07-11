@@ -6,13 +6,13 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('netbox_contract', '0021_alter_contract_external_partie'),
+        ('netbox_contract', '0021_alter_contract_external_party'),
     ]
 
     operations = [
         migrations.AlterField(
             model_name='contract',
-            name='internal_partie',
+            name='internal_party',
             field=models.CharField(max_length=50),
         ),
         migrations.AlterField(

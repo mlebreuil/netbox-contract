@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RemoveField(
             model_name='contract',
-            name='external_partie',
+            name='external_party',
         ),
     ]

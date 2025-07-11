@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ('name', models.CharField(max_length=100)),
-                ('internal_partie', models.CharField(default='Active', max_length=50)),
+                ('internal_party', models.CharField(default='Active', max_length=50)),
                 ('status', models.CharField(default='Active', max_length=50)),
                 ('start_date', models.DateField()),
                 ('initial_term', models.IntegerField(default=12)),
@@ -137,7 +137,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='contract',
-            name='external_partie',
+            name='external_party',
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name='contract',

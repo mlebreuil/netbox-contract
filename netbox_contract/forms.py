@@ -51,13 +51,13 @@ plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 class ContractForm(NetBoxModelForm):
     comments = CommentField(label=_('Comments'))
 
-    external_partie_object_type = ContentTypeChoiceField(
+    external_party_object_type = ContentTypeChoiceField(
         queryset=ContentType.objects.all(),
         limit_choices_to=SERVICE_PROVIDER_MODELS,
         widget=HTMXSelect(),
-        label=_('External partie object type'),
+        label=_('External party object type'),
     )
-    external_partie_object = forms.ModelChoiceField(queryset=None, label=_('External partie object'))
+    external_party_object = forms.ModelChoiceField(queryset=None, label=_('External party object'))
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant'))
     parent = DynamicModelChoiceField(
         queryset=Contract.objects.all(),
@@ -74,24 +74,24 @@ class ContractForm(NetBoxModelForm):
         super().__init__(*args, **kwargs)
 
         # Initialize the external party object gfk
-        if initial and 'external_partie_object_type' in initial:
-            external_partie_object_type = ContentType.objects.get_for_id(initial['external_partie_object_type'])
-            external_partie_class = external_partie_object_type.model_class()
-            self.fields['external_partie_object'].queryset = external_partie_class.objects.all()
+        if initial and 'external_party_object_type' in initial:
+            external_party_object_type = ContentType.objects.get_for_id(initial['external_party_object_type'])
+            external_party_class = external_party_object_type.model_class()
+            self.fields['external_party_object'].queryset = external_party_class.objects.all()
             if (
-                self.instance.external_partie_object_type
-                and self.instance.external_partie_object_type.id == external_partie_object_type.id
+                self.instance.external_party_object_type
+                and self.instance.external_party_object_type.id == external_party_object_type.id
             ):
-                self.fields['external_partie_object'].initial = self.instance.external_partie_object
+                self.fields['external_party_object'].initial = self.instance.external_party_object
             else:
-                self.fields['external_partie_object'].initial = None
-        elif self.instance.external_partie_object_type:
-            external_partie_class = self.instance.external_partie_object_type.model_class()
-            self.fields['external_partie_object'].queryset = external_partie_class.objects.all()
-            self.fields['external_partie_object'].initial = self.instance.external_partie_object
+                self.fields['external_party_object'].initial = None
+        elif self.instance.external_party_object_type:
+            external_party_class = self.instance.external_party_object_type.model_class()
+            self.fields['external_party_object'].queryset = external_party_class.objects.all()
+            self.fields['external_party_object'].initial = self.instance.external_party_object
         else:
-            self.fields['external_partie_object'].queryset = ServiceProvider.objects.all()
-            self.fields['external_partie_object'].initial = None
+            self.fields['external_party_object'].queryset = ServiceProvider.objects.all()
+            self.fields['external_party_object'].initial = None
 
         # Initialise fields settings
         mandatory_fields = plugin_settings.get('mandatory_contract_fields')
@@ -107,10 +107,10 @@ class ContractForm(NetBoxModelForm):
         fields = (
             'name',
             'contract_type',
-            'external_partie_object_type',
-            'external_partie_object',
+            'external_party_object_type',
+            'external_party_object',
             'external_reference',
-            'internal_partie',
+            'internal_party',
             'tenant',
             'status',
             'start_date',
@@ -151,7 +151,7 @@ class ContractFilterForm(ContactModelFilterForm, TenancyFilterForm, NetBoxModelF
         label=_('Contract type'),
     )
     external_reference = forms.CharField(required=False, label=_('External reference'))
-    internal_partie = forms.ChoiceField(choices=InternalEntityChoices, required=False, label=_('Internal partie'))
+    internal_party = forms.ChoiceField(choices=InternalEntityChoices, required=False, label=_('Internal party'))
     status = forms.ChoiceField(choices=StatusChoices, required=False, label=_('Status'))
     currency = forms.ChoiceField(choices=CurrencyChoices, required=False, label=_('Currency'))
     parent = DynamicModelChoiceField(
@@ -164,13 +164,13 @@ class ContractFilterForm(ContactModelFilterForm, TenancyFilterForm, NetBoxModelF
 
 
 class ContractCSVForm(NetBoxModelImportForm):
-    external_partie_object_type = CSVContentTypeField(
+    external_party_object_type = CSVContentTypeField(
         queryset=ContentType.objects.all(),
         limit_choices_to=SERVICE_PROVIDER_MODELS,
         help_text='service provider object type in the form <app>.<model>',
     )
-    external_partie_object_id = forms.CharField(
-        help_text='service provider object name', label=_('External partie name')
+    external_party_object_id = forms.CharField(
+        help_text='service provider object name', label=_('External party name')
     )
     tenant = CSVModelChoiceField(
         queryset=Tenant.objects.all(),
@@ -200,10 +200,10 @@ class ContractCSVForm(NetBoxModelImportForm):
         fields = [
             'name',
             'contract_type',
-            'external_partie_object_type',
-            'external_partie_object_id',
+            'external_party_object_type',
+            'external_party_object_id',
             'external_reference',
-            'internal_partie',
+            'internal_party',
             'tenant',
             'status',
             'start_date',
@@ -220,12 +220,12 @@ class ContractCSVForm(NetBoxModelImportForm):
             'parent',
         ]
 
-    def clean_external_partie_object_id(self):
-        name = self.cleaned_data.get('external_partie_object_id')
-        external_partie_object_type = self.cleaned_data.get('external_partie_object_type')
-        external_partie_object = external_partie_object_type.get_object_for_this_type(name=name)
+    def clean_external_party_object_id(self):
+        name = self.cleaned_data.get('external_party_object_id')
+        external_party_object_type = self.cleaned_data.get('external_party_object_type')
+        external_party_object = external_party_object_type.get_object_for_this_type(name=name)
 
-        return external_partie_object.id
+        return external_party_object.id
 
 
 class ContractBulkEditForm(NetBoxModelBulkEditForm):
@@ -237,7 +237,7 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
         label=_('Contract Type')
     )
     external_reference = forms.CharField(max_length=100, required=False, label=_('External reference'))
-    internal_partie = forms.ChoiceField(choices=InternalEntityChoices, required=False, label=_('Internal partie'))
+    internal_party = forms.ChoiceField(choices=InternalEntityChoices, required=False, label=_('Internal party'))
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant'))
     comments = CommentField(required=False, label=_('Comments'))
     parent = DynamicModelChoiceField(

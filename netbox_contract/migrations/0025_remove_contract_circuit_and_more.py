@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('netbox_contract', '0024_remove_contract_external_partie'),
+        ('netbox_contract', '0024_remove_contract_external_party'),
     ]
 
     operations = [

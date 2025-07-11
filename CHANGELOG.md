@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Version 2.4.1
+
+* [261](https://github.com/mlebreuil/netbox-contract/issues/261) Fix spelling of word "party".
 
 ## Version 2
 

@@ -15,7 +15,7 @@ DATABASE = {
 }
 
 FIELD_CHOICES = {
-    'netbox_contract.Contract.internal_partie': (
+    'netbox_contract.Contract.internal_party': (
         ('default', 'Default entity', 'green'),
         ('entity1', 'Entity 1', 'green'),
         ('entity2', 'Entity 2', 'yellow'),

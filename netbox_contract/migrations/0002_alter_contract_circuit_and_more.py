@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='contract',
-            name='external_partie',
+            name='external_party',
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name='contracts',

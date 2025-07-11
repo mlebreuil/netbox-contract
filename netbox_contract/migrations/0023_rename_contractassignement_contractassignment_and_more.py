@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
         ('contenttypes', '0002_remove_content_type_name'),
         (
             'netbox_contract',
-            '0022_alter_contract_internal_partie_alter_contract_parent',
+            '0022_alter_contract_internal_party_alter_contract_parent',
         ),
     ]
 
