@@ -7,6 +7,7 @@
 
 ### Version 2.4.1
 
+* [258](https://github.com/mlebreuil/netbox-contract/issues/258) Fix assignement of contacts to service providers.
 * [261](https://github.com/mlebreuil/netbox-contract/issues/261) Fix spelling of word "party".
 
 ### Version 2.4.0
