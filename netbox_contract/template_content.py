@@ -1,4 +1,4 @@
-from circuits.models import Circuit
+from circuits.models import Circuit, VirtualCircuit
 from dcim.models import Device, Site
 from django.contrib.contenttypes.models import ContentType
 from netbox.plugins import PluginTemplateExtension
@@ -88,9 +88,31 @@ class SiteContractAssignments(PluginTemplateExtension):
         )
 
 
+class VirtualCircuitContractAssignments(PluginTemplateExtension):
+    models = ['circuits.virtualcircuit']
+
+    def full_width_page(self):
+        virtualcircuit = self.context['object']
+        virtualcircuit_type = ContentType.objects.get_for_model(VirtualCircuit)
+        contract_assignments = ContractAssignment.objects.filter(
+            content_type__pk=virtualcircuit_type.id, object_id=virtualcircuit.id
+        )
+
+        assignments_table = tables.ContractAssignmentObjectTable(contract_assignments)
+        assignments_table.configure(self.context['request'])
+
+        return self.render(
+            'contract_assignments_bottom.html',
+            extra_context={
+                'assignments_table': assignments_table,
+            },
+        )
+
+
 template_extensions = [
     CircuitContractAssignments,
     DeviceContractAssignments,
     VMContractAssignments,
     SiteContractAssignments,
+    VirtualCircuitContractAssignments,
 ]
