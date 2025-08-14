@@ -416,6 +416,12 @@ class InvoiceFilterForm(NetBoxModelFilterSetForm):
         selector=True,
         label=_('Contracts'),
     )
+    accounting_dimensions = DynamicModelMultipleChoiceField(
+        queryset=AccountingDimension.objects.all(),
+        required=False,
+        selector=True,
+        label=_('Accounting Dimensions'),
+    )
 
     tag = TagFilterField(model)
 

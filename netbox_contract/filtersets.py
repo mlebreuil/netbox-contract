@@ -58,6 +58,11 @@ class InvoiceFilterSet(NetBoxModelFilterSet):
     currency = django_filters.MultipleChoiceFilter(
         choices=CurrencyChoices, null_value=None
     )
+    accounting_dimensions = django_filters.ModelChoiceFilter(
+        field_name='invoicelines__accounting_dimensions',
+        queryset=AccountingDimension.objects.all(),
+        label='Accounting Dimension'
+    )
 
     class Meta:
         model = Invoice
