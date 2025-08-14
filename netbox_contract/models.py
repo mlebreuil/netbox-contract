@@ -60,6 +60,20 @@ class CurrencyChoices(ChoiceSet):
     ]
 
 
+class InvoiceStatusChoices(ChoiceSet):
+    key = 'Invoice.status'
+
+    STATUS_DRAFT = 'draft'
+    STATUS_POSTED = 'posted'
+    STATUS_CANCELED = 'canceled'
+
+    CHOICES = [
+        (STATUS_DRAFT, 'Draft', 'yellow'),
+        (STATUS_POSTED, 'Posted', 'green'),
+        (STATUS_CANCELED, 'Canceled', 'red'),
+    ]
+
+
 CURRENCY_DEFAULT = CurrencyChoices.CHOICES[0][0]
 
 
@@ -307,6 +321,12 @@ class Invoice(NetBoxModel):
         verbose_name=_('template'),
         help_text=_('Wether this invoice is a template or not'),
     )
+    status = models.CharField(
+        max_length=50,
+        choices=InvoiceStatusChoices,
+        default=InvoiceStatusChoices.STATUS_POSTED,
+        verbose_name=_('status'),
+    )
     date = models.DateField(blank=True, null=True, verbose_name=_('date'))
     contracts = models.ManyToManyField(Contract, related_name='invoices', blank=True, verbose_name=_('contracts'))
     period_start = models.DateField(blank=True, null=True, verbose_name=_('period start'))
@@ -332,6 +352,9 @@ class Invoice(NetBoxModel):
 
     def __str__(self):
         return self.number
+
+    def get_status_color(self):
+        return InvoiceStatusChoices.colors.get(self.status)
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:invoice', args=[self.pk])
