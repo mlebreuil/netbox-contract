@@ -15,6 +15,7 @@ from .models import (
     InvoiceLine,
     ServiceProvider,
     StatusChoices,
+    InvoiceStatusChoices,
 )
 
 
@@ -53,6 +54,7 @@ class ContractFilterSet(ContactModelFilterSet, NetBoxModelFilterSet, TenancyFilt
 
 
 class InvoiceFilterSet(NetBoxModelFilterSet):
+    status = django_filters.MultipleChoiceFilter(choices=InvoiceStatusChoices, null_value=None)
     currency = django_filters.MultipleChoiceFilter(
         choices=CurrencyChoices, null_value=None
     )

@@ -40,6 +40,7 @@ from .models import (
     InvoiceLine,
     ServiceProvider,
     StatusChoices,
+    InvoiceStatusChoices,
 )
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
@@ -380,6 +381,7 @@ class InvoiceForm(NetBoxModelForm):
             'date',
             'contracts',
             'template',
+            'status',
             'period_start',
             'period_end',
             'currency',
@@ -406,6 +408,7 @@ class InvoiceFilterForm(NetBoxModelFilterSetForm):
         widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
         label=_('Template'),
     )
+    status = forms.ChoiceField(choices=InvoiceStatusChoices, required=False, label=_('Status'))
     currency = forms.ChoiceField(choices=CurrencyChoices, required=False, label=_('Currency'))
     contracts = DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(),
@@ -413,6 +416,7 @@ class InvoiceFilterForm(NetBoxModelFilterSetForm):
         selector=True,
         label=_('Contracts'),
     )
+
     tag = TagFilterField(model)
 
 
@@ -423,6 +427,7 @@ class InvoiceCSVForm(NetBoxModelImportForm):
         help_text='Related Contracts',
         label=_('Contracts'),
     )
+    status = CSVChoiceField(choices=InvoiceStatusChoices, help_text='Invoice status', label=_('Status'))
 
     class Meta:
         model = Invoice
@@ -431,6 +436,7 @@ class InvoiceCSVForm(NetBoxModelImportForm):
             'date',
             'contracts',
             'template',
+            'status',
             'period_start',
             'period_end',
             'currency',

@@ -28,6 +28,10 @@
               <th scope="row">{% trans "Date" %}</th>
               <td>{{ object.date }}</td>
             </tr>
+            <tr>
+              <th scope="row">{% trans "Status" %}</th>
+              <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
+            </tr>
             {% if not object.template %}
             <tr>
               <th scope="row">{% trans "Period start" %}</th>

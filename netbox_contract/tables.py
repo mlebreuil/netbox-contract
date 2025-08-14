@@ -196,6 +196,9 @@ class ContractListBottomTable(NetBoxTable):
 class InvoiceListTable(NetBoxTable):
     contracts = tables.ManyToManyColumn(linkify=True)
     number = tables.Column(linkify=True)
+    status = columns.ChoiceFieldColumn(
+        verbose_name=('Status'),
+    )
     tags = columns.TagColumn(url_name='plugins:netbox_contract:invoiceline_list')
 
     class Meta(NetBoxTable.Meta):
@@ -205,6 +208,7 @@ class InvoiceListTable(NetBoxTable):
             'id',
             'number',
             'date',
+            'status',
             'contracts',
             'period_start',
             'period_end',
@@ -217,6 +221,7 @@ class InvoiceListTable(NetBoxTable):
         default_columns = (
             'number',
             'date',
+            'status',
             'contracts',
             'period_start',
             'period_end',

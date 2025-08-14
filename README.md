@@ -95,6 +95,11 @@ FIELD_CHOICES = {
         ('active', 'Active', 'green'),
         ('canceled', 'Canceled', 'red'),
     )
+    'netbox_contract.Invoice.status': (
+        ('draft', 'Draft', 'yellow'),
+        ('posted', 'Posted', 'green'),
+        ('canceled', 'Canceled', 'red'),
+    )
 }
 
 ```

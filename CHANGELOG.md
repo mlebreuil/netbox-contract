@@ -7,6 +7,7 @@
 
 ### Version 2.4.1
 
+* [267](https://github.com/mlebreuil/netbox-contract/issues/267) Add status field to invoices.
 * [263](https://github.com/mlebreuil/netbox-contract/issues/263) Enable contract assignment to virtual circuits.
 * [258](https://github.com/mlebreuil/netbox-contract/issues/258) Fix assignement of contacts to service providers.
 * [261](https://github.com/mlebreuil/netbox-contract/issues/261) Fix spelling of word "party".
