@@ -74,13 +74,13 @@ PLUGINS_CONFIG = {
 
 ### Customize the plugin fields choices
 
-Internal partie reference the legal entity of your organization that is a partie to the contract.  
+Internal party reference the legal entity of your organization that is a party to the contract.  
 The first currency will also be the default currency for contracts.  
 
 ```python
 # configuration.py
 FIELD_CHOICES = {
-    'netbox_contract.Contract.internal_partie': (
+    'netbox_contract.Contract.internal_party': (
         ('default', 'Default entity', 'green'),
         ('entity1', 'Entity 1', 'green'),
         ('entity2', 'Entity 2', 'yellow'),

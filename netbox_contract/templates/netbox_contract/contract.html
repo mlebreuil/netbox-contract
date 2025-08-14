@@ -4,7 +4,7 @@
 {% load i18n %}
 {% block breadcrumbs %}
   {{ block.super }}
-  <li class="breadcrumb-item"><a href="{% url 'plugins:netbox_contract:contract_list' %}?external_partie={{ object.external_partie.pk }}">{{ object.external_partie }}</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'plugins:netbox_contract:contract_list' %}?external_party={{ object.external_party.pk }}">{{ object.external_party }}</a></li>
 {% endblock %}
 {% block content %}
   <div class="row mb-3">
@@ -23,13 +23,13 @@
               </td>
             </tr>
             <tr>
-              <th scope="row">{% trans "External partie type" %}</th>
-              <td>{{ object.external_partie_object_type }}</td>
+              <th scope="row">{% trans "External party type" %}</th>
+              <td>{{ object.external_party_object_type }}</td>
             </tr>
             <tr>
-              <th scope="row">{% trans "External partie" %}</th>
+              <th scope="row">{% trans "External party" %}</th>
               <td>
-                <a href="{{ object.external_partie_object.get_absolute_url }}">{{ object.external_partie_object.name }}</a>
+                <a href="{{ object.external_party_object.get_absolute_url }}">{{ object.external_party_object.name }}</a>
               </td>
             </tr>
             <tr>
@@ -41,8 +41,8 @@
               <td>{{ object.external_reference }}</td>
             </tr>
             <tr>
-              <th scope="row">{% trans "Internal partie" %}</th>
-              <td>{{ object.internal_partie }}</td>
+              <th scope="row">{% trans "Internal party" %}</th>
+              <td>{{ object.internal_party }}</td>
             </tr>
             {% if not 'tenant' in hidden_fields %}
             <tr>

@@ -256,7 +256,7 @@ class ContractEditView(generic.ObjectEditView):
     def alter_object(self, obj, request, url_args, url_kwargs):
         """
         When this method is called after a Post,
-        it is used here to set the external partie object id for exiting objects,
+        it is used here to set the external party object id for exiting objects,
         In any case, this happens before the form is instanciated.
 
         Args:
@@ -268,15 +268,15 @@ class ContractEditView(generic.ObjectEditView):
 
         if request.method == 'POST':
             data = normalize_querydict(request.POST)
-            obj.external_partie_object_id = data['external_partie_object']
-            external_partie_object_type_id = data['external_partie_object_type']
-            obj.external_partie_object_type = ContentType.objects.get(
-                id=external_partie_object_type_id
+            obj.external_party_object_id = data['external_party_object']
+            external_party_object_type_id = data['external_party_object_type']
+            obj.external_party_object_type = ContentType.objects.get(
+                id=external_party_object_type_id
             )
-            external_partie_object_type = obj.external_partie_object_type
-            obj.external_partie_object = (
-                external_partie_object_type.get_object_for_this_type(
-                    id=obj.external_partie_object_id
+            external_party_object_type = obj.external_party_object_type
+            obj.external_party_object = (
+                external_party_object_type.get_object_for_this_type(
+                    id=obj.external_party_object_id
                 )
             )
 

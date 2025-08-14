@@ -20,7 +20,7 @@ from .models import (
 
 class ContractFilterSet(ContactModelFilterSet, NetBoxModelFilterSet, TenancyFilterSet):
     status = django_filters.MultipleChoiceFilter(choices=StatusChoices, null_value=None)
-    internal_partie = django_filters.MultipleChoiceFilter(
+    internal_party = django_filters.MultipleChoiceFilter(
         choices=InternalEntityChoices, null_value=None
     )
     currency = django_filters.MultipleChoiceFilter(
