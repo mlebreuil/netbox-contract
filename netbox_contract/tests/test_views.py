@@ -43,9 +43,9 @@ class ContractTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCas
         contract1 = Contract.objects.create(
             name='Contract1',
             contract_type=ContractType.objects.get(name='Contract Type A'),
-            external_partie_object_type=ContentType.objects.get_for_model(Provider),
-            external_partie_object_id=Provider.objects.get(slug='provider-a').id,
-            internal_partie='default',
+            external_party_object_type=ContentType.objects.get_for_model(Provider),
+            external_party_object_id=Provider.objects.get(slug='provider-a').id,
+            internal_party='default',
             status=StatusChoices.STATUS_ACTIVE,
             start_date=date(2025, 1, 1),
             end_date=date(2025, 12, 31),
@@ -56,9 +56,9 @@ class ContractTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCas
 
         contract2 = Contract.objects.create(
             name='Contract2',
-            external_partie_object_type=ContentType.objects.get_for_model(Provider),
-            external_partie_object_id=Provider.objects.get(slug='provider-a').id,
-            internal_partie='default',
+            external_party_object_type=ContentType.objects.get_for_model(Provider),
+            external_party_object_id=Provider.objects.get(slug='provider-a').id,
+            internal_party='default',
             status=StatusChoices.STATUS_ACTIVE,
             start_date=date(2025, 1, 1),
             end_date=date(2025, 12, 31),
@@ -69,9 +69,9 @@ class ContractTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCas
 
         contract3 = Contract.objects.create(
             name='Contract3',
-            external_partie_object_type=ContentType.objects.get_for_model(Provider),
-            external_partie_object_id=Provider.objects.get(slug='provider-a').id,
-            internal_partie='default',
+            external_party_object_type=ContentType.objects.get_for_model(Provider),
+            external_party_object_id=Provider.objects.get(slug='provider-a').id,
+            internal_party='default',
             status=StatusChoices.STATUS_ACTIVE,
             start_date=date(2025, 1, 1),
             end_date=date(2025, 12, 31),
@@ -83,10 +83,10 @@ class ContractTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCas
         cls.form_data = {
             'name': 'Contract X',
             'contract_type': ContractType.objects.get(name='Contract Type A').pk,
-            'external_partie_object_type': ContentType.objects.get_for_model(Provider).pk,
-            'external_partie_object': Provider.objects.get(slug='provider-a').id,
+            'external_party_object_type': ContentType.objects.get_for_model(Provider).pk,
+            'external_party_object': Provider.objects.get(slug='provider-a').id,
             'external_reference': 'External Reference 1',
-            'internal_partie': 'default',
+            'internal_party': 'default',
             'tenant': Tenant.objects.get(name='Tenant 1').id,
             'status': StatusChoices.STATUS_ACTIVE,
             'start_date': date(2025, 1, 1),
@@ -101,7 +101,7 @@ class ContractTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCas
         }
 
         cls.csv_data = (
-            'name,contract_type,external_partie_object_type,external_partie_object_id,internal_partie,'
+            'name,contract_type,external_party_object_type,external_party_object_id,internal_party,'
             'tenant,status,start_date,end_date,currency,mrc,nrc,invoice_frequency',
             'Contract 4,Contract Type A,netbox_contract.serviceprovider,Service Provider A,entity1,'
             'Tenant 1,active,2025-01-01,2025-12-31,usd,100,1000,1',
@@ -135,9 +135,9 @@ class InvoiceTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCase
         # Create test Contract
         contract1 = Contract.objects.create(
             name='Contract1',
-            external_partie_object_type=ContentType.objects.get_for_model(Provider),
-            external_partie_object_id=Provider.objects.get(slug='provider-a').id,
-            internal_partie='default',
+            external_party_object_type=ContentType.objects.get_for_model(Provider),
+            external_party_object_id=Provider.objects.get(slug='provider-a').id,
+            internal_party='default',
             status=StatusChoices.STATUS_ACTIVE,
             start_date=date(2025, 1, 1),
             end_date=date(2025, 12, 31),
@@ -401,9 +401,9 @@ class ContractAssignmentTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectV
         # Create a test Contract
         contract1 = Contract.objects.create(
             name='Contract1',
-            external_partie_object_type=ContentType.objects.get_for_model(ServiceProvider),
-            external_partie_object_id=ServiceProvider.objects.get(slug='service-provider-1').id,
-            internal_partie='default',
+            external_party_object_type=ContentType.objects.get_for_model(ServiceProvider),
+            external_party_object_id=ServiceProvider.objects.get(slug='service-provider-1').id,
+            internal_party='default',
             status=StatusChoices.STATUS_ACTIVE,
             start_date=date(2025, 1, 1),
             end_date=date(2025, 12, 31),
@@ -429,9 +429,9 @@ class ContractAssignmentTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectV
 
         contract2 = Contract.objects.create(
             name='Contract2',
-            external_partie_object_type=ContentType.objects.get_for_model(Provider),
-            external_partie_object_id=Provider.objects.get(slug='provider-a').id,
-            internal_partie='default',
+            external_party_object_type=ContentType.objects.get_for_model(Provider),
+            external_party_object_id=Provider.objects.get(slug='provider-a').id,
+            internal_party='default',
             status=StatusChoices.STATUS_ACTIVE,
             start_date=date(2025, 1, 1),
             end_date=date(2025, 12, 31),
@@ -478,9 +478,9 @@ class ContractAssignmentTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectV
         # contract for bulk edition
         contract3 = Contract.objects.create(
             name='Contract3',
-            external_partie_object_type=ContentType.objects.get_for_model(ServiceProvider),
-            external_partie_object_id=ServiceProvider.objects.get(slug='service-provider-1').id,
-            internal_partie='default',
+            external_party_object_type=ContentType.objects.get_for_model(ServiceProvider),
+            external_party_object_id=ServiceProvider.objects.get(slug='service-provider-1').id,
+            internal_party='default',
             status=StatusChoices.STATUS_ACTIVE,
             start_date=date(2025, 1, 1),
             end_date=date(2025, 12, 31),
