@@ -416,6 +416,7 @@ class InvoiceFilterForm(NetBoxModelFilterSetForm):
         selector=True,
         label=_('Contracts'),
     )
+
     tag = TagFilterField(model)
 
 

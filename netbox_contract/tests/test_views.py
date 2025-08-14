@@ -17,6 +17,7 @@ from netbox_contract.models import (
     InvoiceLine,
     ServiceProvider,
     StatusChoices,
+    InvoiceStatusChoices,
 )
 from netbox_contract.tests.custom import ModelViewTestCase
 
@@ -149,12 +150,14 @@ class InvoiceTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCase
         # Create test invoices
         invoices = Invoice.objects.bulk_create([
             Invoice(number='Invoice1', template=False, date=date(2025, 1, 25),
+                    status=InvoiceStatusChoices.STATUS_POSTED,
                     period_start=date(2025, 1, 1), period_end=date(2025, 1, 31),
                     currency='usd', amount=Decimal(100)),
             Invoice(number='Invoice2', template=False, date=date(2025, 2, 25),
                     period_start=date(2025, 2, 1), period_end=date(2025, 2, 28),
                     currency='usd', amount=Decimal(100)),
             Invoice(number='Invoice3', template=False, date=date(2025, 3, 25),
+                    status=InvoiceStatusChoices.STATUS_POSTED,
                     period_start=date(2025, 3, 1), period_end=date(2025, 3, 31),
                     currency='usd', amount=Decimal(100))
         ])
@@ -168,6 +171,7 @@ class InvoiceTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCase
             'number': 'Invoice X',
             'contracts': [contract1.pk],
             'template': False,
+            'status': InvoiceStatusChoices.STATUS_POSTED,
             'date': date(2025, 1, 25),
             'period_start': date(2025, 1, 1),
             'period_end': date(2025, 1, 31),
@@ -176,10 +180,10 @@ class InvoiceTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCase
         }
 
         cls.csv_data = (
-            'number,contracts,currency,amount,date,template,period_start,period_end',
-            'invoice4,Contract1,usd,100,2025-04-25,False,2025-04-01,2025-04-30',
-            'invoice5,Contract1,usd,100,2025-05-25,False,2025-05-01,2025-05-31',
-            'invoice6,Contract1,usd,100,2025-06-25,False,2025-06-01,2025-06-30',
+            'number,contracts,status,currency,amount,date,template,period_start,period_end',
+            'invoice4,Contract1,posted,usd,100,2025-04-25,False,2025-04-01,2025-04-30',
+            'invoice5,Contract1,posted,usd,100,2025-05-25,False,2025-05-01,2025-05-31',
+            'invoice6,Contract1,posted,usd,100,2025-06-25,False,2025-06-01,2025-06-30',
         )
 
         cls.csv_update_data = (
