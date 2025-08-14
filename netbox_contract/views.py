@@ -9,7 +9,6 @@ from django.db.models.functions import Round
 from django.shortcuts import get_object_or_404, render
 from netbox.views import generic
 from netbox.views.generic.utils import get_prerequisite_model
-from tenancy.views import ObjectContactsView
 from utilities.forms import restrict_form_fields
 from utilities.querydict import normalize_querydict
 from utilities.views import register_model_view
@@ -19,6 +18,7 @@ from .models import (
     AccountingDimension,
     Contract,
     ContractAssignment,
+    ContractType,
     Invoice,
     InvoiceLine,
     ServiceProvider,
@@ -26,14 +26,52 @@ from .models import (
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 
+
+# ContractType views
+
+
+class ContractTypeView(generic.ObjectView):
+    queryset = ContractType.objects.all()
+
+
+class ContractTypeListView(generic.ObjectListView):
+    queryset = ContractType.objects.all()
+    table = tables.ContractTypeListTable
+    filterset = filtersets.ContractTypeFilterSet
+    filterset_form = forms.ContractTypeFilterForm
+
+
+class ContractTypeEditView(generic.ObjectEditView):
+    queryset = ContractType.objects.all()
+    form = forms.ContractTypeForm
+
+
+class ContractTypeBulkImportView(generic.BulkImportView):
+    queryset = ContractType.objects.all()
+    model_form = forms.ContractTypeCSVForm
+    table = tables.ContractTypeListTable
+
+
+class ContractTypeBulkEditView(generic.BulkEditView):
+    queryset = ContractType.objects.annotate()
+    filterset = filtersets.ContractTypeFilterSet
+    table = tables.ContractTypeListTable
+    form = forms.ContractTypeBulkEditForm
+
+
+class ContractTypeDeleteView(generic.ObjectDeleteView):
+    queryset = ContractType.objects.all()
+
+
+class ContractTypeBulkDeleteView(generic.BulkDeleteView):
+    queryset = ContractType.objects.annotate()
+    filterset = filtersets.ContractTypeFilterSet
+    table = tables.ContractTypeListTable
+
+
 # ServiceProvider views
 
-
-@register_model_view(ServiceProvider, 'contacts')
-class ServiceProviderContactsView(ObjectContactsView):
-    queryset = ServiceProvider.objects.all()
-
-
+@register_model_view(ServiceProvider)
 class ServiceProviderView(generic.ObjectView):
     queryset = ServiceProvider.objects.all()
 
@@ -85,14 +123,6 @@ class ContractAssignmentListView(generic.ObjectListView):
     table = tables.ContractAssignmentListTable
     filterset = filtersets.ContractAssignmentFilterSet
     filterset_form = forms.ContractAssignmentFilterForm
-    # actions = {
-    #     'import': {'add'},
-    #     'export': set(),
-    #     'edit': {'add'},
-    #     'delete' : {'delete'},
-    #     'bulk_edit': {'change'},
-    #     'bulk_delete': {'delete'},
-    # }
 
 
 class ContractAssignmentEditView(generic.ObjectEditView):
@@ -208,7 +238,7 @@ class ContractEditView(generic.ObjectEditView):
     def alter_object(self, obj, request, url_args, url_kwargs):
         """
         When this method is called after a Post,
-        it is used here to set the external partie object id for exiting objects,
+        it is used here to set the external party object id for exiting objects,
         In any case, this happens before the form is instanciated.
 
         Args:
@@ -220,15 +250,15 @@ class ContractEditView(generic.ObjectEditView):
 
         if request.method == 'POST':
             data = normalize_querydict(request.POST)
-            obj.external_partie_object_id = data['external_partie_object']
-            external_partie_object_type_id = data['external_partie_object_type']
-            obj.external_partie_object_type = ContentType.objects.get(
-                id=external_partie_object_type_id
+            obj.external_party_object_id = data['external_party_object']
+            external_party_object_type_id = data['external_party_object_type']
+            obj.external_party_object_type = ContentType.objects.get(
+                id=external_party_object_type_id
             )
-            external_partie_object_type = obj.external_partie_object_type
-            obj.external_partie_object = (
-                external_partie_object_type.get_object_for_this_type(
-                    id=obj.external_partie_object_id
+            external_party_object_type = obj.external_party_object_type
+            obj.external_party_object = (
+                external_party_object_type.get_object_for_this_type(
+                    id=obj.external_party_object_id
                 )
             )
 

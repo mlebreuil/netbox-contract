@@ -20,6 +20,7 @@ Accounting dimensions can be linked with invoice lines.
 |----------------|----------------|
 |     4.1        |      2.2       |
 |     4.2        |      2.3       |
+|     4.3        |      2.4       |
 
 ## Installing
 
@@ -73,13 +74,14 @@ PLUGINS_CONFIG = {
 
 ### Customize the plugin fields choices
 
-Internal partie reference the legal entity of your organization that is a partie to the contract.  
+Internal party reference the legal entity of your organization that is a party to the contract.  
 The first currency will also be the default currency for contracts.  
 
 ```python
 # configuration.py
 FIELD_CHOICES = {
-    'netbox_contract.Contract.internal_partie': (
+    'netbox_contract.Contract.internal_party': (
+        ('default', 'Default entity', 'green'),
         ('entity1', 'Entity 1', 'green'),
         ('entity2', 'Entity 2', 'yellow'),
     ),
@@ -91,6 +93,11 @@ FIELD_CHOICES = {
     ),
     'netbox_contract.Contract.status': (
         ('active', 'Active', 'green'),
+        ('canceled', 'Canceled', 'red'),
+    )
+    'netbox_contract.Invoice.status': (
+        ('draft', 'Draft', 'yellow'),
+        ('posted', 'Posted', 'green'),
         ('canceled', 'Canceled', 'red'),
     )
 }

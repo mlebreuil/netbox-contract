@@ -1,29 +1,34 @@
 import django_filters
 from django.db.models import Q
 from netbox.filtersets import NetBoxModelFilterSet
-from tenancy.filtersets import TenancyFilterSet
+from tenancy.filtersets import ContactModelFilterSet, TenancyFilterSet
 
 from .models import (
     AccountingDimension,
     AccountingDimensionStatusChoices,
     Contract,
     ContractAssignment,
+    ContractType,
     CurrencyChoices,
     InternalEntityChoices,
     Invoice,
     InvoiceLine,
     ServiceProvider,
     StatusChoices,
+    InvoiceStatusChoices,
 )
 
 
-class ContractFilterSet(NetBoxModelFilterSet, TenancyFilterSet):
+class ContractFilterSet(ContactModelFilterSet, NetBoxModelFilterSet, TenancyFilterSet):
     status = django_filters.MultipleChoiceFilter(choices=StatusChoices, null_value=None)
-    internal_partie = django_filters.MultipleChoiceFilter(
+    internal_party = django_filters.MultipleChoiceFilter(
         choices=InternalEntityChoices, null_value=None
     )
     currency = django_filters.MultipleChoiceFilter(
         choices=CurrencyChoices, null_value=None
+    )
+    contract_type = django_filters.ModelMultipleChoiceFilter(
+        field_name='contract_type__name', to_field_name='name', queryset=ContractType.objects.all()
     )
 
     class Meta:
@@ -31,6 +36,7 @@ class ContractFilterSet(NetBoxModelFilterSet, TenancyFilterSet):
         fields = (
             'id',
             'name',
+            'contract_type',
             'external_reference',
             'start_date',
             'end_date',
@@ -48,8 +54,14 @@ class ContractFilterSet(NetBoxModelFilterSet, TenancyFilterSet):
 
 
 class InvoiceFilterSet(NetBoxModelFilterSet):
+    status = django_filters.MultipleChoiceFilter(choices=InvoiceStatusChoices, null_value=None)
     currency = django_filters.MultipleChoiceFilter(
         choices=CurrencyChoices, null_value=None
+    )
+    accounting_dimensions = django_filters.ModelChoiceFilter(
+        field_name='invoicelines__accounting_dimensions',
+        queryset=AccountingDimension.objects.all(),
+        label='Accounting Dimension'
     )
 
     class Meta:
@@ -71,10 +83,19 @@ class InvoiceFilterSet(NetBoxModelFilterSet):
         )
 
 
-class ServiceProviderFilterSet(NetBoxModelFilterSet):
+class ServiceProviderFilterSet(ContactModelFilterSet, NetBoxModelFilterSet):
     class Meta:
         model = ServiceProvider
         fields = ('id', 'name')
+
+    def search(self, queryset, name, value):
+        return queryset.filter(name__icontains=value)
+
+
+class ContractTypeFilterSet(NetBoxModelFilterSet):
+    class Meta:
+        model = ContractType
+        fields = ('name', 'description', 'color')
 
     def search(self, queryset, name, value):
         return queryset.filter(name__icontains=value)

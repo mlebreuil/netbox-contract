@@ -5,6 +5,27 @@
 
 ## Version 2
 
+### Version 2.4.1
+
+* [257](https://github.com/mlebreuil/netbox-contract/issues/257) Add the possibility to filter invoices by accounting dimensions.
+* [267](https://github.com/mlebreuil/netbox-contract/issues/267) Add status field to invoices.
+* [263](https://github.com/mlebreuil/netbox-contract/issues/263) Enable contract assignment to virtual circuits.
+* [258](https://github.com/mlebreuil/netbox-contract/issues/258) Fix assignement of contacts to service providers.
+* [261](https://github.com/mlebreuil/netbox-contract/issues/261) Fix spelling of word "party".
+
+### Version 2.4.0
+
+> [!WARNING]
+> This version requires Netbox 4.3.0 or later
+
+* [253](https://github.com/mlebreuil/netbox-contract/pull/253) Implement Netbox 4.3 compatibility
+
+### Version 2.3.3
+
+* [250](https://github.com/mlebreuil/netbox-contract/pull/250) Add contacts to contract.
+* [248](https://github.com/mlebreuil/netbox-contract/pull/248) Add contact filtering on service provider.
+* [245](https://github.com/mlebreuil/netbox-contract/pull/245) Add contract-type model.
+
 ### Version 2.3.2
 
 * [234](https://github.com/mlebreuil/netbox-contract/issues/234) As part of the preparation of the [plugin for certification](https://github.com/netbox-community/netbox/wiki/Plugin-Certification-Program), this version includes standard Netbox unittest for model views. Correction to data import are also present as well.
@@ -104,7 +125,7 @@ Corresponding value is used to calculate the invoices amount without rounding ap
 
 ### Version 2.0.11
 
-* [115](https://github.com/mlebreuil/netbox-contract/issues/115) API correction for contract external partie
+* [115](https://github.com/mlebreuil/netbox-contract/issues/115) API correction for contract external party
 * [117](https://github.com/mlebreuil/netbox-contract/issues/117) Tenant and accounting dimensions optional
 * [119](https://github.com/mlebreuil/netbox-contract/issues/119) Add a Yearly recuring cost, read only, calculated field for contract
 * [15](https://github.com/mlebreuil/netbox-contract/issues/105) Quick serach limited to active contracts
@@ -116,7 +137,7 @@ Corresponding value is used to calculate the invoices amount without rounding ap
 
 ### Version 2.0.9
 
-* [42](https://github.com/mlebreuil/netbox-contract/issues/42) Allow the selection of either providers or Service providers as contract third partie.
+* [42](https://github.com/mlebreuil/netbox-contract/issues/42) Allow the selection of either providers or Service providers as contract third party.
 * Removed all reference to the direct assignement of circuits to contracts
 * [88](https://github.com/mlebreuil/netbox-contract/issues/88) Add a placeholder value to the accounting dimensions jsonfield. This placeholder vale con be configured as part of the PLUGINS_CONFIG parameter in the configuration.py file (see above)
 * [89](https://github.com/mlebreuil/netbox-contract/issues/89) add the posibility to link contracts to sites and virtual machines.

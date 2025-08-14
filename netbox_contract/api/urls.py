@@ -6,6 +6,7 @@ app_name = 'netbox_contract'
 
 router = NetBoxRouter()
 router.register('contracts', views.ContractViewSet)
+router.register('contracttype', views.ContractTypeViewSet)
 router.register('invoices', views.InvoiceViewSet)
 router.register('serviceproviders', views.ServiceProviderViewSet)
 router.register('contractassignment', views.ContractAssignmentViewSet)

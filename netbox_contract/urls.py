@@ -33,7 +33,7 @@ urlpatterns = (
     ),
     path(
         'serviceproviders/<int:pk>/',
-        views.ServiceProviderView.as_view(),
+        include(get_model_urls('netbox_contract', 'serviceprovider')),
         name='serviceprovider',
     ),
     path(
@@ -52,11 +52,7 @@ urlpatterns = (
         name='serviceprovider_changelog',
         kwargs={'model': models.ServiceProvider},
     ),
-    path(
-        'serviceproviders/<int:pk>/contacts/',
-        views.ServiceProviderContactsView.as_view(),
-        name='serviceprovider_contacts',
-    ),
+
     # Contracts
     path('contracts/', views.ContractListView.as_view(), name='contract_list'),
     path('contracts/add/', views.ContractEditView.as_view(), name='contract_add'),
@@ -269,5 +265,51 @@ urlpatterns = (
         ObjectChangeLogView.as_view(),
         name='accountingdimension_changelog',
         kwargs={'model': models.AccountingDimension},
+    ),
+    path(
+        'contracttype/',
+        views.ContractTypeListView.as_view(),
+        name='contracttype_list',
+    ),
+    path(
+        'contracttype/add/',
+        views.ContractTypeEditView.as_view(),
+        name='contracttype_add',
+    ),
+    path(
+        'contracttype/<int:pk>/',
+        views.ContractTypeView.as_view(),
+        name='contracttype',
+    ),
+    path(
+        'contracttype/<int:pk>/edit/',
+        views.ContractTypeEditView.as_view(),
+        name='contracttype_edit',
+    ),
+    path(
+        'contracttype/edit/',
+        views.ContractTypeBulkEditView.as_view(),
+        name='contracttype_bulk_edit',
+    ),
+    path(
+        'contracttype/<int:pk>/delete/',
+        views.ContractTypeDeleteView.as_view(),
+        name='contracttype_delete',
+    ),
+    path(
+        'contracttype/delete/',
+        views.ContractTypeBulkDeleteView.as_view(),
+        name='contracttype_bulk_delete',
+    ),
+    path(
+        'contracttype/import/',
+        views.ContractTypeBulkImportView.as_view(),
+        name='contracttype_bulk_import',
+    ),
+    path(
+        'contracttype/<int:pk>/changelog/',
+        ObjectChangeLogView.as_view(),
+        name='contracttype_changelog',
+        kwargs={'model': models.ContractType},
     ),
 )

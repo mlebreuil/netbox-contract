@@ -1,15 +1,17 @@
 from datetime import timedelta
 
+from dcim.choices import DeviceStatusChoices, SiteStatusChoices
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from netbox.choices import ColorChoices
 from netbox.models import NetBoxModel
 from netbox.models.features import ContactsMixin
 from utilities.choices import ChoiceSet
-from dcim.choices import DeviceStatusChoices, SiteStatusChoices
+from utilities.fields import ColorField
 from virtualization.choices import VirtualMachineStatusChoices
 
 
@@ -38,7 +40,7 @@ class AccountingDimensionStatusChoices(ChoiceSet):
 
 
 class InternalEntityChoices(ChoiceSet):
-    key = 'Contract.internal_partie'
+    key = 'Contract.internal_party'
 
     ENTITY = 'Default entity'
 
@@ -58,7 +60,41 @@ class CurrencyChoices(ChoiceSet):
     ]
 
 
+class InvoiceStatusChoices(ChoiceSet):
+    key = 'Invoice.status'
+
+    STATUS_DRAFT = 'draft'
+    STATUS_POSTED = 'posted'
+    STATUS_CANCELED = 'canceled'
+
+    CHOICES = [
+        (STATUS_DRAFT, 'Draft', 'yellow'),
+        (STATUS_POSTED, 'Posted', 'green'),
+        (STATUS_CANCELED, 'Canceled', 'red'),
+    ]
+
+
 CURRENCY_DEFAULT = CurrencyChoices.CHOICES[0][0]
+
+
+class ContractType(NetBoxModel):
+    name = models.CharField(max_length=100, unique=True, verbose_name=_('name'))
+    description = models.TextField(blank=True, verbose_name=_('description'))
+    color = ColorField(default=ColorChoices.COLOR_GREY, verbose_name=_('color'))
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = _('contract type')
+        verbose_name_plural = _('contract types')
+
+    def __str__(self):
+        return self.name
+
+    def get_color(self):
+        return self.color
+
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_contract:contracttype', args=[self.pk])
 
 
 class AccountingDimension(NetBoxModel):
@@ -150,24 +186,32 @@ class ContractAssignment(NetBoxModel):
         return status_colors.get(self.content_object.status)
 
 
-class Contract(NetBoxModel):
+class Contract(ContactsMixin, NetBoxModel):
     name = models.CharField(max_length=100, verbose_name=_('name'))
-    external_partie_object_type = models.ForeignKey(
+    contract_type = models.ForeignKey(
+        to='netbox_contract.ContractType',
+        on_delete=models.PROTECT,
+        related_name='contracts',
+        blank=True,
+        null=True,
+        verbose_name=_('contract type'),
+    )
+    external_party_object_type = models.ForeignKey(
         to=ContentType,
         on_delete=models.CASCADE,
         blank=True,
         null=True,
-        verbose_name=_('external partie object type'),
+        verbose_name=_('external party object type'),
     )
-    external_partie_object_id = models.PositiveBigIntegerField(
-        blank=True, null=True, verbose_name=_('external partie object ID')
+    external_party_object_id = models.PositiveBigIntegerField(
+        blank=True, null=True, verbose_name=_('external party object ID')
     )
-    external_partie_object = GenericForeignKey(
-        ct_field='external_partie_object_type', fk_field='external_partie_object_id'
+    external_party_object = GenericForeignKey(
+        ct_field='external_party_object_type', fk_field='external_party_object_id'
     )
-    external_partie_object.editable = True
+    external_party_object.editable = True
     external_reference = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('external reference'))
-    internal_partie = models.CharField(max_length=50, choices=InternalEntityChoices, verbose_name=_('internal partie'))
+    internal_party = models.CharField(max_length=50, choices=InternalEntityChoices, verbose_name=_('internal party'))
     tenant = models.ForeignKey(
         to='tenancy.Tenant',
         on_delete=models.PROTECT,
@@ -255,7 +299,7 @@ class Contract(NetBoxModel):
     class Meta:
         ordering = ('name',)
         indexes = [
-            models.Index(fields=['external_partie_object_type', 'external_partie_object_id']),
+            models.Index(fields=['external_party_object_type', 'external_party_object_id']),
         ]
         verbose_name = _('contract')
         verbose_name_plural = _('contracts')
@@ -276,6 +320,12 @@ class Invoice(NetBoxModel):
         default=False,
         verbose_name=_('template'),
         help_text=_('Wether this invoice is a template or not'),
+    )
+    status = models.CharField(
+        max_length=50,
+        choices=InvoiceStatusChoices,
+        default=InvoiceStatusChoices.STATUS_POSTED,
+        verbose_name=_('status'),
     )
     date = models.DateField(blank=True, null=True, verbose_name=_('date'))
     contracts = models.ManyToManyField(Contract, related_name='invoices', blank=True, verbose_name=_('contracts'))
@@ -302,6 +352,9 @@ class Invoice(NetBoxModel):
 
     def __str__(self):
         return self.number
+
+    def get_status_color(self):
+        return InvoiceStatusChoices.colors.get(self.status)
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:invoice', args=[self.pk])
