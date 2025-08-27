@@ -37,6 +37,11 @@
               <td>{% badge object.get_status_display bg_color=object.get_status_color %}</td>
             </tr>
             <tr>
+             <tr>
+              <th scope="row">{% trans "notice_warning" %}</th>
+              <td>{% badge object.notice_warning bg_color=object.get_notice_warning_color %}</td>
+            </tr>
+            <tr>
               <th scope="row">{% trans "External reference" %}</th>
               <td>{{ object.external_reference }}</td>
             </tr>

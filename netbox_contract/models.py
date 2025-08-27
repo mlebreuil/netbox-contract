@@ -226,6 +226,11 @@ class Contract(ContactsMixin, NetBoxModel):
         default=StatusChoices.STATUS_ACTIVE,
         verbose_name=_('status'),
     )
+    notice_warning = models.BooleanField(
+        default=False,
+        verbose_name=_('notice warning'),
+        help_text=_('Whether to send a notice warning for this contract'),
+    )
     start_date = models.DateField(blank=True, null=True, verbose_name=_('start date'))
     end_date = models.DateField(blank=True, null=True, verbose_name=_('end date'))
     initial_term = models.IntegerField(
@@ -295,6 +300,11 @@ class Contract(ContactsMixin, NetBoxModel):
 
     def get_status_color(self):
         return StatusChoices.colors.get(self.status)
+
+    def get_notice_warning_color(self):
+        if self.notice_warning:
+            return 'red'
+        return 'green'
 
     class Meta:
         ordering = ('name',)

@@ -18,7 +18,12 @@ class ContractsConfig(PluginConfig):
         'mandatory_invoice_fields': [],
         'hidden_invoice_fields': [],
         'mandatory_dimensions': [],
+        'days_before_notice_notification': 30,
     }
+
+    def ready(self):
+        super().ready()
+        from .jobs import ContractEndNotificationJob as ContractEndNotificationJob
 
 
 config = ContractsConfig
