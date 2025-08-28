@@ -114,6 +114,7 @@ class ContractForm(NetBoxModelForm):
             'internal_party',
             'tenant',
             'status',
+            'notice_warning',
             'start_date',
             'end_date',
             'initial_term',

@@ -1,3 +1,5 @@
+from django.utils.translation import gettext as _
+from netbox.events import EventType, EVENT_TYPE_KIND_WARNING
 from netbox.plugins import PluginConfig
 
 
@@ -23,7 +25,10 @@ class ContractsConfig(PluginConfig):
 
     def ready(self):
         super().ready()
-        from .jobs import ContractEndNotificationJob as ContractEndNotificationJob
+
+        EventType('contract_notice', _('Contract notice period approaching'), kind=EVENT_TYPE_KIND_WARNING).register()
+
+        from .jobs import ContractEventTrigger as ContractEventTrigger
 
 
 config = ContractsConfig

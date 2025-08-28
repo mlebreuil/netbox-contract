@@ -39,7 +39,7 @@
             <tr>
              <tr>
               <th scope="row">{% trans "notice_warning" %}</th>
-              <td>{% badge object.notice_warning bg_color=object.get_notice_warning_color %}</td>
+              <td>{% badge object.notice_warning bg_color=object.get_notice_warning_color show_empty=True %}</td>
             </tr>
             <tr>
               <th scope="row">{% trans "External reference" %}</th>
