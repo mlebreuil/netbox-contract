@@ -5,6 +5,11 @@
 
 ## Version 2
 
+### Version 2.4.2
+
+* [272](https://github.com/mlebreuil/netbox-contract/issues/272) Add missing contract_type fields to the api.
+
+
 ### Version 2.4.1
 
 * [257](https://github.com/mlebreuil/netbox-contract/issues/257) Add the possibility to filter invoices by accounting dimensions.
