@@ -1,0 +1,577 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-28 20:14+0800\n"
+"PO-Revision-Date: 2025-09-28 20:56+0800\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: zh\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.7\n"
+
+#: .\netbox_contract\forms.py:53 .\netbox_contract\forms.py:243
+#: .\netbox_contract\forms.py:497 .\netbox_contract\forms.py:509
+#: .\netbox_contract\forms.py:524 .\netbox_contract\forms.py:533
+#: .\netbox_contract\forms.py:704 .\netbox_contract\forms.py:753
+msgid "Comments"
+msgstr "评论"
+
+#: .\netbox_contract\forms.py:59
+msgid "External party object type"
+msgstr "外部参与方类别"
+
+#: .\netbox_contract\forms.py:61
+msgid "External party object"
+msgstr "外部参与方"
+
+#: .\netbox_contract\forms.py:62 .\netbox_contract\forms.py:181
+#: .\netbox_contract\forms.py:242
+#: .\netbox_contract\templates\netbox_contract\contract.html:49
+msgid "Tenant"
+msgstr "租户"
+
+#: .\netbox_contract\forms.py:67 .\netbox_contract\forms.py:162
+#: .\netbox_contract\forms.py:189 .\netbox_contract\forms.py:248
+#: .\netbox_contract\templates\netbox_contract\contract.html:109
+msgid "Parent"
+msgstr "上级"
+
+#: .\netbox_contract\forms.py:70 .\netbox_contract\forms.py:152
+#: .\netbox_contract\forms.py:196 .\netbox_contract\navigation.py:70
+#: .\netbox_contract\templates\netbox_contract\contract.html:20
+#: .\netbox_contract\templates\netbox_contract\contracttype.html:10
+msgid "Contract type"
+msgstr "合同类型"
+
+#: .\netbox_contract\forms.py:154 .\netbox_contract\forms.py:240
+#: .\netbox_contract\templates\netbox_contract\contract.html:40
+msgid "External reference"
+msgstr "扩展引用"
+
+#: .\netbox_contract\forms.py:155 .\netbox_contract\forms.py:241
+#: .\netbox_contract\templates\netbox_contract\contract.html:44
+msgid "Internal party"
+msgstr "内部参与方"
+
+#: .\netbox_contract\forms.py:156 .\netbox_contract\forms.py:183
+#: .\netbox_contract\forms.py:411 .\netbox_contract\forms.py:436
+#: .\netbox_contract\forms.py:732
+#: .\netbox_contract\templates\netbox_contract\accountingdimension.html:21
+#: .\netbox_contract\templates\netbox_contract\contract.html:36
+#: .\netbox_contract\templates\netbox_contract\invoice.html:32
+msgid "Status"
+msgstr "状态"
+
+#: .\netbox_contract\forms.py:157 .\netbox_contract\forms.py:412
+#: .\netbox_contract\forms.py:483 .\netbox_contract\forms.py:664
+#: .\netbox_contract\templates\netbox_contract\contract.html:84
+#: .\netbox_contract\templates\netbox_contract\contract.html:143
+#: .\netbox_contract\templates\netbox_contract\invoice.html:46
+#: .\netbox_contract\templates\netbox_contract\invoiceline.html:28
+msgid "Currency"
+msgstr "货币单位"
+
+#: .\netbox_contract\forms.py:174
+msgid "External party name"
+msgstr "外部参与方"
+
+#: .\netbox_contract\forms.py:233 .\netbox_contract\forms.py:272
+#: .\netbox_contract\forms.py:290 .\netbox_contract\forms.py:518
+#: .\netbox_contract\forms.py:532 .\netbox_contract\forms.py:727
+#: .\netbox_contract\forms.py:751
+#: .\netbox_contract\templates\netbox_contract\accountingdimension.html:13
+#: .\netbox_contract\templates\netbox_contract\contract.html:16
+#: .\netbox_contract\templates\netbox_contract\contracttype.html:13
+#: .\netbox_contract\templates\netbox_contract\serviceprovider.html:12
+msgid "Name"
+msgstr "名称"
+
+#: .\netbox_contract\forms.py:238
+msgid "Contract Type"
+msgstr "合同类型"
+
+#: .\netbox_contract\forms.py:259 .\netbox_contract\forms.py:274
+#: .\netbox_contract\forms.py:284
+#: .\netbox_contract\templates\netbox_contract\contracttype.html:21
+msgid "Color"
+msgstr "颜色"
+
+#: .\netbox_contract\forms.py:273 .\netbox_contract\forms.py:282
+#: .\netbox_contract\forms.py:291
+#: .\netbox_contract\templates\netbox_contract\contracttype.html:17
+msgid "Description"
+msgstr "描述"
+
+#: .\netbox_contract\forms.py:300 .\netbox_contract\forms.py:404
+#: .\netbox_contract\forms.py:457
+#: .\netbox_contract\templates\netbox_contract\contract.html:137
+#: .\netbox_contract\templates\netbox_contract\invoice.html:24
+msgid "Number"
+msgstr "编号"
+
+#: .\netbox_contract\forms.py:306 .\netbox_contract\forms.py:417
+#: .\netbox_contract\forms.py:434 .\netbox_contract\navigation.py:63
+#: .\netbox_contract\navigation.py:120
+#: .\netbox_contract\templates\contract_list_bottom.html:7
+#: .\netbox_contract\templates\netbox_contract\invoice.html:89
+msgid "Contracts"
+msgstr "外购合同"
+
+#: .\netbox_contract\forms.py:409 .\netbox_contract\forms.py:460
+msgid "Template"
+msgstr "模版"
+
+#: .\netbox_contract\forms.py:423
+msgid "Accounting Dimensions"
+msgstr "统计维度"
+
+#: .\netbox_contract\forms.py:461 .\netbox_contract\models.py:322
+msgid "Wether this invoice is a template or not"
+msgstr "此付款是否是一个模版"
+
+#: .\netbox_contract\forms.py:465
+#: .\netbox_contract\templates\netbox_contract\invoice.html:28
+msgid "Date"
+msgstr "日期"
+
+#: .\netbox_contract\forms.py:474
+#: .\netbox_contract\templates\netbox_contract\invoice.html:37
+msgid "Period start"
+msgstr "起始日期"
+
+#: .\netbox_contract\forms.py:478
+#: .\netbox_contract\templates\netbox_contract\invoice.html:41
+msgid "Period end"
+msgstr "结束日期"
+
+#: .\netbox_contract\forms.py:489
+#: .\netbox_contract\templates\netbox_contract\invoice.html:50
+#: .\netbox_contract\templates\netbox_contract\invoiceline.html:24
+msgid "Amount"
+msgstr "总计"
+
+#: .\netbox_contract\forms.py:493
+#: .\netbox_contract\templates\netbox_contract\contract.html:117
+#: .\netbox_contract\templates\netbox_contract\contract.html:119
+#: .\netbox_contract\templates\netbox_contract\invoice.html:55
+#: .\netbox_contract\templates\netbox_contract\invoice.html:57
+msgid "Documents"
+msgstr "文档"
+
+#: .\netbox_contract\forms.py:494 .\netbox_contract\models.py:281
+#: .\netbox_contract\models.py:344
+msgid "URL to the contract documents"
+msgstr "文档链接"
+
+#: .\netbox_contract\forms.py:508 .\netbox_contract\forms.py:523
+msgid "Slug"
+msgstr "缩写"
+
+#: .\netbox_contract\forms.py:546
+msgid "object type"
+msgstr "对象类型"
+
+#: .\netbox_contract\forms.py:552 .\netbox_contract\forms.py:569
+#: .\netbox_contract\forms.py:583 .\netbox_contract\forms.py:596
+#: .\netbox_contract\templates\netbox_contract\contract.html:13
+#: .\netbox_contract\templates\netbox_contract\contractassignment.html:18
+msgid "Contract"
+msgstr "外购合同"
+
+#: .\netbox_contract\forms.py:578
+msgid "Content type"
+msgstr "合同类别"
+
+#: .\netbox_contract\forms.py:608 .\netbox_contract\forms.py:653
+#: .\netbox_contract\forms.py:674
+#: .\netbox_contract\templates\netbox_contract\invoice.html:20
+#: .\netbox_contract\templates\netbox_contract\invoiceline.html:18
+msgid "Invoice"
+msgstr "付款"
+
+#: .\netbox_contract\forms.py:614 .\netbox_contract\forms.py:659
+#: .\netbox_contract\forms.py:681 .\netbox_contract\forms.py:702
+#: .\netbox_contract\navigation.py:91
+#: .\netbox_contract\templates\netbox_contract\invoiceline.html:32
+msgid "Accounting dimensions"
+msgstr "统计维度"
+
+#: .\netbox_contract\forms.py:728 .\netbox_contract\forms.py:752
+#: .\netbox_contract\templates\netbox_contract\accountingdimension.html:17
+msgid "Value"
+msgstr "值"
+
+#: .\netbox_contract\models.py:81 .\netbox_contract\models.py:136
+#: .\netbox_contract\models.py:190
+msgid "name"
+msgstr "名称"
+
+#: .\netbox_contract\models.py:82
+msgid "description"
+msgstr "描述"
+
+#: .\netbox_contract\models.py:83
+msgid "color"
+msgstr "颜色"
+
+#: .\netbox_contract\models.py:87 .\netbox_contract\models.py:197
+msgid "contract type"
+msgstr "合同类型"
+
+#: .\netbox_contract\models.py:88
+msgid "contract types"
+msgstr "合同类型"
+
+#: .\netbox_contract\models.py:103
+msgid "dimension name"
+msgstr "维度名称"
+
+#: .\netbox_contract\models.py:104
+msgid "Accounting dimension name. Ex: Department, Location, etc."
+msgstr "统计维度名称，例如光纤、管道、机柜、U位等"
+
+#: .\netbox_contract\models.py:106
+msgid "value"
+msgstr "值"
+
+#: .\netbox_contract\models.py:111 .\netbox_contract\models.py:227
+#: .\netbox_contract\models.py:328
+msgid "status"
+msgstr "状态"
+
+#: .\netbox_contract\models.py:113 .\netbox_contract\models.py:139
+#: .\netbox_contract\models.py:283 .\netbox_contract\models.py:346
+#: .\netbox_contract\models.py:387
+msgid "comments"
+msgstr "评论"
+
+#: .\netbox_contract\models.py:131
+msgid "accounting dimension"
+msgstr "统计维度"
+
+#: .\netbox_contract\models.py:132 .\netbox_contract\models.py:385
+msgid "accounting dimensions"
+msgstr "统计维度"
+
+#: .\netbox_contract\models.py:137
+#: .\netbox_contract\templates\netbox_contract\serviceprovider.html:16
+msgid "slug"
+msgstr "缩写"
+
+#: .\netbox_contract\models.py:138
+msgid "portal URL"
+msgstr "portal URL"
+
+#: .\netbox_contract\models.py:143
+msgid "service provider"
+msgstr "服务提供商"
+
+#: .\netbox_contract\models.py:144
+msgid "service providers"
+msgstr "服务提供商"
+
+#: .\netbox_contract\models.py:154
+msgid "content type"
+msgstr "内容类型"
+
+#: .\netbox_contract\models.py:155
+msgid "object ID"
+msgstr "对象ID"
+
+#: .\netbox_contract\models.py:161 .\netbox_contract\models.py:304
+msgid "contract"
+msgstr "外购合同"
+
+#: .\netbox_contract\models.py:170
+msgid "contract assignment"
+msgstr "合同内容"
+
+#: .\netbox_contract\models.py:171
+msgid "contract assignments"
+msgstr "合同内容"
+
+#: .\netbox_contract\models.py:204
+msgid "external party object type"
+msgstr "外部参与方类型"
+
+#: .\netbox_contract\models.py:207
+msgid "external party object ID"
+msgstr "外部参与方ID"
+
+#: .\netbox_contract\models.py:213
+msgid "external reference"
+msgstr "external reference"
+
+#: .\netbox_contract\models.py:214
+msgid "internal party"
+msgstr "内部参与方"
+
+#: .\netbox_contract\models.py:221
+msgid "tenant"
+msgstr "租户"
+
+#: .\netbox_contract\models.py:229
+msgid "start date"
+msgstr "起始日期"
+
+#: .\netbox_contract\models.py:230
+msgid "end date"
+msgstr "结束日期"
+
+#: .\netbox_contract\models.py:232 .\netbox_contract\models.py:239
+msgid "In month"
+msgstr "按月"
+
+#: .\netbox_contract\models.py:236
+msgid "initial term"
+msgstr "initial term"
+
+#: .\netbox_contract\models.py:243
+msgid "renewal term"
+msgstr "renewal term"
+
+#: .\netbox_contract\models.py:246
+msgid "Contract notice period. Default to 90 days"
+msgstr "提前提醒天数，缺省90天"
+
+#: .\netbox_contract\models.py:248
+msgid "notice period"
+msgstr "提醒天数"
+
+#: .\netbox_contract\models.py:254 .\netbox_contract\models.py:338
+#: .\netbox_contract\models.py:381
+msgid "currency"
+msgstr "货币单位"
+
+#: .\netbox_contract\models.py:257
+msgid "yearly recuring cost"
+msgstr "每年费用"
+
+#: .\netbox_contract\models.py:262
+msgid "Use either this field of the monthly recuring cost field"
+msgstr "使用此字段或每月费用字段"
+
+#: .\netbox_contract\models.py:265
+msgid "monthly recuring cost"
+msgstr "每月费用"
+
+#: .\netbox_contract\models.py:270
+msgid "Use either this field of the yearly recuring cost field"
+msgstr "使用此字段或每年费用字段"
+
+#: .\netbox_contract\models.py:272
+msgid "none recuring cost"
+msgstr "一次性费用"
+
+#: .\netbox_contract\models.py:274
+msgid "The frequency of invoices in month"
+msgstr "费用周期，按月计算"
+
+#: .\netbox_contract\models.py:276
+msgid "invoice frequency"
+msgstr "费用周期"
+
+#: .\netbox_contract\models.py:280 .\netbox_contract\models.py:343
+msgid "documents"
+msgstr "文档"
+
+#: .\netbox_contract\models.py:290
+msgid "parent"
+msgstr "上级"
+
+#: .\netbox_contract\models.py:305 .\netbox_contract\models.py:331
+msgid "contracts"
+msgstr "外购合同"
+
+#: .\netbox_contract\models.py:316
+msgid "number"
+msgstr "编号"
+
+#: .\netbox_contract\models.py:321
+msgid "template"
+msgstr "模版"
+
+#: .\netbox_contract\models.py:330
+msgid "date"
+msgstr "日期"
+
+#: .\netbox_contract\models.py:332
+msgid "period start"
+msgstr "起始日期"
+
+#: .\netbox_contract\models.py:333
+msgid "period end"
+msgstr "结束日期"
+
+#: .\netbox_contract\models.py:340 .\netbox_contract\models.py:383
+msgid "amount"
+msgstr "总计"
+
+#: .\netbox_contract\models.py:350 .\netbox_contract\models.py:375
+msgid "invoice"
+msgstr "付款"
+
+#: .\netbox_contract\models.py:351
+msgid "invoices"
+msgstr "付款"
+
+#: .\netbox_contract\models.py:391
+msgid "invoice line"
+msgstr "付款明细"
+
+#: .\netbox_contract\models.py:392
+msgid "invoice lines"
+msgstr "付款明细"
+
+#: .\netbox_contract\navigation.py:10 .\netbox_contract\navigation.py:19
+#: .\netbox_contract\navigation.py:28 .\netbox_contract\navigation.py:37
+#: .\netbox_contract\navigation.py:46 .\netbox_contract\navigation.py:55
+msgid "Add"
+msgstr "增加"
+
+#: .\netbox_contract\navigation.py:77
+#: .\netbox_contract\templates\netbox_contract\contract.html:182
+msgid "Invoices"
+msgstr "付款"
+
+#: .\netbox_contract\navigation.py:84
+#: .\netbox_contract\templates\netbox_contract\invoice.html:75
+#: .\netbox_contract\templates\netbox_contract\invoiceline.html:15
+msgid "Invoice lines"
+msgstr "付款明细"
+
+#: .\netbox_contract\navigation.py:98
+msgid "Service providers"
+msgstr "服务提供商"
+
+#: .\netbox_contract\navigation.py:104
+#: .\netbox_contract\templates\contract_assignments_bottom.html:8
+msgid "Contracts assignments"
+msgstr "合同内容"
+
+#: .\netbox_contract\templates\contract_assignments_bottom.html:13
+msgid "Add assignment"
+msgstr "增加一项内容"
+
+#: .\netbox_contract\templates\netbox_contract\accountingdimension.html:10
+msgid "Accounting dimension"
+msgstr "统计维度"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:26
+msgid "External party type"
+msgstr "外部参与方类型"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:30
+msgid "External party"
+msgstr "外部参与方"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:55
+msgid "Start date"
+msgstr "起始日期"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:61
+msgid "End date"
+msgstr "结束日期"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:67
+msgid "Initial term"
+msgstr "Initial term"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:68
+#: .\netbox_contract\templates\netbox_contract\contract.html:74
+msgid "month"
+msgstr "按月"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:73
+msgid "Renewal term"
+msgstr "Renewal term"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:79
+msgid "Notice period"
+msgstr "提醒天数"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:80
+msgid "days"
+msgstr "按天"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:88
+msgid "Monthly recuring costs"
+msgstr "每月费用"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:92
+msgid "Yearly recuring costs"
+msgstr "每年费用"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:96
+msgid "Calculated corresponding Yearly or Monthly value"
+msgstr "每年费用（计算）"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:100
+msgid "Non recuring costs"
+msgstr "一次性费用"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:104
+msgid "Invoice frequency"
+msgstr "付款周期"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:133
+#: .\netbox_contract\templates\netbox_contract\invoice.html:18
+msgid "Invoice template"
+msgstr "付款模版"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:147
+msgid "Total amount"
+msgstr "合计"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:152
+msgid "Invoice template lines"
+msgstr "付款模版明细"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:162
+msgid "Assignments"
+msgstr "合同内容"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:171
+msgid "childs"
+msgstr "下级"
+
+#: .\netbox_contract\templates\netbox_contract\contract.html:187
+msgid "Add an invoice"
+msgstr "增加一个付款"
+
+#: .\netbox_contract\templates\netbox_contract\contractassignment.html:7
+msgid "Contract assignment"
+msgstr "合同内容"
+
+#: .\netbox_contract\templates\netbox_contract\contractassignment.html:10
+msgid "Model"
+msgstr "模型"
+
+#: .\netbox_contract\templates\netbox_contract\contractassignment.html:14
+msgid "Object"
+msgstr "对象"
+
+#: .\netbox_contract\templates\netbox_contract\invoice.html:62
+msgid "Invoice lines total"
+msgstr "付款明细合计"
+
+#: .\netbox_contract\templates\netbox_contract\invoice.html:78
+msgid "Add a line"
+msgstr "增加一项明细"
+
+#: .\netbox_contract\templates\netbox_contract\serviceprovider.html:9
+msgid "Service provider"
+msgstr "服务提供商"
+
+#: .\netbox_contract\templates\netbox_contract\serviceprovider.html:20
+msgid "Portal url"
+msgstr "Portal url"
