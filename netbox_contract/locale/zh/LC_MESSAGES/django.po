@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-09-28 20:14+0800\n"
-"PO-Revision-Date: 2025-09-28 20:56+0800\n"
+"PO-Revision-Date: 2025-09-28 21:53+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh\n"
@@ -157,7 +157,7 @@ msgstr "结束日期"
 #: .\netbox_contract\templates\netbox_contract\invoice.html:50
 #: .\netbox_contract\templates\netbox_contract\invoiceline.html:24
 msgid "Amount"
-msgstr "总计"
+msgstr "费用"
 
 #: .\netbox_contract\forms.py:493
 #: .\netbox_contract\templates\netbox_contract\contract.html:117
@@ -165,7 +165,7 @@ msgstr "总计"
 #: .\netbox_contract\templates\netbox_contract\invoice.html:55
 #: .\netbox_contract\templates\netbox_contract\invoice.html:57
 msgid "Documents"
-msgstr "文档"
+msgstr "Documents"
 
 #: .\netbox_contract\forms.py:494 .\netbox_contract\models.py:281
 #: .\netbox_contract\models.py:344
@@ -382,7 +382,7 @@ msgstr "费用周期"
 
 #: .\netbox_contract\models.py:280 .\netbox_contract\models.py:343
 msgid "documents"
-msgstr "文档"
+msgstr "documents"
 
 #: .\netbox_contract\models.py:290
 msgid "parent"
@@ -414,7 +414,7 @@ msgstr "结束日期"
 
 #: .\netbox_contract\models.py:340 .\netbox_contract\models.py:383
 msgid "amount"
-msgstr "总计"
+msgstr "费用"
 
 #: .\netbox_contract\models.py:350 .\netbox_contract\models.py:375
 msgid "invoice"
