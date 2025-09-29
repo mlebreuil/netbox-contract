@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-09-28 20:14+0800\n"
-"PO-Revision-Date: 2025-09-28 22:09+0800\n"
+"PO-Revision-Date: 2025-09-29 09:52+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh\n"
@@ -513,7 +513,7 @@ msgstr "每年费用"
 
 #: .\netbox_contract\templates\netbox_contract\contract.html:96
 msgid "Calculated corresponding Yearly or Monthly value"
-msgstr "每年费用（计算）"
+msgstr "月费用（计算）"
 
 #: .\netbox_contract\templates\netbox_contract\contract.html:100
 msgid "Non recuring costs"
