@@ -63,10 +63,10 @@ class ContractAssignmentObjectTable(NetBoxTable):
     contract = tables.Column(linkify=True)
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
     contract__external_party_object = tables.Column(
-        verbose_name='Partner', linkify=True
+        verbose_name=_('external_party_object'), linkify=True
     )
     contract__status = columns.ChoiceFieldColumn(
-        verbose_name=('Status'),
+        verbose_name=_('Status'),
     )
     contract__contract_type = columns.ColoredLabelColumn(verbose_name=_('Contract type'))
     contract_type = tables.Column(linkify=True, verbose_name=_('Contract type'))
@@ -100,10 +100,10 @@ class ContractAssignmentObjectTable(NetBoxTable):
 
 
 class ContractAssignmentContractTable(NetBoxTable):
-    content_type = columns.ContentTypeColumn(verbose_name='Object Type')
-    content_object = tables.Column(linkify=True, verbose_name='Object', orderable=False)
+    content_type = columns.ContentTypeColumn(verbose_name=_('Object Type'))
+    content_object = tables.Column(linkify=True, verbose_name=_('Object'), orderable=False)
     content_object__status = columns.ChoiceFieldColumn(
-        verbose_name=('Status'),
+        verbose_name=_('Status'),
     )
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
 
@@ -167,7 +167,7 @@ class ContractListTable(ContactsColumnMixin, NetBoxTable):
 
 class ContractListBottomTable(NetBoxTable):
     name = tables.Column(linkify=True)
-    external_party_object = tables.Column(linkify=True)
+    external_party_object = tables.Column(linkify=True, verbose_name=_('External party'))
     status = columns.ChoiceFieldColumn(
         verbose_name=_('Status'),
     )
