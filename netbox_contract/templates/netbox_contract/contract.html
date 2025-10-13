@@ -38,7 +38,7 @@
             </tr>
             <tr>
               <th scope="row">{% trans "External reference" %}</th>
-              <td>{{ object.external_reference }}</td>
+              <td>{{ object.external_reference|placeholder }}</td>
             </tr>
             <tr>
               <th scope="row">{% trans "Internal party" %}</th>
@@ -53,13 +53,13 @@
             {% if not 'start_date' in hidden_fields %}
             <tr>
               <th scope="row">{% trans "Start date" %}</th>
-              <td>{{ object.start_date }}</td>
+              <td>{{ object.start_date|isodate|placeholder}}</td>
             </tr>
             {% endif %}
             {% if not 'end_date' in hidden_fields %}
             <tr>
               <th scope="row">{% trans "End date" %}</th>
-              <td>{{ object.end_date }}</td>
+              <td>{{ object.end_date|isodate|placeholder }}</td>
             </tr>
             {% endif %}
             {% if not 'initial_term' in hidden_fields %}
@@ -86,11 +86,11 @@
             </tr>
             <tr>
               <th scope="row">{% trans "Monthly recuring costs" %}</th>
-              <td>{{ object.mrc }}</td>
+              <td>{{ object.mrc|placeholder }}</td>
             </tr>
             <tr>
               <th scope="row">{% trans "Yearly recuring costs" %}</th>
-              <td>{{ object.yrc }}</td>
+              <td>{{ object.yrc|placeholder }}</td>
             </tr>
             <tr>
               <th scope="row">{% trans "Calculated corresponding Yearly or Monthly value" %}</th>

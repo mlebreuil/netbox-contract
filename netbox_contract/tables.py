@@ -1,4 +1,6 @@
 import django_tables2 as tables
+
+from django.utils.translation import gettext_lazy as _
 from netbox.tables import NetBoxTable, columns
 from tenancy.tables import ContactsColumnMixin
 
@@ -26,13 +28,13 @@ class ContractTypeListTable(NetBoxTable):
 
 class ContractAssignmentListTable(NetBoxTable):
     id = tables.Column(linkify=True)
-    content_type = columns.ContentTypeColumn(verbose_name='Object Type')
-    content_object = tables.Column(linkify=True, orderable=False)
+    content_type = columns.ContentTypeColumn(verbose_name=_('Object Type'))
+    content_object = tables.Column(linkify=True, orderable=False, verbose_name=_('content_Object'))
     contract = tables.Column(linkify=True)
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
-    contract__external_party_object = tables.Column(linkify=True)
+    contract__external_party_object = tables.Column(linkify=True, verbose_name=_('external_party_object'))
     tags = columns.TagColumn(url_name='plugins:netbox_contract:contractassignment_list')
-    contract__contract_type = columns.ColoredLabelColumn(verbose_name='Contract type')
+    contract__contract_type = columns.ColoredLabelColumn(verbose_name=_('Contract type'))
 
     class Meta(NetBoxTable.Meta):
         model = ContractAssignment
@@ -66,8 +68,8 @@ class ContractAssignmentObjectTable(NetBoxTable):
     contract__status = columns.ChoiceFieldColumn(
         verbose_name=('Status'),
     )
-    contract__contract_type = columns.ColoredLabelColumn(verbose_name='Contract type')
-    contract_type = tables.Column(linkify=True, verbose_name='Contract type')
+    contract__contract_type = columns.ColoredLabelColumn(verbose_name=_('Contract type'))
+    contract_type = tables.Column(linkify=True, verbose_name=_('Contract type'))
 
     class Meta(NetBoxTable.Meta):
         model = ContractAssignment
@@ -124,14 +126,14 @@ class ContractAssignmentContractTable(NetBoxTable):
 
 class ContractListTable(ContactsColumnMixin, NetBoxTable):
     name = tables.Column(linkify=True)
-    external_party_object = tables.Column(verbose_name='External party', linkify=True)
+    external_party_object = tables.Column(verbose_name=_('External party'), linkify=True)
     parent = tables.Column(linkify=True)
-    yrc = tables.Column(verbose_name='Yerly recuring costs')
+    yrc = tables.Column(verbose_name=_('Yerly recuring costs'))
     status = columns.ChoiceFieldColumn(
-        verbose_name=('Status'),
+        verbose_name=_('Status'),
     )
     tags = columns.TagColumn(url_name='plugins:netbox_contract:contract_list')
-    contract_type = tables.Column(linkify=True, verbose_name='Contract type')
+    contract_type = tables.Column(linkify=True, verbose_name=_('Contract type'))
 
     class Meta(NetBoxTable.Meta):
         model = Contract
@@ -167,7 +169,7 @@ class ContractListBottomTable(NetBoxTable):
     name = tables.Column(linkify=True)
     external_party_object = tables.Column(linkify=True)
     status = columns.ChoiceFieldColumn(
-        verbose_name=('Status'),
+        verbose_name=_('Status'),
     )
 
     class Meta(NetBoxTable.Meta):
@@ -197,7 +199,7 @@ class InvoiceListTable(NetBoxTable):
     contracts = tables.ManyToManyColumn(linkify=True)
     number = tables.Column(linkify=True)
     status = columns.ChoiceFieldColumn(
-        verbose_name=('Status'),
+        verbose_name=_('Status'),
     )
     tags = columns.TagColumn(url_name='plugins:netbox_contract:invoiceline_list')
 
@@ -267,7 +269,7 @@ class InvoiceLineListTable(NetBoxTable):
 class AccountingDimensionListTable(NetBoxTable):
     name = tables.Column(linkify=True)
     status = columns.ChoiceFieldColumn(
-        verbose_name=('Status'),
+        verbose_name=_('Status'),
     )
     tags = columns.TagColumn(url_name='plugins:netbox_contract:accountingdimension_list')
 

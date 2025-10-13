@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-28 20:14+0800\n"
-"PO-Revision-Date: 2025-09-29 09:52+0800\n"
+"POT-Creation-Date: 2025-10-13 16:19+0800\n"
+"PO-Revision-Date: 2025-10-13 16:20+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh\n"
@@ -47,6 +47,8 @@ msgstr "上级"
 
 #: .\netbox_contract\forms.py:70 .\netbox_contract\forms.py:152
 #: .\netbox_contract\forms.py:196 .\netbox_contract\navigation.py:70
+#: .\netbox_contract\tables.py:37 .\netbox_contract\tables.py:71
+#: .\netbox_contract\tables.py:72 .\netbox_contract\tables.py:136
 #: .\netbox_contract\templates\netbox_contract\contract.html:20
 #: .\netbox_contract\templates\netbox_contract\contracttype.html:10
 msgid "Contract type"
@@ -64,7 +66,9 @@ msgstr "内部参与方"
 
 #: .\netbox_contract\forms.py:156 .\netbox_contract\forms.py:183
 #: .\netbox_contract\forms.py:411 .\netbox_contract\forms.py:436
-#: .\netbox_contract\forms.py:732
+#: .\netbox_contract\forms.py:732 .\netbox_contract\tables.py:133
+#: .\netbox_contract\tables.py:172 .\netbox_contract\tables.py:202
+#: .\netbox_contract\tables.py:272
 #: .\netbox_contract\templates\netbox_contract\accountingdimension.html:21
 #: .\netbox_contract\templates\netbox_contract\contract.html:36
 #: .\netbox_contract\templates\netbox_contract\invoice.html:32
@@ -309,7 +313,7 @@ msgstr "外部参与方ID"
 
 #: .\netbox_contract\models.py:213
 msgid "external reference"
-msgstr "external reference"
+msgstr "扩展引用"
 
 #: .\netbox_contract\models.py:214
 msgid "internal party"
@@ -333,11 +337,11 @@ msgstr "按月"
 
 #: .\netbox_contract\models.py:236
 msgid "initial term"
-msgstr "initial term"
+msgstr "初始期限"
 
 #: .\netbox_contract\models.py:243
 msgid "renewal term"
-msgstr "renewal term"
+msgstr "续期期限"
 
 #: .\netbox_contract\models.py:246
 msgid "Contract notice period. Default to 90 days"
@@ -458,6 +462,27 @@ msgstr "服务提供商"
 msgid "Contracts assignments"
 msgstr "合同内容"
 
+#: .\netbox_contract\tables.py:31
+msgid "Object Type"
+msgstr "内容类型"
+
+#: .\netbox_contract\tables.py:32
+msgid "content_Object"
+msgstr "内容对象"
+
+#: .\netbox_contract\tables.py:35
+msgid "external_party_object"
+msgstr "外部参与方"
+
+#: .\netbox_contract\tables.py:129
+#: .\netbox_contract\templates\netbox_contract\contract.html:30
+msgid "External party"
+msgstr "外部参与方"
+
+#: .\netbox_contract\tables.py:131
+msgid "Yerly recuring costs"
+msgstr "每年费用"
+
 #: .\netbox_contract\templates\contract_assignments_bottom.html:13
 msgid "Add assignment"
 msgstr "增加一项内容"
@@ -470,10 +495,6 @@ msgstr "统计维度"
 msgid "External party type"
 msgstr "外部参与方类型"
 
-#: .\netbox_contract\templates\netbox_contract\contract.html:30
-msgid "External party"
-msgstr "外部参与方"
-
 #: .\netbox_contract\templates\netbox_contract\contract.html:55
 msgid "Start date"
 msgstr "起始日期"
@@ -484,7 +505,7 @@ msgstr "结束日期"
 
 #: .\netbox_contract\templates\netbox_contract\contract.html:67
 msgid "Initial term"
-msgstr "Initial term"
+msgstr "初始期限"
 
 #: .\netbox_contract\templates\netbox_contract\contract.html:68
 #: .\netbox_contract\templates\netbox_contract\contract.html:74
@@ -493,7 +514,7 @@ msgstr "按月"
 
 #: .\netbox_contract\templates\netbox_contract\contract.html:73
 msgid "Renewal term"
-msgstr "Renewal term"
+msgstr "续期期限"
 
 #: .\netbox_contract\templates\netbox_contract\contract.html:79
 msgid "Notice period"
