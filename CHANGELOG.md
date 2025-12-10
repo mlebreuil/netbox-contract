@@ -4,6 +4,9 @@
 
 
 ## Version 2
+### Version 2.4.3
+
+* [282](https://github.com/mlebreuil/netbox-contract/issues/282) Ability to assign contract to clusters and racks.
 
 ### Version 2.4.2
 
