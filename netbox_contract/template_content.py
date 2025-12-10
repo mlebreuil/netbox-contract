@@ -1,11 +1,11 @@
-from circuits.models import Circuit, VirtualCircuit
+from circuits.models import Circuit, VirtualCircuit, Provider
 from dcim.models import Device, Site, Rack
 from django.contrib.contenttypes.models import ContentType
 from netbox.plugins import PluginTemplateExtension
 from virtualization.models import VirtualMachine, Cluster
 
 from . import tables
-from .models import ContractAssignment
+from .models import ContractAssignment, Contract
 
 
 class CircuitContractAssignments(PluginTemplateExtension):
@@ -45,6 +45,28 @@ class VirtualCircuitContractAssignments(PluginTemplateExtension):
             'contract_assignments_bottom.html',
             extra_context={
                 'assignments_table': assignments_table,
+            },
+        )
+
+
+class ProviderContracts(PluginTemplateExtension):
+    models = ['circuits.provider']
+
+    def full_width_page(self):
+        provider = self.context['object']
+        provider_type = ContentType.objects.get_for_model(Provider)
+        contracts = Contract.objects.filter(
+            external_party_object_type__pk=provider_type.id,
+            external_party_object_id=provider.id
+        )
+
+        contracts_table = tables.ContractProviderBottomTable(contracts)
+        contracts_table.configure(self.context['request'])
+
+        return self.render(
+            'contract_list_bottom.html',
+            extra_context={
+                'contracts_table': contracts_table,
             },
         )
 
@@ -154,6 +176,7 @@ class ClusterContractAssignments(PluginTemplateExtension):
 template_extensions = [
     CircuitContractAssignments,
     VirtualCircuitContractAssignments,
+    ProviderContracts,
     DeviceContractAssignments,
     SiteContractAssignments,
     RackContractAssignments,
