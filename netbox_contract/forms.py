@@ -11,6 +11,7 @@ from netbox.forms import (
 )
 from tenancy.forms import ContactModelFilterForm, TenancyFilterForm
 from tenancy.models import Tenant
+from circuits.models import Provider
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import (
     ColorField,
@@ -151,6 +152,23 @@ class ContractFilterForm(ContactModelFilterForm, TenancyFilterForm, NetBoxModelF
         selector=True,
         label=_('Contract type'),
     )
+
+    service_provider_id = DynamicModelChoiceField(
+        queryset=ServiceProvider.objects.all(),
+        required=False,
+        selector=True,
+        label=_('Service provider'),
+        help_text=_('Filter by Service Provider'),
+    )
+
+    provider_id = DynamicModelChoiceField(
+        queryset=Provider.objects.all(),
+        required=False,
+        selector=True,
+        label=_('Circuit Provider'),
+        help_text=_('Filter by Circuit Provider'),
+    )
+
     external_reference = forms.CharField(required=False, label=_('External reference'))
     internal_party = forms.ChoiceField(choices=InternalEntityChoices, required=False, label=_('Internal party'))
     status = forms.ChoiceField(choices=StatusChoices, required=False, label=_('Status'))
