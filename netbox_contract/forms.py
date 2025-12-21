@@ -12,7 +12,7 @@ from netbox.forms import (
 from tenancy.forms import ContactModelFilterForm, TenancyFilterForm
 from tenancy.models import Tenant
 from circuits.models import Provider
-from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
+from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES, get_field_value
 from utilities.forms.fields import (
     ColorField,
     CommentField,
@@ -27,8 +27,9 @@ from utilities.forms.fields import (
     TagFilterField,
 )
 from utilities.forms.widgets import DatePicker, HTMXSelect
+from utilities.templatetags.builtins.filters import bettertitle
 
-from .constants import ASSIGNEMENT_MODELS, SERVICE_PROVIDER_MODELS
+from .constants import ASSIGNEMENT_MODELS, SERVICE_PROVIDER_MODELS, SERVICE_PROVIDER_TYPES
 from .models import (
     AccountingDimension,
     AccountingDimensionStatusChoices,
@@ -268,6 +269,21 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
         selector=True,
         label=_('Contract Type')
     )
+
+    external_party_object_type = ContentTypeChoiceField(
+        queryset=ContentType.objects.filter(model__in=SERVICE_PROVIDER_TYPES),
+        widget=HTMXSelect(method='post', attrs={'hx-select': '#form_fields'}),
+        required=False,
+        label=_('External party type')
+    )
+    external_party_object = DynamicModelChoiceField(
+        label=_('External party'),
+        queryset=ServiceProvider.objects.none(),  # Initial queryset
+        required=False,
+        disabled=True,
+        selector=True
+    )
+
     external_reference = forms.CharField(max_length=100, required=False, label=_('External reference'))
     internal_party = forms.ChoiceField(choices=InternalEntityChoices, required=False, label=_('Internal party'))
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant'))
@@ -282,6 +298,19 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
     nullable_fields = ('comments',)
     model = Contract
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if external_party_object_type_id := get_field_value(self, 'external_party_object_type'):
+            try:
+                external_party_object_type = ContentType.objects.get(pk=external_party_object_type_id)
+                model = external_party_object_type.model_class()
+                self.fields['external_party_object'].queryset = model.objects.all()
+                self.fields['external_party_object'].widget.attrs['selector'] = model._meta.label_lower
+                self.fields['external_party_object'].disabled = False
+                self.fields['external_party_object'].label = _(bettertitle(model._meta.verbose_name))
+            except ObjectDoesNotExist:
+                pass
 
 # ContractType
 

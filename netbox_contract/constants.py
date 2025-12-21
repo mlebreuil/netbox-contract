@@ -5,6 +5,11 @@ SERVICE_PROVIDER_MODELS = Q(
     | Q(app_label='netbox_contract', model__in=('serviceprovider',))
 )
 
+SERVICE_PROVIDER_TYPES = (
+    'provider',
+    'serviceprovider',
+)
+
 ASSIGNEMENT_MODELS = Q(
     Q(app_label='circuits', model__in=('circuit',))
     | Q(app_label='circuits', model__in=('virtualcircuit',))
