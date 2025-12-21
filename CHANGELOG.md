@@ -6,7 +6,8 @@
 ## Version 2
 ### Version 2.4.3
 
-* [282](https://github.com/mlebreuil/netbox-contract/issues/282) Ability to assign contract to clusters and racks.
+* [282](https://github.com/mlebreuil/netbox-contract/issues/282) Add the possibility to assign contract to clusters and racks.
+* [275](https://github.com/mlebreuil/netbox-contract/issues/275) Add the possibility to filter contract by provider an service provider. Remove the default value for the currency and internal party fields in the contract search form.
 * [274](https://github.com/mlebreuil/netbox-contract/issues/274) List contracts on providers and service providers pages
 
 ### Version 2.4.2

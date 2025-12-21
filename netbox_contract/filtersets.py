@@ -1,7 +1,9 @@
 import django_filters
 from django.db.models import Q
+from django.contrib.contenttypes.models import ContentType
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import ContactModelFilterSet, TenancyFilterSet
+from circuits.models import Provider
 
 from .models import (
     AccountingDimension,
@@ -31,16 +33,29 @@ class ContractFilterSet(ContactModelFilterSet, NetBoxModelFilterSet, TenancyFilt
         field_name='contract_type__name', to_field_name='name', queryset=ContractType.objects.all()
     )
 
+    service_provider_id = django_filters.NumberFilter(
+        field_name='external_party_object_id',
+        method='filter_by_service_provider',
+        label='Service provider'
+    )
+
+    provider_id = django_filters.NumberFilter(
+        field_name='external_party_object_id',
+        method='filter_by_circuit_provider',
+        label='Circuit provider'
+    )
+
     class Meta:
         model = Contract
         fields = (
             'id',
             'name',
+            'status',
+            'internal_party',
+            'currency',
             'contract_type',
+            'external_party_object_id',
             'external_reference',
-            'start_date',
-            'end_date',
-            'initial_term',
             'parent',
         )
 
@@ -50,6 +65,22 @@ class ContractFilterSet(ContactModelFilterSet, NetBoxModelFilterSet, TenancyFilt
             | Q(external_reference__icontains=value)
             | Q(comments__icontains=value),
             Q(status__iexact='Active'),
+        )
+
+    def filter_by_service_provider(self, queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.filter(
+            external_party_object_id=value,
+            external_party_object_type=ContentType.objects.get_for_model(ServiceProvider)
+        )
+
+    def filter_by_circuit_provider(self, queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.filter(
+            external_party_object_id=value,
+            external_party_object_type=ContentType.objects.get_for_model(Provider)
         )
 
 
