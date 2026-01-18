@@ -63,6 +63,17 @@ PLUGINS_CONFIG = {
         'mandatory_invoice_fields': [],
         'hidden_invoice_fields': [],
         'mandatory_dimensions': [],
+        'supported_models': [
+            'circuits.circuit',
+            'circuits.virtualcircuit',
+            'dcim.site',
+            'dcim.device',
+            'dcim.rack',
+            'virtualization.virtualmachine',
+            'virtualization.cluster',
+            'ipam.ipaddress',
+            'ipam.prefix',
+        ],
     }
 }
 

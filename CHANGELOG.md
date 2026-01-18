@@ -4,6 +4,10 @@
 
 
 ## Version 2
+
+### Version 2.4.4
+* [288](https://github.com/mlebreuil/netbox-contract/issues/288) Add the possibility to assign contract any object type. By default the following objects types: 'circuits.circuit', 'circuits.virtualcircuit', 'dcim.site', 'dcim.device', 'dcim.rack', 'virtualization.virtualmachine', 'virtualization.cluster', 'ipam.ipaddress', 'ipam.prefix'. This list can be overriden within the PLUGINS_CONFIG configuration parameter. Check the README file or [documentation](https://mlebreuil.github.io/netbox-contract/) for more information.
+
 ### Version 2.4.3
 
 * [282](https://github.com/mlebreuil/netbox-contract/issues/282) Add the possibility to assign contract to clusters and racks.
