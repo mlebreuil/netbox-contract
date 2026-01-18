@@ -1,4 +1,6 @@
 {% extends 'generic/object.html' %}
+{% load plugins %}
+{% load render_table from django_tables2 %}
 {% load static %}
 {% load helpers %}
 {% load i18n %}
@@ -31,6 +33,14 @@
       {% include 'inc/panels/custom_fields.html' %}
       {% include 'inc/panels/comments.html' %}
       {% include 'inc/panels/tags.html' %}
+      <div class="row">
+        <div class="col col-md-12">
+          <div class="card">
+            <h5 class="card-header">{% trans "Contracts" %}</h5>
+              {% render_table contracts_table %}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 {% endblock content %}

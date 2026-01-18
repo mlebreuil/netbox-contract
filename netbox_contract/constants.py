@@ -1,14 +1,36 @@
 from django.db.models import Q
+from django.conf import settings
 
-SERVICE_PROVIDER_MODELS = Q(
-    Q(app_label='circuits', model__in=('provider',))
-    | Q(app_label='netbox_contract', model__in=('serviceprovider',))
+plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
+
+ASSIGNEMENT_TYPES = plugin_settings.get('supported_models')
+
+SERVICE_PROVIDER_TYPES = (
+    'circuits.provider',
+    'netbox_contract.serviceprovider',
 )
 
-ASSIGNEMENT_MODELS = Q(
-    Q(app_label='circuits', model__in=('circuit',))
-    | Q(app_label='circuits', model__in=('virtualcircuit',))
-    | Q(app_label='dcim', model__in=('site',))
-    | Q(app_label='dcim', model__in=('device',))
-    | Q(app_label='virtualization', model__in=('virtualmachine',))
-)
+# ASSIGNEMENT_TYPES = (
+#     'circuits.circuit',
+#     'circuits.virtualcircuit',
+#     'dcim.site',
+#     'dcim.device',
+#     'dcim.rack',
+#     'virtualization.virtualmachine',
+#     'virtualization.cluster',
+#     'ipam.ipaddress',
+#     'ipam.prefix',
+# )
+
+
+def build_models_q(model_strings):
+    """Build a Q object from a list of 'app_label.model' strings."""
+    q = Q()
+    for model_string in model_strings:
+        app_label, model = model_string.split('.')
+        q |= Q(app_label=app_label, model=model)
+    return q
+
+
+ASSIGNEMENT_MODELS = build_models_q(ASSIGNEMENT_TYPES)
+SERVICE_PROVIDER_MODELS = build_models_q(SERVICE_PROVIDER_TYPES)

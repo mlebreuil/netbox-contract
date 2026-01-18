@@ -21,6 +21,7 @@ Accounting dimensions can be linked with invoice lines.
 |     4.1        |      2.2       |
 |     4.2        |      2.3       |
 |     4.3        |      2.4       |
+|     4.4        |      2.4       |
 
 ## Installing
 
@@ -62,6 +63,17 @@ PLUGINS_CONFIG = {
         'mandatory_invoice_fields': [],
         'hidden_invoice_fields': [],
         'mandatory_dimensions': [],
+        'supported_models': [
+            'circuits.circuit',
+            'circuits.virtualcircuit',
+            'dcim.site',
+            'dcim.device',
+            'dcim.rack',
+            'virtualization.virtualmachine',
+            'virtualization.cluster',
+            'ipam.ipaddress',
+            'ipam.prefix',
+        ],
     }
 }
 

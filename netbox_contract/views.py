@@ -75,6 +75,19 @@ class ContractTypeBulkDeleteView(generic.BulkDeleteView):
 class ServiceProviderView(generic.ObjectView):
     queryset = ServiceProvider.objects.all()
 
+    def get_extra_context(self, request, instance):
+        provider_type = ContentType.objects.get_for_model(ServiceProvider)
+        contracts = Contract.objects.filter(
+            external_party_object_type__pk=provider_type.id,
+            external_party_object_id=instance.id
+        )
+
+        contracts_table = tables.ContractProviderBottomTable(contracts)
+        contracts_table.configure(request)
+        return {
+            'contracts_table': contracts_table,
+        }
+
 
 class ServiceProviderListView(generic.ObjectListView):
     queryset = ServiceProvider.objects.all()

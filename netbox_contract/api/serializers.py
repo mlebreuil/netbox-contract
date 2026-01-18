@@ -34,6 +34,7 @@ class NestedContractSerializer(WritableNestedSerializer):
             'url',
             'display',
             'name',
+            'contract_type',
             'external_party_object_type',
             'external_party_object_id',
             'external_party_object',
@@ -86,10 +87,30 @@ class NestedAccountingDimensionSerializer(WritableNestedSerializer):
         brief_fields = ('id', 'url', 'display', 'name', 'value')
 
 
+class ContractTypeSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:contracttype-detail')
+
+    class Meta:
+        model = ContractType
+        fields = (
+            'id',
+            'url',
+            'display',
+            'name',
+            'description',
+            'tags',
+            'custom_fields',
+            'created',
+            'last_updated',
+        )
+        brief_fields = ('id', 'name', 'description', 'url', 'display')
+
+
 class ContractSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_contract-api:contract-detail'
     )
+    contract_type = ContractTypeSerializer(nested=True, required=False, allow_null=True)
     yrc = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     parent = NestedContractSerializer(many=False, required=False)
     tenant = TenantSerializer(nested=True, required=False, allow_null=True)
@@ -103,6 +124,7 @@ class ContractSerializer(NetBoxModelSerializer):
             'url',
             'display',
             'name',
+            'contract_type',
             'external_party_object_type',
             'external_party_object_id',
             'external_party_object',
@@ -131,6 +153,7 @@ class ContractSerializer(NetBoxModelSerializer):
             'url',
             'display',
             'name',
+            'contract_type',
             'external_party_object_type',
             'external_party_object_id',
             'external_party_object',
@@ -396,22 +419,3 @@ class AccountingDimensionSerializer(NetBoxModelSerializer):
             'last_updated',
         )
         brief_fields = ('id', 'name', 'value', 'url', 'display')
-
-
-class ContractTypeSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:contracttype-detail')
-
-    class Meta:
-        model = ContractType
-        fields = (
-            'id',
-            'url',
-            'display',
-            'name',
-            'description',
-            'tags',
-            'custom_fields',
-            'created',
-            'last_updated',
-        )
-        brief_fields = ('id', 'name', 'description', 'url', 'display')
