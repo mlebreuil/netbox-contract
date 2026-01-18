@@ -7,14 +7,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "netbox-contract"
-version = "2.4.3"
+version = "2.4.4"
 authors = [
   { name="Marc Lebreuil", email="marc@famillelebreuil.net" },
 ]
 
 description = "Contract management plugin for Netbox"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 
 dependencies = [
     'python-dateutil',
