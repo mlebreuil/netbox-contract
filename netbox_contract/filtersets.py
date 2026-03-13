@@ -1,9 +1,9 @@
 import django_filters
-from django.db.models import Q
+from circuits.models import Provider
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import ContactModelFilterSet, TenancyFilterSet
-from circuits.models import Provider
 
 from .models import (
     AccountingDimension,
@@ -15,9 +15,9 @@ from .models import (
     InternalEntityChoices,
     Invoice,
     InvoiceLine,
+    InvoiceStatusChoices,
     ServiceProvider,
     StatusChoices,
-    InvoiceStatusChoices,
 )
 
 

@@ -2,8 +2,8 @@ from django.contrib.contenttypes.models import ContentType
 from netbox.plugins import PluginTemplateExtension
 
 from . import tables
-from .models import ContractAssignment
 from .constants import ASSIGNEMENT_TYPES
+from .models import ContractAssignment
 
 
 class ObjectContractAssignments(PluginTemplateExtension):
