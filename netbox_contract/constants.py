@@ -1,5 +1,5 @@
-from django.db.models import Q
 from django.conf import settings
+from django.db.models import Q
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 

@@ -1,3 +1,4 @@
+from circuits.models import Provider
 from django import forms
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -11,7 +12,6 @@ from netbox.forms import (
 )
 from tenancy.forms import ContactModelFilterForm, TenancyFilterForm
 from tenancy.models import Tenant
-from circuits.models import Provider
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES, get_field_value
 from utilities.forms.fields import (
     ColorField,
@@ -40,9 +40,9 @@ from .models import (
     InternalEntityChoices,
     Invoice,
     InvoiceLine,
+    InvoiceStatusChoices,
     ServiceProvider,
     StatusChoices,
-    InvoiceStatusChoices,
 )
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
@@ -61,6 +61,11 @@ class ContractForm(NetBoxModelForm):
         label=_('External party object type'),
     )
     external_party_object = forms.ModelChoiceField(queryset=None, label=_('External party object'))
+    internal_party = internal_party = forms.ChoiceField(
+        choices=InternalEntityChoices,
+        required=True,
+        label=_('Internal party')
+    )
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant'))
     parent = DynamicModelChoiceField(
         queryset=Contract.objects.all(),
@@ -683,8 +688,7 @@ class InvoiceLineForm(NetBoxModelForm):
         for dimension in accounting_dimensions:
             if dimension.name in dimensions_names:
                 raise ValidationError('duplicate accounting dimension')
-            else:
-                dimensions_names.append(dimension.name)
+            dimensions_names.append(dimension.name)
 
         # Make sure mandatory dimensions are present
         mandatory_dimensions = plugin_settings.get('mandatory_dimensions')

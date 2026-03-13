@@ -394,8 +394,7 @@ class InvoiceLineSerializer(NetBoxModelSerializer):
         for dimension in accounting_dimensions:
             if dimension.name in dimensions_names:
                 raise serializers.ValidationError('duplicate accounting dimension')
-            else:
-                dimensions_names.append(dimension.name)
+            dimensions_names.append(dimension.name)
         return data
 
 

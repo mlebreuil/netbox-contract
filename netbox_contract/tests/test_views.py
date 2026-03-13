@@ -15,9 +15,9 @@ from netbox_contract.models import (
     ContractType,
     Invoice,
     InvoiceLine,
+    InvoiceStatusChoices,
     ServiceProvider,
     StatusChoices,
-    InvoiceStatusChoices,
 )
 from netbox_contract.tests.custom import ModelViewTestCase
 

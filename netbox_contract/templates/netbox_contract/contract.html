@@ -42,7 +42,7 @@
             </tr>
             <tr>
               <th scope="row">{% trans "Internal party" %}</th>
-              <td>{{ object.internal_party }}</td>
+              <td>{{ object.get_internal_party_display }}</td>
             </tr>
             {% if not 'tenant' in hidden_fields %}
             <tr>
