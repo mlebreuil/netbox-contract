@@ -61,6 +61,11 @@ class ContractForm(NetBoxModelForm):
         label=_('External party object type'),
     )
     external_party_object = forms.ModelChoiceField(queryset=None, label=_('External party object'))
+    internal_party = internal_party = forms.ChoiceField(
+        choices=InternalEntityChoices,
+        required=True,
+        label=_('Internal party')
+    )
     tenant = DynamicModelChoiceField(queryset=Tenant.objects.all(), required=False, selector=True, label=_('Tenant'))
     parent = DynamicModelChoiceField(
         queryset=Contract.objects.all(),
