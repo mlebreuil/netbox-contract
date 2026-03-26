@@ -22,6 +22,7 @@ Accounting dimensions can be linked with invoice lines.
 |     4.2        |      2.3       |
 |     4.3        |      2.4       |
 |     4.4        |      2.4       |
+|     4.5        |      2.4       |
 
 ## Installing
 

@@ -5,6 +5,10 @@ on:
   push:
     branches:
       - "!release"
+    paths-ignore:
+      - '.github/**'
+      - 'docs/**'
+      - '**.md'
 
 concurrency:
   group: ${{ github.workflow }}
