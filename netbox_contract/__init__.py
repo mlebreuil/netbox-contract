@@ -27,6 +27,7 @@ class ContractsConfig(PluginConfig):
             'virtualization.virtualmachine',
             'virtualization.cluster',
         ],
+        'contract_assignments_display': 'both',  # options: 'tab', 'inline', 'both'
     }
 
 

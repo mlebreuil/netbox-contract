@@ -74,12 +74,17 @@ PLUGINS_CONFIG = {
             'ipam.ipaddress',
             'ipam.prefix',
         ],
+        'contract_assignments_display': 'both',  # options: 'tab', 'inline', 'both'
     }
 }
 
 ```
 
 * top_level_menu : If "Contracts" appears under the "Plugins" menu item or on its own
+* contract_assignments_display:
+  * `'tab'` - only the Contracts view tab is visible on the related object page.
+  * `'inline'` - only the inline contract assignments table is shown in object detail; the Contracts tab is hidden.
+  * `'both'` - both tab and inline table are shown (default behavior).
 * default_accounting_dimensions: The accounting dimensions which will appear in the field' background when empty. Note that accounting dimensions are now managed as individual objects. The use of this field is deprecated.  
 * mandatory_contract_fields, mandatory_invoice_fields: Fields which are not required by default and can be set as such. The list of fields is at the bottom of the contract import form.
 * hidden_contract_fields, hidden_invoice_fields: List of fields to be hidden. Fields should not be required to be hidden.
