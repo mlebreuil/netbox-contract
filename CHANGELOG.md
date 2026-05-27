@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* [#300](https://github.com/mlebreuil/netbox-contract/issues/300) Expose missing model fields (slug, comments, color, notice_period, documents, status) via API serializers.
 
 ## Version 2
 
