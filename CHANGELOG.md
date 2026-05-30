@@ -2,7 +2,6 @@
 
 ## [Unreleased]
 
-
 ## Version 2
 
 ### Version 2.4.5

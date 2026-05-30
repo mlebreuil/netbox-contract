@@ -3,15 +3,17 @@
 #  only. It is not intended for production use.                   #
 ###################################################################
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['*']
 
-DATABASE = {
-    "NAME": "netbox",
-    "USER": "netbox",
-    "PASSWORD": "netbox",
-    "HOST": "localhost",
-    "PORT": "",
-    "CONN_MAX_AGE": 300,
+DATABASES = {
+    'default': {
+        'NAME': 'netbox',
+        'USER': 'netbox',
+        'PASSWORD': 'netbox',
+        'HOST': 'localhost',
+        'PORT': '',
+        'CONN_MAX_AGE': 300,
+    }
 }
 
 FIELD_CHOICES = {
@@ -33,6 +35,7 @@ FIELD_CHOICES = {
 }
 
 PLUGINS = [
+    'netbox.tests.dummy_plugin',
     'netbox_contract',
 ]
 
@@ -46,21 +49,38 @@ PLUGINS_CONFIG = {
     }
 }
 
-REDIS = {
-    "tasks": {
-        "HOST": "localhost",
-        "PORT": 6379,
-        "PASSWORD": "",
-        "DATABASE": 0,
-        "SSL": False,
-    },
-    "caching": {
-        "HOST": "localhost",
-        "PORT": 6379,
-        "PASSWORD": "",
-        "DATABASE": 1,
-        "SSL": False,
-    },
+RQ = {
+    'COMMIT_MODE': 'auto',
 }
 
-SECRET_KEY = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+REDIS = {
+    'tasks': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'USERNAME': '',
+        'PASSWORD': '',
+        'DATABASE': 0,
+        'SSL': False,
+    },
+    'caching': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'USERNAME': '',
+        'PASSWORD': '',
+        'DATABASE': 1,
+        'SSL': False,
+    }
+}
+
+SECRET_KEY = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+
+DEFAULT_PERMISSIONS = {}
+
+API_TOKEN_PEPPERS = {
+    1: 'TEST-VALUE-DO-NOT-USE-TEST-VALUE-DO-NOT-USE-TEST-VALUE-DO-NOT-USE',
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True
+}
