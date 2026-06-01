@@ -325,7 +325,7 @@ class ServiceProviderSerializer(NetBoxModelSerializer):
             'created',
             'last_updated',
         )
-        brief_fields = ('id', 'url', 'display', 'name','slug')
+        brief_fields = ('id', 'url', 'display', 'name', 'slug')
 
 
 class ContractAssignmentSerializer(NetBoxModelSerializer):
@@ -347,11 +347,11 @@ class ContractAssignmentSerializer(NetBoxModelSerializer):
             'content_object',
             'contract',
             'tags',
-            'cuustom_fields',
+            'custom_fields',
             'created',
             'last_updated',
         )
-        brief_fields = ('id', 'url', 'display', 'content_object', 'contract','tags','custom_fields')
+        brief_fields = ('id', 'url', 'display', 'content_object', 'contract', 'tags', 'custom_fields')
 
     @swagger_serializer_method(serializer_or_field=serializers.JSONField)
     def get_content_object(self, instance):
