@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
-* [#300](https://github.com/mlebreuil/netbox-contract/issues/300) Expose missing model fields (slug, comments, color, notice_period, documents, status, tags, custom_fields) via API serializers.
-
 ## Version 2
+
+### Vesion 2.4.6
+
+* [#300](https://github.com/mlebreuil/netbox-contract/issues/300) Expose missing model fields (slug, comments, color, notice_period, documents, status, tags, custom_fields) via API serializers.
 
 ### Version 2.4.5
 * [292](https://github.com/mlebreuil/netbox-contract/issues/292) bug fix. Contract detail show internal party value instead of label.
