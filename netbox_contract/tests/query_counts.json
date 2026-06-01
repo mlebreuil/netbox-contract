@@ -1,0 +1,9 @@
+{
+  "accountingdimension:list_objects_with_permission": 18,
+  "contract:list_objects_with_permission": 20,
+  "contractassignment:list_objects_with_permission": 25,
+  "contracttype:list_objects_with_permission": 18,
+  "invoice:list_objects_with_permission": 20,
+  "invoiceline:list_objects_with_permission": 21,
+  "serviceprovider:list_objects_with_permission": 19
+}
