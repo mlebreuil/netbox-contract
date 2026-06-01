@@ -46,12 +46,14 @@ class NestedContractSerializer(WritableNestedSerializer):
             'end_date',
             'initial_term',
             'renewal_term',
+            'notice_period',
             'currency',
             'mrc',
             'yrc',
             'nrc',
             'invoice_frequency',
             'comments',
+            'documents',
         )
 
     @swagger_serializer_method(serializer_or_field=serializers.JSONField)
@@ -98,6 +100,7 @@ class ContractTypeSerializer(NetBoxModelSerializer):
             'display',
             'name',
             'description',
+            'color',
             'tags',
             'custom_fields',
             'created',
@@ -136,12 +139,14 @@ class ContractSerializer(NetBoxModelSerializer):
             'end_date',
             'initial_term',
             'renewal_term',
+            'notice_period',
             'currency',
             'mrc',
             'yrc',
             'nrc',
             'invoice_frequency',
             'comments',
+            'documents',
             'parent',
             'tags',
             'custom_fields',
@@ -205,12 +210,14 @@ class InvoiceSerializer(NetBoxModelSerializer):
             'number',
             'date',
             'template',
+            'status',
             'contracts',
             'period_start',
             'period_end',
             'currency',
             'amount',
             'comments',
+            'documents',
             'tags',
             'custom_fields',
             'created',
@@ -310,13 +317,15 @@ class ServiceProviderSerializer(NetBoxModelSerializer):
             'url',
             'display',
             'name',
+            'slug',
             'portal_url',
+            'comments',
             'tags',
             'custom_fields',
             'created',
             'last_updated',
         )
-        brief_fields = ('id', 'url', 'display', 'name')
+        brief_fields = ('id', 'url', 'display', 'name', 'slug')
 
 
 class ContractAssignmentSerializer(NetBoxModelSerializer):
@@ -337,10 +346,12 @@ class ContractAssignmentSerializer(NetBoxModelSerializer):
             'object_id',
             'content_object',
             'contract',
+            'tags',
+            'custom_fields',
             'created',
             'last_updated',
         )
-        brief_fields = ('id', 'url', 'display', 'content_object', 'contract')
+        brief_fields = ('id', 'url', 'display', 'content_object', 'contract', 'tags', 'custom_fields')
 
     @swagger_serializer_method(serializer_or_field=serializers.JSONField)
     def get_content_object(self, instance):
@@ -411,6 +422,7 @@ class AccountingDimensionSerializer(NetBoxModelSerializer):
             'display',
             'name',
             'value',
+            'status',
             'comments',
             'tags',
             'custom_fields',
