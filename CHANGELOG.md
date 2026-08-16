@@ -4,7 +4,11 @@
 
 ## Version 2
 
-### Vesion 2.4.6
+### Version v2.4.7
+
+* [#303](https://github.com/mlebreuil/netbox-contract/issues/303) Gracefully skip `supported_models` entries that don't resolve to a registered Django model instead of raising an unhandled `LookupError` during app startup (which previously crashed *every* management command, including `migrate`). This most commonly affects models created dynamically by other plugins (e.g. `netbox_custom_objects` custom object types), whose registration order relative to `netbox_contract` is not guaranteed. A clear error is now logged (`netbox.plugins.netbox_contract`) naming the offending entry, and the rest of the plugin continues to load normally.
+
+### Version 2.4.6
 
 * [#300](https://github.com/mlebreuil/netbox-contract/issues/300) Expose missing model fields (slug, comments, color, notice_period, documents, status, tags, custom_fields) via API serializers.
 
