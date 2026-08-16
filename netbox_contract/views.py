@@ -1,3 +1,4 @@
+import logging
 from datetime import date, timedelta
 
 from dateutil.relativedelta import relativedelta
@@ -29,6 +30,8 @@ from .models import (
 )
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
+
+logger = logging.getLogger('netbox.plugins.netbox_contract')
 
 
 # ContractType views
@@ -234,7 +237,27 @@ class BaseObjectContractAssignmentView(generic.ObjectChildrenView):
 # Dynamically register the view for all supported models
 for model_string in ASSIGNEMENT_TYPES:
     app_label, model_name = model_string.split('.')
-    model = apps.get_model(app_label, model_name)
+    try:
+        model = apps.get_model(app_label, model_name)
+    except LookupError:
+        # A configured supported model may not (yet) be registered in the
+        # app registry. This happens in particular with models that are
+        # created dynamically by other plugins (e.g. netbox_custom_objects
+        # custom object types), whose registration timing relative to our
+        # own app loading is not guaranteed. Rather than letting this take
+        # down the entire NetBox instance (including unrelated management
+        # commands such as `migrate`), skip this entry and let the rest of
+        # the plugin continue to load normally.
+        logger.error(
+            "netbox_contract: 'supported_models' entry '%s' does not "
+            "resolve to a registered model; skipping the Contracts tab/"
+            "view for it. Verify the app label and model name are "
+            "correct, and that any plugin providing this model (e.g. "
+            "netbox_custom_objects) has finished initializing before "
+            "netbox_contract loads.",
+            model_string,
+        )
+        continue
 
     class_name = f"{model_name.title()}ContractAssignmentView"
     attrs = {
