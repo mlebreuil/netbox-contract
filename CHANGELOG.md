@@ -2,8 +2,30 @@
 
 ## [Unreleased]
 
-
 ## Version 2
+
+### Version v2.4.7
+
+* [#303](https://github.com/mlebreuil/netbox-contract/issues/303) Gracefully skip `supported_models` entries that don't resolve to a registered Django model instead of raising an unhandled `LookupError` during app startup (which previously crashed *every* management command, including `migrate`). This most commonly affects models created dynamically by other plugins (e.g. `netbox_custom_objects` custom object types), whose registration order relative to `netbox_contract` is not guaranteed. A clear error is now logged (`netbox.plugins.netbox_contract`) naming the offending entry, and the rest of the plugin continues to load normally.
+
+### Version 2.4.6
+
+* [#300](https://github.com/mlebreuil/netbox-contract/issues/300) Expose missing model fields (slug, comments, color, notice_period, documents, status, tags, custom_fields) via API serializers.
+
+### Version 2.4.5
+* [292](https://github.com/mlebreuil/netbox-contract/issues/292) bug fix. Contract detail show internal party value instead of label.
+
+* [294](https://github.com/mlebreuil/netbox-contract/issues/294) Add `contract_assignments_display` plugin setting (`tab`, `inline`, `both`) for contract assignment UI. The tab view allows customization of the contracts list table columns.
+
+### Version 2.4.4
+* [288](https://github.com/mlebreuil/netbox-contract/issues/288) Add the possibility to assign contract any object type. By default the following objects types: 'circuits.circuit', 'circuits.virtualcircuit', 'dcim.site', 'dcim.device', 'dcim.rack', 'virtualization.virtualmachine', 'virtualization.cluster', 'ipam.ipaddress', 'ipam.prefix'. This list can be overriden within the PLUGINS_CONFIG configuration parameter. Check the README file or [documentation](https://mlebreuil.github.io/netbox-contract/) for more information.
+
+### Version 2.4.3
+
+* [282](https://github.com/mlebreuil/netbox-contract/issues/282) Add the possibility to assign contract to clusters and racks.
+* [276](https://github.com/mlebreuil/netbox-contract/issues/276) Add the possibility to update the provider in bulk for contracts.
+* [275](https://github.com/mlebreuil/netbox-contract/issues/275) Add the possibility to filter contract by provider an service provider. Remove the default value for the currency and internal party fields in the contract search form.
+* [274](https://github.com/mlebreuil/netbox-contract/issues/274) List contracts on providers and service providers pages
 
 ### Version 2.4.2
 

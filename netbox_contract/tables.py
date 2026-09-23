@@ -193,6 +193,36 @@ class ContractListBottomTable(NetBoxTable):
         )
 
 
+class ContractProviderBottomTable(NetBoxTable):
+    name = tables.Column(linkify=True)
+    external_party_object = tables.Column(linkify=True)
+    status = columns.ChoiceFieldColumn(
+        verbose_name=('Status'),
+    )
+
+    class Meta(NetBoxTable.Meta):
+        model = Contract
+        fields = (
+            'pk',
+            'id',
+            'name',
+            'start_date',
+            'end_date',
+            'external_reference',
+            'status',
+            'mrc',
+            'comments',
+            'actions',
+        )
+        default_columns = (
+            'name',
+            'status',
+            'external_reference',
+            'start_date',
+            'end_date',
+        )
+
+
 class InvoiceListTable(NetBoxTable):
     contracts = tables.ManyToManyColumn(linkify=True)
     number = tables.Column(linkify=True)

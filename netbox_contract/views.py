@@ -1,19 +1,24 @@
+import logging
 from datetime import date, timedelta
 
 from dateutil.relativedelta import relativedelta
+from django.apps import apps
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Case, F, When
 from django.db.models.functions import Round
 from django.shortcuts import get_object_or_404, render
+from django.utils.translation import gettext_lazy as _
+from netbox.object_actions import *
 from netbox.views import generic
 from netbox.views.generic.utils import get_prerequisite_model
 from utilities.forms import restrict_form_fields
 from utilities.querydict import normalize_querydict
-from utilities.views import register_model_view
+from utilities.views import ViewTab, get_action_url, register_model_view
 
 from . import filtersets, forms, tables
+from .constants import ASSIGNEMENT_TYPES
 from .models import (
     AccountingDimension,
     Contract,
@@ -25,6 +30,8 @@ from .models import (
 )
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
+
+logger = logging.getLogger('netbox.plugins.netbox_contract')
 
 
 # ContractType views
@@ -74,6 +81,19 @@ class ContractTypeBulkDeleteView(generic.BulkDeleteView):
 @register_model_view(ServiceProvider)
 class ServiceProviderView(generic.ObjectView):
     queryset = ServiceProvider.objects.all()
+
+    def get_extra_context(self, request, instance):
+        provider_type = ContentType.objects.get_for_model(ServiceProvider)
+        contracts = Contract.objects.filter(
+            external_party_object_type__pk=provider_type.id,
+            external_party_object_id=instance.id
+        )
+
+        contracts_table = tables.ContractProviderBottomTable(contracts)
+        contracts_table.configure(request)
+        return {
+            'contracts_table': contracts_table,
+        }
 
 
 class ServiceProviderListView(generic.ObjectListView):
@@ -168,6 +188,86 @@ class ContractAssignmentBulkDeleteView(generic.BulkDeleteView):
     queryset = ContractAssignment.objects.annotate()
     filterset = filtersets.ContractAssignmentFilterSet
     table = tables.ContractAssignmentListTable
+
+
+class AddContractAssignment(AddObject):
+    label = _('Add contract')
+
+    @classmethod
+    def get_url(cls, obj):
+        # obj will be the parent object in the custom template (ObjectChildren hook)
+        if hasattr(obj, 'pk') and hasattr(obj, '_meta') and obj.pk:
+            parent = obj
+            parent_ct = ContentType.objects.get_for_model(parent)
+            base_url = get_action_url(ContractAssignment, action='add')
+            return (
+                f"{base_url}?content_type={parent_ct.pk}"
+                f"&object_id={parent.pk}&return_url={parent.get_absolute_url()}"
+            )
+
+        # fallback for a class value (if called as model class)
+        return get_action_url(ContractAssignment, action='add')
+
+
+class BaseObjectContractAssignmentView(generic.ObjectChildrenView):
+    child_model = ContractAssignment
+    table = tables.ContractAssignmentObjectTable
+    filterset = filtersets.ContractAssignmentFilterSet
+    template_name = 'netbox_contract/object_contracts.html'
+    actions = (AddContractAssignment, BulkEdit, BulkDelete)
+    tab = ViewTab(
+        label=_('Contracts'),
+        visible=lambda obj: plugin_settings.get('contract_assignments_display', 'both') != 'inline',
+        badge=lambda obj: ContractAssignment.objects.filter(
+            content_type=ContentType.objects.get_for_model(obj), object_id=obj.id
+        ).count(),
+        permission='contracts.view_contractassignment',
+        weight=550,
+        hide_if_empty=True,
+    )
+
+    def get_children(self, request, parent):
+        object_type = ContentType.objects.get_for_model(parent)
+        contract_assignments = ContractAssignment.objects.filter(
+            content_type__pk=object_type.id, object_id=parent.id
+        )
+        return contract_assignments
+
+
+# Dynamically register the view for all supported models
+for model_string in ASSIGNEMENT_TYPES:
+    app_label, model_name = model_string.split('.')
+    try:
+        model = apps.get_model(app_label, model_name)
+    except LookupError:
+        # A configured supported model may not (yet) be registered in the
+        # app registry. This happens in particular with models that are
+        # created dynamically by other plugins (e.g. netbox_custom_objects
+        # custom object types), whose registration timing relative to our
+        # own app loading is not guaranteed. Rather than letting this take
+        # down the entire NetBox instance (including unrelated management
+        # commands such as `migrate`), skip this entry and let the rest of
+        # the plugin continue to load normally.
+        logger.error(
+            "netbox_contract: 'supported_models' entry '%s' does not "
+            "resolve to a registered model; skipping the Contracts tab/"
+            "view for it. Verify the app label and model name are "
+            "correct, and that any plugin providing this model (e.g. "
+            "netbox_custom_objects) has finished initializing before "
+            "netbox_contract loads.",
+            model_string,
+        )
+        continue
+
+    class_name = f"{model_name.title()}ContractAssignmentView"
+    attrs = {
+        'queryset': model.objects.all(),
+        'viewname': f'netbox_contract:{model_name}_contracts',
+    }
+    view_class = type(class_name, (BaseObjectContractAssignmentView,), attrs)
+
+    register_model_view(model, 'contracts', path='contracts')(view_class)
+
 
 # Contract views
 
