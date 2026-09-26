@@ -38,6 +38,7 @@ from .constants import (
     SERVICE_PROVIDER_TYPES,
 )
 from .models import (
+    CONTRACT_LINE_LOCKED_FIELDS,
     AccountingDimension,
     AccountingDimensionStatusChoices,
     BillingMethodChoices,
@@ -905,6 +906,11 @@ class ContractLineForm(NetBoxModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Once invoiced, only the internal fields of a line can change: the contract terms are shown disabled
+        if self.instance.pk and self.instance.lock_message():
+            for field in CONTRACT_LINE_LOCKED_FIELDS:
+                if field in self.fields:
+                    self.fields[field].disabled = True
         # Propose the currency of the contract given in the URL (?contract=<id>)
         contract_id = self.initial.get('contract')
         if contract_id and not self.initial.get('currency') and not self.instance.pk:

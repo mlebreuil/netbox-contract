@@ -7,7 +7,7 @@ note: When creating invoices and invoice lines through the API, the correspondin
 ## Units and contract lines
 
 - `units/`: `name`, `description`, `billing_method` (`one_time`, `recurring`, `usage`), `months` (required for `recurring`, empty otherwise). Deleting a unit used by contract lines returns 409.
-- `contract-lines/`: `contract` (id), `description`, `quantity`, `unit_price`, `unit` (id), `currency` (defaults to the contract's), `start_date` and `end_date` (default to the contract's), `accounting_dimensions` (list of ids), and the read-only `total_value`, `yearly_value` and `invoiced_at_conversion`. Filters: `contract_id`, `unit_id`, `unit`, `currency`, `billing_method`, `accounting_dimensions`, `invoice_id`, `q`. Creating, changing or deleting a line of a contract that has invoices returns 400.
+- `contract-lines/`: `contract` (id), `description`, `quantity`, `unit_price`, `unit` (id), `currency` (defaults to the contract's), `start_date` and `end_date` (default to the contract's), `accounting_dimensions` (list of ids), and the read-only `total_value`, `yearly_value` and `invoiced_at_conversion`. Filters: `contract_id`, `unit_id`, `unit`, `currency`, `billing_method`, `accounting_dimensions`, `invoice_id`, `q`. Creating or deleting a line of a contract that has invoices, or changing its contract terms, returns 400; its `accounting_dimensions`, `comments` and `tags` can still be changed.
 
 ## Contracts
 

@@ -111,6 +111,7 @@ The assessment (`.specify/assessments/contract-lines-units/`) already settled th
 - **I6. Unit name clash in the conversion**: a unit of the expected name with another definition is not reused; the conversion uses "<name> (converted)" and reports it.
 - **I7. Imports**: the invoice import applies the one-contract and currency rules (no line generation); the invoice line import accepts optional `contract_line` and `quantity` columns.
 - **I8. `calculated_rc`**: it was never an API field; no API alias is added. It stays on the contract page with a "deprecated" badge when `show_deprecated_fields` is true.
+- **I9. Internal fields of a locked contract line**: the lock of FR-029 covers the contract terms (contract, description, quantity, unit price, unit, currency, dates and custom fields). Accounting dimensions, comments and tags stay editable, since they are internal classification; the edit form shows the locked fields disabled. Invoice lines already created keep their dimensions. Adding and deleting lines stays locked.
 
 ## Testing approach (feeds tasks)
 

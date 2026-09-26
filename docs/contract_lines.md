@@ -39,4 +39,6 @@ Months are counted as whole calendar months plus the leftover days divided by th
 
 ### Lock once invoiced
 
-As soon as a contract has an invoice (draft, posted or canceled), its contract lines can no longer be added, changed or deleted: a new contract must be created. A contract line is also locked as soon as an invoice line references it, even when its own contract (a non-billable child) has no invoice. Deleting the contract itself still deletes its lines.
+As soon as a contract has an invoice (draft, posted or canceled), its contract lines can no longer be added or deleted, and their contract terms (description, quantity, unit price, unit, currency, dates and custom fields) can no longer change: a new contract must be created. A contract line is also locked as soon as an invoice line references it, even when its own contract (a non-billable child) has no invoice. Deleting the contract itself still deletes its lines.
+
+The accounting dimensions, comments and tags of a locked line can still be edited, since they are internal classification rather than contract terms; the edit form shows the other fields disabled. Invoice lines already created keep their own dimensions; new invoice lines take the new ones.

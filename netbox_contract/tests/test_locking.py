@@ -3,21 +3,27 @@
 from datetime import date
 from decimal import Decimal
 
+from core.models import ObjectType
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import ProtectedError
 from django.test import TestCase
 from django.urls import reverse
+from extras.choices import CustomFieldTypeChoices
+from extras.models import CustomField
+from rest_framework import status as http_status
 from utilities.exceptions import AbortRequest
 from utilities.testing import TestCase as NetBoxTestCase
 
 from netbox_contract.models import (
+    AccountingDimension,
     BillingMethodChoices,
     Contract,
     ContractLine,
     InvoiceStatusChoices,
     Unit,
 )
+from netbox_contract.tests.custom import APITestCase
 from netbox_contract.tests.helpers import (
     make_contract,
     make_invoice,
@@ -190,7 +196,7 @@ class LockViewsTestCase(NetBoxTestCase):
         self.assertTrue(ContractLine.objects.filter(pk=self.line.pk).exists())
         self.assertIn(NEW_CONTRACT_MESSAGE, response.content.decode())
 
-    def test_edit_view_refuses(self):
+    def test_edit_view_keeps_the_contract_terms(self):
         url = reverse('plugins:netbox_contract:contractline_edit', args=[self.line.pk])
         response = self.client.post(url, {
             'contract': self.contract.pk,
@@ -199,13 +205,122 @@ class LockViewsTestCase(NetBoxTestCase):
             'unit_price': 150,
             'unit': self.line.unit.pk,
         })
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(NEW_CONTRACT_MESSAGE, response.content.decode())
+        self.assertEqual(response.status_code, 302)
         self.line.refresh_from_db()
         self.assertEqual(self.line.description, 'Line')
+        self.assertEqual(self.line.unit_price, Decimal(100))
+
+    def test_add_view_refuses(self):
+        response = self.client.post(reverse('plugins:netbox_contract:contractline_add'), {
+            'contract': self.contract.pk,
+            'description': 'New',
+            'quantity': 1,
+            'unit_price': 150,
+            'unit': self.line.unit.pk,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(NEW_CONTRACT_MESSAGE, response.content.decode())
+        self.assertEqual(ContractLine.objects.count(), 1)
 
     def test_contract_page_hides_line_buttons_and_shows_notice(self):
         response = self.client.get(reverse('plugins:netbox_contract:contract', args=[self.contract.pk]))
         content = response.content.decode()
         self.assertIn(NEW_CONTRACT_MESSAGE, content)
         self.assertNotIn(f"{reverse('plugins:netbox_contract:contractline_add')}?contract={self.contract.pk}", content)
+        self.assertIn(reverse('plugins:netbox_contract:contractline_edit', args=[self.line.pk]), content)
+        self.assertNotIn(reverse('plugins:netbox_contract:contractline_delete', args=[self.line.pk]), content)
+        self.assertIn('accounting dimensions, comments and tags can still be edited', content)
+
+
+class InternalFieldsOfLockedLineTestCase(NetBoxTestCase):
+    """Accounting dimensions, comments and tags stay editable on a locked contract line (FR-029, decision I9)."""
+
+    def setUp(self):
+        super().setUp()
+        self.user.is_superuser = True
+        self.user.save()
+        self.contract = make_contract()
+        self.line = make_line(self.contract, monthly(), 100)
+        self.old = AccountingDimension.objects.create(name='account', value='OLD')
+        self.new = AccountingDimension.objects.create(name='account', value='NEW')
+        self.line.accounting_dimensions.set([self.old])
+        self.invoice = make_invoice(self.contract, amount=100)
+        self.invoice_line = make_invoice_line(self.invoice, contract_line=self.line, quantity=1, amount=100)
+        self.invoice_line.accounting_dimensions.set([self.old])
+
+    def test_model_accepts_internal_changes(self):
+        self.line.comments = 'Moved to the new cost center'
+        self.line.full_clean()
+        self.line.save()
+        self.line.accounting_dimensions.set([self.new])
+        self.line.tags.add('reviewed')
+        self.line.refresh_from_db()
+        self.assertEqual(list(self.line.accounting_dimensions.all()), [self.new])
+
+    def test_model_refuses_contract_terms(self):
+        custom_field = CustomField.objects.create(name='po_number', type=CustomFieldTypeChoices.TYPE_TEXT)
+        custom_field.object_types.set([ObjectType.objects.get_for_model(ContractLine)])
+        for field, value in (
+            ('description', 'Changed'), ('quantity', Decimal(2)), ('unit_price', Decimal(1)),
+            ('start_date', date(2025, 2, 1)), ('end_date', date(2025, 11, 30)),
+            ('custom_field_data', {'po_number': 'PO-1'}),
+        ):
+            with self.subTest(field=field):
+                line = ContractLine.objects.get(pk=self.line.pk)
+                setattr(line, field, value)
+                with self.assertRaises(ValidationError) as cm:
+                    line.full_clean()
+                self.assertIn(NEW_CONTRACT_MESSAGE, ' '.join(cm.exception.messages))
+
+    def test_existing_invoice_lines_keep_their_dimensions(self):
+        self.line.accounting_dimensions.set([self.new])
+        self.assertEqual(list(self.invoice_line.accounting_dimensions.all()), [self.old])
+
+    def test_edit_form_of_a_locked_line(self):
+        url = reverse('plugins:netbox_contract:contractline_edit', args=[self.line.pk])
+        form = self.client.get(url).context['form']
+        for field in ('contract', 'description', 'quantity', 'unit_price', 'unit', 'currency', 'start_date',
+                      'end_date'):
+            self.assertTrue(form.fields[field].disabled, field)
+        for field in ('accounting_dimensions', 'comments', 'tags'):
+            self.assertFalse(form.fields[field].disabled, field)
+
+        # disabled fields keep their values even if a client sends others
+        response = self.client.post(url, {
+            'contract': self.contract.pk,
+            'description': 'Ignored',
+            'quantity': 5,
+            'unit_price': 1,
+            'unit': self.line.unit.pk,
+            'accounting_dimensions': [self.new.pk],
+            'comments': 'New cost center',
+        })
+        self.assertEqual(response.status_code, 302, response.content.decode()[-1500:])
+        self.line.refresh_from_db()
+        self.assertEqual(self.line.description, 'Line')
+        self.assertEqual(self.line.unit_price, Decimal(100))
+        self.assertEqual(list(self.line.accounting_dimensions.all()), [self.new])
+        self.assertEqual(self.line.comments, 'New cost center')
+
+    def test_deleting_stays_refused(self):
+        with self.assertRaises(AbortRequest):
+            self.line.delete()
+
+
+class InternalFieldsAPITestCase(APITestCase):
+    model = ContractLine
+
+    def test_api(self):
+        self.add_permissions('netbox_contract.change_contractline', 'netbox_contract.view_contractline')
+        contract = make_contract()
+        line = make_line(contract, monthly(), 100)
+        make_invoice(contract, amount=100)
+        dimension = AccountingDimension.objects.create(name='account', value='NEW')
+        url = self._get_detail_url(line)
+        response = self.client.patch(
+            url, {'accounting_dimensions': [dimension.pk], 'comments': 'x'}, format='json', **self.header
+        )
+        self.assertHttpStatus(response, http_status.HTTP_200_OK)
+        self.assertEqual([d['id'] for d in response.data['accounting_dimensions']], [dimension.pk])
+        response = self.client.patch(url, {'unit_price': 1}, format='json', **self.header)
+        self.assertHttpStatus(response, http_status.HTTP_400_BAD_REQUEST)

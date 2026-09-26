@@ -10,7 +10,9 @@
 {% endblock %}
 {% block content %}
   {% if lock_message %}
-  <div class="alert alert-warning" role="alert">{{ lock_message }}</div>
+  <div class="alert alert-warning" role="alert">
+    {{ lock_message }} {% trans "Its accounting dimensions, comments and tags can still be edited." %}
+  </div>
   {% endif %}
   <div class="row mb-3">
     <div class="col col-md-6">

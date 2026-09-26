@@ -316,12 +316,11 @@ class ContractView(generic.ObjectView):
         hidden_fields = plugin_settings.get('hidden_contract_fields')
 
         lines_locked = instance.invoices.exists()
-        lines_table = tables.ContractLineContractTable(
+        table_class = tables.ContractLineLockedContractTable if lines_locked else tables.ContractLineContractTable
+        lines_table = table_class(
             instance.lines.select_related('unit').prefetch_related('accounting_dimensions', 'tags')
         )
         lines_table.configure(request)
-        if lines_locked:
-            lines_table.columns.hide('actions')
 
         return {
             'hidden_fields': hidden_fields,

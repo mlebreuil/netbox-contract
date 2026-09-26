@@ -27,7 +27,7 @@ For existing users and API clients:
 * A new invoice must have the currency of its contract, and cannot be created for a non-billable contract.
 * Creating an invoice (web interface or `POST invoices/`) now generates its invoice lines from the contract lines, and is refused when the invoice amount is lower than their total. Invoice lines are not generated when an invoice is edited or imported.
 * The copy of invoice template lines onto a new invoice is removed. Invoice templates are no longer used to pre-fill invoices; the pre-fill uses the contract lines instead of `mrc` and `yrc`.
-* Contract lines are locked once their contract has an invoice (any status) or once an invoice line references them: a new contract must be created. The billing method and months of a unit used by such lines are locked too.
+* Contract lines are locked once their contract has an invoice (any status) or once an invoice line references them: a new contract must be created. Their accounting dimensions, comments and tags remain editable. The billing method and months of a unit used by such lines are locked too.
 * The billable flag of a contract cannot change once the contract, one of its parents or one of its children has invoices. The currency of a contract cannot change once it has invoices or invoice lines; without invoices, its contract lines follow the new currency.
 * The amount of an invoice line that references a contract line is calculated, and a value sent for it is ignored.
 * The contract cost fields and new invoice templates are hidden unless `show_deprecated_fields` is `True`. The mandatory and hidden field settings ignore a deprecated field that is not shown (with a warning in the log) instead of failing.

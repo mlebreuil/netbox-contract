@@ -430,3 +430,12 @@ class ContractLineContractTable(ContractLineListTable):
             'yearly_value',
             'actions',
         )
+
+
+class ContractLineLockedContractTable(ContractLineContractTable):
+    """Contract lines of an invoiced contract: only their internal fields can be edited, none can be deleted."""
+
+    actions = columns.ActionsColumn(actions=('edit',))
+
+    class Meta(ContractLineContractTable.Meta):
+        pass

@@ -26,6 +26,21 @@ LOCKED_CONTRACT_MESSAGE = _(
 REFERENCED_LINE_MESSAGE = _(
     'This contract line is used by invoice lines: it cannot be changed or deleted. A new contract must be created.'
 )
+INTERNAL_FIELDS_NOTE = _('Its accounting dimensions, comments and tags can still be edited.')
+
+# Contract terms of a contract line, locked once it is invoiced (FR-029); its accounting dimensions, comments
+# and tags are internal classification and stay editable (decision I9)
+CONTRACT_LINE_LOCKED_FIELDS = (
+    'contract',
+    'description',
+    'quantity',
+    'unit_price',
+    'unit',
+    'currency',
+    'start_date',
+    'end_date',
+    'custom_field_data',
+)
 
 
 def _format_date(value, default):
@@ -764,6 +779,12 @@ class ContractLine(NetBoxModel):
             return LOCKED_CONTRACT_MESSAGE
         return None
 
+    def locked_fields_changed(self):
+        """Whether a contract term of this saved line differs from the database."""
+        attnames = [self._meta.get_field(name).attname for name in CONTRACT_LINE_LOCKED_FIELDS]
+        original = ContractLine.objects.filter(pk=self.pk).values(*attnames).first()
+        return original is None or any(original[name] != getattr(self, name) for name in attnames)
+
     def clean(self):
         super().clean()
         if not self.contract_id:
@@ -771,8 +792,8 @@ class ContractLine(NetBoxModel):
         self.apply_contract_defaults()
 
         message = self.lock_message()
-        if message:
-            raise ValidationError(message)
+        if message and (not self.pk or self.locked_fields_changed()):
+            raise ValidationError(f'{message} {INTERNAL_FIELDS_NOTE}' if self.pk else message)
 
         errors = {}
         contract = self.contract
