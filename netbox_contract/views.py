@@ -23,10 +23,12 @@ from .models import (
     AccountingDimension,
     Contract,
     ContractAssignment,
+    ContractLine,
     ContractType,
     Invoice,
     InvoiceLine,
     ServiceProvider,
+    Unit,
 )
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
@@ -309,8 +311,19 @@ class ContractView(generic.ObjectView):
 
         hidden_fields = plugin_settings.get('hidden_contract_fields')
 
+        lines_locked = instance.invoices.exists()
+        lines_table = tables.ContractLineContractTable(
+            instance.lines.select_related('unit').prefetch_related('accounting_dimensions', 'tags')
+        )
+        lines_table.configure(request)
+        if lines_locked:
+            lines_table.columns.hide('actions')
+
         return {
             'hidden_fields': hidden_fields,
+            'show_deprecated_fields': plugin_settings.get('show_deprecated_fields'),
+            'lines_table': lines_table,
+            'lines_locked': lines_locked,
             'invoices_table': invoices_table,
             'invoice_template': invoice_template,
             'invoicelines_table': invoicelines_table,
@@ -516,7 +529,7 @@ class InvoiceLineView(generic.ObjectView):
 
 
 class InvoiceLineListView(generic.ObjectListView):
-    queryset = InvoiceLine.objects.all()
+    queryset = InvoiceLine.objects.select_related('invoice', 'contract_line__unit')
     table = tables.InvoiceLineListTable
     filterset = filtersets.InvoiceLineFilterSet
     filterset_form = forms.InvoiceLineFilterForm
@@ -582,6 +595,104 @@ class InvoiceLineBulkDeleteView(generic.BulkDeleteView):
     queryset = InvoiceLine.objects.annotate()
     filterset = filtersets.InvoiceLineFilterSet
     table = tables.InvoiceLineListTable
+
+
+# Unit
+
+
+@register_model_view(Unit)
+class UnitView(generic.ObjectView):
+    queryset = Unit.objects.all()
+
+    def get_extra_context(self, request, instance):
+        lines_table = tables.ContractLineListTable(
+            instance.contract_lines.select_related('contract', 'unit').prefetch_related('accounting_dimensions')
+        )
+        lines_table.configure(request)
+        return {'lines_table': lines_table}
+
+
+class UnitListView(generic.ObjectListView):
+    queryset = Unit.objects.all()
+    table = tables.UnitListTable
+    filterset = filtersets.UnitFilterSet
+    filterset_form = forms.UnitFilterForm
+
+
+class UnitEditView(generic.ObjectEditView):
+    queryset = Unit.objects.all()
+    form = forms.UnitForm
+
+
+class UnitDeleteView(generic.ObjectDeleteView):
+    queryset = Unit.objects.all()
+
+
+class UnitBulkImportView(generic.BulkImportView):
+    queryset = Unit.objects.all()
+    model_form = forms.UnitImportForm
+    table = tables.UnitListTable
+
+
+class UnitBulkEditView(generic.BulkEditView):
+    queryset = Unit.objects.all()
+    filterset = filtersets.UnitFilterSet
+    table = tables.UnitListTable
+    form = forms.UnitBulkEditForm
+
+
+class UnitBulkDeleteView(generic.BulkDeleteView):
+    queryset = Unit.objects.all()
+    filterset = filtersets.UnitFilterSet
+    table = tables.UnitListTable
+
+
+# ContractLine
+
+
+@register_model_view(ContractLine)
+class ContractLineView(generic.ObjectView):
+    queryset = ContractLine.objects.select_related('contract', 'unit')
+
+    def get_extra_context(self, request, instance):
+        return {'lock_message': instance.lock_message()}
+
+
+class ContractLineListView(generic.ObjectListView):
+    queryset = ContractLine.objects.select_related('contract', 'unit').prefetch_related('accounting_dimensions')
+    table = tables.ContractLineListTable
+    filterset = filtersets.ContractLineFilterSet
+    filterset_form = forms.ContractLineFilterForm
+
+
+class ContractLineEditView(generic.ObjectEditView):
+    """The add view accepts ?contract=<id> to pre-select the contract."""
+
+    queryset = ContractLine.objects.all()
+    form = forms.ContractLineForm
+
+
+class ContractLineDeleteView(generic.ObjectDeleteView):
+    queryset = ContractLine.objects.all()
+
+
+class ContractLineBulkImportView(generic.BulkImportView):
+    queryset = ContractLine.objects.all()
+    model_form = forms.ContractLineImportForm
+    table = tables.ContractLineListTable
+
+
+class ContractLineBulkEditView(generic.BulkEditView):
+    queryset = ContractLine.objects.select_related('contract', 'unit')
+    filterset = filtersets.ContractLineFilterSet
+    table = tables.ContractLineListTable
+    form = forms.ContractLineBulkEditForm
+
+
+class ContractLineBulkDeleteView(generic.BulkDeleteView):
+    queryset = ContractLine.objects.select_related('contract', 'unit')
+    filterset = filtersets.ContractLineFilterSet
+    table = tables.ContractLineListTable
 
 
 # Accounting dimension

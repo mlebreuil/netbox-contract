@@ -6,10 +6,12 @@ from .models import (
     AccountingDimension,
     Contract,
     ContractAssignment,
+    ContractLine,
     ContractType,
     Invoice,
     InvoiceLine,
     ServiceProvider,
+    Unit,
 )
 
 
@@ -315,4 +317,81 @@ class AccountingDimensionListTable(NetBoxTable):
             'value',
             'comments',
             'status',
+        )
+
+
+class UnitListTable(NetBoxTable):
+    name = tables.Column(linkify=True)
+    billing_method = columns.ChoiceFieldColumn(verbose_name='Billing method')
+    tags = columns.TagColumn(url_name='plugins:netbox_contract:unit_list')
+
+    class Meta(NetBoxTable.Meta):
+        model = Unit
+        fields = ('pk', 'id', 'name', 'description', 'billing_method', 'months', 'comments', 'tags', 'actions')
+        default_columns = ('name', 'billing_method', 'months', 'description')
+
+
+class ContractLineListTable(NetBoxTable):
+    contract = tables.Column(linkify=True)
+    description = tables.Column(linkify=True)
+    unit = tables.Column(linkify=True)
+    unit__billing_method = columns.ChoiceFieldColumn(verbose_name='Billing method')
+    accounting_dimensions = tables.ManyToManyColumn(linkify_item=True, filter=lambda qs: qs.order_by('name'))
+    total_value = tables.Column(verbose_name='Total value', orderable=False)
+    yearly_value = tables.Column(verbose_name='Yearly value', orderable=False)
+    invoiced_at_conversion = columns.BooleanColumn(verbose_name='Invoiced at conversion')
+    tags = columns.TagColumn(url_name='plugins:netbox_contract:contractline_list')
+
+    class Meta(NetBoxTable.Meta):
+        model = ContractLine
+        fields = (
+            'pk',
+            'id',
+            'contract',
+            'description',
+            'quantity',
+            'unit',
+            'unit__billing_method',
+            'unit_price',
+            'currency',
+            'start_date',
+            'end_date',
+            'accounting_dimensions',
+            'total_value',
+            'yearly_value',
+            'invoiced_at_conversion',
+            'comments',
+            'tags',
+            'actions',
+        )
+        default_columns = (
+            'contract',
+            'description',
+            'quantity',
+            'unit',
+            'unit_price',
+            'currency',
+            'start_date',
+            'end_date',
+            'accounting_dimensions',
+        )
+
+
+class ContractLineContractTable(ContractLineListTable):
+    """Contract lines shown on their contract page."""
+
+    class Meta(ContractLineListTable.Meta):
+        fields = tuple(field for field in ContractLineListTable.Meta.fields if field != 'contract')
+        default_columns = (
+            'description',
+            'quantity',
+            'unit',
+            'unit__billing_method',
+            'unit_price',
+            'start_date',
+            'end_date',
+            'accounting_dimensions',
+            'total_value',
+            'yearly_value',
+            'actions',
         )

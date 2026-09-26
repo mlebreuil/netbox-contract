@@ -33,8 +33,10 @@ from .constants import ASSIGNEMENT_MODELS, SERVICE_PROVIDER_MODELS, SERVICE_PROV
 from .models import (
     AccountingDimension,
     AccountingDimensionStatusChoices,
+    BillingMethodChoices,
     Contract,
     ContractAssignment,
+    ContractLine,
     ContractType,
     CurrencyChoices,
     InternalEntityChoices,
@@ -43,6 +45,7 @@ from .models import (
     InvoiceStatusChoices,
     ServiceProvider,
     StatusChoices,
+    Unit,
 )
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
@@ -131,6 +134,7 @@ class ContractForm(NetBoxModelForm):
             'mrc',
             'nrc',
             'invoice_frequency',
+            'billable',
             'parent',
             'documents',
             'comments',
@@ -253,6 +257,7 @@ class ContractCSVForm(NetBoxModelImportForm):
             'mrc',
             'nrc',
             'invoice_frequency',
+            'billable',
             'documents',
             'comments',
             'parent',
@@ -672,6 +677,14 @@ class InvoiceLineForm(NetBoxModelForm):
         selector=True,
         label=_('Invoice'),
     )
+    contract_line = DynamicModelChoiceField(
+        queryset=ContractLine.objects.all(),
+        required=False,
+        query_params={'invoice_id': '$invoice'},
+        label=_('Contract line'),
+        help_text=_('Lines of the invoice contract and of its non-billable descendants. When a contract line is '
+                    'chosen, the unit and unit price come from it and the amount is calculated from the quantity.'),
+    )
     accounting_dimensions = DynamicModelMultipleChoiceField(
         queryset=AccountingDimension.objects.all(),
         required=False,
@@ -683,7 +696,7 @@ class InvoiceLineForm(NetBoxModelForm):
         super().clean()
 
         # check for duplicate dimensions
-        accounting_dimensions = self.cleaned_data['accounting_dimensions']
+        accounting_dimensions = self.cleaned_data.get('accounting_dimensions') or []
         dimensions_names = []
         for dimension in accounting_dimensions:
             if dimension.name in dimensions_names:
@@ -700,6 +713,8 @@ class InvoiceLineForm(NetBoxModelForm):
         model = InvoiceLine
         fields = [
             'invoice',
+            'contract_line',
+            'quantity',
             'currency',
             'amount',
             'accounting_dimensions',
@@ -768,6 +783,157 @@ class InvoiceLineBulkEditForm(NetBoxModelBulkEditForm):
     comments = CommentField(label=_('Comments'))
     nullable_fields = ('comments',)
     model = InvoiceLine
+
+
+# Unit
+
+
+class UnitForm(NetBoxModelForm):
+    comments = CommentField(label=_('Comments'))
+
+    class Meta:
+        model = Unit
+        fields = ('name', 'description', 'billing_method', 'months', 'comments', 'tags')
+
+
+class UnitFilterForm(NetBoxModelFilterSetForm):
+    model = Unit
+    name = forms.CharField(required=False, label=_('Name'))
+    billing_method = forms.MultipleChoiceField(
+        choices=BillingMethodChoices, required=False, label=_('Billing method')
+    )
+    tag = TagFilterField(model)
+
+
+class UnitImportForm(NetBoxModelImportForm):
+    billing_method = CSVChoiceField(
+        choices=BillingMethodChoices, help_text='one_time, recurring or usage', label=_('Billing method')
+    )
+
+    class Meta:
+        model = Unit
+        fields = ('name', 'description', 'billing_method', 'months', 'comments', 'tags')
+
+
+class UnitBulkEditForm(NetBoxModelBulkEditForm):
+    description = forms.CharField(required=False, label=_('Description'))
+    comments = CommentField(required=False, label=_('Comments'))
+    nullable_fields = ('description', 'comments')
+    model = Unit
+
+
+# ContractLine
+
+
+def check_duplicate_dimensions(accounting_dimensions):
+    names = [dimension.name for dimension in accounting_dimensions or ()]
+    if len(names) != len(set(names)):
+        raise ValidationError(_('duplicate accounting dimension'))
+
+
+class ContractLineForm(NetBoxModelForm):
+    contract = DynamicModelChoiceField(queryset=Contract.objects.all(), selector=True, label=_('Contract'))
+    unit = DynamicModelChoiceField(queryset=Unit.objects.all(), selector=True, label=_('Unit'))
+    accounting_dimensions = DynamicModelMultipleChoiceField(
+        queryset=AccountingDimension.objects.all(),
+        required=False,
+        selector=True,
+        label=_('Accounting dimensions'),
+    )
+    comments = CommentField(label=_('Comments'))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Propose the currency of the contract given in the URL (?contract=<id>)
+        contract_id = self.initial.get('contract')
+        if contract_id and not self.initial.get('currency') and not self.instance.pk:
+            contract = Contract.objects.filter(pk=contract_id).first()
+            if contract:
+                self.initial['currency'] = contract.currency
+
+    def clean(self):
+        super().clean()
+        check_duplicate_dimensions(self.cleaned_data.get('accounting_dimensions'))
+
+    class Meta:
+        model = ContractLine
+        fields = (
+            'contract',
+            'description',
+            'quantity',
+            'unit_price',
+            'unit',
+            'currency',
+            'start_date',
+            'end_date',
+            'accounting_dimensions',
+            'comments',
+            'tags',
+        )
+        widgets = {
+            'start_date': DatePicker(),
+            'end_date': DatePicker(),
+        }
+
+
+class ContractLineFilterForm(NetBoxModelFilterSetForm):
+    model = ContractLine
+    contract_id = DynamicModelMultipleChoiceField(
+        queryset=Contract.objects.all(), required=False, selector=True, label=_('Contract')
+    )
+    unit_id = DynamicModelMultipleChoiceField(
+        queryset=Unit.objects.all(), required=False, selector=True, label=_('Unit')
+    )
+    billing_method = forms.MultipleChoiceField(
+        choices=BillingMethodChoices, required=False, label=_('Billing method')
+    )
+    currency = forms.MultipleChoiceField(choices=CurrencyChoices, required=False, label=_('Currency'))
+    accounting_dimensions = DynamicModelMultipleChoiceField(
+        queryset=AccountingDimension.objects.all(), required=False, selector=True, label=_('Accounting dimensions')
+    )
+    tag = TagFilterField(model)
+
+
+class ContractLineImportForm(NetBoxModelImportForm):
+    contract = CSVModelChoiceField(queryset=Contract.objects.all(), help_text='Contract id', label=_('Contract'))
+    unit = CSVModelChoiceField(
+        queryset=Unit.objects.all(), to_field_name='name', help_text='Unit name', label=_('Unit')
+    )
+    accounting_dimensions = CSVModelMultipleChoiceField(
+        queryset=AccountingDimension.objects.all(),
+        to_field_name='id',
+        required=False,
+        help_text='accounting dimension id',
+        label=_('Accounting dimensions'),
+    )
+
+    class Meta:
+        model = ContractLine
+        fields = (
+            'contract',
+            'description',
+            'quantity',
+            'unit_price',
+            'unit',
+            'currency',
+            'start_date',
+            'end_date',
+            'accounting_dimensions',
+            'comments',
+            'tags',
+        )
+
+
+class ContractLineBulkEditForm(NetBoxModelBulkEditForm):
+    description = forms.CharField(max_length=200, required=False, label=_('Description'))
+    quantity = forms.DecimalField(max_digits=12, decimal_places=4, required=False, label=_('Quantity'))
+    unit_price = forms.DecimalField(max_digits=12, decimal_places=2, required=False, label=_('Unit price'))
+    unit = DynamicModelChoiceField(queryset=Unit.objects.all(), required=False, selector=True, label=_('Unit'))
+    start_date = forms.DateField(required=False, widget=DatePicker(), label=_('Start date'))
+    end_date = forms.DateField(required=False, widget=DatePicker(), label=_('End date'))
+    comments = CommentField(required=False, label=_('Comments'))
+    nullable_fields = ('comments',)
+    model = ContractLine
 
 
 # AccountingDimension

@@ -156,6 +156,33 @@
       {% endif %}
     </div>
   </div>
+  {% if perms.netbox_contract.view_contractline %}
+  <div class="row">
+    <div class="col col-md-12">
+      <div class="card">
+        <h5 class="card-header">
+          {% trans "Contract lines" %}
+          {% if perms.netbox_contract.add_contractline and not lines_locked %}
+          <div class="card-actions">
+            <a href="{% url 'plugins:netbox_contract:contractline_add' %}?contract={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
+              <i class="mdi mdi-plus-thick" aria-hidden="true"></i>
+              {% trans "Add a contract line" %}
+            </a>
+          </div>
+          {% endif %}
+        </h5>
+        {% if lines_locked %}
+        <div class="card-body">
+          <div class="alert alert-info mb-0" role="alert">
+            {% trans "This contract has invoices, so its lines can no longer be added, changed or deleted: a new contract must be created." %}
+          </div>
+        </div>
+        {% endif %}
+        {% render_table lines_table %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
   <div class="row">
     <div class="col col-md-12">
       <div class="card">

@@ -6,11 +6,13 @@ from .. import filtersets, models
 from .serializers import (
     AccountingDimensionSerializer,
     ContractAssignmentSerializer,
+    ContractLineSerializer,
     ContractSerializer,
     ContractTypeSerializer,
     InvoiceLineSerializer,
     InvoiceSerializer,
     ServiceProviderSerializer,
+    UnitSerializer,
 )
 
 
@@ -57,3 +59,17 @@ class AccountingDimensionViewSet(NetBoxModelViewSet):
 class ContractTypeViewSet(NetBoxModelViewSet):
     queryset = models.ContractType.objects.prefetch_related('tags')
     serializer_class = ContractTypeSerializer
+
+
+class UnitViewSet(NetBoxModelViewSet):
+    queryset = models.Unit.objects.prefetch_related('tags')
+    serializer_class = UnitSerializer
+    filterset_class = filtersets.UnitFilterSet
+
+
+class ContractLineViewSet(NetBoxModelViewSet):
+    queryset = models.ContractLine.objects.select_related('contract', 'unit').prefetch_related(
+        'accounting_dimensions', 'tags'
+    )
+    serializer_class = ContractLineSerializer
+    filterset_class = filtersets.ContractLineFilterSet

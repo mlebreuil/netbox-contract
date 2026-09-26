@@ -11,10 +11,13 @@ from ..models import (
     AccountingDimension,
     Contract,
     ContractAssignment,
+    ContractLine,
     ContractType,
+    CurrencyChoices,
     Invoice,
     InvoiceLine,
     ServiceProvider,
+    Unit,
 )
 
 
@@ -358,6 +361,85 @@ class ContractAssignmentSerializer(NetBoxModelSerializer):
         serializer = get_serializer_for_model(instance.content_type.model_class())
         context = {'request': self.context['request']}
         return serializer(instance.content_object, nested=True, context=context).data
+
+
+class UnitSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:unit-detail')
+
+    class Meta:
+        model = Unit
+        fields = (
+            'id',
+            'url',
+            'display',
+            'name',
+            'description',
+            'billing_method',
+            'months',
+            'comments',
+            'tags',
+            'custom_fields',
+            'created',
+            'last_updated',
+        )
+        brief_fields = ('id', 'url', 'display', 'name', 'description', 'billing_method', 'months')
+
+
+class ContractLineSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:contractline-detail')
+    contract = NestedContractSerializer()
+    unit = UnitSerializer(nested=True)
+    currency = serializers.ChoiceField(
+        choices=CurrencyChoices,
+        required=False,
+        allow_blank=True,
+        help_text="Defaults to the contract's currency",
+    )
+    accounting_dimensions = SerializedPKRelatedField(
+        queryset=AccountingDimension.objects.all(),
+        serializer=NestedAccountingDimensionSerializer,
+        required=False,
+        many=True,
+    )
+    total_value = serializers.DecimalField(
+        max_digits=14, decimal_places=2, read_only=True, allow_null=True,
+        help_text='Null when not available (recurring line without end date on an open-ended contract)',
+    )
+    yearly_value = serializers.DecimalField(max_digits=14, decimal_places=2, read_only=True)
+
+    class Meta:
+        model = ContractLine
+        fields = (
+            'id',
+            'url',
+            'display',
+            'contract',
+            'description',
+            'quantity',
+            'unit_price',
+            'unit',
+            'currency',
+            'start_date',
+            'end_date',
+            'accounting_dimensions',
+            'total_value',
+            'yearly_value',
+            'invoiced_at_conversion',
+            'comments',
+            'tags',
+            'custom_fields',
+            'created',
+            'last_updated',
+        )
+        brief_fields = ('id', 'url', 'display', 'contract', 'description', 'quantity', 'unit', 'unit_price',
+                        'currency')
+
+    def validate(self, data):
+        data = super().validate(data)
+        names = [dimension.name for dimension in data.get('accounting_dimensions') or ()]
+        if len(names) != len(set(names)):
+            raise serializers.ValidationError('duplicate accounting dimension')
+        return data
 
 
 class InvoiceLineSerializer(NetBoxModelSerializer):

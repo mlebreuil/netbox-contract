@@ -22,6 +22,24 @@ contracttype_buttons = [
     )
 ]
 
+contractline_buttons = [
+    PluginMenuButton(
+        link='plugins:netbox_contract:contractline_add',
+        title=_('Add'),
+        icon_class='mdi mdi-plus-thick',
+        permissions=['netbox_contract.add_contractline'],
+    )
+]
+
+unit_buttons = [
+    PluginMenuButton(
+        link='plugins:netbox_contract:unit_add',
+        title=_('Add'),
+        icon_class='mdi mdi-plus-thick',
+        permissions=['netbox_contract.add_unit'],
+    )
+]
+
 invoice_buttons = [
     PluginMenuButton(
         link='plugins:netbox_contract:invoice_add',
@@ -72,6 +90,20 @@ contracttype_menu_item = PluginMenuItem(
     permissions=['netbox_contract.view_contract'],
 )
 
+contractline_menu_item = PluginMenuItem(
+    link='plugins:netbox_contract:contractline_list',
+    link_text=_('Contract lines'),
+    buttons=contractline_buttons,
+    permissions=['netbox_contract.view_contractline'],
+)
+
+unit_menu_item = PluginMenuItem(
+    link='plugins:netbox_contract:unit_list',
+    link_text=_('Units'),
+    buttons=unit_buttons,
+    permissions=['netbox_contract.view_unit'],
+)
+
 invoices_menu_item = PluginMenuItem(
     link='plugins:netbox_contract:invoice_list',
     link_text=_('Invoices'),
@@ -107,6 +139,8 @@ contract_assignemnt_menu_item = PluginMenuItem(
 
 items = (
     contract_menu_item,
+    contractline_menu_item,
+    unit_menu_item,
     contracttype_menu_item,
     invoices_menu_item,
     invoicelines_menu_item,
