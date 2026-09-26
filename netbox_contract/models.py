@@ -939,6 +939,16 @@ class InvoiceLine(NetBoxModel):
             if amount > (invoice.amount - invoice.total_invoicelines_amount + previous_amount):
                 raise ValidationError('Sum of invoice line amount greater than invoice amount')
 
+    def save(self, *args, **kwargs):
+        if self.contract_line_id:
+            try:
+                self.amount = self.calculate_amount()
+            except ValueError:
+                # Recurring line on an invoice without period: keep the amount given, if any
+                if self.amount is None:
+                    self.amount = Decimal(0)
+        super().save(*args, **kwargs)
+
 
 def yearly_value_annotation():
     """

@@ -21,8 +21,36 @@
               </td>
             </tr>
             <tr>
+              <th scope="row">{% trans "Contract line" %}</th>
+              <td>
+                {% if object.contract_line %}
+                  <a href="{{ object.contract_line.get_absolute_url }}">{{ object.contract_line }}</a>
+                  ({{ object.contract_line.contract }})
+                {% else %}
+                  {{ ''|placeholder }}
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">{% trans "Quantity" %}</th>
+              <td>{{ object.quantity|placeholder }}</td>
+            </tr>
+            <tr>
+              <th scope="row">{% trans "Unit" %}</th>
+              <td>
+                {% if object.unit %}<a href="{{ object.unit.get_absolute_url }}">{{ object.unit }}</a>{% else %}{{ ''|placeholder }}{% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">{% trans "Unit price" %}</th>
+              <td>{{ object.unit_price|placeholder }}</td>
+            </tr>
+            <tr>
               <th scope="row">{% trans "Amount" %}</th>
-              <td>{{ object.amount }}</td>
+              <td>
+                {{ object.amount }}
+                {% if object.contract_line %}<span class="text-muted">({% trans "calculated" %})</span>{% endif %}
+              </td>
             </tr>
             <tr>
               <th scope="row">{% trans "Currency" %}</th>
@@ -30,7 +58,13 @@
             </tr>
             <tr>
               <th scope="row">{% trans "Accounting dimensions" %}</th>
-              <td>{{ object.accounting_dimensions }}</td>
+              <td>
+                {% for dimension in object.accounting_dimensions.all %}
+                  <a href="{{ dimension.get_absolute_url }}">{{ dimension }}</a>{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                  {{ ''|placeholder }}
+                {% endfor %}
+              </td>
             </tr>
           </table>
       </div>

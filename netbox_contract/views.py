@@ -410,7 +410,9 @@ class InvoiceView(generic.ObjectView):
     def get_extra_context(self, request, instance):
         contracts_table = tables.ContractListTable(instance.contracts.annotate(yearly_value=yearly_value_annotation()))
         contracts_table.configure(request)
-        invoicelines_table = tables.InvoiceLineListTable(instance.invoicelines.all())
+        invoicelines_table = tables.InvoiceLineListTable(
+            instance.invoicelines.select_related('contract_line__unit').prefetch_related('accounting_dimensions')
+        )
         invoicelines_table.columns.hide('invoice')
         invoicelines_table.configure(request)
         hidden_fields = plugin_settings.get('hidden_invoice_fields')

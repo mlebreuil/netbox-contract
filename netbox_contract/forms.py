@@ -54,6 +54,7 @@ from .models import (
     StatusChoices,
     Unit,
 )
+from .services import invoicing
 from .validators import check_invoice_contracts
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
@@ -439,6 +440,15 @@ class InvoiceForm(NetBoxModelForm):
             previous_contract_ids=[] if is_new else list(self.instance.contracts.values_list('pk', flat=True)),
             previous_currency=None if is_new else Invoice.objects.get(pk=self.instance.pk).currency,
         )
+        # a new invoice gets its lines from the contract lines (FR-021, FR-023)
+        contracts = list(self.cleaned_data.get('contracts') or [])
+        if is_new and not self.cleaned_data.get('template') and len(contracts) == 1 and not errors:
+            errors = invoicing.check_new_invoice(
+                contracts[0],
+                self.cleaned_data.get('amount'),
+                self.cleaned_data.get('period_start'),
+                self.cleaned_data.get('period_end'),
+            )
         if errors:
             raise ValidationError(errors)
 
@@ -464,35 +474,10 @@ class InvoiceForm(NetBoxModelForm):
 
         instance = super().save(*args, **kwargs)
 
-        if is_new and not self.cleaned_data.get('template'):
-            contracts = self.cleaned_data['contracts']
-
-            for contract in contracts:
-                try:
-                    template_exists = True
-                    invoice_template = Invoice.objects.get(template=True, contracts=contract)
-                except ObjectDoesNotExist:
-                    template_exists = False
-
-                if template_exists:
-                    first = True
-                    for line in invoice_template.invoicelines.all():
-                        dimensions = line.accounting_dimensions.all()
-                        line.pk = None
-                        line.id = None
-                        line._state.adding = True
-                        line.invoice = self.instance
-
-                        # adjust the first invoice line amount
-                        amount = self.cleaned_data['amount']
-                        if first and amount != invoice_template.total_invoicelines_amount:
-                            line.amount = line.amount + amount - invoice_template.total_invoicelines_amount
-
-                        line.save()
-
-                        for dimension in dimensions:
-                            line.accounting_dimensions.add(dimension)
-                        first = False
+        # Invoice lines are generated from the contract lines of a new invoice only; invoice templates are
+        # no longer copied (they are kept for reference)
+        if is_new and not instance.template:
+            invoicing.generate_invoice_lines(instance)
 
         return instance
 
@@ -820,6 +805,12 @@ class InvoiceLineImportForm(NetBoxModelImportForm):
         help_text='Invoice number',
         label=_('Invoice'),
     )
+    contract_line = CSVModelChoiceField(
+        queryset=ContractLine.objects.all(),
+        required=False,
+        help_text='Contract line id; the amount is then calculated from the quantity',
+        label=_('Contract line'),
+    )
     accounting_dimensions = CSVModelMultipleChoiceField(
         queryset=AccountingDimension.objects.all(),
         to_field_name='id',
@@ -832,6 +823,8 @@ class InvoiceLineImportForm(NetBoxModelImportForm):
         model = InvoiceLine
         fields = [
             'invoice',
+            'contract_line',
+            'quantity',
             'currency',
             'amount',
             'accounting_dimensions',

@@ -1,5 +1,4 @@
 from django.contrib.auth.models import ContentType
-from django.core.exceptions import ObjectDoesNotExist
 from drf_yasg.utils import swagger_serializer_method
 from netbox.api.fields import ContentTypeField, SerializedPKRelatedField
 from netbox.api.serializers import NetBoxModelSerializer, WritableNestedSerializer
@@ -19,6 +18,7 @@ from ..models import (
     ServiceProvider,
     Unit,
 )
+from ..services import invoicing
 from ..validators import check_invoice_contracts
 
 
@@ -288,6 +288,14 @@ class InvoiceSerializer(NetBoxModelSerializer):
         if errors:
             raise serializers.ValidationError({'contracts': errors})
 
+        # a new invoice gets its lines from the contract lines (FR-021, FR-023)
+        if is_new and not data.get('template') and len(contracts) == 1:
+            errors = invoicing.check_new_invoice(
+                contracts[0], data.get('amount'), data.get('period_start'), data.get('period_end')
+            )
+            if errors:
+                raise serializers.ValidationError({'non_field_errors': errors})
+
         # template checks
         if data.get('template'):
             # Check that there is only one invoice template per contract
@@ -310,44 +318,9 @@ class InvoiceSerializer(NetBoxModelSerializer):
     def create(self, validated_data):
         instance = super().create(validated_data)
 
+        # Invoice lines are generated from the contract lines; invoice templates are no longer copied
         if not instance.template:
-            contracts = instance.contracts.all()
-
-            for contract in contracts:
-                try:
-                    template_exists = True
-                    invoice_template = Invoice.objects.get(
-                        template=True, contracts=contract
-                    )
-                except ObjectDoesNotExist:
-                    template_exists = False
-
-                if template_exists:
-                    first = True
-                    for line in invoice_template.invoicelines.all():
-                        dimensions = line.accounting_dimensions.all()
-                        line.pk = None
-                        line.id = None
-                        line._state.adding = True
-                        line.invoice = instance
-
-                        # adjust the first invoice line amount
-                        amount = validated_data['amount']
-                        if (
-                            first
-                            and amount != invoice_template.total_invoicelines_amount
-                        ):
-                            line.amount = (
-                                line.amount
-                                + amount
-                                - invoice_template.total_invoicelines_amount
-                            )
-
-                        line.save()
-
-                        for dimension in dimensions:
-                            line.accounting_dimensions.add(dimension)
-                        first = False
+            invoicing.generate_invoice_lines(instance)
 
         return instance
 
@@ -491,6 +464,15 @@ class InvoiceLineSerializer(NetBoxModelSerializer):
         view_name='plugins-api:netbox_contract-api:invoiceline-detail'
     )
     invoice = NestedInvoiceSerializer(many=False, required=False)
+    contract_line = ContractLineSerializer(nested=True, required=False, allow_null=True)
+    unit = UnitSerializer(nested=True, read_only=True, help_text='Unit of the contract line')
+    unit_price = serializers.DecimalField(
+        max_digits=12, decimal_places=2, read_only=True, allow_null=True, help_text='Unit price of the contract line'
+    )
+    amount = serializers.DecimalField(
+        max_digits=10, decimal_places=2, required=False,
+        help_text='Calculated (and ignored if sent) when the line references a contract line; required otherwise',
+    )
     accounting_dimensions = SerializedPKRelatedField(
         queryset=AccountingDimension.objects.all(),
         serializer=NestedAccountingDimensionSerializer,
@@ -505,6 +487,10 @@ class InvoiceLineSerializer(NetBoxModelSerializer):
             'url',
             'display',
             'invoice',
+            'contract_line',
+            'quantity',
+            'unit',
+            'unit_price',
             'amount',
             'currency',
             'accounting_dimensions',
