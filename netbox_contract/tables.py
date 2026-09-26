@@ -152,6 +152,8 @@ class ContractListTable(DeprecatedColumnsMixin, ContactsColumnMixin, NetBoxTable
     )
     tags = columns.TagColumn(url_name='plugins:netbox_contract:contract_list')
     contract_type = tables.Column(linkify=True, verbose_name='Contract type')
+    billable = columns.BooleanColumn(verbose_name='Billable')
+    yearly_value = tables.Column(verbose_name='Yearly value')
 
     class Meta(NetBoxTable.Meta):
         model = Contract
@@ -175,12 +177,14 @@ class ContractListTable(DeprecatedColumnsMixin, ContactsColumnMixin, NetBoxTable
             'yrc',
             'nrc',
             'invoice_frequency',
+            'billable',
+            'yearly_value',
             'documents',
             'comments',
             'parent',
             'actions',
         )
-        default_columns = ('name', 'status', 'contract_type', 'parent')
+        default_columns = ('name', 'status', 'contract_type', 'parent', 'billable', 'yearly_value')
 
 
 class ContractListBottomTable(DeprecatedColumnsMixin, NetBoxTable):

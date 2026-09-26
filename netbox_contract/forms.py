@@ -229,6 +229,12 @@ class ContractFilterForm(ContactModelFilterForm, TenancyFilterForm, NetBoxModelF
         label=_('Parent'),
     )
 
+    billable = forms.NullBooleanField(
+        required=False,
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_('Billable'),
+    )
+
     tag = TagFilterField(model)
 
 
@@ -330,6 +336,11 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         selector=True,
         label=_('Parent'),
+    )
+    billable = forms.NullBooleanField(
+        required=False,
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_('Billable'),
     )
 
     nullable_fields = ('comments',)

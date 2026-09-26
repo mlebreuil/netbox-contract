@@ -60,6 +60,7 @@ class ContractFilterSet(ContactModelFilterSet, NetBoxModelFilterSet, TenancyFilt
             'external_party_object_id',
             'external_reference',
             'parent',
+            'billable',
         )
 
     def search(self, queryset, name, value):

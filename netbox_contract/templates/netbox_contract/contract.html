@@ -127,6 +127,31 @@
       {% include 'inc/panels/custom_fields.html' %}
     </div>
     <div class="col col-md-6">
+      <div class="card">
+        <h5 class="card-header">{% trans "Values" %}</h5>
+        <table class="table table-hover attr-table">
+          <tr>
+            <th scope="row">{% trans "Billable" %}</th>
+            <td>{% checkmark object.billable %}</td>
+          </tr>
+          <tr>
+            <th scope="row">{% trans "Total contract value" %}</th>
+            <td>
+              {% with total=object.total_contract_value %}
+                {% if total is None %}{% trans "Not available" %}{% else %}{{ total }} {{ object.get_currency_display }}{% endif %}
+              {% endwith %}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">{% trans "Yearly value" %}</th>
+            <td>{{ object.yearly_contract_value }} {{ object.get_currency_display }}</td>
+          </tr>
+          <tr>
+            <th scope="row">{% trans "Yearly billable value" %}</th>
+            <td>{{ object.yearly_billable_value }} {{ object.get_currency_display }}</td>
+          </tr>
+        </table>
+      </div>
       {% include 'inc/panels/tags.html' %}
       {% include 'inc/panels/comments.html' %}
       {% if invoice_template %}

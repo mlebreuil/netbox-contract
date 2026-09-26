@@ -7,9 +7,9 @@ from django.urls import reverse
 from rest_framework import status
 from utilities.testing import APIViewTestCases
 
-from netbox_contract.models import AccountingDimension, BillingMethodChoices, ContractLine, Unit
+from netbox_contract.models import AccountingDimension, BillingMethodChoices, Contract, ContractLine, Unit
 from netbox_contract.tests.custom import APITestCase
-from netbox_contract.tests.helpers import make_contract, make_invoice, make_line, monthly
+from netbox_contract.tests.helpers import make_contract, make_invoice, make_line, monthly, one_time
 
 
 class UnitAPITestCase(
@@ -186,3 +186,61 @@ class ContractLineAPITestCase(
         self.assertEqual(response.data['count'], 1)
         response = self.client.get(f'{url}?q=setup', **self.header)
         self.assertEqual(response.data['count'], 1)
+
+
+class ContractAPITestCase(APITestCase):
+    """contracts/: billable flag, computed values and deprecated fields (US3)."""
+
+    model = Contract
+
+    def setUp(self):
+        super().setUp()
+        self.add_permissions('netbox_contract.view_contract', 'netbox_contract.change_contract')
+        self.contract = make_contract(name='Valued', mrc=Decimal(100))
+        make_line(self.contract, monthly(), 100)
+        make_line(self.contract, one_time(), 500)
+        self.open_ended = make_contract(name='Open', end_date=None, billable=False)
+        make_line(self.open_ended, monthly(), 10)
+
+    def test_computed_values(self):
+        response = self.client.get(self._get_detail_url(self.contract), **self.header)
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+        self.assertTrue(response.data['billable'])
+        self.assertEqual(Decimal(response.data['total_contract_value']), Decimal('1700.00'))
+        self.assertEqual(Decimal(response.data['yearly_contract_value']), Decimal('1200.00'))
+        self.assertEqual(Decimal(response.data['yearly_billable_value']), Decimal('1200.00'))
+        self.assertEqual(Decimal(response.data['mrc']), Decimal(100))
+
+        response = self.client.get(self._get_detail_url(self.open_ended), **self.header)
+        self.assertIsNone(response.data['total_contract_value'])
+        self.assertEqual(Decimal(response.data['yearly_contract_value']), Decimal('120.00'))
+        self.assertEqual(Decimal(response.data['yearly_billable_value']), Decimal('0.00'))
+
+    def test_list_values_and_billable_filter(self):
+        url = self._get_list_url()
+        response = self.client.get(url, **self.header)
+        values = {item['name']: Decimal(item['yearly_contract_value']) for item in response.data['results']}
+        self.assertEqual(values, {'Valued': Decimal('1200.00'), 'Open': Decimal('120.00')})
+        response = self.client.get(f'{url}?billable=false', **self.header)
+        self.assertEqual([item['name'] for item in response.data['results']], ['Open'])
+        response = self.client.get(f'{url}?billable=true', **self.header)
+        self.assertEqual([item['name'] for item in response.data['results']], ['Valued'])
+
+    def test_billable_writable_and_values_read_only(self):
+        url = self._get_detail_url(self.contract)
+        response = self.client.patch(
+            url, {'billable': False, 'total_contract_value': '1', 'yearly_contract_value': '1'}, format='json',
+            **self.header,
+        )
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+        self.contract.refresh_from_db()
+        self.assertFalse(self.contract.billable)
+        self.assertEqual(Decimal(response.data['total_contract_value']), Decimal('1700.00'))
+
+    def test_billable_locked_once_invoiced(self):
+        make_invoice(self.contract, amount=100)
+        response = self.client.patch(
+            self._get_detail_url(self.contract), {'billable': False}, format='json', **self.header
+        )
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('billable', response.data)

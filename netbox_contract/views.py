@@ -29,6 +29,7 @@ from .models import (
     InvoiceLine,
     ServiceProvider,
     Unit,
+    yearly_value_annotation,
 )
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
@@ -334,12 +335,7 @@ class ContractView(generic.ObjectView):
 
 
 class ContractListView(generic.ObjectListView):
-    queryset = Contract.objects.annotate(
-        calculated_rc=Round(
-            Case(When(yrc__gt=0, then=F('yrc') / 12), default=F('mrc') * 12),
-            precision=2,
-        )
-    )
+    queryset = Contract.objects.annotate(yearly_value=yearly_value_annotation())
     table = tables.ContractListTable
     filterset = filtersets.ContractFilterSet
     filterset_form = forms.ContractFilterForm
@@ -410,7 +406,7 @@ class InvoiceView(generic.ObjectView):
     queryset = Invoice.objects.all()
 
     def get_extra_context(self, request, instance):
-        contracts_table = tables.ContractListTable(instance.contracts.all())
+        contracts_table = tables.ContractListTable(instance.contracts.annotate(yearly_value=yearly_value_annotation()))
         contracts_table.configure(request)
         invoicelines_table = tables.InvoiceLineListTable(instance.invoicelines.all())
         invoicelines_table.columns.hide('invoice')

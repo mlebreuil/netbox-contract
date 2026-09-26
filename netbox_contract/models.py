@@ -868,3 +868,29 @@ class InvoiceLine(NetBoxModel):
             previous_amount = self.__class__.objects.get(pk=self.pk).amount
             if amount > (invoice.amount - invoice.total_invoicelines_amount + previous_amount):
                 raise ValidationError('Sum of invoice line amount greater than invoice amount')
+
+
+def yearly_value_annotation():
+    """
+    SQL expression of a contract's yearly value (sum of its recurring lines, each rounded to two decimals),
+    for list views and the API so that the value does not cost one query per contract (research D6).
+    """
+    line_yearly = models.functions.Round(
+        models.ExpressionWrapper(
+            models.F('quantity') * models.F('unit_price') * models.Value(12) / models.F('unit__months'),
+            output_field=models.DecimalField(max_digits=24, decimal_places=8),
+        ),
+        precision=2,
+    )
+    per_contract = (
+        ContractLine.objects.filter(contract=models.OuterRef('pk'), unit__billing_method=BillingMethodChoices.RECURRING)
+        .order_by()
+        .values('contract')
+        .annotate(total=models.Sum(line_yearly))
+        .values('total')
+    )
+    return models.functions.Coalesce(
+        models.Subquery(per_contract, output_field=models.DecimalField(max_digits=16, decimal_places=2)),
+        models.Value(Decimal('0.00')),
+        output_field=models.DecimalField(max_digits=16, decimal_places=2),
+    )
