@@ -17,10 +17,13 @@ from netbox_contract.tests.helpers import (
     make_invoice,
     make_invoice_line,
     make_line,
+    make_unit,
     monthly,
     one_time,
     usage,
 )
+
+DRAFT = InvoiceStatusChoices.STATUS_DRAFT
 
 
 class HierarchyMixin:
@@ -104,6 +107,8 @@ class GenerationViewTestCase(HierarchyMixin, NetBoxTestCase):
             {
                 'invoice': line.invoice.pk,
                 'contract_line': self.usage_line.pk,
+                'unit': self.usage_line.unit.pk,
+                'unit_price': '20',
                 'quantity': '3',
                 'currency': line.currency,
                 'amount': '9999',
@@ -115,6 +120,43 @@ class GenerationViewTestCase(HierarchyMixin, NetBoxTestCase):
         self.assertEqual(line.contract_line, self.usage_line)
         self.assertEqual(line.amount, Decimal('60.00'))
         self.assertEqual(list(line.accounting_dimensions.all()), [self.account])
+
+    def test_edit_form_of_a_line_with_a_contract_line(self):
+        """Only the quantity (and the internal fields) can change; unit and unit price are shown read-only."""
+        self.create_invoice(self.parent)
+        line = InvoiceLine.objects.get(contract_line=self.parent_line)
+        url = reverse('plugins:netbox_contract:invoiceline_edit', args=[line.pk])
+        response = self.client.get(url)
+        form = response.context['form']
+        content = response.content.decode()
+        self.assertIn('Unit price', content)
+        self.assertIn('Monthly', content)
+        for field in ('invoice', 'contract_line', 'currency', 'amount'):
+            self.assertTrue(form.fields[field].disabled, field)
+        for field in ('unit', 'unit_price', 'quantity', 'accounting_dimensions', 'comments', 'tags'):
+            self.assertFalse(form.fields[field].disabled, field)
+        self.assertEqual(form.initial['unit'], self.parent_line.unit.pk)
+        self.assertEqual(form.initial['unit_price'], Decimal(100))
+        names = list(form.fields)
+        position = names.index('contract_line')
+        self.assertEqual(names[position + 1:position + 3], ['unit', 'unit_price'])
+
+        response = self.client.post(url, {
+            'unit': self.parent_line.unit.pk, 'unit_price': '100', 'quantity': '2', 'amount': '1',
+            'accounting_dimensions': [self.account.pk],
+        })
+        self.assertEqual(response.status_code, 302, response.content.decode()[-1500:])
+        line.refresh_from_db()
+        self.assertEqual((line.quantity, line.amount), (Decimal(2), Decimal('200.00')))
+        self.assertEqual((line.contract_line, line.invoice.number), (self.parent_line, 'GEN-1'))
+
+    def test_edit_form_of_a_manual_line(self):
+        invoice = make_invoice(None, number='MANUAL', amount=100, status=DRAFT)
+        line = make_invoice_line(invoice, amount=40)
+        form = self.client.get(reverse('plugins:netbox_contract:invoiceline_edit', args=[line.pk])).context['form']
+        self.assertFalse(form.fields['amount'].disabled)
+        self.assertFalse(form.fields['unit'].disabled)
+        self.assertFalse(form.fields['unit_price'].disabled)
 
     def test_non_billable_contract_refused(self):
         """Scenario 4."""
@@ -167,7 +209,7 @@ class GenerationViewTestCase(HierarchyMixin, NetBoxTestCase):
         self.assertEqual(Invoice.objects.get(number='IMP-1').invoicelines.count(), 0)
 
     def test_import_invoice_line_with_a_contract_line(self):
-        invoice = make_invoice(self.parent, number='IMPORTED', amount=1000)
+        invoice = make_invoice(self.parent, number='IMPORTED', amount=1000, status=DRAFT)
         csv = f'invoice,contract_line,quantity,currency,amount\nIMPORTED,{self.usage_line.pk},4,usd,'
         response = self.client.post(
             reverse('plugins:netbox_contract:invoiceline_bulk_import'),
@@ -260,7 +302,7 @@ class GenerationRulesTestCase(TestCase):
         self.assertEqual(len(errors), 1)
         self.assertIn('300.00', errors[0])
         self.assertEqual(invoicing.check_new_invoice(contract, Decimal(300), None, None), [])
-        invoice = make_invoice(contract, amount=1000, period_start=None, period_end=None)
+        invoice = make_invoice(contract, amount=1000, period_start=None, period_end=None, status=DRAFT)
         (generated,) = invoicing.generate_invoice_lines(invoice)
         self.assertEqual(generated.amount, Decimal('300.00'))
         generated.quantity = Decimal(2)
@@ -281,7 +323,7 @@ class GenerationRulesTestCase(TestCase):
         """Edge case: the amounts follow the invoice period when each line is saved again."""
         contract = make_contract()
         make_line(contract, monthly(), 100)
-        invoice = make_invoice(contract, amount=1000)
+        invoice = make_invoice(contract, amount=1000, status=DRAFT)
         (generated,) = invoicing.generate_invoice_lines(invoice)
         self.assertEqual(generated.amount, Decimal('100.00'))
         invoice.period_end = date(2025, 2, 28)
@@ -304,7 +346,7 @@ class InvoiceLineRulesTestCase(TestCase):
     def setUp(self):
         self.contract = make_contract()
         self.line = make_line(self.contract, usage(), 20)
-        self.invoice = make_invoice(self.contract, amount=1000)
+        self.invoice = make_invoice(self.contract, amount=1000, status=DRAFT)
 
     def test_contract_line_of_an_unrelated_contract_refused(self):
         """FR-021a."""
@@ -408,7 +450,15 @@ class GenerationAPITestCase(HierarchyMixin, APITestCase):
 
         response = self.client.patch(url, {'unit_price': 1}, format='json', **self.header)
         self.assertHttpStatus(response, status.HTTP_200_OK)
-        self.assertEqual(Decimal(response.data['unit_price']), Decimal(20))
+        self.assertEqual(Decimal(response.data['amount']), Decimal('10.00'))
+
+        url = reverse('plugins-api:netbox_contract-api:invoiceline-list')
+        response = self.client.post(
+            url, {'invoice': line.invoice.pk, 'currency': 'usd', 'unit': self.usage_line.unit.pk, 'unit_price': 7,
+                  'quantity': 3}, format='json', **self.header,
+        )
+        self.assertHttpStatus(response, status.HTTP_201_CREATED)
+        self.assertEqual(Decimal(response.data['amount']), Decimal('21.00'))
 
         invoice = line.invoice
         url = reverse('plugins-api:netbox_contract-api:invoiceline-list')
@@ -417,3 +467,119 @@ class GenerationAPITestCase(HierarchyMixin, APITestCase):
         )
         self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
         self.assertIn('amount', response.data)
+
+
+class InvoiceLineUnitPriceTestCase(TestCase):
+    """Invoice lines carry their own unit and unit price, fixed at creation (FR-024, decision I11)."""
+
+    def setUp(self):
+        self.contract = make_contract()
+        self.monthly_line = make_line(self.contract, monthly(), 100)
+        self.usage_line = make_line(self.contract, usage(), 20, description='Traffic')
+        self.invoice = make_invoice(self.contract, amount=10000, status=DRAFT)
+
+    def new_line(self, **kwargs):
+        line = InvoiceLine(invoice=self.invoice, currency='usd', **kwargs)
+        line.full_clean()
+        line.save()
+        return line
+
+    def test_generated_lines_copy_unit_and_price(self):
+        for generated in invoicing.generate_invoice_lines(self.invoice):
+            self.assertEqual(generated.unit, generated.contract_line.unit)
+            self.assertEqual(generated.unit_price, generated.contract_line.unit_price)
+
+    def test_new_line_defaults_from_its_contract_line(self):
+        line = self.new_line(contract_line=self.usage_line, quantity=Decimal(3))
+        self.assertEqual(
+            (line.unit, line.unit_price, line.amount), (self.usage_line.unit, Decimal(20), Decimal('60.00'))
+        )
+
+    def test_new_line_overrides_the_contract_line_price(self):
+        line = self.new_line(contract_line=self.monthly_line, quantity=Decimal(1), unit_price=Decimal(90))
+        self.assertEqual((line.unit, line.amount), (self.monthly_line.unit, Decimal('90.00')))
+        self.monthly_line.refresh_from_db()
+        self.assertEqual(self.monthly_line.unit_price, Decimal(100))
+
+    def test_manual_line_with_unit_and_price(self):
+        self.assertEqual(self.new_line(unit=usage(), unit_price=Decimal(20), quantity=Decimal(3)).amount,
+                         Decimal('60.00'))
+        # a recurring unit is prorated to the invoice period (January, one month)
+        self.assertEqual(self.new_line(unit=monthly(), unit_price=Decimal(100), quantity=Decimal(1)).amount,
+                         Decimal('100.00'))
+        self.assertEqual(self.new_line(unit_price=Decimal(15), quantity=Decimal(2)).amount, Decimal('30.00'))
+
+    def test_manual_line_without_price_keeps_a_free_amount(self):
+        line = self.new_line(amount=Decimal('12.34'), quantity=Decimal(5))
+        self.assertEqual(line.amount, Decimal('12.34'))
+
+    def test_unit_and_price_editable_until_the_invoice_is_posted(self):
+        line = self.new_line(contract_line=self.usage_line, quantity=Decimal(3))
+        line.quantity = Decimal(4)
+        line.unit_price = Decimal(15)
+        line.full_clean()
+        line.save()
+        self.assertEqual(line.amount, Decimal('60.00'))
+        manual = self.new_line(amount=Decimal(5), quantity=Decimal(2))
+        manual.unit_price = Decimal(2)
+        manual.full_clean()
+        manual.save()
+        self.assertEqual(manual.amount, Decimal('4.00'))
+
+    def test_unit_used_by_an_invoice_line_is_locked(self):
+        unit = make_unit('Every 2 months', 'recurring', 2)
+        self.new_line(unit=unit, unit_price=Decimal(10), quantity=Decimal(1))
+        unit.months = 3
+        with self.assertRaises(ValidationError):
+            unit.full_clean()
+
+    def test_migration_copies_the_contract_line_prices(self):
+        import importlib
+
+        from django.apps import apps
+
+        line = self.new_line(contract_line=self.usage_line, quantity=Decimal(3))
+        InvoiceLine.objects.filter(pk=line.pk).update(unit=None, unit_price=None)
+        manual = self.new_line(amount=Decimal(5))
+        migration = importlib.import_module('netbox_contract.migrations.0047_invoiceline_unit_unit_price')
+        migration.copy_contract_line_prices(apps, None)
+        line.refresh_from_db()
+        manual.refresh_from_db()
+        self.assertEqual(
+            (line.unit, line.unit_price, line.amount), (self.usage_line.unit, Decimal(20), Decimal('60.00'))
+        )
+        self.assertEqual((manual.unit, manual.unit_price), (None, None))
+
+
+class InvoiceLineFormUnitPriceTestCase(NetBoxTestCase):
+    def setUp(self):
+        super().setUp()
+        self.user.is_superuser = True
+        self.user.save()
+        self.contract = make_contract()
+        self.line = make_line(self.contract, usage(), 20)
+        self.invoice = make_invoice(self.contract, amount=1000, status=DRAFT)
+
+    def test_new_line_form(self):
+        url = reverse('plugins:netbox_contract:invoiceline_add')
+        form = self.client.get(f'{url}?invoice={self.invoice.pk}').context['form']
+        for field in ('unit', 'unit_price', 'quantity', 'contract_line'):
+            self.assertFalse(form.fields[field].disabled, field)
+        response = self.client.post(url, {
+            'invoice': self.invoice.pk, 'contract_line': self.line.pk, 'unit_price': '18', 'quantity': '5',
+            'currency': 'usd', 'amount': '1',
+        })
+        self.assertEqual(response.status_code, 302, response.content.decode()[-1500:])
+        created = InvoiceLine.objects.get(invoice=self.invoice)
+        self.assertEqual(
+            (created.unit, created.unit_price, created.amount), (self.line.unit, Decimal(18), Decimal('90.00'))
+        )
+
+    def test_import_with_unit_and_price(self):
+        csv = f'invoice,unit,unit_price,quantity,currency\n{self.invoice.number},{self.line.unit.name},4,3,usd'
+        response = self.client.post(
+            reverse('plugins:netbox_contract:invoiceline_bulk_import'),
+            {'data': csv, 'format': 'csv', 'csv_delimiter': 'auto'},
+        )
+        self.assertEqual(response.status_code, 302, response.content.decode()[-1500:])
+        self.assertEqual(InvoiceLine.objects.get(invoice=self.invoice).amount, Decimal('12.00'))

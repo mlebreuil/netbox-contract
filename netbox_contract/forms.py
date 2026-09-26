@@ -739,7 +739,13 @@ class InvoiceLineForm(NetBoxModelForm):
         query_params={'invoice_id': '$invoice'},
         label=_('Contract line'),
         help_text=_('Lines of the invoice contract and of its non-billable descendants. When a contract line is '
-                    'chosen, the unit and unit price come from it and the amount is calculated from the quantity.'),
+                    'chosen, the unit and unit price default to its own.'),
+    )
+    unit = DynamicModelChoiceField(
+        queryset=Unit.objects.all(),
+        required=False,
+        label=_('Unit'),
+        help_text=_('Defaults to the unit of the contract line; fixed once the line is created'),
     )
     accounting_dimensions = DynamicModelMultipleChoiceField(
         queryset=AccountingDimension.objects.all(),
@@ -747,6 +753,29 @@ class InvoiceLineForm(NetBoxModelForm):
         selector=True,
         label=_('Accounting dimensions'),
     )
+
+    # Fields fixed once a line with a unit price is created (FR-024, decision I11): only its quantity and
+    # internal fields change afterwards
+    CALCULATED_LINE_FIXED_FIELDS = ('invoice', 'contract_line', 'currency', 'amount')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['unit'].help_text = _('Defaults to the unit of the contract line')
+        self.fields['unit_price'].help_text = _('Defaults to the unit price of the contract line')
+        if not self.instance.pk:
+            self.fields['amount'].help_text = _(
+                'Calculated from the quantity and the unit price when the line has a unit price (ignored then); '
+                'entered manually otherwise'
+            )
+            return
+
+        # A calculated line keeps its invoice, contract line and currency; its unit, unit price and quantity change
+        if self.instance.unit_price is not None or self.instance.contract_line_id:
+            for field in self.CALCULATED_LINE_FIXED_FIELDS:
+                self.fields[field].disabled = True
+            self.fields['amount'].help_text = _(
+                'Calculated from the quantity and the unit price when the line is saved'
+            )
 
     def clean(self):
         super().clean()
@@ -770,6 +799,8 @@ class InvoiceLineForm(NetBoxModelForm):
         fields = [
             'invoice',
             'contract_line',
+            'unit',
+            'unit_price',
             'quantity',
             'currency',
             'amount',
@@ -811,8 +842,15 @@ class InvoiceLineImportForm(NetBoxModelImportForm):
     contract_line = CSVModelChoiceField(
         queryset=ContractLine.objects.all(),
         required=False,
-        help_text='Contract line id; the amount is then calculated from the quantity',
+        help_text='Contract line id; the unit and unit price default to its own',
         label=_('Contract line'),
+    )
+    unit = CSVModelChoiceField(
+        queryset=Unit.objects.all(),
+        to_field_name='name',
+        required=False,
+        help_text='Unit name',
+        label=_('Unit'),
     )
     accounting_dimensions = CSVModelMultipleChoiceField(
         queryset=AccountingDimension.objects.all(),
@@ -827,6 +865,8 @@ class InvoiceLineImportForm(NetBoxModelImportForm):
         fields = [
             'invoice',
             'contract_line',
+            'unit',
+            'unit_price',
             'quantity',
             'currency',
             'amount',

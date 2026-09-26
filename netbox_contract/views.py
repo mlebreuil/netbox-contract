@@ -411,7 +411,7 @@ class InvoiceView(generic.ObjectView):
         contracts_table = tables.ContractListTable(instance.contracts.annotate(yearly_value=yearly_value_annotation()))
         contracts_table.configure(request)
         invoicelines_table = tables.InvoiceLineListTable(
-            instance.invoicelines.select_related('contract_line__unit').prefetch_related('accounting_dimensions')
+            instance.invoicelines.select_related('contract_line', 'unit').prefetch_related('accounting_dimensions')
         )
         invoicelines_table.columns.hide('invoice')
         invoicelines_table.configure(request)
@@ -530,7 +530,7 @@ class InvoiceLineView(generic.ObjectView):
 
 
 class InvoiceLineListView(generic.ObjectListView):
-    queryset = InvoiceLine.objects.select_related('invoice', 'contract_line__unit')
+    queryset = InvoiceLine.objects.select_related('invoice', 'contract_line', 'unit')
     table = tables.InvoiceLineListTable
     filterset = filtersets.InvoiceLineFilterSet
     filterset_form = forms.InvoiceLineFilterForm

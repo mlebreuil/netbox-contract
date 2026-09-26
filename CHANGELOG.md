@@ -18,6 +18,7 @@
   * Deprecated, kept and hidden by default: the contract fields `mrc`, `yrc` and `nrc` and the invoice templates (never deleted, shown with a "deprecated" badge). The new plugin setting `show_deprecated_fields` (default `False`) shows them again. They remain in the bulk import and the REST API.
   * CI runs the tests against the NetBox v4.6.10 tag.
   * The unit price or quantity of a recurring or usage-based line can be amended from a date ("Amend" button, REST `POST contract-lines/{id}/amend/`): the line ends the day before and a new line replaces it, invoiced periods keep their price, and the required reason is recorded in the change log.
+  * Invoice lines carry their own unit and unit price, taken from the contract line by default and editable as long as the invoice is not posted (for example a discount on one invoice); the amount is calculated from quantity x unit price. Migration 0047 copies the unit and unit price of the contract line into existing lines without changing their amounts.
   * Invoice lines have a readable name (`<invoice number> line <id>`) in search results, the change log and reports.
 
 #### Behaviour changes

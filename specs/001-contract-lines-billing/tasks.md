@@ -195,6 +195,7 @@
 - [X] T063 Keep the accounting dimensions, comments and tags of a locked contract line editable (decision I9): `ContractLine.clean()` locks only the contract terms, `ContractLineForm` disables them on a locked line, the contract page keeps an edit button; tests in `tests/test_locking.py`; FR-029, docs and changelog updated.
 - [X] T064 Amend the price or quantity of a contract line from a date (FR-030, decision I10): `ContractLine.replaces` and migration 0046, `services/amendments.py`, the amend screen and button, the REST action, yearly values without replaced lines; tests in `tests/test_amendments.py`; spec, docs and changelog updated.
 - [X] T065 Keep the invoice number free of the template help text and the fields of an existing invoice line with a contract line read-only except its quantity (`forms.py`, tests in `tests/test_deprecated.py` and `tests/test_generation.py`).
+- [X] T066 Give invoice lines their own unit and unit price, defaulted from the contract line and editable while the invoice is not posted, amount calculated from them (decision I11): model, migration 0047, form, import, API, table; tests in `tests/test_generation.py`; spec, docs and changelog updated.
 
 ---
 

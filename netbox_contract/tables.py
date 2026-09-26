@@ -298,8 +298,7 @@ class ServiceProviderListTable(NetBoxTable):
 class InvoiceLineListTable(NetBoxTable):
     invoice = tables.Column(linkify=True)
     contract_line = tables.Column(linkify=True)
-    unit = tables.Column(accessor='contract_line__unit', linkify=True, orderable=False, verbose_name='Unit')
-    unit_price = tables.Column(accessor='contract_line__unit_price', orderable=False, verbose_name='Unit price')
+    unit = tables.Column(linkify=True, verbose_name='Unit')
     accounting_dimensions = tables.ManyToManyColumn(linkify_item=True, filter=lambda qs: qs.order_by('name'))
     tags = columns.TagColumn(url_name='plugins:netbox_contract:invoiceline_list')
 

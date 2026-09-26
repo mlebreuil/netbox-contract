@@ -49,7 +49,7 @@
               <th scope="row">{% trans "Amount" %}</th>
               <td>
                 {{ object.amount }}
-                {% if object.contract_line %}<span class="text-muted">({% trans "calculated" %})</span>{% endif %}
+                {% if object.unit_price is not None %}<span class="text-muted">({% trans "calculated" %})</span>{% endif %}
               </td>
             </tr>
             <tr>

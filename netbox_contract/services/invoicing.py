@@ -153,6 +153,8 @@ def generate_invoice_lines(invoice):
         invoice_line = InvoiceLine(
             invoice=invoice,
             contract_line=planned.contract_line,
+            unit=planned.contract_line.unit,
+            unit_price=planned.contract_line.unit_price,
             quantity=planned.quantity,
             amount=planned.amount,
             currency=invoice.currency,

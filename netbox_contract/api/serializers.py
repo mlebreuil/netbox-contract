@@ -484,13 +484,17 @@ class InvoiceLineSerializer(NetBoxModelSerializer):
     )
     invoice = NestedInvoiceSerializer(many=False, required=False)
     contract_line = ContractLineSerializer(nested=True, required=False, allow_null=True)
-    unit = UnitSerializer(nested=True, read_only=True, help_text='Unit of the contract line')
+    unit = UnitSerializer(
+        nested=True, required=False, allow_null=True,
+        help_text='Defaults to the unit of the contract line; fixed once the line is created',
+    )
     unit_price = serializers.DecimalField(
-        max_digits=12, decimal_places=2, read_only=True, allow_null=True, help_text='Unit price of the contract line'
+        max_digits=12, decimal_places=2, required=False, allow_null=True,
+        help_text='Defaults to the unit price of the contract line; fixed once the line is created',
     )
     amount = serializers.DecimalField(
         max_digits=10, decimal_places=2, required=False,
-        help_text='Calculated (and ignored if sent) when the line references a contract line; required otherwise',
+        help_text='Calculated (and ignored if sent) when the line has a unit price; required otherwise',
     )
     accounting_dimensions = SerializedPKRelatedField(
         queryset=AccountingDimension.objects.all(),

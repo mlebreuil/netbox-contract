@@ -669,7 +669,7 @@ class Unit(NetBoxModel):
                 field for field in ('billing_method', 'months')
                 if original and original[field] != getattr(self, field)
             ]
-            if changed and self.invoiced_lines().exists():
+            if changed and (self.invoiced_lines().exists() or InvoiceLine.objects.filter(unit=self.pk).exists()):
                 message = _('This unit is used by contracts that have invoices: its billing method and months '
                             'cannot change. Create a new unit instead.')
                 errors.update({field: message for field in changed})
@@ -872,6 +872,23 @@ class InvoiceLine(NetBoxModel):
         null=True,
         verbose_name=_('contract line'),
     )
+    unit = models.ForeignKey(
+        to='Unit',
+        on_delete=models.PROTECT,
+        related_name='invoicelines',
+        blank=True,
+        null=True,
+        verbose_name=_('unit'),
+        help_text=_('Defaults to the unit of the contract line; fixed once the line is created'),
+    )
+    unit_price = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name=_('unit price'),
+        help_text=_('Defaults to the unit price of the contract line; fixed once the line is created'),
+    )
     quantity = models.DecimalField(
         max_digits=12, decimal_places=4, blank=True, null=True, verbose_name=_('quantity')
     )
@@ -886,7 +903,8 @@ class InvoiceLine(NetBoxModel):
         decimal_places=2,
         blank=True,
         verbose_name=_('amount'),
-        help_text=_('Calculated when the line references a contract line; entered manually otherwise'),
+        help_text=_('Calculated from the quantity and the unit price when the line has a unit price; entered '
+                    'manually otherwise'),
     )
     accounting_dimensions = models.ManyToManyField(
         AccountingDimension, blank=True, verbose_name=_('accounting dimensions')
@@ -905,33 +923,37 @@ class InvoiceLine(NetBoxModel):
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:invoiceline', args=[self.pk])
 
-    @property
-    def unit(self):
-        """Unit of the referenced contract line (FR-024)."""
-        return self.contract_line.unit if self.contract_line_id else None
-
-    @property
-    def unit_price(self):
-        """Unit price of the referenced contract line (FR-024)."""
-        return self.contract_line.unit_price if self.contract_line_id else None
+    def apply_contract_line_defaults(self):
+        """A new line takes the unit and unit price of its contract line when they are not given (FR-024)."""
+        if self.pk or not self.contract_line_id:
+            return
+        if self.unit_id is None:
+            self.unit = self.contract_line.unit
+        if self.unit_price is None:
+            self.unit_price = self.contract_line.unit_price
 
     def calculate_amount(self):
         """
-        Amount calculated from the quantity when a contract line is referenced (research D7). Without an
-        invoice period, a recurring line counts for one invoice frequency of the invoice's contract.
+        Amount from the quantity and the unit price of the line (research D7, decision I11): recurring units
+        are prorated to the invoice period and the dates of the contract line, as for the pre-fill; without an
+        invoice period, a recurring line counts for one invoice frequency of the invoice's contract. None when
+        the line has no unit price (manual amount).
         """
-        line = self.contract_line
-        invoiced_contract = self.invoice.contracts.first() or line.contract
+        if self.unit_price is None:
+            return None
+        line = self.contract_line if self.contract_line_id else None
+        unit = self.unit if self.unit_id else None
+        invoiced_contract = self.invoice.contracts.first() or (line.contract if line else None)
         return calculations.invoice_line_amount(
-            line.unit.billing_method,
+            unit.billing_method if unit else calculations.USAGE,
             self.quantity,
-            line.unit_price,
-            line.unit.months,
+            self.unit_price,
+            unit.months if unit else None,
             self.invoice.period_start,
             self.invoice.period_end,
-            line.effective_start_date,
-            line.effective_end_date,
-            default_months=invoiced_contract.invoice_frequency or 1,
+            line.effective_start_date if line else None,
+            line.effective_end_date if line else None,
+            default_months=(invoiced_contract.invoice_frequency if invoiced_contract else None) or 1,
         )
 
     def clean(self):
@@ -943,6 +965,8 @@ class InvoiceLine(NetBoxModel):
             InvoiceLine.objects.filter(pk=self.pk).values('invoice', 'currency', 'contract_line').first()
             if self.pk else None
         )
+
+        self.apply_contract_line_defaults()
 
         if self.contract_line_id:
             if not original or (original['invoice'], original['contract_line']) != (
@@ -960,14 +984,10 @@ class InvoiceLine(NetBoxModel):
                             'non-billable descendants.'
                         )
                     })
-            try:
-                self.amount = self.calculate_amount()
-            except ValueError:
-                raise ValidationError(
-                    _('The invoice needs a period to calculate the amount of a recurring contract line.')
-                )
+        if self.unit_price is not None:
+            self.amount = self.calculate_amount()
         elif self.amount is None:
-            raise ValidationError({'amount': _('This field is required.')})
+            raise ValidationError({'amount': _('This field is required when the line has no unit price.')})
         currency_changed = not original or (original['invoice'], original['currency']) != (
             self.invoice_id, self.currency
         )
@@ -990,13 +1010,9 @@ class InvoiceLine(NetBoxModel):
                 raise ValidationError('Sum of invoice line amount greater than invoice amount')
 
     def save(self, *args, **kwargs):
-        if self.contract_line_id:
-            try:
-                self.amount = self.calculate_amount()
-            except ValueError:
-                # Recurring line on an invoice without period: keep the amount given, if any
-                if self.amount is None:
-                    self.amount = Decimal(0)
+        self.apply_contract_line_defaults()
+        if self.unit_price is not None:
+            self.amount = self.calculate_amount()
         super().save(*args, **kwargs)
 
 
