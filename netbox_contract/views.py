@@ -4,6 +4,7 @@ from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from django.apps import apps
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Case, F, When
@@ -31,6 +32,7 @@ from .models import (
     Unit,
     yearly_value_annotation,
 )
+from .services import invoicing
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 
@@ -460,21 +462,21 @@ class InvoiceEditView(generic.ObjectEditView):
                 else:
                     new_period_start = None
 
+            new_period_end = None
             if new_period_start:
                 initial_data['period_start'] = new_period_start
                 delta = relativedelta(months=contract.invoice_frequency)
                 new_period_end = new_period_start + delta - timedelta(days=1)
                 initial_data['period_end'] = new_period_end
 
-            if contract.yrc:
-                if contract.invoice_frequency == 12:
-                    initial_data['amount'] = contract.yrc
-                else:
-                    initial_data['amount'] = round(
-                        contract.yrc / 12 * contract.invoice_frequency, 2
-                    )
+            # Amount proposed from the contract lines (not from the deprecated cost fields)
+            try:
+                proposal = invoicing.propose_invoice(contract, new_period_start, new_period_end)
+            except invoicing.InvoicingError as e:
+                messages.error(request, e.message)
             else:
-                initial_data['amount'] = contract.mrc * contract.invoice_frequency
+                if proposal.lines:
+                    initial_data['amount'] = proposal.total
 
             initial_data['currency'] = contract.currency
 
