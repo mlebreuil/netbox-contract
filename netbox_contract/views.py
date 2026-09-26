@@ -300,6 +300,7 @@ class ContractView(generic.ObjectView):
             invoicelines_table.columns.hide('invoice')
             invoicelines_table.columns.hide('currency')
             invoicelines_table.configure(request)
+            invoicelines_table.columns.hide('actions')
         else:
             invoicelines_table = None
         assignments_table.configure(request)

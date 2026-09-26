@@ -112,12 +112,26 @@ class ContractTypeSerializer(NetBoxModelSerializer):
         brief_fields = ('id', 'name', 'description', 'url', 'display')
 
 
+DEPRECATED_COST_HELP = 'Deprecated: replaced by contract lines. Kept for compatibility.'
+
+
 class ContractSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_contract-api:contract-detail'
     )
     contract_type = ContractTypeSerializer(nested=True, required=False, allow_null=True)
-    yrc = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    yrc = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True, help_text=DEPRECATED_COST_HELP)
+    total_contract_value = serializers.DecimalField(
+        max_digits=16, decimal_places=2, read_only=True, allow_null=True,
+        help_text='Total value of the contract lines; null when not available (open-ended recurring line)',
+    )
+    yearly_contract_value = serializers.DecimalField(
+        max_digits=16, decimal_places=2, read_only=True, help_text='Twelve-month value of the recurring lines'
+    )
+    yearly_billable_value = serializers.DecimalField(
+        max_digits=16, decimal_places=2, read_only=True,
+        help_text='Yearly value invoiced under this contract, including its non-billable descendants',
+    )
     parent = NestedContractSerializer(many=False, required=False)
     tenant = TenantSerializer(nested=True, required=False, allow_null=True)
     external_party_object_type = ContentTypeField(queryset=ContentType.objects.all())
@@ -148,6 +162,10 @@ class ContractSerializer(NetBoxModelSerializer):
             'yrc',
             'nrc',
             'invoice_frequency',
+            'billable',
+            'total_contract_value',
+            'yearly_contract_value',
+            'yearly_billable_value',
             'comments',
             'documents',
             'parent',
@@ -156,6 +174,10 @@ class ContractSerializer(NetBoxModelSerializer):
             'created',
             'last_updated',
         )
+        extra_kwargs = {
+            'mrc': {'help_text': DEPRECATED_COST_HELP},
+            'nrc': {'help_text': DEPRECATED_COST_HELP},
+        }
         brief_fields = (
             'id',
             'url',
@@ -178,6 +200,7 @@ class ContractSerializer(NetBoxModelSerializer):
             'yrc',
             'nrc',
             'invoice_frequency',
+            'billable',
             'comments',
             'parent',
         )
@@ -226,6 +249,9 @@ class InvoiceSerializer(NetBoxModelSerializer):
             'created',
             'last_updated',
         )
+        extra_kwargs = {
+            'template': {'help_text': 'Deprecated: invoice lines are generated from the contract lines.'},
+        }
         brief_fields = (
             'id',
             'url',

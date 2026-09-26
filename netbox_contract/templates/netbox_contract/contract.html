@@ -84,22 +84,24 @@
               <th scope="row">{% trans "Currency" %}</th>
               <td>{{ object.get_currency_display  }}</td>
             </tr>
+            {% if show_deprecated_fields %}
             <tr>
-              <th scope="row">{% trans "Monthly recuring costs" %}</th>
+              <th scope="row">{% trans "Monthly recuring costs" %} <span class="badge text-bg-warning">{% trans "deprecated" %}</span></th>
               <td>{{ object.mrc }}</td>
             </tr>
             <tr>
-              <th scope="row">{% trans "Yearly recuring costs" %}</th>
+              <th scope="row">{% trans "Yearly recuring costs" %} <span class="badge text-bg-warning">{% trans "deprecated" %}</span></th>
               <td>{{ object.yrc }}</td>
             </tr>
             <tr>
-              <th scope="row">{% trans "Calculated corresponding Yearly or Monthly value" %}</th>
+              <th scope="row">{% trans "Calculated corresponding Yearly or Monthly value" %} <span class="badge text-bg-warning">{% trans "deprecated" %}</span></th>
               <td>{{ object.calculated_rc }}</td>
             </tr>
             <tr>
-              <th scope="row">{% trans "Non recuring costs" %}</th>
+              <th scope="row">{% trans "Non recuring costs" %} <span class="badge text-bg-warning">{% trans "deprecated" %}</span></th>
               <td>{{ object.nrc }}</td>
             </tr>
+            {% endif %}
             <tr>
               <th scope="row">{% trans "Invoice frequency" %}</th>
               <td>{{ object.invoice_frequency }}</td>
@@ -130,7 +132,8 @@
       {% if invoice_template %}
       <div class="card">
         <h5 class="card-header">
-          {% trans "Invoice template" %}
+          {% trans "Invoice templates (kept for reference)" %}
+          <span class="badge text-bg-warning">{% trans "deprecated" %}</span>
         </h5>
         <table class="table table-hover attr-table">
           <tr>

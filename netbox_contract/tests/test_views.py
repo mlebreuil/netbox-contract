@@ -99,8 +99,6 @@ class ContractTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCas
             'renewal_term': 12,
             'notice_period': 90,
             'currency': 'usd',
-            'yrc': Decimal(1000),
-            'nrc': Decimal(1000),
             'invoice_frequency': 1,
             'billable': True,
         }

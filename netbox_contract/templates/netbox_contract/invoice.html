@@ -15,7 +15,15 @@
     <div class="col col-md-6">
       <div class="card">
         {% if object.template %}
-        <h5 class="card-header">{% trans "Invoice template" %}</h5>
+        <h5 class="card-header">
+          {% trans "Invoice template" %}
+          <span class="badge text-bg-warning">{% trans "deprecated" %}</span>
+        </h5>
+        <div class="card-body">
+          <div class="alert alert-warning mb-0" role="alert">
+            {% trans "Invoice templates are deprecated and kept for reference only: invoice lines are now generated from the contract lines." %}
+          </div>
+        </div>
         {% else %}
         <h5 class="card-header">{% trans "Invoice" %}</h5>
         {% endif %}

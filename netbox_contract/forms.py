@@ -1,3 +1,5 @@
+import logging
+
 from circuits.models import Provider
 from django import forms
 from django.conf import settings
@@ -29,7 +31,12 @@ from utilities.forms.fields import (
 from utilities.forms.widgets import DatePicker, HTMXSelect
 from utilities.templatetags.builtins.filters import bettertitle
 
-from .constants import ASSIGNEMENT_MODELS, SERVICE_PROVIDER_MODELS, SERVICE_PROVIDER_TYPES
+from .constants import (
+    ASSIGNEMENT_MODELS,
+    DEPRECATED_CONTRACT_FIELDS,
+    SERVICE_PROVIDER_MODELS,
+    SERVICE_PROVIDER_TYPES,
+)
 from .models import (
     AccountingDimension,
     AccountingDimensionStatusChoices,
@@ -49,6 +56,24 @@ from .models import (
 )
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
+
+logger = logging.getLogger('netbox.plugins.netbox_contract')
+
+
+def apply_field_settings(form, mandatory_setting, hidden_setting):
+    """Apply the mandatory and hidden field settings, ignoring (with a warning) fields the form does not have."""
+    for field in plugin_settings.get(mandatory_setting) or []:
+        if field not in form.fields:
+            logger.warning('%s: field "%s" is not in the form (deprecated or unknown), ignored', mandatory_setting,
+                           field)
+            continue
+        form.fields[field].required = True
+    for field in plugin_settings.get(hidden_setting) or []:
+        if field not in form.fields:
+            logger.warning('%s: field "%s" is not in the form (deprecated or unknown), ignored', hidden_setting, field)
+            continue
+        if not form.fields[field].required:
+            form.fields[field].widget = forms.HiddenInput()
 
 
 # Contract
@@ -104,14 +129,16 @@ class ContractForm(NetBoxModelForm):
             self.fields['external_party_object'].queryset = ServiceProvider.objects.all()
             self.fields['external_party_object'].initial = None
 
+        # Deprecated cost fields are replaced by contract lines
+        if plugin_settings.get('show_deprecated_fields'):
+            for field in DEPRECATED_CONTRACT_FIELDS:
+                self.fields[field].help_text = _('Deprecated: use contract lines instead.')
+        else:
+            for field in DEPRECATED_CONTRACT_FIELDS:
+                del self.fields[field]
+
         # Initialise fields settings
-        mandatory_fields = plugin_settings.get('mandatory_contract_fields')
-        for field in mandatory_fields:
-            self.fields[field].required = True
-        hidden_fields = plugin_settings.get('hidden_contract_fields')
-        for field in hidden_fields:
-            if not self.fields[field].required:
-                self.fields[field].widget = forms.HiddenInput()
+        apply_field_settings(self, 'mandatory_contract_fields', 'hidden_contract_fields')
 
     class Meta:
         model = Contract
@@ -149,7 +176,7 @@ class ContractForm(NetBoxModelForm):
     def clean(self):
         super().clean()
 
-        if self.cleaned_data['mrc'] and self.cleaned_data['yrc']:
+        if self.cleaned_data.get('mrc') and self.cleaned_data.get('yrc'):
             raise ValidationError('you should set monthly OR yearly recuring costs not both')
 
 
@@ -379,20 +406,20 @@ class InvoiceForm(NetBoxModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Invoice templates are deprecated: new ones are offered only when deprecated fields are shown
+        if not plugin_settings.get('show_deprecated_fields'):
+            del self.fields['template']
+        else:
+            self.fields['template'].help_text = _('Deprecated: invoice lines are generated from the contract lines.')
+
         # Initialise fields settings
-        mandatory_fields = plugin_settings.get('mandatory_invoice_fields')
-        for field in mandatory_fields:
-            self.fields[field].required = True
-        hidden_fields = plugin_settings.get('hidden_invoice_fields')
-        for field in hidden_fields:
-            if not self.fields[field].required:
-                self.fields[field].widget = forms.HiddenInput()
+        apply_field_settings(self, 'mandatory_invoice_fields', 'hidden_invoice_fields')
 
     def clean(self):
         super().clean()
 
         # template checks
-        if self.cleaned_data['template']:
+        if self.cleaned_data.get('template'):
             # Check that there is only one invoice template per contract
             contracts = self.cleaned_data['contracts']
             for contract in contracts:
@@ -412,7 +439,7 @@ class InvoiceForm(NetBoxModelForm):
 
         instance = super().save(*args, **kwargs)
 
-        if is_new and not self.cleaned_data['template']:
+        if is_new and not self.cleaned_data.get('template'):
             contracts = self.cleaned_data['contracts']
 
             for contract in contracts:

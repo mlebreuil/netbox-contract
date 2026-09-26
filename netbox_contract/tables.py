@@ -1,4 +1,5 @@
 import django_tables2 as tables
+from django.conf import settings
 from netbox.tables import NetBoxTable, columns
 from tenancy.tables import ContactsColumnMixin
 
@@ -13,6 +14,19 @@ from .models import (
     ServiceProvider,
     Unit,
 )
+
+plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
+
+
+class DeprecatedColumnsMixin:
+    """Leave out the columns of deprecated contract fields unless the show_deprecated_fields setting is true."""
+
+    deprecated_columns = ()
+
+    def __init__(self, *args, **kwargs):
+        if not plugin_settings.get('show_deprecated_fields'):
+            kwargs['exclude'] = (*(kwargs.get('exclude') or ()), *self.deprecated_columns)
+        super().__init__(*args, **kwargs)
 
 
 class ContractTypeListTable(NetBoxTable):
@@ -59,7 +73,8 @@ class ContractAssignmentListTable(NetBoxTable):
         )
 
 
-class ContractAssignmentObjectTable(NetBoxTable):
+class ContractAssignmentObjectTable(DeprecatedColumnsMixin, NetBoxTable):
+    deprecated_columns = ('contract__mrc', 'contract__nrc')
     contract = tables.Column(linkify=True)
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
     contract__external_party_object = tables.Column(
@@ -124,11 +139,14 @@ class ContractAssignmentContractTable(NetBoxTable):
         )
 
 
-class ContractListTable(ContactsColumnMixin, NetBoxTable):
+class ContractListTable(DeprecatedColumnsMixin, ContactsColumnMixin, NetBoxTable):
+    deprecated_columns = ('mrc', 'yrc', 'nrc')
     name = tables.Column(linkify=True)
     external_party_object = tables.Column(verbose_name='External party', linkify=True)
     parent = tables.Column(linkify=True)
-    yrc = tables.Column(verbose_name='Yerly recuring costs')
+    yrc = tables.Column(verbose_name='Yearly recurring cost (deprecated)')
+    mrc = tables.Column(verbose_name='Monthly recurring cost (deprecated)')
+    nrc = tables.Column(verbose_name='Non-recurring cost (deprecated)')
     status = columns.ChoiceFieldColumn(
         verbose_name=('Status'),
     )
@@ -165,7 +183,8 @@ class ContractListTable(ContactsColumnMixin, NetBoxTable):
         default_columns = ('name', 'status', 'contract_type', 'parent')
 
 
-class ContractListBottomTable(NetBoxTable):
+class ContractListBottomTable(DeprecatedColumnsMixin, NetBoxTable):
+    deprecated_columns = ('mrc',)
     name = tables.Column(linkify=True)
     external_party_object = tables.Column(linkify=True)
     status = columns.ChoiceFieldColumn(
@@ -195,7 +214,8 @@ class ContractListBottomTable(NetBoxTable):
         )
 
 
-class ContractProviderBottomTable(NetBoxTable):
+class ContractProviderBottomTable(DeprecatedColumnsMixin, NetBoxTable):
+    deprecated_columns = ('mrc',)
     name = tables.Column(linkify=True)
     external_party_object = tables.Column(linkify=True)
     status = columns.ChoiceFieldColumn(

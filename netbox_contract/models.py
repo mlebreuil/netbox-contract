@@ -303,7 +303,7 @@ class Contract(ContactsMixin, NetBoxModel):
         decimal_places=2,
         blank=True,
         null=True,
-        help_text=_('Use either this field of the monthly recuring cost field'),
+        help_text=_('Deprecated: replaced by contract lines. Use either this field of the monthly recuring cost field'),
     )
     mrc = models.DecimalField(
         verbose_name=_('monthly recuring cost'),
@@ -311,9 +311,15 @@ class Contract(ContactsMixin, NetBoxModel):
         decimal_places=2,
         blank=True,
         null=True,
-        help_text=_('Use either this field of the yearly recuring cost field'),
+        help_text=_('Deprecated: replaced by contract lines. Use either this field of the yearly recuring cost field'),
     )
-    nrc = models.DecimalField(verbose_name=_('none recuring cost'), default=0, max_digits=10, decimal_places=2)
+    nrc = models.DecimalField(
+        verbose_name=_('none recuring cost'),
+        default=0,
+        max_digits=10,
+        decimal_places=2,
+        help_text=_('Deprecated: replaced by contract lines'),
+    )
     invoice_frequency = models.IntegerField(
         help_text=_('The frequency of invoices in month'),
         default=1,
@@ -548,7 +554,8 @@ class Invoice(NetBoxModel):
         null=True,
         default=False,
         verbose_name=_('template'),
-        help_text=_('Wether this invoice is a template or not'),
+        help_text=_('Deprecated: invoice lines are generated from the contract lines. Wether this invoice is a '
+                    'template or not'),
     )
     status = models.CharField(
         max_length=50,
