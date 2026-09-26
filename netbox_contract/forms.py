@@ -407,7 +407,6 @@ class ContractTypeFilterForm(NetBoxModelFilterSetForm):
 class InvoiceForm(NetBoxModelForm):
     number = forms.CharField(
         max_length=100,
-        help_text='Invoice template name will be overriden to _invoice_template_contract name',
         label=_('Number'),
     )
     contracts = DynamicModelMultipleChoiceField(
@@ -424,7 +423,10 @@ class InvoiceForm(NetBoxModelForm):
         if not plugin_settings.get('show_deprecated_fields'):
             del self.fields['template']
         else:
-            self.fields['template'].help_text = _('Deprecated: invoice lines are generated from the contract lines.')
+            self.fields['template'].help_text = _(
+                'Deprecated: invoice lines are generated from the contract lines. The number of a template is '
+                'replaced by _invoice_template_<contract name>.'
+            )
 
         # Initialise fields settings
         apply_field_settings(self, 'mandatory_invoice_fields', 'hidden_invoice_fields')

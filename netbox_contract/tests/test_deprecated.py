@@ -101,6 +101,8 @@ class DeprecatedFieldsViewTestCase(TestCase):
     def test_new_template_offered_only_with_setting(self):
         response = self.client.get(reverse('plugins:netbox_contract:invoice_add'))
         self.assertNotIn('template', response.context['form'].fields)
+        self.assertFalse(response.context['form'].fields['number'].help_text)
+        self.assertNotIn('_invoice_template_', response.content.decode())
         with mock.patch.dict(PLUGIN_SETTINGS, {'show_deprecated_fields': True}):
             response = self.client.get(reverse('plugins:netbox_contract:invoice_add'))
         self.assertIn('template', response.context['form'].fields)
