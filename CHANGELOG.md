@@ -17,6 +17,7 @@
   * Upgrade: the migration converts the monthly, yearly and non-recurring costs and the invoice templates into contract lines (units "One-time", "Monthly", "Yearly") and prints a report. It can be run again with `python manage.py convert_contract_lines`. Every existing contract is billable. Invoices and invoice lines are not changed.
   * Deprecated, kept and hidden by default: the contract fields `mrc`, `yrc` and `nrc` and the invoice templates (never deleted, shown with a "deprecated" badge). The new plugin setting `show_deprecated_fields` (default `False`) shows them again. They remain in the bulk import and the REST API.
   * CI runs the tests against the NetBox v4.6.10 tag.
+  * Invoice lines have a readable name (`<invoice number> line <id>`) in search results, the change log and reports.
 
 #### Behaviour changes
 

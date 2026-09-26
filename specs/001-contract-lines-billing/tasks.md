@@ -189,6 +189,10 @@
 - [X] T060 Coverage check: walk the traceability table in `specs/001-contract-lines-billing/quickstart.md` and the spec's edge case list and confirm each scenario and edge case has at least one test; add the missing ones (also: recurring line without end date, credit (negative) lines, a unit whose months change after invoices exist, Canceled invoices when computing what remains, running the conversion on contracts that already have lines). Update the test module names in `plan.md` (`test_contract_lines.py`, `test_values.py`, `test_locking.py` are added).
 - [ ] T061 (Scripted walkthrough of steps 1-7 done on an upgraded copy of the dev database on 2026-09-26, all checks passed; still open: the SC-001 timing by a person.) Run the manual walkthrough of `specs/001-contract-lines-billing/quickstart.md` on an upgraded copy of real data, time the recording of a contract with three lines of different natures against the 10-minute target of SC-001, and fix any gap; run `ruff check`, `makemigrations --check` and the full suite.
 
+## Adjustments after the upgrade test (2026-09-26)
+
+- [X] T062 Give invoice lines a readable name (`<invoice number> line <id>`), used by the currency report, search and change log (`netbox_contract/models.py`, test in `tests/test_generation.py`).
+
 ---
 
 ## Dependencies and execution order

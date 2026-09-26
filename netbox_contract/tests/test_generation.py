@@ -338,6 +338,12 @@ class InvoiceLineRulesTestCase(TestCase):
         invoice_line.amount = Decimal(5)
         invoice_line.full_clean()
 
+    def test_invoice_line_name(self):
+        invoice_line = InvoiceLine(invoice=self.invoice, contract_line=self.line, quantity=1, currency='usd')
+        invoice_line.save()
+        self.assertEqual(str(invoice_line), f'INV line {invoice_line.pk}')
+        self.assertEqual(str(InvoiceLine(invoice=self.invoice)), 'INV new line')
+
     def test_lines_cannot_exceed_the_invoice_amount(self):
         invoice_line = InvoiceLine(invoice=self.invoice, contract_line=self.line, quantity=Decimal(51), currency='usd')
         with self.assertRaises(ValidationError):

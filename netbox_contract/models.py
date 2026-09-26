@@ -852,6 +852,10 @@ class InvoiceLine(NetBoxModel):
         verbose_name = _('invoice line')
         verbose_name_plural = _('invoice lines')
 
+    def __str__(self):
+        number = self.invoice.number if self.invoice_id else ''
+        return f'{number} line {self.pk}' if self.pk else f'{number} new line'
+
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:invoiceline', args=[self.pk])
 
