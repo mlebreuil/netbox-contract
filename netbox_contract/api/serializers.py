@@ -19,6 +19,7 @@ from ..models import (
     ServiceProvider,
     Unit,
 )
+from ..validators import check_invoice_contracts
 
 
 class NestedContractSerializer(WritableNestedSerializer):
@@ -268,12 +269,28 @@ class InvoiceSerializer(NetBoxModelSerializer):
         )
 
     def validate(self, data):
+        is_new = self.instance is None
+        previous_contract_ids = [] if is_new else list(self.instance.contracts.values_list('pk', flat=True))
+        previous_currency = None if is_new else Invoice.objects.get(pk=self.instance.pk).currency
+
         data = super().validate(data)
 
-        # template checks
-        if data['template']:
-            # Check that there is only one invoice template per contract
+        # contracts and currency (the relation is saved after the invoice, so it is checked here)
+        if 'contracts' in data:
             contracts = data['contracts']
+        else:
+            contracts = [] if is_new else list(Contract.objects.filter(pk__in=previous_contract_ids))
+        currency = data.get('currency', previous_currency or Invoice._meta.get_field('currency').default)
+        errors = check_invoice_contracts(
+            is_new, contracts, currency, previous_contract_ids=previous_contract_ids,
+            previous_currency=previous_currency,
+        )
+        if errors:
+            raise serializers.ValidationError({'contracts': errors})
+
+        # template checks
+        if data.get('template'):
+            # Check that there is only one invoice template per contract
             for contract in contracts:
                 for invoice in contract.invoices.all():
                     if invoice.template and invoice != self.instance:
@@ -282,7 +299,8 @@ class InvoiceSerializer(NetBoxModelSerializer):
                         )
 
             # Prefix the invoice name with _template
-            data['number'] = '_invoice_template_' + contract.name
+            if contracts:
+                data['number'] = '_invoice_template_' + contracts[-1].name
 
             # set the periode start and end date to null
             data['period_start'] = None
@@ -506,9 +524,9 @@ class InvoiceLineSerializer(NetBoxModelSerializer):
         )
 
     def validate(self, data):
-        super().validate(data)
+        data = super().validate(data)
         # check for duplicate dimensions
-        accounting_dimensions = data['accounting_dimensions']
+        accounting_dimensions = data.get('accounting_dimensions') or []
         dimensions_names = []
         for dimension in accounting_dimensions:
             if dimension.name in dimensions_names:

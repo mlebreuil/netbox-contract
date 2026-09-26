@@ -855,8 +855,78 @@ class InvoiceLine(NetBoxModel):
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:invoiceline', args=[self.pk])
 
+    @property
+    def unit(self):
+        """Unit of the referenced contract line (FR-024)."""
+        return self.contract_line.unit if self.contract_line_id else None
+
+    @property
+    def unit_price(self):
+        """Unit price of the referenced contract line (FR-024)."""
+        return self.contract_line.unit_price if self.contract_line_id else None
+
+    def calculate_amount(self):
+        """
+        Amount calculated from the quantity when a contract line is referenced (research D7). Without an
+        invoice period, a recurring line counts for one invoice frequency of the invoice's contract.
+        """
+        line = self.contract_line
+        invoiced_contract = self.invoice.contracts.first() or line.contract
+        return calculations.invoice_line_amount(
+            line.unit.billing_method,
+            self.quantity,
+            line.unit_price,
+            line.unit.months,
+            self.invoice.period_start,
+            self.invoice.period_end,
+            line.effective_start_date,
+            line.effective_end_date,
+            default_months=invoiced_contract.invoice_frequency or 1,
+        )
+
     def clean(self):
         super().clean()
+        if not self.invoice_id:
+            return
+
+        original = (
+            InvoiceLine.objects.filter(pk=self.pk).values('invoice', 'currency', 'contract_line').first()
+            if self.pk else None
+        )
+
+        if self.contract_line_id:
+            if not original or (original['invoice'], original['contract_line']) != (
+                self.invoice_id, self.contract_line_id
+            ):
+                allowed = {
+                    contract.pk
+                    for invoice_contract in self.invoice.contracts.all()
+                    for contract in invoice_contract.billing_scope()
+                }
+                if self.contract_line.contract_id not in allowed:
+                    raise ValidationError({
+                        'contract_line': _(
+                            'The contract line must belong to the contract of the invoice or to one of its '
+                            'non-billable descendants.'
+                        )
+                    })
+            try:
+                self.amount = self.calculate_amount()
+            except ValueError:
+                raise ValidationError(
+                    _('The invoice needs a period to calculate the amount of a recurring contract line.')
+                )
+        elif self.amount is None:
+            raise ValidationError({'amount': _('This field is required.')})
+        currency_changed = not original or (original['invoice'], original['currency']) != (
+            self.invoice_id, self.currency
+        )
+        if currency_changed and self.currency != self.invoice.currency:
+            raise ValidationError({
+                'currency': _('The currency {found} of an invoice line must be the currency {expected} of its '
+                              'invoice.').format(found=self.currency.upper(), expected=self.invoice.currency.upper())
+            })
+
         # Check that the sum of the invoice line amount is not greater the invoice amount
         amount = self.amount
         invoice = self.invoice

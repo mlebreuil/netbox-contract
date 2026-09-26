@@ -54,6 +54,7 @@ from .models import (
     StatusChoices,
     Unit,
 )
+from .validators import check_invoice_contracts
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 
@@ -429,17 +430,30 @@ class InvoiceForm(NetBoxModelForm):
     def clean(self):
         super().clean()
 
+        # contracts and currency (the relation is saved after the invoice, so it is checked here)
+        is_new = not self.instance.pk
+        errors = check_invoice_contracts(
+            is_new,
+            self.cleaned_data.get('contracts'),
+            self.cleaned_data.get('currency'),
+            previous_contract_ids=[] if is_new else list(self.instance.contracts.values_list('pk', flat=True)),
+            previous_currency=None if is_new else Invoice.objects.get(pk=self.instance.pk).currency,
+        )
+        if errors:
+            raise ValidationError(errors)
+
         # template checks
         if self.cleaned_data.get('template'):
             # Check that there is only one invoice template per contract
-            contracts = self.cleaned_data['contracts']
+            contracts = list(self.cleaned_data.get('contracts') or [])
             for contract in contracts:
                 for invoice in contract.invoices.all():
                     if invoice.template and invoice.pk != self.instance.pk:
                         raise ValidationError('Only one invoice template allowed per contract')
 
             # Prefix the invoice name with _template
-            self.cleaned_data['number'] = '_invoice_template_' + contract.name
+            if contracts:
+                self.cleaned_data['number'] = '_invoice_template_' + contracts[-1].name
 
             # set the periode start and end date to null
             self.cleaned_data['period_start'] = None
@@ -542,6 +556,22 @@ class InvoiceCSVForm(NetBoxModelImportForm):
         label=_('Contracts'),
     )
     status = CSVChoiceField(choices=InvoiceStatusChoices, help_text='Invoice status', label=_('Status'))
+
+    def clean(self):
+        super().clean()
+        # Imported invoices follow the contract and currency rules; their lines are not generated
+        is_new = not self.instance.pk
+        if 'contracts' not in self.cleaned_data and not is_new:
+            return
+        errors = check_invoice_contracts(
+            is_new,
+            self.cleaned_data.get('contracts'),
+            self.cleaned_data.get('currency', self.instance.currency),
+            previous_contract_ids=[] if is_new else list(self.instance.contracts.values_list('pk', flat=True)),
+            previous_currency=None if is_new else Invoice.objects.get(pk=self.instance.pk).currency,
+        )
+        if errors:
+            raise ValidationError(errors)
 
     class Meta:
         model = Invoice

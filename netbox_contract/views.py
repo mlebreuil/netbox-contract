@@ -553,6 +553,7 @@ class InvoiceLineEditView(generic.ObjectEditView):
         if 'invoice' in initial_data.keys():
             invoice = Invoice.objects.get(pk=initial_data['invoice'])
             initial_data['amount'] = invoice.amount - invoice.total_invoicelines_amount
+            initial_data.setdefault('currency', invoice.currency)
 
         form = self.form(instance=obj, initial=initial_data)
         restrict_form_fields(form, request.user)
