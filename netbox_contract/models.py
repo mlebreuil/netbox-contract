@@ -772,6 +772,15 @@ class ContractLine(NetBoxModel):
             self.unit.billing_method, self.quantity, self.unit_price, self.unit.months
         )
 
+    @property
+    def can_be_amended(self):
+        """Whether the amend action applies: a saved recurring or usage-based line not replaced yet (FR-030)."""
+        return (
+            bool(self.pk)
+            and self.unit.billing_method != BillingMethodChoices.ONE_TIME
+            and not self.replaced_by.exists()
+        )
+
     def apply_contract_defaults(self):
         """Take the dates and the currency of the contract when they are not set (FR-002)."""
         if not self.contract_id:

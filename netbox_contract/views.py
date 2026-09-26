@@ -319,7 +319,7 @@ class ContractView(generic.ObjectView):
         lines_locked = instance.invoices.exists()
         table_class = tables.ContractLineLockedContractTable if lines_locked else tables.ContractLineContractTable
         lines_table = table_class(
-            instance.lines.select_related('unit').prefetch_related('accounting_dimensions', 'tags')
+            instance.lines.select_related('unit').prefetch_related('accounting_dimensions', 'tags', 'replaced_by')
         )
         lines_table.configure(request)
 
@@ -710,6 +710,10 @@ class ContractLineEditView(generic.ObjectEditView):
 
     queryset = ContractLine.objects.all()
     form = forms.ContractLineForm
+    template_name = 'netbox_contract/contractline_edit.html'
+
+    def get_extra_context(self, request, instance):
+        return {'lock_message': instance.lock_message() if instance.pk else None}
 
 
 class ContractLineDeleteView(generic.ObjectDeleteView):

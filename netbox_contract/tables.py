@@ -432,10 +432,23 @@ class ContractLineContractTable(ContractLineListTable):
         )
 
 
-class ContractLineLockedContractTable(ContractLineContractTable):
-    """Contract lines of an invoiced contract: only their internal fields can be edited, none can be deleted."""
+AMEND_BUTTON = """
+{% if perms.netbox_contract.change_contractline and record.can_be_amended %}
+  <a href="{% url 'plugins:netbox_contract:contractline_amend' pk=record.pk %}"
+     class="btn btn-sm btn-primary" title="Amend price or quantity">
+    <i class="mdi mdi-cash-sync" aria-hidden="true"></i> Amend
+  </a>
+{% endif %}
+"""
 
-    actions = columns.ActionsColumn(actions=('edit',))
+
+class ContractLineLockedContractTable(ContractLineContractTable):
+    """
+    Contract lines of an invoiced contract: only their internal fields can be edited, none can be deleted,
+    and their price or quantity can be amended from a date.
+    """
+
+    actions = columns.ActionsColumn(actions=('edit',), extra_buttons=AMEND_BUTTON)
 
     class Meta(ContractLineContractTable.Meta):
         pass

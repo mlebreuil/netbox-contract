@@ -181,6 +181,31 @@ class AmendmentViewTestCase(NetBoxTestCase):
     def test_button_on_the_line_page(self):
         response = self.client.get(self.line.get_absolute_url())
         self.assertContains(response, self.url)
+        self.assertContains(response, '</i> Amend\n')
+        self.assertContains(response, 'To change its price or quantity from a date, use Amend')
+
+    def test_amend_button_on_the_contract_page(self):
+        setup = make_line(self.contract, one_time(), 500, description='Setup')
+        content = self.client.get(self.contract.get_absolute_url()).content.decode()
+        self.assertIn(self.url, content)
+        self.assertNotIn(reverse('plugins:netbox_contract:contractline_amend', args=[setup.pk]), content)
+        self.assertIn('Amend', content)
+
+    def test_amend_button_on_the_edit_page_of_a_locked_line(self):
+        edit_url = reverse('plugins:netbox_contract:contractline_edit', args=[self.line.pk])
+        response = self.client.get(edit_url)
+        self.assertContains(response, self.url)
+        self.assertContains(response, '</i> Amend\n')
+
+    def test_no_amend_button_once_replaced_or_before_invoicing(self):
+        new = amend_contract_line(self.line, date(2025, 7, 1), 'Indexation', unit_price=Decimal(110))
+        content = self.client.get(self.contract.get_absolute_url()).content.decode()
+        self.assertNotIn(self.url, content)
+        self.assertIn(reverse('plugins:netbox_contract:contractline_amend', args=[new.pk]), content)
+        other = make_contract(name='Not invoiced')
+        line = make_line(other, monthly(), 10)
+        response = self.client.get(reverse('plugins:netbox_contract:contractline_edit', args=[line.pk]))
+        self.assertNotContains(response, reverse('plugins:netbox_contract:contractline_amend', args=[line.pk]))
 
     def test_amend_through_the_form(self):
         self.assertEqual(self.client.get(self.url).status_code, 200)

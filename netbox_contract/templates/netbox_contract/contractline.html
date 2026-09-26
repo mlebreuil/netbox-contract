@@ -9,9 +9,9 @@
   </li>
 {% endblock %}
 {% block extra_controls %}
-  {% if perms.netbox_contract.change_contractline and object.unit.billing_method != 'one_time' and not object.replaced_by.exists %}
+  {% if perms.netbox_contract.change_contractline and object.can_be_amended %}
     <a href="{% url 'plugins:netbox_contract:contractline_amend' pk=object.pk %}" class="btn btn-primary">
-      <i class="mdi mdi-cash-sync" aria-hidden="true"></i> {% trans "Amend price or quantity" %}
+      <i class="mdi mdi-cash-sync" aria-hidden="true"></i> {% trans "Amend" %}
     </a>
   {% endif %}
 {% endblock %}
@@ -19,6 +19,9 @@
   {% if lock_message %}
   <div class="alert alert-warning" role="alert">
     {{ lock_message }} {% trans "Its accounting dimensions, comments and tags can still be edited." %}
+    {% if object.can_be_amended %}
+      {% trans "To change its price or quantity from a date, use Amend: the line then ends the day before and a new line with the new terms replaces it." %}
+    {% endif %}
   </div>
   {% endif %}
   <div class="row mb-3">

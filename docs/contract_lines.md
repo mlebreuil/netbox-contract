@@ -43,7 +43,7 @@ As soon as a contract has an invoice (draft, posted or canceled), its contract l
 
 ### Amending a price or quantity
 
-When the price or the quantity of a recurring or usage-based line changes during the contract (for example a yearly indexation, or more licences), use **Amend price or quantity** on the contract line page. Enter the date the new terms apply from, the new unit price and/or quantity, and a reason. The line then ends the day before that date, and a new line with the new terms replaces it from that date; the new line keeps the unit, currency, accounting dimensions and end date, and shows which line it replaces.
+When the price or the quantity of a recurring or usage-based line changes during the contract (for example a yearly indexation, or more licences), use the **Amend** button of the line (on the contract page, the contract line page or its edit page). Enter the date the new terms apply from, the new unit price and/or quantity, and a reason. The line then ends the day before that date, and a new line with the new terms replaces it from that date; the new line keeps the unit, currency, accounting dimensions and end date, and shows which line it replaces.
 
 - The date must be after the end of the last invoiced period of the line (draft and posted invoices count, canceled ones do not), so invoiced periods never change price.
 - The reason is required. It is recorded as the change-log message of both lines and added to the comments of the new line.
