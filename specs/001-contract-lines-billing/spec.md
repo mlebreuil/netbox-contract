@@ -6,28 +6,29 @@
 
 **Status**: Draft
 
-**Input**: User description: "Let a contract be described line by line (contract lines with a unit that defines the nature of the cost: one-time, recurring or usage-based), replace the contract-level monthly, yearly and non-recurring costs and the invoice templates, add a billable flag and computed contract values, enforce currency consistency between contracts, contract lines, invoices and invoice lines, pre-fill invoices from the contract lines, then generate editable invoice lines from them. Delivered in two releases, targeting NetBox 4.6 as the minimum version. Update the existing tests and add new ones covering every use case." (Source: GitHub issue #278 and the assessment in `.specify/assessments/contract-lines-units/`, verdict go, Option C.)
+**Input**: User description: "Let a contract be described line by line (contract lines with a unit that defines the nature of the cost: one-time, recurring or usage-based), replace the contract-level monthly, yearly and non-recurring costs and the invoice templates, add a billable flag and computed contract values, enforce currency consistency between contracts, contract lines, invoices and invoice lines, pre-fill invoices from the contract lines, then generate editable invoice lines from them. Delivered as a single release, targeting NetBox 4.6 as the minimum version. Update the existing tests and add new ones covering every use case." (Source: GitHub issue #278 and the assessment in `.specify/assessments/contract-lines-units/`, verdict go, Option C.)
 
 ## Delivery Overview
 
-The feature is delivered in two releases. Each user story below is tagged with its release.
-
-- **Release 1**: contract lines and units, the billable flag and computed contract values, currency consistency, the conversion of existing data, and the invoice pre-fill computed from contract lines.
-- **Release 2**: generation of editable invoice lines from contract lines (usage quantity, child contract roll-up, reference back to the contract line) and retirement of invoice templates from generation.
+The feature is delivered as a single release (plugin version 2.5.0). The user stories are ordered by priority, which is also the suggested build order: contract lines and the conversion of existing data first, then billable flag and computed values, currency rules, invoice pre-fill and finally invoice line generation. Existing invoice templates are kept for future reference and are never deleted.
 
 ## Clarifications
 
 ### Session 2026-09-26
 
-- Q: When an invoice is pre-filled in release 1, what is proposed for usage-based contract lines? → A: Nothing; release 1 pre-fill covers recurring and one-time lines only, usage-based lines are handled in release 2.
+- Q: When an invoice is pre-filled, what is proposed for usage-based contract lines? → A: Nothing; the amount pre-fill covers recurring and one-time lines only. Usage-based lines are handled through the quantity entered on the invoice line.
 - Q: What happens when a contract's currency is changed while it has contract lines, invoices or invoice lines? → A: Refused only if invoices or invoice lines exist; if only contract lines exist, they follow the contract's new currency.
 - Q: What happens when a contract line's dates fall outside its contract's dates? → A: The save is refused when the contract has that date; an open-ended contract imposes no limit on that side.
 - Q: What happens when a unit that contract lines use is edited or deleted? → A: Deleting a used unit is blocked; editing is allowed and only affects future computations, saved invoices keep their amounts.
 - Q: Who can see the currency mismatch report and where does it appear? → A: It is delivered as a NetBox custom script (run by users allowed to run scripts), not a plugin page; NetBox core custom scripts will be deprecated and replaced by an open-source plugin, so moving the report is part of the later NetBox 4.7 work.
+- Q: Should the work ship as two releases? → A: No, a single release; release 1 and release 2 are merged.
+- Q: What happens to invoice templates? → A: They are kept for future reference and never deleted; they are no longer used to pre-fill or to generate invoices, and the copy of template lines on invoice save is removed.
+- Q: Where is the quantity defined for an invoice? → A: On the invoice line, which references its contract line; unit and unit price come from the contract line and the invoice line amount is calculated.
+- Q: Can a contract line be changed once invoices exist? → A: No. As soon as a contract has an invoice, its contract lines can no longer be added, changed or deleted; a new contract must be created.
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - Describe a contract line by line (Priority: P1, Release 1)
+### User Story 1 - Describe a contract line by line (Priority: P1)
 
 A contract manager records what a contract actually bills for as several contract lines instead of one lump recurring cost and one one-time cost. Each contract line has a description, a quantity, a unit price, a unit, its own start and end dates (defaulting to the contract's dates) and accounting dimensions. The unit defines the nature of the cost: one-time, recurring or usage-based, and for a recurring unit the number of months one unit price covers (monthly is 1, quarterly 3, yearly 12).
 
@@ -42,12 +43,13 @@ A contract manager records what a contract actually bills for as several contrac
 3. **Given** a contract line with several accounting dimensions, **When** the contract is viewed, **Then** each contract line shows its dimensions.
 4. **Given** a contract in one currency, **When** a contract line is added, **Then** the contract line uses the contract's currency.
 5. **Given** a contract from 1 January to 31 December, **When** a contract line ending on the following 31 March is saved, **Then** the save is refused with a message naming the contract's dates.
-6. **Given** a unit used by a contract line, **When** a user tries to delete it, **Then** the deletion is refused; **When** the user edits the unit's covered months, **Then** the edit is accepted and invoices already saved keep their amounts.
+6. **Given** a unit used by a contract line, **When** a user tries to delete it, **Then** the deletion is refused; **When** the user edits the unit's covered months while only contracts without invoices use it, **Then** the edit is accepted; if a contract with invoices uses it, the change to billing method or covered months is refused.
 7. **Given** a contract line, **When** a user edits or deletes it, **Then** the contract's computed values update accordingly.
+8. **Given** a contract that already has an invoice, **When** a user tries to add, change or delete one of its contract lines, **Then** it is refused with a message saying that a new contract must be created.
 
 ---
 
-### User Story 2 - Keep existing data working after the upgrade (Priority: P1, Release 1)
+### User Story 2 - Keep existing data working after the upgrade (Priority: P1)
 
 An administrator upgrades an installation that already has contracts with monthly, yearly and one-time costs and invoice templates. After the upgrade those costs and templates are represented as contract lines, nothing is lost, and the old fields and templates remain but are marked as deprecated and hidden by default. Every existing contract is billable.
 
@@ -66,11 +68,11 @@ An administrator upgrades an installation that already has contracts with monthl
 
 ---
 
-### User Story 3 - Control billing and see contract values (Priority: P2, Release 1)
+### User Story 3 - Control billing and see contract values (Priority: P2)
 
 A finance user marks whether a contract is billable and sees, for each contract, its total value, its yearly value and its yearly billable value, computed from the contract lines.
 
-**Why this priority**: it turns contract lines into information users need without spreadsheets, and the billable flag drives the invoice behaviour of both releases.
+**Why this priority**: it turns contract lines into information users need without spreadsheets, and the billable flag drives the invoice behaviour.
 
 **Independent Test**: create contracts with known contract lines (recurring, one-time, usage-based, with and without end dates, with non-billable children) and check the three values against hand-computed results.
 
@@ -83,7 +85,7 @@ A finance user marks whether a contract is billable and sees, for each contract,
 
 ---
 
-### User Story 4 - Prevent inconsistent currencies (Priority: P2, Release 1)
+### User Story 4 - Prevent inconsistent currencies (Priority: P2)
 
 A finance user can no longer save a contract line, invoice or invoice line whose currency does not match its contract or invoice. Existing mismatches are not silently changed; they are reported so users can fix them.
 
@@ -103,11 +105,11 @@ A finance user can no longer save a contract line, invoice or invoice line whose
 
 ---
 
-### User Story 5 - Pre-fill an invoice from the contract lines (Priority: P2, Release 1)
+### User Story 5 - Pre-fill an invoice from the contract lines (Priority: P2)
 
-A user creating an invoice for a billable contract gets the amount and the period proposed from the contract's contract lines instead of from the old monthly, yearly and one-time cost fields. Recurring lines are proposed for the months the invoice covers, prorated by days when the invoice period only partly overlaps the line's dates. One-time lines are proposed for the amount still to invoice. Usage-based lines are not proposed in release 1. The proposal can be edited before saving.
+A user creating an invoice for a billable contract gets the amount and the period proposed from the contract's contract lines instead of from the old monthly, yearly and one-time cost fields. Recurring lines are proposed for the months the invoice covers, prorated by days when the invoice period only partly overlaps the line's dates. One-time lines are proposed for the amount still to invoice. Usage-based lines are not proposed; their amount comes from the quantity entered on the invoice line. The proposal can be edited before saving.
 
-**Why this priority**: it delivers immediate value from contract lines while invoice line generation follows in release 2.
+**Why this priority**: it is the first place where contract lines produce invoice values, before invoice lines are generated.
 
 **Independent Test**: for a set of reference scenarios (full period, partial period at start and end, one-time line partly and fully invoiced, mixed lines), check the proposed amount against hand-computed values.
 
@@ -123,11 +125,11 @@ A user creating an invoice for a billable contract gets the amount and the perio
 
 ---
 
-### User Story 6 - Generate editable invoice lines from the contract lines (Priority: P3, Release 2)
+### User Story 6 - Generate editable invoice lines from the contract lines (Priority: P3)
 
-A user generates the invoice lines of an invoice from the contract lines in one action. Each generated invoice line references the contract line it came from, carries its accounting dimensions, and stays fully editable. A billable parent's invoice includes the contract lines of all non-billable descendants, stopping at any billable child. Usage-based lines start with the contract line's quantity and unit price and the user sets the actual quantity on each invoice.
+A user generates the invoice lines of an invoice from the contract lines in one action. Each generated invoice line references the contract line it came from and carries its accounting dimensions. The quantity is defined on the invoice line; the unit and the unit price come from the contract line and the amount is calculated. A billable parent's invoice includes the contract lines of all non-billable descendants, stopping at any billable child. Usage-based lines are generated without a quantity and the user enters the actual quantity on each invoice.
 
-**Why this priority**: it completes the workflow and retires invoice templates, but it builds on the data conversion and the amount rules delivered first.
+**Why this priority**: it completes the workflow and replaces the invoice templates as the way to prepare invoice lines, but it builds on the data conversion and the amount rules.
 
 **Independent Test**: generate invoice lines for a hierarchy of contracts (billable parent, non-billable child and grandchild, billable child) and check which contract lines produce invoice lines, their amounts, dimensions and references.
 
@@ -137,9 +139,10 @@ A user generates the invoice lines of an invoice from the contract lines in one 
 2. **Given** a billable parent with a non-billable child and grandchild, **When** invoice lines are generated for the parent, **Then** the lines of the child and grandchild are included.
 3. **Given** a billable parent with a billable child, **When** invoice lines are generated for the parent, **Then** the child's lines are not included.
 4. **Given** a non-billable contract, **When** invoice line generation is requested, **Then** it fails with a clear error.
-5. **Given** a usage-based contract line with quantity 10 at 20, **When** its invoice line is generated, **Then** it starts at quantity 10 and amount 200, and the user can change the quantity, which recomputes the amount.
-6. **Given** any generated invoice line, **When** the user edits its amount or dimensions, **Then** the change is accepted and the reference to the contract line is kept.
-7. **Given** invoice lines that are generated, **When** an invoice template exists for the contract, **Then** the template is not used for generation.
+5. **Given** a usage-based contract line with unit price 20, **When** its invoice line is generated, **Then** it has no quantity and amount 0; **When** the user enters quantity 10, **Then** the amount becomes 200, and changing the quantity to 12 makes it 240.
+6. **Given** any generated invoice line, **When** the user edits its dimensions or quantity, **Then** the change is accepted, the amount is recalculated from the quantity, and the reference to the contract line is kept.
+7. **Given** a recurring contract line of 100 per month generated for an invoice covering 3 months, **When** the invoice line is created, **Then** its quantity is the contract line's quantity (1) and its amount is 300.
+8. **Given** a contract that has an invoice template, **When** a new invoice is saved or its lines are generated, **Then** the template's lines are not copied and the template invoice itself stays untouched.
 
 ---
 
@@ -149,7 +152,11 @@ A user generates the invoice lines of an invoice from the contract lines in one 
 - A contract without start or end dates (open-ended), and recurring lines without end dates.
 - Zero or negative quantities, zero prices, and rounding of prorated amounts to two decimals.
 - A one-time line invoiced more than its total (the remaining amount is never negative).
-- A unit that is in use being deleted (blocked, FR-001a) or edited, including a change of covered months after invoices were prepared (later computations only).
+- A unit that is in use being deleted (blocked, FR-001a) or edited; changing its billing method or covered months is refused when a contract with invoices uses it.
+- A contract with invoices that needs a different price or a new line: a new contract must be created (FR-029); this includes contracts converted at upgrade that already had invoices, whose converted lines are therefore locked.
+- A Draft or Canceled invoice also locks the contract's lines.
+- An invoice whose period is changed after its lines were generated: the amounts of its lines are recalculated when each line is saved again, not automatically.
+- The sum of the invoice lines exceeding the invoice amount (an existing rule), for instance once a usage quantity is entered: the user raises the invoice amount.
 - A contract changing currency: refused when invoices exist, contract lines follow otherwise (FR-009a).
 - A non-billable child that later becomes billable, or a parent that becomes non-billable, after invoices exist.
 - Invoices linked to several contracts that existed before the upgrade (kept unchanged) and their editing.
@@ -163,23 +170,23 @@ A user generates the invoice lines of an invoice from the contract lines in one 
 
 ### Functional Requirements
 
-Contract lines and units (Release 1)
+Contract lines and units
 
 - **FR-001**: The system MUST let users define units, each with a name, a description, a billing method (one-time, recurring, usage-based) and, for recurring units, the number of months one unit price covers.
-- **FR-001a**: The system MUST refuse to delete a unit used by contract lines; editing a used unit is allowed and MUST only affect later computations, never the amounts of invoices already saved.
+- **FR-001a**: The system MUST refuse to delete a unit used by contract lines. Editing a used unit is allowed, except that its billing method and covered months MUST NOT be changed while a contract line of a contract that has invoices uses it (FR-029).
 - **FR-002**: The system MUST let users add contract lines to a contract, each with a description, quantity, unit price, unit, start date, end date and accounting dimensions; the dates default to the contract's dates.
 - **FR-002a**: The system MUST refuse to save a contract line whose start or end date falls outside its contract's dates, when the contract has that date; a contract without a start or end date imposes no limit on that side. Changing a contract's dates so that existing contract lines fall outside them MUST also be refused.
 - **FR-003**: A contract line MUST support several accounting dimensions.
 - **FR-004**: The system MUST show a contract's contract lines on the contract and let users create, edit and delete them, including through bulk import and the programmatic interface used by the plugin today.
 
-Billable flag and computed values (Release 1)
+Billable flag and computed values
 
 - **FR-005**: Every contract MUST have a billable flag; all contracts existing at upgrade are billable.
 - **FR-006**: The system MUST compute and show, for each contract, the total contract value (recurring lines over their dates, one-time lines once, usage-based lines at their stated quantity), the yearly contract value (twelve-month equivalent of the recurring lines only) and the yearly billable value (the yearly value of the lines invoiced under this contract: its own lines when it is billable, plus those of its non-billable descendants; zero for a non-billable contract).
 - **FR-007**: When a contract line has no end date and the contract is open-ended, the total contract value MUST be shown as not available while yearly values are still shown.
 - **FR-008**: Preparing an invoice for a non-billable contract MUST produce a clear error.
 
-Currency consistency (Release 1)
+Currency consistency
 
 - **FR-009**: The system MUST refuse to save a contract line whose currency differs from its contract's currency, an invoice whose currency differs from its contract's currency, and an invoice line whose currency differs from its invoice's currency, with a message naming both currencies.
 - **FR-009a**: Changing a contract's currency MUST be refused, with a message naming the blocking records, when invoices or invoice lines exist for it; when only contract lines exist, they MUST follow the contract's new currency.
@@ -187,28 +194,29 @@ Currency consistency (Release 1)
 - **FR-011**: A new invoice MUST be linked to at most one contract; existing invoices linked to several contracts MUST remain viewable and editable without being altered by the upgrade.
 - **FR-012**: The system MUST NOT change the currency of existing records automatically; it MUST provide a report, delivered as a NetBox custom script, that lists existing records whose currencies do not match, with a link to each record. The report only reads data and MUST NOT alter it. It is a known temporary choice: custom scripts are to be deprecated in NetBox core, so its replacement is planned with the NetBox 4.7 work.
 
-Conversion of existing data (Release 1)
+Conversion of existing data
 
 - **FR-013**: At upgrade, each contract with a monthly recurring cost MUST get a recurring contract line covering one month, each with a yearly recurring cost a recurring line covering twelve months, and each with a non-zero one-time cost a one-time line, all with the existing prices.
-- **FR-014**: At upgrade, each existing invoice template MUST be represented as contract lines carrying the template lines' amounts and accounting dimensions; the template invoices MUST be kept, marked as deprecated, and no longer used to prepare or generate invoices.
+- **FR-014**: At upgrade, each existing invoice template MUST be represented as contract lines carrying the template lines' amounts and accounting dimensions. The template invoices MUST be kept for future reference and MUST NOT be deleted; they are marked as deprecated, are no longer used to pre-fill invoices or to generate invoice lines, and the copy of a template's lines onto a new invoice on save is removed.
 - **FR-015**: The deprecated cost fields MUST be kept, marked as deprecated, and hidden by default; existing invoices and invoice lines MUST NOT be changed by the upgrade.
 - **FR-016**: The upgrade conversion MUST be safe to run again without duplicating contract lines.
 
-Invoice pre-fill (Release 1)
+Invoice pre-fill
 
 - **FR-017**: When an invoice is created for a billable contract, the system MUST propose the invoice amount and period from the contract lines, not from the deprecated cost fields.
 - **FR-018**: For recurring lines the proposed amount MUST be quantity x unit price x (months covered by the invoice) / (months covered by one unit price); when the invoice period only partly overlaps the line's dates the amount MUST be multiplied by (days covered by the line) / (days in the invoice period).
-- **FR-019**: For one-time lines the proposed amount MUST be quantity x unit price minus the amounts already invoiced for that line on Posted invoices; Draft and Canceled invoices are ignored and the result is never negative.
-- **FR-017a**: The pre-fill MUST NOT propose an amount for usage-based contract lines in release 1; they are handled by invoice line generation in release 2.
+- **FR-019**: For one-time lines the proposed amount MUST be quantity x unit price minus the amounts of the invoice lines that reference that contract line on Posted invoices; Draft and Canceled invoices are ignored and the result is never negative.
+- **FR-017a**: The pre-fill MUST NOT propose an amount for usage-based contract lines; their amount comes from the quantity entered on the invoice line (FR-024).
 - **FR-020**: Users MUST be able to edit any proposed amount and period before saving.
 
-Invoice line generation (Release 2)
+Invoice line generation
 
-- **FR-021**: The system MUST generate, on request, one invoice line per applicable contract line of a billable contract; each generated line MUST reference its contract line, carry its accounting dimensions, and remain editable.
+- **FR-021**: The system MUST generate, on request, one invoice line per applicable contract line of a billable contract; each generated line MUST reference its contract line and carry its accounting dimensions.
 - **FR-022**: A billable parent's generation MUST include the contract lines of all non-billable descendants and stop at any billable child.
 - **FR-023**: Generation for a non-billable contract MUST fail with a clear error.
-- **FR-024**: A generated line for a usage-based contract line MUST start with the contract line's quantity and unit price, and changing the quantity on the invoice line MUST recompute its amount.
-- **FR-025**: Recurring and one-time lines MUST be generated with the same amount rules as the pre-fill (FR-018, FR-019).
+- **FR-024**: An invoice line MUST have a quantity entered on the invoice line itself. When it references a contract line, its unit and unit price MUST be taken from that contract line, and its amount MUST be calculated from the quantity: quantity x unit price for usage-based lines, with the amount rules of FR-018 and FR-019 for recurring and one-time lines. Changing the quantity MUST recompute the amount. A usage-based invoice line is generated with no quantity and an amount of zero until the user enters the quantity.
+- **FR-025**: Recurring and one-time lines MUST be generated with the same amount rules as the pre-fill (FR-018, FR-019), starting from the contract line's quantity.
+- **FR-029**: As soon as a contract has an invoice (of any status), the system MUST refuse to add, change or delete its contract lines, with a message that a new contract must be created; the conversion of existing data at upgrade is not affected by this rule.
 
 Compatibility and quality
 
@@ -222,7 +230,7 @@ Compatibility and quality
 - **Unit**: defines a billing method (one-time, recurring, usage-based) and, for recurring units, the months covered by one unit price; referenced by contract lines.
 - **Contract**: gains a billable flag and three computed values (total, yearly, yearly billable); keeps its parent-child hierarchy and now has contract lines; its deprecated cost fields are kept but hidden.
 - **Invoice**: linked to at most one contract for new invoices; its currency equals its contract's currency; deprecated invoice templates are kept but no longer used.
-- **Invoice line**: belongs to an invoice, uses the invoice's currency, and (from Release 2) can reference the contract line it was generated from.
+- **Invoice line**: belongs to an invoice, uses the invoice's currency, has a quantity, and can reference the contract line it comes from, from which it takes its unit and unit price; its amount is calculated when it references a contract line.
 - **Accounting dimension**: existing entity; can now be attached to contract lines and copied to generated invoice lines.
 
 ## Success Criteria *(mandatory)*
@@ -234,7 +242,7 @@ Compatibility and quality
 - **SC-003**: 0 records with mismatching currencies (contract line, invoice, invoice line, non-billable child) can be newly saved, and 100% of pre-existing mismatches appear in the report.
 - **SC-004**: For the reference scenarios of this specification (full and partial periods, quantity, unit months, one-time lines partly and fully invoiced), the proposed invoice amounts match the hand-computed values to the cent in 100% of cases.
 - **SC-005**: 100% of the acceptance scenarios and edge cases in this specification are covered by at least one automated test, and the whole test suite passes on NetBox 4.6.
-- **SC-006** (Release 2): generating the invoice lines of a contract hierarchy takes a single user action, produces exactly the expected contract lines' invoice lines in 100% of reference cases, and each generated line can be traced to its contract line.
+- **SC-006**: generating the invoice lines of a contract hierarchy takes a single user action, produces exactly the expected contract lines' invoice lines in 100% of reference cases, and each generated line can be traced to its contract line.
 - **SC-007**: Users of the deprecated cost fields or invoice templates see no data loss: after the upgrade their previous values are still visible where they were kept, marked as deprecated.
 
 ## Assumptions
@@ -244,7 +252,7 @@ Compatibility and quality
 - Implementation choices (how amounts are stored, how the conversion is built) are decided in planning; the assessment recorded that no additional money library is added (`.specify/assessments/contract-lines-units/decision.md`).
 - The total contract value and the yearly value refer to the contract's own contract lines; the yearly billable value adds the recurring lines of non-billable descendants when the contract is billable.
 - Prorated amounts are rounded to two decimals, matching the precision of existing amounts.
-- Preparing or generating invoices for a non-billable contract is refused with a clear message (Release 1: pre-fill; Release 2: generation).
-- The deprecated cost fields and invoice templates are kept for a deprecation period whose length is decided at planning; their removal is not part of this feature.
+- Preparing or generating invoices for a non-billable contract is refused with a clear message (pre-fill and generation).
+- The deprecated cost fields are kept for a deprecation period whose length is decided at planning; invoice templates are kept for future reference and are not deleted; the removal of the deprecated cost fields is not part of this feature.
 - The plugin's mismatch report is a read-only custom script listing records and does not fix them; it is expected to move to the replacement of core custom scripts later (outside this feature).
 - Dependencies: the existing accounting dimensions, contract hierarchy and invoice statuses (Draft, Posted, Canceled) are reused as they are.
