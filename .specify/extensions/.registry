@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "extensions": {
+    "assess": {
+      "version": "1.0.1",
+      "source": "local",
+      "manifest_hash": "sha256:a1c87d9ce8088e7865f1d352137777a693b0595ccc310957c7c051a604ca1db2",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.assess.intake",
+          "speckit.assess.research",
+          "speckit.assess.define",
+          "speckit.assess.shape",
+          "speckit.assess.decide"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-09-25T15:10:47.894938+00:00"
+    },
+    "git": {
+      "version": "1.0.1",
+      "source": "local",
+      "manifest_hash": "sha256:698cc7089602db44622de39730555db4999cda94ab47195bcfe18f41d08b430a",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.git.feature",
+          "speckit.git.validate",
+          "speckit.git.remote",
+          "speckit.git.initialize",
+          "speckit.git.commit"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-09-26T08:38:47.206652+00:00"
+    }
+  }
+}
