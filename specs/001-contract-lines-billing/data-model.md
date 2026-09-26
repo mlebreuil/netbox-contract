@@ -34,8 +34,9 @@ Defines the nature of a cost and, for recurring units, how many months one unit 
 | `end_date` | `DateField`, null | defaults to the contract's end date; must not be after the contract end date when the contract has one (FR-002a); must not be before `start_date` |
 | `accounting_dimensions` | M2M `AccountingDimension`, blank | any number (FR-003) |
 | `comments` | `TextField`, blank | |
+| `invoiced_at_conversion` | `BooleanField`, default `False`, read-only in forms and API | set only by the conversion, for a one-time line of a contract that already had a Posted invoice; the line is then treated as fully invoiced (remaining amount 0) |
 
-Lock: adding, changing or deleting a contract line is refused when its contract has any invoice (FR-029). Ordering: contract, start date, description. Currency-mismatch and date rules are in `clean()`, so the UI, bulk import and REST interface enforce them alike.
+Lock: adding, changing or deleting a contract line is refused when its contract has any invoice, and changing or deleting it is also refused when any invoice line references it (FR-029). Ordering: contract, start date, description. Currency-mismatch and date rules are in `clean()`, so the UI, bulk import and REST interface enforce them alike.
 
 Derived (not stored): `total_value`, `yearly_value` per line, computed by `calculations.py`.
 
@@ -46,7 +47,7 @@ Derived (not stored): `total_value`, `yearly_value` per line, computed by `calcu
 | new `billable` | `BooleanField`, default `True`; the migration leaves every existing contract `True` (FR-005) |
 | new read-only values | `total_contract_value` (None when not available, FR-007), `yearly_contract_value`, `yearly_billable_value` (FR-006), computed on read |
 | deprecated, kept | `mrc`, `yrc`, `nrc` (hidden by default, `show_deprecated_fields` setting); `calculated_rc` alias kept in the API during the deprecation period |
-| new `clean()` rules | currency change refused when invoices or invoice lines exist (FR-009a); a non-billable child must have its parent's currency (FR-010); changing dates so that existing lines fall outside is refused (FR-002a) |
+| new `clean()` rules | `billable` cannot change when the contract, any ancestor or any descendant has an invoice, or an invoice line references one of its lines (FR-008a); currency change refused when invoices or invoice lines exist (FR-009a); a non-billable child must have its parent's currency (FR-010); changing dates so that existing lines fall outside is refused (FR-002a) |
 | unchanged | hierarchy (`parent`, `childs`), `invoice_frequency`, party, dates, status |
 
 Yearly billable value: 0 when the contract is not billable; otherwise the yearly value of its own recurring lines plus the yearly value of the recurring lines of all non-billable descendants, stopping at any billable descendant (which invoices itself).

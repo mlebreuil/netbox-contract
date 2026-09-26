@@ -8,9 +8,9 @@
 - **Invoice add screen**: unchanged layout; amount and period are proposed from contract lines. For a non-billable contract an error message is shown and no amount is proposed. Usage-based lines never contribute. Users can edit everything before saving.
 - **Invoice detail / template invoices**: template invoices show a "deprecated" badge.
 
-## Invoice line generation and quantity
+## Invoice creation, line generation and quantity
 
-- **Invoice detail**: a "Generate invoice lines" button (permission `add_invoiceline`) opens a small form listing the applicable contract lines, with a quantity input for usage-based lines; confirming creates the lines. Errors: non-billable contract, or invoice that already has lines (offer to add anyway).
+- **Invoice creation**: saving a new invoice for a billable contract generates its invoice lines at once (no button, no separate step); usage-based lines appear without quantity and the user enters it on each line. Saving a new invoice for a non-billable contract is refused with an error. Editing an existing invoice never generates lines.
 - **Invoice line form**: fields "Contract line" and "Quantity"; unit and unit price are displayed from the contract line; the amount is displayed and calculated when a contract line is chosen (entered by the user otherwise).
 - **Contract screens**: when the contract has invoices, the add/edit/delete buttons of its contract lines are hidden and a notice says a new contract must be created.
 - Invoice templates: never deleted; visible, marked deprecated, from the contract detail page.

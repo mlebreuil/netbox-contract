@@ -30,18 +30,19 @@ Add contract lines and units to the netbox-contract plugin, a billable flag with
 
 ## Constitution Check
 
-The project constitution (`.specify/memory/constitution.md`) is still the unfilled Spec Kit template, so it defines no gates. To avoid an empty check, the plan is checked against the working rules the repository already enforces (`CONTRIBUTING.md`, CI, pre-commit):
+Checked against `.specify/memory/constitution.md` version 1.0.0 (Principles I-VII), before Phase 0 and again after the design of Phase 1:
 
-| Rule in force | Status |
-|---|---|
-| Lint clean with ruff (pre-commit hook, CI) | Planned: every task ends with `ruff check` |
-| Tests run and pass in CI on the supported NetBox | Planned: FR-027/FR-028, pinned 4.6 tag |
-| Schema changes ship as migrations, none missing | Planned: `makemigrations --check` in quickstart |
-| User-visible changes documented (`docs/`, `CHANGELOG.md`, README) | Planned: task group "documentation" |
-| Backward compatibility of the REST API | Met: no field removed or renamed (contracts/rest-api.md) |
-| Simplicity: no new dependency without need | Met: no money library |
+| Principle | Status | Evidence |
+|---|---|---|
+| I. NetBox-native plugin | Met | `Unit` and `ContractLine` are `NetBoxModel`s with the full stack (tasks T015-T022, including the change log route); `min_version` 4.6.0; the one known deprecation-bound API (custom scripts) is recorded as an accepted exception in research D10 with its migration path (logic kept in `reports.py`) |
+| II. Tested behaviour | Met | tests first in every story; every scenario and edge case mapped in quickstart.md; CI pinned to a NetBox 4.6 tag (T002); query-count baseline regenerated with a stated reason (list views change) |
+| III. Lint-clean | Met | every story ends with `ruff check` |
+| IV. Data safety and migrations | Met | migration 0044 schema, 0045 idempotent lossless conversion with a report; `invoiced_at_conversion` flag; nothing altered silently; deprecated fields and templates kept and never deleted |
+| V. Backward-compatible interfaces | Met with recorded behaviour changes | no REST field, endpoint, setting or import column removed or renamed; new validation rules and invoice-creation behaviour are listed as behaviour changes in the changelog task (T057) |
+| VI. Simplicity and minimal dependencies | Met | no new dependency (money library rejected); logic in `calculations.py`, `validators.py`, `conversion.py`, `reports.py`, `services/invoicing.py` |
+| VII. Documented change | Met | documentation, changelog and README tasks (T056-T058); single release 2.5.0 published only when all milestones are done |
 
-Re-check after design: no violation, so no entry in Complexity Tracking. Recommendation: run `/speckit-constitution` later so these rules become the project's stated gates.
+Re-check after design: no violation, so no entry in Complexity Tracking.
 
 ## Decisions taken with the maintainer
 
@@ -49,7 +50,8 @@ Re-check after design: no violation, so no entry in Complexity Tracking. Recomme
 2. **Quantity at the invoice line**: unit and unit price come from the contract line, the amount is calculated (research D7). Usage-based lines are generated without quantity.
 3. **Lock once invoiced**: a contract that has an invoice cannot get new, changed or deleted contract lines; a new contract must be created. Consequence: converted lines of contracts that already had invoices at upgrade are locked; a used unit's billing method and months are locked with them.
 4. **Invoice templates are kept**, never deleted, deprecated; the template-line copy on save is removed in this release.
-5. **Conversion**: template lines replace the `mrc`/`yrc` line; differences are reported, not added.
+5. **Invoice lines are generated at invoice creation** (screen and REST create), never on an existing invoice and never through bulk import; there is no generation button or endpoint.
+6. **Conversion**: template lines replace the `mrc`/`yrc` line; differences are reported, not added.
 
 Points to watch during implementation: amounts of recurring invoice lines are recalculated on save, not when the invoice period changes; the existing rule that lines cannot exceed the invoice amount means the user raises the invoice amount once usage quantities are entered.
 
