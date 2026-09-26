@@ -525,6 +525,15 @@ class InvoiceLineUnitPriceTestCase(TestCase):
         manual.full_clean()
         manual.save()
         self.assertEqual(manual.amount, Decimal('4.00'))
+        self.invoice.status = InvoiceStatusChoices.STATUS_POSTED
+        self.invoice.save()
+        for field, value in (('unit_price', Decimal(1)), ('unit', monthly())):
+            with self.subTest(field=field):
+                changed = InvoiceLine.objects.get(pk=line.pk)
+                setattr(changed, field, value)
+                with self.assertRaises(ValidationError) as cm:
+                    changed.full_clean()
+                self.assertIn(field, cm.exception.message_dict)
 
     def test_unit_used_by_an_invoice_line_is_locked(self):
         unit = make_unit('Every 2 months', 'recurring', 2)

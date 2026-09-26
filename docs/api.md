@@ -17,11 +17,13 @@ note: When creating invoices and invoice lines through the API, the correspondin
 
 ## Invoices
 
-- A new invoice is linked to at most one contract and has its currency.
+- A new invoice is linked to at most one contract and has its currency. Its `status` defaults to `draft`.
+- A Posted invoice cannot change its `amount`, `currency`, `period_start`, `period_end` or `contracts` (400); its `status` can change.
 - `POST invoices/` generates the invoice lines of a new invoice from the contract lines, in the same request. It returns 400 for a non-billable contract, or when `amount` is lower than the total of the lines to generate. Editing an invoice never generates lines.
 - `template` is deprecated: invoice templates are no longer copied.
 
 ## Invoice lines
 
-- `contract_line` (id, optional), `quantity`, read-only `unit` and `unit_price` (from the contract line).
-- When `contract_line` is set, `amount` is calculated and ignored if sent; otherwise it is required.
+- `contract_line` (id, optional), `unit` (id) and `unit_price` (default to those of the contract line), `quantity`.
+- Lines of a Posted invoice cannot be created or deleted, and their unit, unit price, quantity, amount, currency and contract line cannot change (400).
+- When the line has a unit price, `amount` is calculated and ignored if sent; otherwise it is required.

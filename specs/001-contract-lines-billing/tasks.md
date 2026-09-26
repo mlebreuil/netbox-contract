@@ -196,6 +196,7 @@
 - [X] T064 Amend the price or quantity of a contract line from a date (FR-030, decision I10): `ContractLine.replaces` and migration 0046, `services/amendments.py`, the amend screen and button, the REST action, yearly values without replaced lines; tests in `tests/test_amendments.py`; spec, docs and changelog updated.
 - [X] T065 Keep the invoice number free of the template help text and the fields of an existing invoice line with a contract line read-only except its quantity (`forms.py`, tests in `tests/test_deprecated.py` and `tests/test_generation.py`).
 - [X] T066 Give invoice lines their own unit and unit price, defaulted from the contract line and editable while the invoice is not posted, amount calculated from them (decision I11): model, migration 0047, form, import, API, table; tests in `tests/test_generation.py`; spec, docs and changelog updated.
+- [X] T067 Lock posted invoices and their lines and make new invoices Draft by default (FR-031, decision I12): models, migration 0048, signal, invoice and invoice line forms, invoice serializer, invoice page; tests in `tests/test_posted.py`; spec, docs and changelog updated.
 
 ---
 

@@ -26,6 +26,9 @@ LOCKED_CONTRACT_MESSAGE = _(
 REFERENCED_LINE_MESSAGE = _(
     'This contract line is used by invoice lines: it cannot be changed or deleted. A new contract must be created.'
 )
+POSTED_INVOICE_MESSAGE = _(
+    'This invoice is posted: its amounts and its lines are locked. Set it back to draft to change them.'
+)
 INTERNAL_FIELDS_NOTE = _('Its accounting dimensions, comments and tags can still be edited.')
 
 # Contract terms of a contract line, locked once it is invoiced (FR-029); its accounting dimensions, comments
@@ -581,8 +584,9 @@ class Invoice(NetBoxModel):
     status = models.CharField(
         max_length=50,
         choices=InvoiceStatusChoices,
-        default=InvoiceStatusChoices.STATUS_POSTED,
+        default=InvoiceStatusChoices.STATUS_DRAFT,
         verbose_name=_('status'),
+        help_text=_('A posted invoice is locked: set it back to draft to change its amounts or its lines'),
     )
     date = models.DateField(blank=True, null=True, verbose_name=_('date'))
     contracts = models.ManyToManyField(Contract, related_name='invoices', blank=True, verbose_name=_('contracts'))
@@ -615,6 +619,31 @@ class Invoice(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:invoice', args=[self.pk])
+
+    # Fields of a posted invoice that cannot change (FR-031); its status can
+    POSTED_LOCKED_FIELDS = ('amount', 'currency', 'period_start', 'period_end')
+
+    @property
+    def is_locked(self):
+        """A posted invoice (not a deprecated template) is locked (FR-031)."""
+        return self.status == InvoiceStatusChoices.STATUS_POSTED and not self.template
+
+    def locked_in_database(self):
+        """Whether the saved version of this invoice is locked."""
+        original = Invoice.objects.filter(pk=self.pk).values('status', 'template').first() if self.pk else None
+        return bool(original) and original['status'] == InvoiceStatusChoices.STATUS_POSTED and not original['template']
+
+    def clean(self):
+        super().clean()
+        if self.locked_in_database():
+            original = Invoice.objects.filter(pk=self.pk).values(*self.POSTED_LOCKED_FIELDS).first()
+            errors = {
+                field: POSTED_INVOICE_MESSAGE
+                for field in self.POSTED_LOCKED_FIELDS
+                if original[field] != getattr(self, field)
+            }
+            if errors:
+                raise ValidationError(errors)
 
     @property
     def total_invoicelines_amount(self):
@@ -916,6 +945,9 @@ class InvoiceLine(NetBoxModel):
         verbose_name = _('invoice line')
         verbose_name_plural = _('invoice lines')
 
+    # Fields of a line of a posted invoice that cannot change (FR-031)
+    POSTED_LOCKED_FIELDS = ('invoice', 'contract_line', 'unit', 'unit_price', 'quantity', 'amount', 'currency')
+
     def __str__(self):
         number = self.invoice.number if self.invoice_id else ''
         return f'{number} line {self.pk}' if self.pk else f'{number} new line'
@@ -956,15 +988,33 @@ class InvoiceLine(NetBoxModel):
             default_months=(invoiced_contract.invoice_frequency if invoiced_contract else None) or 1,
         )
 
+    def invoice_locked(self):
+        """Whether this line belongs, or belonged when last saved, to a posted invoice (FR-031)."""
+        if self.invoice_id and self.invoice.is_locked:
+            return True
+        if not self.pk:
+            return False
+        original_invoice = InvoiceLine.objects.filter(pk=self.pk).values_list('invoice', flat=True).first()
+        return bool(original_invoice) and Invoice(pk=original_invoice).locked_in_database()
+
     def clean(self):
         super().clean()
         if not self.invoice_id:
             return
 
         original = (
-            InvoiceLine.objects.filter(pk=self.pk).values('invoice', 'currency', 'contract_line').first()
-            if self.pk else None
+            InvoiceLine.objects.filter(pk=self.pk).values(*self.POSTED_LOCKED_FIELDS).first() if self.pk else None
         )
+
+        # Lines of a posted invoice: none added, and only their internal fields change (FR-031)
+        if self.invoice_locked():
+            if not original:
+                raise ValidationError(POSTED_INVOICE_MESSAGE)
+            attnames = {field: self._meta.get_field(field).attname for field in self.POSTED_LOCKED_FIELDS}
+            changed = [field for field, attname in attnames.items() if original[field] != getattr(self, attname)]
+            if changed:
+                raise ValidationError({field: POSTED_INVOICE_MESSAGE for field in changed})
+            return
 
         self.apply_contract_line_defaults()
 
@@ -1011,9 +1061,16 @@ class InvoiceLine(NetBoxModel):
 
     def save(self, *args, **kwargs):
         self.apply_contract_line_defaults()
-        if self.unit_price is not None:
+        # The amount of a line of a posted invoice never moves (FR-031)
+        if self.unit_price is not None and not (self.pk and self.invoice_locked()):
             self.amount = self.calculate_amount()
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        # Checked before Django's deletion collector opens its transaction; signals.py covers queryset deletions
+        if self.invoice_locked():
+            raise AbortRequest(escape(POSTED_INVOICE_MESSAGE))
+        return super().delete(*args, **kwargs)
 
 
 def yearly_value_annotation():

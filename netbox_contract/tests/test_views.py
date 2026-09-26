@@ -152,14 +152,14 @@ class InvoiceTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCase
         # Create test invoices
         invoices = Invoice.objects.bulk_create([
             Invoice(number='Invoice1', template=False, date=date(2025, 1, 25),
-                    status=InvoiceStatusChoices.STATUS_POSTED,
+                    status=InvoiceStatusChoices.STATUS_DRAFT,
                     period_start=date(2025, 1, 1), period_end=date(2025, 1, 31),
                     currency='usd', amount=Decimal(100)),
             Invoice(number='Invoice2', template=False, date=date(2025, 2, 25),
                     period_start=date(2025, 2, 1), period_end=date(2025, 2, 28),
                     currency='usd', amount=Decimal(100)),
             Invoice(number='Invoice3', template=False, date=date(2025, 3, 25),
-                    status=InvoiceStatusChoices.STATUS_POSTED,
+                    status=InvoiceStatusChoices.STATUS_DRAFT,
                     period_start=date(2025, 3, 1), period_end=date(2025, 3, 31),
                     currency='usd', amount=Decimal(100))
         ])

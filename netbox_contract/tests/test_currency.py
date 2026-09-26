@@ -10,7 +10,7 @@ from django.urls import reverse
 from rest_framework import status
 from utilities.testing import TestCase as NetBoxTestCase
 
-from netbox_contract.models import Contract, ContractLine, Invoice, InvoiceLine
+from netbox_contract.models import Contract, ContractLine, Invoice, InvoiceLine, InvoiceStatusChoices
 from netbox_contract.tests.custom import APITestCase
 from netbox_contract.tests.helpers import (
     make_contract,
@@ -41,7 +41,7 @@ class ModelCurrencyTestCase(TestCase):
 
     def test_invoice_line_currency_must_match(self):
         """Scenario 3."""
-        invoice = make_invoice(None, amount=100, currency='eur')
+        invoice = make_invoice(None, amount=100, currency='eur', status=InvoiceStatusChoices.STATUS_DRAFT)
         line = InvoiceLine(invoice=invoice, amount=Decimal(10), currency='chf')
         with self.assertRaises(ValidationError) as cm:
             line.full_clean()
@@ -135,7 +135,7 @@ class InvoiceFormCurrencyTestCase(NetBoxTestCase):
         data = {
             'number': 'INV-X',
             'date': '2025-01-31',
-            'status': 'posted',
+            'status': 'draft',
             'period_start': '2025-01-01',
             'period_end': '2025-01-31',
             'currency': currency,
@@ -171,7 +171,9 @@ class InvoiceFormCurrencyTestCase(NetBoxTestCase):
     def test_existing_multi_contract_invoice_stays_editable(self):
         """Scenario 6: grandfathered invoices."""
         other = make_contract(name='Other EUR', currency='eur')
-        invoice = make_invoice(self.eur, number='OLD', amount=0, currency='eur')
+        invoice = make_invoice(
+            self.eur, number='OLD', amount=0, currency='eur', status=InvoiceStatusChoices.STATUS_DRAFT
+        )
         invoice.contracts.add(other)
         response = self.post_invoice([self.eur, other], instance=invoice, number='OLD', comments='Edited')
         self.assertEqual(response.status_code, 302)
@@ -285,7 +287,7 @@ class APICurrencyTestCase(APITestCase):
         self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
         self.assertIn('currency', response.data)
 
-        invoice = make_invoice(None, amount=100, currency='eur')
+        invoice = make_invoice(None, amount=100, currency='eur', status=InvoiceStatusChoices.STATUS_DRAFT)
         url = reverse('plugins-api:netbox_contract-api:invoiceline-list')
         data = {'invoice': invoice.pk, 'amount': 10, 'currency': 'chf'}
         response = self.client.post(url, data, format='json', **self.header)

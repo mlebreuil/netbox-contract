@@ -81,12 +81,21 @@
         <div class="card">
           <h5 class="card-header">
             {% trans "Invoice lines" %}
+            {% if not object.is_locked %}
             <div class="card-actions">
               <a href="{% url 'plugins:netbox_contract:invoiceline_add' %}?invoice={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
                 <i class="mdi mdi-plus-thick" aria-hidden="true"></i> {% trans "Add a line" %}
               </a>
             </div>
+            {% endif %}
           </h5>
+          {% if object.is_locked %}
+          <div class="card-body">
+            <div class="alert alert-info mb-0" role="alert">
+              {% trans "This invoice is posted: its amounts and its lines are locked, apart from their accounting dimensions, comments and tags. Set it back to draft to change them." %}
+            </div>
+          </div>
+          {% endif %}
             {% render_table invoicelines_table %}
         </div>
       </div>

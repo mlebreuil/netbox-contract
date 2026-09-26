@@ -7,6 +7,7 @@ from tenancy.api.serializers_.tenants import TenantSerializer
 from utilities.api import get_serializer_for_model
 
 from ..models import (
+    POSTED_INVOICE_MESSAGE,
     AccountingDimension,
     Contract,
     ContractAssignment,
@@ -285,6 +286,9 @@ class InvoiceSerializer(NetBoxModelSerializer):
             is_new, contracts, currency, previous_contract_ids=previous_contract_ids,
             previous_currency=previous_currency,
         )
+        locked = not is_new and self.instance.locked_in_database()
+        if locked and {contract.pk for contract in contracts} != set(previous_contract_ids):
+            errors.append(POSTED_INVOICE_MESSAGE)
         if errors:
             raise serializers.ValidationError({'contracts': errors})
 

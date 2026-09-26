@@ -19,6 +19,7 @@
   * CI runs the tests against the NetBox v4.6.10 tag.
   * The unit price or quantity of a recurring or usage-based line can be amended from a date ("Amend" button, REST `POST contract-lines/{id}/amend/`): the line ends the day before and a new line replaces it, invoiced periods keep their price, and the required reason is recorded in the change log.
   * Invoice lines carry their own unit and unit price, taken from the contract line by default and editable as long as the invoice is not posted (for example a discount on one invoice); the amount is calculated from quantity x unit price. Migration 0047 copies the unit and unit price of the contract line into existing lines without changing their amounts.
+  * Posted invoices are locked: their amounts, period and contracts, and the amounts of their lines, can no longer change, and lines can no longer be added or deleted (accounting dimensions, comments and tags remain editable; the status can change back to Draft).
   * Invoice lines have a readable name (`<invoice number> line <id>`) in search results, the change log and reports.
 
 #### Behaviour changes
@@ -31,7 +32,9 @@ For existing users and API clients:
 * The copy of invoice template lines onto a new invoice is removed. Invoice templates are no longer used to pre-fill invoices; the pre-fill uses the contract lines instead of `mrc` and `yrc`.
 * Contract lines are locked once their contract has an invoice (any status) or once an invoice line references them: a new contract must be created. Their accounting dimensions, comments and tags remain editable, and their price or quantity can be amended from a date after the last invoiced period. The billing method and months of a unit used by such lines are locked too.
 * The billable flag of a contract cannot change once the contract, one of its parents or one of its children has invoices. The currency of a contract cannot change once it has invoices or invoice lines; without invoices, its contract lines follow the new currency.
-* The amount of an invoice line that references a contract line is calculated, and a value sent for it is ignored.
+* The amount of an invoice line that has a unit price (always the case when it references a contract line) is calculated, and a value sent for it is ignored.
+* New invoices are Draft by default (previously Posted), in the web interface and the REST API; imports still set the status given in the file.
+* Posted invoices are locked: their amount, currency, period and contracts cannot change, lines cannot be added or deleted, and the unit, unit price, quantity and amount of their lines cannot change. Set an invoice back to Draft to correct it.
 * The contract cost fields and new invoice templates are hidden unless `show_deprecated_fields` is `True`. The mandatory and hidden field settings ignore a deprecated field that is not shown (with a warning in the log) instead of failing.
 * The custom scripts `create_invoice_template` and `create_invoice_lines` are removed: they read fields that no longer exist and are superseded by the conversion.
 

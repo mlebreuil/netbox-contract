@@ -2,6 +2,10 @@
 
 New invoices should be created from the corresponding contract ("Add an invoice" button). A new invoice is linked to one contract, has the currency of that contract, and cannot be created for a non-billable contract (its lines are invoiced through its billable parent).
 
+## Draft and posted invoices
+
+New invoices are **Draft** by default. While an invoice is a draft you can enter the quantities of its usage lines, adjust units and unit prices, and add or delete lines. Once you set it to **Posted**, it is locked: its amount, currency, period and contracts, and the unit, unit price, quantity and amount of its lines can no longer change, and lines can no longer be added or deleted. Accounting dimensions, comments and tags remain editable. To correct a posted invoice, set it back to Draft, or record the correction on a new invoice (for example with a negative line). Deprecated invoice templates are not locked.
+
 ## Pre-fill
 
 When an invoice is added from a contract, the form proposes:
@@ -27,6 +31,7 @@ Lines are generated only when an invoice is created (through the web interface o
 ![Invoice](img/invoice.png "invoice")
 
 - Number: The invoice number. Should correspond to your accounting sysstem invoice number.
+- Status: Draft (default), Posted (locked, see above) or Canceled. Only Posted invoices count as invoiced when the remaining amount of one-time lines is computed.
 - Date: the date of the invoice
 - Contracts: The contract linked to the invoice. Invoices linked to several contracts before version 2.5.0 stay as they are and can still be edited, but no contract can be added to them.
 - Period_start: The start of the contract periode covered by this invoice.

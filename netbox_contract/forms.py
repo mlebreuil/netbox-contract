@@ -431,6 +431,12 @@ class InvoiceForm(NetBoxModelForm):
         # Initialise fields settings
         apply_field_settings(self, 'mandatory_invoice_fields', 'hidden_invoice_fields')
 
+        # A posted invoice keeps its amounts, period and contracts; its status can change (FR-031)
+        if self.instance.pk and self.instance.locked_in_database():
+            for field in (*Invoice.POSTED_LOCKED_FIELDS, 'contracts'):
+                if field in self.fields:
+                    self.fields[field].disabled = True
+
     def clean(self):
         super().clean()
 
@@ -767,6 +773,13 @@ class InvoiceLineForm(NetBoxModelForm):
                 'Calculated from the quantity and the unit price when the line has a unit price (ignored then); '
                 'entered manually otherwise'
             )
+            return
+
+        # Lines of a posted invoice: only their accounting dimensions, comments and tags change (FR-031)
+        if self.instance.invoice_locked():
+            for field in InvoiceLine.POSTED_LOCKED_FIELDS:
+                self.fields[field].disabled = True
+            self.fields['amount'].help_text = _('The invoice is posted: set it back to draft to change this line')
             return
 
         # A calculated line keeps its invoice, contract line and currency; its unit, unit price and quantity change
