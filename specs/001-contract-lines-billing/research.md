@@ -101,6 +101,17 @@ The assessment (`.specify/assessments/contract-lines-units/`) already settled th
 
 - **Decision**: a single release, plugin version 2.5.0 (new models and a data migration justify a minor version); update `docs/` (contract, a new contract lines page, invoice), `CHANGELOG.md`, `README.md` and the sample import files in `utils/`.
 
+## Decisions taken during implementation (reviewed with the maintainer on 2026-09-26)
+
+- **I1. Currency checks and existing mismatches**: invoices, invoice lines and non-billable children are checked when they are new or when their currency, contract, invoice, parent or billable flag changes. Records mismatched before the upgrade stay editable and are listed by the report script (FR-012).
+- **I2. Empty line dates follow the contract**: an empty start or end date of a contract line means the contract's date, for the calculations and for the date checks, so an open-ended contract with invoices can still be given an end date.
+- **I3. Pre-fill scope**: the pre-fill covers the same lines as the generation (own lines and those of non-billable descendants), so the proposed amount always passes the FR-021 amount check.
+- **I4. No invoice period**: a recurring line counts for one invoice frequency of the invoiced contract (quantity x unit price x frequency / unit months), in the pre-fill, the generation and the invoice line amount. Creation is not refused for a missing period.
+- **I5. Applicable lines**: a line of any billing method is proposed or generated only when its dates overlap the invoice period (a missing period date is open-ended).
+- **I6. Unit name clash in the conversion**: a unit of the expected name with another definition is not reused; the conversion uses "<name> (converted)" and reports it.
+- **I7. Imports**: the invoice import applies the one-contract and currency rules (no line generation); the invoice line import accepts optional `contract_line` and `quantity` columns.
+- **I8. `calculated_rc`**: it was never an API field; no API alias is added. It stays on the contract page with a "deprecated" badge when `show_deprecated_fields` is true.
+
 ## Testing approach (feeds tasks)
 
 - Keep the generic NetBox view test cases for every new model (`Unit`, `ContractLine`) in `tests/test_views.py`, and update the existing `Contract`, `Invoice` and `InvoiceLine` cases for the new fields.

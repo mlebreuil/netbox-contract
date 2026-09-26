@@ -30,10 +30,10 @@ Expected: no lint error, no pending migration, every test passes on NetBox 4.6.
 
 ## Traceability: scenario to test
 
-| Spec scenarios / requirements | Test module (to be written) |
+| Spec scenarios / requirements | Test module |
 |---|---|
 | US1 scenarios, FR-001..FR-004, FR-001a, FR-002a, FR-029 | `test_views.py` (Unit, ContractLine cases), `test_contract_lines.py` (dates rules), `test_locking.py`, `test_api.py` |
-| US2 scenarios, FR-013..FR-016, SC-002, SC-007, upgrade edge cases | `test_conversion.py` |
+| US2 scenarios, FR-013..FR-016, SC-002, SC-007, upgrade edge cases | `test_conversion.py`, `test_deprecated.py` |
 | US3 scenarios, FR-005..FR-008a, SC-001 arithmetic | `test_calculations.py`, `test_values.py`, `test_views.py` (contract detail), `test_api.py` |
 | US4 scenarios, FR-009..FR-012, SC-003 | `test_currency.py`, `test_reports.py` |
 | US5 scenarios, FR-017..FR-020, FR-017a, SC-004 | `test_calculations.py` (amounts), `test_prefill.py` (view) |

@@ -91,7 +91,9 @@ netbox_contract/
     ├── test_views.py           # updated + Unit/ContractLine cases
     ├── test_calculations.py, test_currency.py, test_conversion.py,
     ├── test_contract_lines.py, test_values.py, test_prefill.py, test_api.py,
-    ├── test_reports.py, test_generation.py, test_locking.py   # NEW
+    ├── test_reports.py, test_generation.py, test_locking.py,
+    ├── test_deprecated.py      # NEW (deprecated fields and invoice templates, US2)
+    ├── helpers.py              # NEW shared test factories (not a test module)
     └── query_counts.json       # regenerated
 scripts/netbox-contract.py      # + currency report script, - two stale scripts
 .github/workflows/lint-tests.yaml   # pinned NetBox 4.6 tag

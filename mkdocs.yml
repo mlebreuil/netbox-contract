@@ -5,6 +5,7 @@ repo_name: netbox-contract
 nav:
   - Home: index.md
   - Contract: contract.md
+  - Contract lines: contract_lines.md
   - Invoice: invoice.md
   - Invoice line: invoice_line.md
   - Accounting dimensions: accounting_dimensions.md

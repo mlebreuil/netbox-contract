@@ -4,11 +4,11 @@ Written 2026-09-26 at the end of the specification phase, to start a fresh Claud
 
 ## Where things stand
 
-- Branch: `278-replace-invoice-templates-with-contract-lines` (based on GitHub `develop`, plugin version 2.4.7 at the time). Refresh with `git fetch origin` before starting.
-- Spec Kit artifacts are complete and analysed with no CRITICAL or HIGH finding: `spec.md`, `plan.md`, `research.md`, `data-model.md`, `contracts/rest-api.md`, `contracts/ui-and-settings.md`, `quickstart.md`, `tasks.md` (61 tasks, Phases 1-9) and `checklists/requirements.md`.
-- Project rules: `.specify/memory/constitution.md` version 1.0.0 (Principles I-VII). The plan's Constitution Check is done.
-- Assessment notes: `.specify/assessments/contract-lines-units/` (verdict go).
-- Nothing of the feature is implemented yet: no model, migration or test has been written.
+- Updated 2026-09-26 after `/speckit-implement`: tasks T001-T060 are done and marked in `tasks.md`; T061 is open only for the SC-001 timing by a person (the scripted walkthrough on an upgraded copy of the dev database passed).
+- Nothing is committed yet: all changes are in the working tree of branch `278-replace-invoice-templates-with-contract-lines`.
+- Checks at hand-over: `ruff check` clean, `makemigrations --check` reports nothing, 530 tests pass on the local NetBox 4.6.8 and on a clone of the pinned `v4.6.10` tag.
+- Run the tests in the dev container with `NETBOX_CONFIGURATION=netbox.configuration_testing` (the default configuration has DEBUG on, which the debug toolbar refuses in tests).
+- Spec Kit artifacts: `spec.md`, `plan.md`, `research.md`, `data-model.md`, `contracts/`, `quickstart.md`, `tasks.md`, `checklists/requirements.md`. Project rules: `.specify/memory/constitution.md` 1.0.0.
 
 ## Start here
 

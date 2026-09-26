@@ -4,6 +4,34 @@
 
 ## Version 2
 
+### Version 2.5.0
+
+> [!WARNING]
+> This version requires Netbox 4.6.0 or later
+
+* [#278](https://github.com/mlebreuil/netbox-contract/issues/278) Contract lines replace the contract costs and the invoice templates.
+  * New models **Unit** (billing method one-time, recurring or usage-based, and the months one unit price covers) and **Contract line** (description, quantity, unit price, unit, currency, dates and accounting dimensions), with list, detail, edit, bulk import, bulk edit and bulk delete screens, and the REST API endpoints `units/` and `contract-lines/`.
+  * Contracts get a **billable** flag and three computed values: total contract value, yearly value and yearly billable value (which includes the lines of non-billable descendants).
+  * The invoice add screen proposes the amount from the contract lines, and creating an invoice generates its invoice lines from them. Invoice lines get a reference to their contract line and a quantity; their amount is calculated from it.
+  * Currency consistency: contract lines, invoices and invoice lines must have the currency of their contract or invoice; a non-billable child has the currency of its parent. The new read-only custom script "Report currency mismatches" lists existing mismatches without changing them.
+  * Upgrade: the migration converts the monthly, yearly and non-recurring costs and the invoice templates into contract lines (units "One-time", "Monthly", "Yearly") and prints a report. It can be run again with `python manage.py convert_contract_lines`. Every existing contract is billable. Invoices and invoice lines are not changed.
+  * Deprecated, kept and hidden by default: the contract fields `mrc`, `yrc` and `nrc` and the invoice templates (never deleted, shown with a "deprecated" badge). The new plugin setting `show_deprecated_fields` (default `False`) shows them again. They remain in the bulk import and the REST API.
+  * CI runs the tests against the NetBox v4.6.10 tag.
+
+#### Behaviour changes
+
+For existing users and API clients:
+
+* A new invoice can no longer be linked to more than one contract. Existing invoices linked to several contracts stay as they are and can be edited, but no contract can be added to them.
+* A new invoice must have the currency of its contract, and cannot be created for a non-billable contract.
+* Creating an invoice (web interface or `POST invoices/`) now generates its invoice lines from the contract lines, and is refused when the invoice amount is lower than their total. Invoice lines are not generated when an invoice is edited or imported.
+* The copy of invoice template lines onto a new invoice is removed. Invoice templates are no longer used to pre-fill invoices; the pre-fill uses the contract lines instead of `mrc` and `yrc`.
+* Contract lines are locked once their contract has an invoice (any status) or once an invoice line references them: a new contract must be created. The billing method and months of a unit used by such lines are locked too.
+* The billable flag of a contract cannot change once the contract, one of its parents or one of its children has invoices. The currency of a contract cannot change once it has invoices or invoice lines; without invoices, its contract lines follow the new currency.
+* The amount of an invoice line that references a contract line is calculated, and a value sent for it is ignored.
+* The contract cost fields and new invoice templates are hidden unless `show_deprecated_fields` is `True`. The mandatory and hidden field settings ignore a deprecated field that is not shown (with a warning in the log) instead of failing.
+* The custom scripts `create_invoice_template` and `create_invoice_lines` are removed: they read fields that no longer exist and are superseded by the conversion.
+
 ### Version v2.4.7
 
 * [#303](https://github.com/mlebreuil/netbox-contract/issues/303) Gracefully skip `supported_models` entries that don't resolve to a registered Django model instead of raising an unhandled `LookupError` during app startup (which previously crashed *every* management command, including `migrate`). This most commonly affects models created dynamically by other plugins (e.g. `netbox_custom_objects` custom object types), whose registration order relative to `netbox_contract` is not guaranteed. A clear error is now logged (`netbox.plugins.netbox_contract`) naming the offending entry, and the rest of the plugin continues to load normally.

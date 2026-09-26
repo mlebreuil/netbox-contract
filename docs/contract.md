@@ -5,13 +5,29 @@
 ![Contract](img/contract.png "contract")
 
 - External party type: either an Circuit provider or Contract Service provider.
-- Accounting dimensions: Will be copied to each invoice. Although this this field is still available the use invoice templates with accounting dimensions should be prefered.
-- Monthly / Yearly recuring costs: Only one of these two options can be used for each contract. The value will be used, along with the invoice frequency, to calculate each invoice amount.
-- Invoice frequency : The number of month that each invoice covers.
+- Invoice frequency : The number of month that each invoice covers. It is used to propose the period of a new invoice.
 - Parent: Contrats can be arranged in a parent / child hierarchie.
+- Billable: whether invoices are issued for this contract (default: yes). The lines of a non-billable contract are invoiced through its closest billable parent. The flag cannot change once the contract, one of its parents or one of its children has invoices, or once an invoice line references one of its lines.
+- Currency: contract lines and invoices of the contract use the same currency. The currency cannot change once the contract has invoices (or invoice lines referencing its lines); without invoices, its contract lines follow the new currency. A non-billable child must have the currency of its parent.
+
+What a contract bills for is described by its [contract lines](contract_lines.md).
+
+## Values
+
+The contract page shows values computed from the contract lines:
+
+- Total contract value: the total value of its lines, "Not available" when a recurring line has no end date on an open-ended contract.
+- Yearly value: the twelve-month value of its recurring lines.
+- Yearly billable value: the yearly value of the lines invoiced under this contract, which are its own lines and those of its non-billable descendants (stopping at any billable child). It is zero for a non-billable contract.
+
+## Deprecated fields
+
+The monthly, yearly and non-recurring cost fields (`mrc`, `yrc`, `nrc`) are replaced by contract lines. The upgrade to version 2.5.0 converts them into contract lines. They are kept, marked as deprecated, and hidden by default in the contract form, detail page and tables; set the plugin setting `show_deprecated_fields` to `True` to show them. They stay available in the bulk import and in the REST API.
 
 ## Linked objects:  
 
 ![Contract linked objects](img/contract_linked_objects.png "contract linked objects")
 
+- Contract lines: the lines of the contract, with a button to add a new one. The buttons are hidden once the contract has invoices.
 - Assignments: the assignement of contract to objects is managed from each object's detail view.
+- Invoice templates (kept for reference): the deprecated invoice template of the contract, if any.
