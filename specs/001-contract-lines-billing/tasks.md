@@ -193,6 +193,7 @@
 
 - [X] T062 Give invoice lines a readable name (`<invoice number> line <id>`), used by the currency report, search and change log (`netbox_contract/models.py`, test in `tests/test_generation.py`).
 - [X] T063 Keep the accounting dimensions, comments and tags of a locked contract line editable (decision I9): `ContractLine.clean()` locks only the contract terms, `ContractLineForm` disables them on a locked line, the contract page keeps an edit button; tests in `tests/test_locking.py`; FR-029, docs and changelog updated.
+- [X] T064 Amend the price or quantity of a contract line from a date (FR-030, decision I10): `ContractLine.replaces` and migration 0046, `services/amendments.py`, the amend screen and button, the REST action, yearly values without replaced lines; tests in `tests/test_amendments.py`; spec, docs and changelog updated.
 
 ---
 

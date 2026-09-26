@@ -112,6 +112,7 @@ The assessment (`.specify/assessments/contract-lines-units/`) already settled th
 - **I7. Imports**: the invoice import applies the one-contract and currency rules (no line generation); the invoice line import accepts optional `contract_line` and `quantity` columns.
 - **I8. `calculated_rc`**: it was never an API field; no API alias is added. It stays on the contract page with a "deprecated" badge when `show_deprecated_fields` is true.
 - **I9. Internal fields of a locked contract line**: the lock of FR-029 covers the contract terms (contract, description, quantity, unit price, unit, currency, dates and custom fields). Accounting dimensions, comments and tags stay editable, since they are internal classification; the edit form shows the locked fields disabled. Invoice lines already created keep their dimensions. Adding and deleting lines stays locked.
+- **I10. Amending a price or quantity**: an invoiced line is never edited in place. The amend action (`services/amendments.py`, screen `contract-lines/<id>/amend/`, REST `POST contract-lines/{id}/amend/`) ends it the day before the new terms and creates a successor line (`ContractLine.replaces`, migration 0046) with the new unit price or quantity. Because the old line keeps its price and ends only after its last invoiced period, posted invoice lines never change amount, so no freeze of posted invoice lines is needed. Yearly values leave out replaced lines. Permission: change contract line (and add contract line for the REST action).
 
 ## Testing approach (feeds tasks)
 

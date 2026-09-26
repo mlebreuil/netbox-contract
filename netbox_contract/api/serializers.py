@@ -402,6 +402,23 @@ class UnitSerializer(NetBoxModelSerializer):
         brief_fields = ('id', 'url', 'display', 'name', 'description', 'billing_method', 'months')
 
 
+class NestedContractLineSerializer(WritableNestedSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:contractline-detail')
+
+    class Meta:
+        model = ContractLine
+        fields = ('id', 'url', 'display', 'description', 'quantity', 'unit_price', 'start_date', 'end_date')
+
+
+class ContractLineAmendmentSerializer(serializers.Serializer):
+    """Input of the amend action (FR-030)."""
+
+    effective_date = serializers.DateField(help_text='First day of the new terms')
+    unit_price = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True)
+    quantity = serializers.DecimalField(max_digits=12, decimal_places=4, required=False, allow_null=True)
+    reason = serializers.CharField(help_text='Recorded in the change log and on the new line')
+
+
 class ContractLineSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:contractline-detail')
     contract = NestedContractSerializer()
@@ -423,6 +440,7 @@ class ContractLineSerializer(NetBoxModelSerializer):
         help_text='Null when not available (recurring line without end date on an open-ended contract)',
     )
     yearly_value = serializers.DecimalField(max_digits=14, decimal_places=2, read_only=True)
+    replaces = NestedContractLineSerializer(read_only=True, help_text='The line replaced by an amendment')
 
     class Meta:
         model = ContractLine
@@ -441,6 +459,7 @@ class ContractLineSerializer(NetBoxModelSerializer):
             'accounting_dimensions',
             'total_value',
             'yearly_value',
+            'replaces',
             'invoiced_at_conversion',
             'comments',
             'tags',

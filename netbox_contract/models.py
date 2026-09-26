@@ -423,6 +423,10 @@ class Contract(ContactsMixin, NetBoxModel):
     def _lines(self):
         return self.lines.select_related('unit')
 
+    def _current_lines(self):
+        """Lines not replaced by an amendment: the yearly values count only the current price (FR-030)."""
+        return self._lines().filter(replaced_by__isnull=True)
+
     @property
     def total_contract_value(self):
         """Total value of the contract's own lines; None when not available (open-ended recurring line)."""
@@ -440,14 +444,16 @@ class Contract(ContactsMixin, NetBoxModel):
         annotated = self.__dict__.get('yearly_value')
         if annotated is not None:
             return annotated
-        return calculations.round_amount(sum((line.yearly_value for line in self._lines()), Decimal(0)))
+        return calculations.round_amount(sum((line.yearly_value for line in self._current_lines()), Decimal(0)))
 
     @property
     def yearly_billable_value(self):
         """Yearly value of the lines invoiced under this contract; zero for a non-billable contract."""
         if not self.billable:
             return calculations.round_amount(0)
-        lines = ContractLine.objects.filter(contract__in=self.billing_scope()).select_related('unit')
+        lines = ContractLine.objects.filter(
+            contract__in=self.billing_scope(), replaced_by__isnull=True
+        ).select_related('unit')
         return calculations.round_amount(sum((line.yearly_value for line in lines), Decimal(0)))
 
     # Validation
@@ -710,6 +716,16 @@ class ContractLine(NetBoxModel):
         AccountingDimension, blank=True, related_name='contract_lines', verbose_name=_('accounting dimensions')
     )
     comments = models.TextField(blank=True, verbose_name=_('comments'))
+    replaces = models.ForeignKey(
+        to='self',
+        on_delete=models.SET_NULL,
+        related_name='replaced_by',
+        blank=True,
+        null=True,
+        editable=False,
+        verbose_name=_('replaces'),
+        help_text=_('The line this line replaces after an amendment of its price or quantity'),
+    )
     invoiced_at_conversion = models.BooleanField(
         default=False,
         editable=False,
@@ -977,7 +993,7 @@ class InvoiceLine(NetBoxModel):
 
 def yearly_value_annotation():
     """
-    SQL expression of a contract's yearly value (sum of its recurring lines, each rounded to two decimals),
+    SQL expression of a contract's yearly value (sum of its current recurring lines, each rounded to two decimals),
     for list views and the API so that the value does not cost one query per contract (research D6).
     """
     line_yearly = models.functions.Round(
@@ -988,7 +1004,11 @@ def yearly_value_annotation():
         precision=2,
     )
     per_contract = (
-        ContractLine.objects.filter(contract=models.OuterRef('pk'), unit__billing_method=BillingMethodChoices.RECURRING)
+        ContractLine.objects.filter(
+            contract=models.OuterRef('pk'),
+            unit__billing_method=BillingMethodChoices.RECURRING,
+            replaced_by__isnull=True,
+        )
         .order_by()
         .values('contract')
         .annotate(total=models.Sum(line_yearly))

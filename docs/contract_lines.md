@@ -41,4 +41,14 @@ Months are counted as whole calendar months plus the leftover days divided by th
 
 As soon as a contract has an invoice (draft, posted or canceled), its contract lines can no longer be added or deleted, and their contract terms (description, quantity, unit price, unit, currency, dates and custom fields) can no longer change: a new contract must be created. A contract line is also locked as soon as an invoice line references it, even when its own contract (a non-billable child) has no invoice. Deleting the contract itself still deletes its lines.
 
+### Amending a price or quantity
+
+When the price or the quantity of a recurring or usage-based line changes during the contract (for example a yearly indexation, or more licences), use **Amend price or quantity** on the contract line page. Enter the date the new terms apply from, the new unit price and/or quantity, and a reason. The line then ends the day before that date, and a new line with the new terms replaces it from that date; the new line keeps the unit, currency, accounting dimensions and end date, and shows which line it replaces.
+
+- The date must be after the end of the last invoiced period of the line (draft and posted invoices count, canceled ones do not), so invoiced periods never change price.
+- The reason is required. It is recorded as the change-log message of both lines and added to the comments of the new line.
+- One-time lines cannot be amended.
+- The yearly values of the contract count only the current line; the total contract value counts each line over its own dates. An invoice whose period spans the change gets both lines, each prorated to its days.
+- The same action is available in the REST API: `POST contract-lines/{id}/amend/`.
+
 The accounting dimensions, comments and tags of a locked line can still be edited, since they are internal classification rather than contract terms; the edit form shows the other fields disabled. Invoice lines already created keep their own dimensions; new invoice lines take the new ones.

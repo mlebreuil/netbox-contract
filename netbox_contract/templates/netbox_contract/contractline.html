@@ -8,6 +8,13 @@
     <a href="{% url 'plugins:netbox_contract:contractline_list' %}?contract_id={{ object.contract.pk }}">{{ object.contract }}</a>
   </li>
 {% endblock %}
+{% block extra_controls %}
+  {% if perms.netbox_contract.change_contractline and object.unit.billing_method != 'one_time' and not object.replaced_by.exists %}
+    <a href="{% url 'plugins:netbox_contract:contractline_amend' pk=object.pk %}" class="btn btn-primary">
+      <i class="mdi mdi-cash-sync" aria-hidden="true"></i> {% trans "Amend price or quantity" %}
+    </a>
+  {% endif %}
+{% endblock %}
 {% block content %}
   {% if lock_message %}
   <div class="alert alert-warning" role="alert">
@@ -67,6 +74,18 @@
             <tr>
               <th scope="row">{% trans "Yearly value" %}</th>
               <td>{{ object.yearly_value }}</td>
+            </tr>
+            <tr>
+              <th scope="row">{% trans "Replaces" %}</th>
+              <td>
+                {% if object.replaces %}<a href="{{ object.replaces.get_absolute_url }}">{{ object.replaces }} ({{ object.replaces.start_date|placeholder }} - {{ object.replaces.end_date|placeholder }})</a>{% else %}{{ ''|placeholder }}{% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">{% trans "Replaced by" %}</th>
+              <td>
+                {% for successor in object.replaced_by.all %}<a href="{{ successor.get_absolute_url }}">{{ successor }} ({% trans "from" %} {{ successor.start_date }})</a>{% empty %}{{ ''|placeholder }}{% endfor %}
+              </td>
             </tr>
             <tr>
               <th scope="row">{% trans "Invoiced at conversion" %}</th>

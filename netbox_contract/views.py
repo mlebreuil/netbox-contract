@@ -9,10 +9,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Case, F, When
 from django.db.models.functions import Round
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 from netbox.object_actions import *
 from netbox.views import generic
+from netbox.views.generic.base import BaseObjectView
 from netbox.views.generic.utils import get_prerequisite_model
 from utilities.forms import restrict_form_fields
 from utilities.querydict import normalize_querydict
@@ -32,7 +33,7 @@ from .models import (
     Unit,
     yearly_value_annotation,
 )
-from .services import invoicing
+from .services import amendments, invoicing
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 
@@ -657,6 +658,44 @@ class ContractLineView(generic.ObjectView):
 
     def get_extra_context(self, request, instance):
         return {'lock_message': instance.lock_message()}
+
+
+@register_model_view(ContractLine, 'amend', path='amend')
+class ContractLineAmendView(BaseObjectView):
+    """End a contract line and create the line that replaces it with a new unit price or quantity (FR-030)."""
+
+    queryset = ContractLine.objects.select_related('contract', 'unit')
+    template_name = 'netbox_contract/contractline_amend.html'
+
+    def get_required_permission(self):
+        return 'netbox_contract.change_contractline'
+
+    def render_form(self, request, line, form):
+        return render(request, self.template_name, {
+            'object': line,
+            'form': form,
+            'last_invoiced_date': amendments.last_invoiced_date(line),
+            'return_url': line.get_absolute_url(),
+        })
+
+    def get(self, request, pk):
+        line = self.get_object(pk=pk)
+        form = forms.ContractLineAmendForm(initial={'unit_price': line.unit_price, 'quantity': line.quantity})
+        return self.render_form(request, line, form)
+
+    def post(self, request, pk):
+        line = self.get_object(pk=pk)
+        form = forms.ContractLineAmendForm(request.POST)
+        if form.is_valid():
+            try:
+                new = amendments.amend_contract_line(line, **form.cleaned_data)
+            except amendments.AmendmentError as e:
+                for field, message in e.errors.items():
+                    form.add_error(None if field == '__all__' else field, message)
+            else:
+                messages.success(request, _('Contract line amended from {date}.').format(date=new.start_date))
+                return redirect(new.get_absolute_url())
+        return self.render_form(request, line, form)
 
 
 class ContractLineListView(generic.ObjectListView):

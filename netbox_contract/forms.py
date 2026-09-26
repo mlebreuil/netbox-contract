@@ -943,6 +943,21 @@ class ContractLineForm(NetBoxModelForm):
         }
 
 
+class ContractLineAmendForm(forms.Form):
+    """New unit price and/or quantity of a contract line from a date (FR-030)."""
+
+    effective_date = forms.DateField(
+        widget=DatePicker(), label=_('Applies from'), help_text=_('First day of the new terms')
+    )
+    unit_price = forms.DecimalField(max_digits=12, decimal_places=2, required=False, label=_('New unit price'))
+    quantity = forms.DecimalField(max_digits=12, decimal_places=4, required=False, label=_('New quantity'))
+    reason = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 3}),
+        label=_('Reason'),
+        help_text=_('Recorded in the change log and on the new line'),
+    )
+
+
 class ContractLineFilterForm(NetBoxModelFilterSetForm):
     model = ContractLine
     contract_id = DynamicModelMultipleChoiceField(
