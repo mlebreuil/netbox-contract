@@ -19,6 +19,7 @@
   * CI runs the tests against the NetBox v4.6.10 tag.
   * The unit price or quantity of a recurring or usage-based line can be amended from a date ("Amend" button, REST `POST contract-lines/{id}/amend/`): the line ends the day before and a new line replaces it, invoiced periods keep their price, and the required reason is recorded in the change log.
   * Invoice lines carry their own unit and unit price, taken from the contract line by default and editable as long as the invoice is not posted (for example a discount on one invoice); the amount is calculated from quantity x unit price. Migration 0047 copies the unit and unit price of the contract line into existing lines without changing their amounts.
+  * The new invoice screen previews the lines that will be generated, with their amounts and total, and lets you change their quantities, unit prices and accounting dimensions, or add lines without contract line, before saving; the invoice and its lines are created in one step.
   * Posted invoices are locked: their amounts, period and contracts, and the amounts of their lines, can no longer change, and lines can no longer be added or deleted (accounting dimensions, comments and tags remain editable; the status can change back to Draft).
   * Invoice lines have a readable name (`<invoice number> line <id>`) in search results, the change log and reports.
 

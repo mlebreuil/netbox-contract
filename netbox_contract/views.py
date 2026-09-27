@@ -1,12 +1,14 @@
 import logging
 from datetime import date, timedelta
+from decimal import Decimal, InvalidOperation
 
 from dateutil.relativedelta import relativedelta
+from django import forms as django_forms
 from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import Case, F, When
 from django.db.models.functions import Round
 from django.shortcuts import get_object_or_404, redirect, render
@@ -19,7 +21,7 @@ from utilities.forms import restrict_form_fields
 from utilities.querydict import normalize_querydict
 from utilities.views import ViewTab, get_action_url, register_model_view
 
-from . import filtersets, forms, tables
+from . import calculations, filtersets, forms, tables
 from .constants import ASSIGNEMENT_TYPES
 from .models import (
     AccountingDimension,
@@ -431,9 +433,119 @@ class InvoiceListView(generic.ObjectListView):
     filterset_form = forms.InvoiceFilterForm
 
 
+def _parse_date(value):
+    if value in (None, ''):
+        return None
+    if isinstance(value, date):
+        return value
+    try:
+        return django_forms.DateField().to_python(value)
+    except ValidationError:
+        return None
+
+
+def _format_number(value):
+    return '' if value is None else f'{value.normalize():f}'
+
+
+def build_lines_preview(data):
+    """
+    Lines a new invoice would get, from the contract, period, amount and the quantities and unit prices typed
+    in the preview (FR-032). None for an invoice template.
+    """
+    if str(data.get('template', '')).lower() in ('on', 'true', '1'):
+        return None
+    preview = {
+        'rows': [], 'extra_rows': [], 'units': Unit.objects.order_by('name'), 'total': None, 'message': None,
+        'errors': [], 'amount_too_low': False, 'contract': None,
+    }
+
+    contract_ids = data.getlist('contracts') if hasattr(data, 'getlist') else data.get('contracts')
+    if not isinstance(contract_ids, (list, tuple)):
+        contract_ids = [contract_ids]
+    contract_ids = [value for value in contract_ids if str(value).isdigit()]
+    contract = Contract.objects.filter(pk=contract_ids[0]).first() if contract_ids else None
+    if contract is None:
+        preview['message'] = _('Choose a contract to see the lines generated for it.')
+        return preview
+    preview['contract'] = contract
+
+    overrides, preview['errors'] = invoicing.parse_line_overrides(data)
+    try:
+        lines = invoicing.lines_to_generate(
+            contract, _parse_date(data.get('period_start')), _parse_date(data.get('period_end')), overrides
+        )
+    except invoicing.InvoicingError as e:
+        preview['message'] = e.message
+        return preview
+
+    for line in lines:
+        prefix = f'line-{line.contract_line.pk}'
+        preview['rows'].append({
+            'line': line,
+            'prefix': prefix,
+            'dimensions_form': forms.InvoiceLineDimensionsForm(
+                prefix=prefix, initial={'accounting_dimensions': [d.pk for d in line.accounting_dimensions]}
+            ),
+            'quantity_value': data.get(f'{prefix}-quantity', _format_number(line.quantity)),
+            'unit_price_value': data.get(f'{prefix}-unit_price') or _format_number(line.unit_price),
+        })
+    # Lines added without contract line, with the buttons that add or remove one
+    period_start, period_end = _parse_date(data.get('period_start')), _parse_date(data.get('period_end'))
+    # incomplete rows simply have no amount yet; they are checked when the invoice is saved
+    extra_lines, _errors = invoicing.parse_extra_lines(data)
+    remove = str(data.get('remove_line', ''))
+    extra_lines = [line for line in extra_lines if str(line.index) != remove]
+    if data.get('add_line'):
+        extra_lines.append(invoicing.ExtraLine(index=max((line.index for line in extra_lines), default=-1) + 1))
+    added = invoicing.price_extra_lines(contract, period_start, period_end, extra_lines)
+    for line in extra_lines:
+        preview['extra_rows'].append({
+            'index': line.index,
+            'prefix': f'extra-{line.index}',
+            'dimensions_form': forms.InvoiceLineDimensionsForm(
+                prefix=f'extra-{line.index}',
+                initial={'accounting_dimensions': [d.pk for d in line.accounting_dimensions]},
+            ),
+            'description': line.description,
+            'unit_id': line.raw.get('unit', ''),
+            'unit_price_value': line.raw.get('unit_price', ''),
+            'quantity_value': line.raw.get('quantity', ''),
+            'amount': line.amount,
+        })
+
+    preview['total'] = calculations.round_amount(sum((line.amount for line in [*lines, *added]), Decimal(0)))
+    try:
+        amount = Decimal(str(data.get('amount') or ''))
+    except InvalidOperation:
+        amount = None
+    preview['amount_too_low'] = amount is not None and amount < preview['total']
+    return preview
+
+
+class InvoiceLinesPreviewView(BaseObjectView):
+    """Refresh the preview of the lines of a new invoice when its form changes (FR-032)."""
+
+    queryset = Invoice.objects.all()
+
+    def get_required_permission(self):
+        return 'netbox_contract.add_invoice'
+
+    def post(self, request):
+        return render(request, 'netbox_contract/inc/invoice_lines_preview.html', {
+            'lines_preview': build_lines_preview(request.POST),
+        })
+
+
 class InvoiceEditView(generic.ObjectEditView):
     queryset = Invoice.objects.all()
     form = forms.InvoiceForm
+    template_name = 'netbox_contract/invoice_edit.html'
+
+    def get_extra_context(self, request, instance):
+        if request.method == 'POST' and not instance.pk:
+            return {'lines_preview': build_lines_preview(request.POST)}
+        return {}
 
     def get(self, request, *args, **kwargs):
         """
@@ -494,6 +606,7 @@ class InvoiceEditView(generic.ObjectEditView):
                 'form': form,
                 'return_url': self.get_return_url(request, obj),
                 'prerequisite_model': get_prerequisite_model(self.queryset),
+                'lines_preview': None if obj.pk else build_lines_preview(initial_data),
                 **self.get_extra_context(request, obj),
             },
         )

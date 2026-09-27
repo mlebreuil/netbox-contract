@@ -197,6 +197,7 @@
 - [X] T065 Keep the invoice number free of the template help text and the fields of an existing invoice line with a contract line read-only except its quantity (`forms.py`, tests in `tests/test_deprecated.py` and `tests/test_generation.py`).
 - [X] T066 Give invoice lines their own unit and unit price, defaulted from the contract line and editable while the invoice is not posted, amount calculated from them (decision I11): model, migration 0047, form, import, API, table; tests in `tests/test_generation.py`; spec, docs and changelog updated.
 - [X] T067 Lock posted invoices and their lines and make new invoices Draft by default (FR-031, decision I12): models, migration 0048, signal, invoice and invoice line forms, invoice serializer, invoice page; tests in `tests/test_posted.py`; spec, docs and changelog updated.
+- [X] T068 Preview the lines of a new invoice with editable quantities and unit prices, and lines added without contract line (FR-032, decision I13): overrides in `services/invoicing.py`, the preview endpoint and templates, `InvoiceForm` using the typed values; tests in `tests/test_invoice_preview.py`; docs and changelog updated.
 
 ---
 

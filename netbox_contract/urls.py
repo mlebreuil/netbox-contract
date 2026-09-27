@@ -125,6 +125,7 @@ urlpatterns = (
     # Contract invoices
     path('invoices/', views.InvoiceListView.as_view(), name='invoice_list'),
     path('invoices/add/', views.InvoiceEditView.as_view(), name='invoice_add'),
+    path('invoices/lines-preview/', views.InvoiceLinesPreviewView.as_view(), name='invoice_lines_preview'),
     path(
         'invoices/import/', views.InvoiceBulkImportView.as_view(), name='invoice_bulk_import'
     ),

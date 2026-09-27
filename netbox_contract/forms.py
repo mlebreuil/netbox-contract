@@ -451,13 +451,22 @@ class InvoiceForm(NetBoxModelForm):
         )
         # a new invoice gets its lines from the contract lines (FR-021, FR-023)
         contracts = list(self.cleaned_data.get('contracts') or [])
+        self.line_overrides = None
         if is_new and not self.cleaned_data.get('template') and len(contracts) == 1 and not errors:
-            errors = invoicing.check_new_invoice(
-                contracts[0],
-                self.cleaned_data.get('amount'),
-                self.cleaned_data.get('period_start'),
-                self.cleaned_data.get('period_end'),
-            )
+            # quantities and unit prices typed in the preview of the lines (FR-032)
+            self.line_overrides, errors = invoicing.parse_line_overrides(self.data)
+            self.extra_lines, extra_errors = invoicing.parse_extra_lines(self.data)
+            errors += extra_errors
+            if not errors:
+                errors = invoicing.check_new_invoice(
+                    contracts[0],
+                    self.cleaned_data.get('amount'),
+                    self.cleaned_data.get('period_start'),
+                    self.cleaned_data.get('period_end'),
+                    self.line_overrides,
+                    self.extra_lines,
+                    check_line_dimensions=True,
+                )
         if errors:
             raise ValidationError(errors)
 
@@ -486,7 +495,9 @@ class InvoiceForm(NetBoxModelForm):
         # Invoice lines are generated from the contract lines of a new invoice only; invoice templates are
         # no longer copied (they are kept for reference)
         if is_new and not instance.template:
-            invoicing.generate_invoice_lines(instance)
+            invoicing.generate_invoice_lines(
+                instance, getattr(self, 'line_overrides', None), getattr(self, 'extra_lines', ())
+            )
 
         return instance
 
@@ -511,6 +522,16 @@ class InvoiceForm(NetBoxModelForm):
             'period_start': DatePicker(),
             'period_end': DatePicker(),
         }
+
+
+class InvoiceLineDimensionsForm(forms.Form):
+    """Accounting dimensions of one row of the preview of a new invoice (FR-032)."""
+
+    accounting_dimensions = DynamicModelMultipleChoiceField(
+        queryset=AccountingDimension.objects.all(),
+        required=False,
+        label=_('Accounting dimensions'),
+    )
 
 
 class InvoiceFilterForm(NetBoxModelFilterSetForm):
