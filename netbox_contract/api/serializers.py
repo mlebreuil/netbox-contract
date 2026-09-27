@@ -114,6 +114,16 @@ class ContractTypeSerializer(NetBoxModelSerializer):
         brief_fields = ('id', 'name', 'description', 'url', 'display')
 
 
+class ContractValueField(serializers.DecimalField):
+    """A computed contract value, taken from the values computed once for a whole list when available."""
+
+    def get_attribute(self, instance):
+        values = self.context.get('contract_values') or {}
+        if instance.pk in values:
+            return values[instance.pk][self.source]
+        return super().get_attribute(instance)
+
+
 DEPRECATED_COST_HELP = 'Deprecated: replaced by contract lines. Kept for compatibility.'
 
 
@@ -123,14 +133,14 @@ class ContractSerializer(NetBoxModelSerializer):
     )
     contract_type = ContractTypeSerializer(nested=True, required=False, allow_null=True)
     yrc = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True, help_text=DEPRECATED_COST_HELP)
-    total_contract_value = serializers.DecimalField(
+    total_contract_value = ContractValueField(
         max_digits=16, decimal_places=2, read_only=True, allow_null=True,
         help_text='Total value of the contract lines; null when not available (open-ended recurring line)',
     )
-    yearly_contract_value = serializers.DecimalField(
+    yearly_contract_value = ContractValueField(
         max_digits=16, decimal_places=2, read_only=True, help_text='Twelve-month value of the recurring lines'
     )
-    yearly_billable_value = serializers.DecimalField(
+    yearly_billable_value = ContractValueField(
         max_digits=16, decimal_places=2, read_only=True,
         help_text='Yearly value invoiced under this contract, including its non-billable descendants',
     )

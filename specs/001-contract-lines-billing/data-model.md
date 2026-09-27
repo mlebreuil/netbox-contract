@@ -34,9 +34,10 @@ Defines the nature of a cost and, for recurring units, how many months one unit 
 | `end_date` | `DateField`, null | defaults to the contract's end date; must not be after the contract end date when the contract has one (FR-002a); must not be before `start_date` |
 | `accounting_dimensions` | M2M `AccountingDimension`, blank | any number (FR-003) |
 | `comments` | `TextField`, blank | |
+| `replaces` | FK `ContractLine` (self), null, `SET_NULL`, related name `replaced_by`, read-only in forms and API | set by the amend action (FR-030): the line this line replaces from its start date |
 | `invoiced_at_conversion` | `BooleanField`, default `False`, read-only in forms and API | set only by the conversion, for a one-time line of a contract that already had a Posted invoice; the line is then treated as fully invoiced (remaining amount 0) |
 
-Lock: adding, changing or deleting a contract line is refused when its contract has any invoice, and changing or deleting it is also refused when any invoice line references it (FR-029). Ordering: contract, start date, description. Currency-mismatch and date rules are in `clean()`, so the UI, bulk import and REST interface enforce them alike.
+Lock: adding, changing or deleting a contract line is refused when its contract has any invoice, and changing or deleting it is also refused when any invoice line references it (FR-029); the lock covers its contract terms (contract, description, quantity, unit price, unit, currency, dates, custom fields), while its accounting dimensions, comments and tags stay editable (decision I9). Its price or quantity changes through the amend action, which ends it the day before the new terms and creates the line that replaces it (FR-030). Ordering: contract, start date, description. Currency-mismatch and date rules are in `clean()`, so the UI, bulk import and REST interface enforce them alike.
 
 Derived (not stored): `total_value`, `yearly_value` per line, computed by `calculations.py`.
 
@@ -45,7 +46,7 @@ Derived (not stored): `total_value`, `yearly_value` per line, computed by `calcu
 | Change | Detail |
 |---|---|
 | new `billable` | `BooleanField`, default `True`; the migration leaves every existing contract `True` (FR-005) |
-| new read-only values | `total_contract_value` (None when not available, FR-007), `yearly_contract_value`, `yearly_billable_value` (FR-006), computed on read |
+| new read-only values | `total_contract_value` (None when not available, FR-007), `yearly_contract_value`, `yearly_billable_value` (FR-006), computed on read by `contract_values()` in a fixed number of queries; the yearly values leave out lines replaced by an amendment |
 | deprecated, kept | `mrc`, `yrc`, `nrc` (hidden by default, `show_deprecated_fields` setting); `calculated_rc` alias kept in the API during the deprecation period |
 | new `clean()` rules | `billable` cannot change when the contract, any ancestor or any descendant has an invoice, or an invoice line references one of its lines (FR-008a); currency change refused when invoices or invoice lines exist (FR-009a); a non-billable child must have its parent's currency (FR-010); changing dates so that existing lines fall outside is refused (FR-002a) |
 | unchanged | hierarchy (`parent`, `childs`), `invoice_frequency`, party, dates, status |
@@ -55,6 +56,7 @@ Yearly billable value: 0 when the contract is not billable; otherwise the yearly
 ## Changed: Invoice
 
 - `template` stays, shown as deprecated; conversion never edits invoices.
+- `status` defaults to Draft (migration 0048). A Posted invoice (not a template) is locked: its amount, currency, period and contracts cannot change, lines cannot be added or deleted, and the amount fields of its lines cannot change; its status can (FR-031).
 - New invoice rules (form and API, research D4): at most one contract for a new invoice (FR-011); invoice currency equals the contract's currency (FR-009); an existing invoice with several contracts is left as it is and stays editable as long as the number of contracts does not increase.
 - Pre-fill for a non-billable contract shows an error and proposes nothing (FR-008).
 
@@ -64,8 +66,8 @@ Yearly billable value: 0 when the contract is not billable; otherwise the yearly
 |---|---|
 | new `contract_line` | FK `ContractLine`, null, `SET_NULL` (FR-021); the contract line's contract must be the invoice's contract or one of its non-billable descendants |
 | new `quantity` | `DecimalField(12, 4)`, null; defined at the invoice line (FR-024) |
-| derived `unit`, `unit_price` | read-only properties taken from `contract_line` |
-| `amount` | when `contract_line` is set it is calculated from `quantity` (FR-024, research D7) and is not entered by the user; otherwise it stays a manually entered amount |
+| new `unit`, `unit_price` | FK `Unit` (null, `PROTECT`) and `DecimalField(12, 2)` (null); default to those of the contract line and can change while the invoice is not posted (FR-024, decisions I11 and I12); migration 0047 copies them from the contract line for existing lines |
+| `amount` | calculated from `quantity` and `unit_price` when the line has a unit price (FR-024, research D7) and not entered by the user; otherwise it stays a manually entered amount; never recalculated on a Posted invoice |
 | `currency` | must equal the invoice's currency (FR-009) |
 
 The existing rule that the sum of invoice lines cannot exceed the invoice amount is kept.
@@ -90,3 +92,6 @@ Invoice 1 ── * InvoiceLine * ── 0..1 ContractLine
 
 1. `0044_units_contract_lines_billable` (schema): `Unit`, `ContractLine`, `Contract.billable`, `InvoiceLine.contract_line` and `InvoiceLine.quantity`.
 2. `0045_convert_legacy_costs` (data): calls `conversion.convert_legacy_data()`; reverse is a no-op.
+3. `0046_contractline_replaces` (schema): `ContractLine.replaces`.
+4. `0047_invoiceline_unit_unit_price` (schema and data): `InvoiceLine.unit` and `InvoiceLine.unit_price`, copied from the contract line for existing lines; amounts unchanged.
+5. `0048_invoice_status_draft_default` (schema): `Invoice.status` defaults to Draft.

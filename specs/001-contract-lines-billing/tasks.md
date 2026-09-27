@@ -187,7 +187,7 @@
 - [X] T058 [P] Update the remaining sample files in `utils/` (`contract_import.csv` with `billable`, `invoice_line_import.csv` with `contract_line` and `quantity`).
 - [X] T059 Regenerate `netbox_contract/tests/query_counts.json` one final time and make sure the whole suite passes on the pinned NetBox 4.6 tag (SC-005, FR-028).
 - [X] T060 Coverage check: walk the traceability table in `specs/001-contract-lines-billing/quickstart.md` and the spec's edge case list and confirm each scenario and edge case has at least one test; add the missing ones (also: recurring line without end date, credit (negative) lines, a unit whose months change after invoices exist, Canceled invoices when computing what remains, running the conversion on contracts that already have lines). Update the test module names in `plan.md` (`test_contract_lines.py`, `test_values.py`, `test_locking.py` are added).
-- [ ] T061 (Scripted walkthrough of steps 1-7 done on an upgraded copy of the dev database on 2026-09-26, all checks passed; still open: the SC-001 timing by a person.) Run the manual walkthrough of `specs/001-contract-lines-billing/quickstart.md` on an upgraded copy of real data, time the recording of a contract with three lines of different natures against the 10-minute target of SC-001, and fix any gap; run `ruff check`, `makemigrations --check` and the full suite.
+- [X] T061 Run the manual walkthrough of `specs/001-contract-lines-billing/quickstart.md` on an upgraded copy of real data and fix any gap; run `ruff check`, `makemigrations --check` and the full suite. (Scripted walkthrough of steps 1-7 done on an upgraded copy of the dev database on 2026-09-26, all checks passed; the timing against SC-001 was dropped with SC-001 on 2026-09-27.)
 
 ## Adjustments after the upgrade test (2026-09-26)
 
@@ -220,3 +220,13 @@
 - **MVP**: Setup, Foundational and US1 (contract lines usable and locked), then US2 immediately, since it is the riskiest part and an upgrade without it would break current users.
 - **Incremental**: add US3, US4, US5 and US6 in that order, running the full suite after each story. Everything ships together as version 2.5.0; do not publish an intermediate version.
 - Commit after each task or logical group; the pre-commit hook runs `ruff` on `netbox_contract/`.
+
+---
+
+## Phase 10: Convergence
+
+- [X] T069 Enforce the invoice contract rules on bulk edits of invoices: an existing invoice cannot get more contracts than it has (at least one), each contract must have the invoice's currency, and the contracts of a Posted invoice cannot change (`InvoiceBulkEditView` / `InvoiceBulkEditForm` in `netbox_contract/views.py` and `forms.py`, reusing `validators.check_invoice_contracts` and `Invoice.locked_in_database()`), with tests, per FR-011, FR-009 and FR-031 (contradicts)
+- [X] T070 Hide the Template field of the invoice bulk edit form unless `show_deprecated_fields` is true, with a test, per plan D9 / T030 (contradicts)
+- [X] T071 Serve `total_contract_value` and `yearly_billable_value` in the contracts API list without a query per contract (prefetch the lines and the hierarchy, or annotations) and add a query-count test for the contracts API list, per plan Performance Goals (partial)
+- [X] T072 Update `plan.md` (project structure: migrations 0046-0048, `services/amendments.py`, tests `test_amendments.py`, `test_posted.py`, `test_invoice_preview.py`), `data-model.md` (`ContractLine.replaces`, `InvoiceLine.unit` and `unit_price`, Draft default and Posted lock) and the traceability table of `quickstart.md` (FR-030 to FR-032) to the implemented design, per T060 and Constitution VII (partial)
+- [X] T073 Run the full suite on the pinned NetBox `v4.6.10` tag again now that FR-030 to FR-032 are implemented, per SC-005 and FR-028 (partial)

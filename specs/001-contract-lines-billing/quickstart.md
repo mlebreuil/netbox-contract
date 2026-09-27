@@ -34,9 +34,13 @@ Expected: no lint error, no pending migration, every test passes on NetBox 4.6.
 |---|---|
 | US1 scenarios, FR-001..FR-004, FR-001a, FR-002a, FR-029 | `test_views.py` (Unit, ContractLine cases), `test_contract_lines.py` (dates rules), `test_locking.py`, `test_api.py` |
 | US2 scenarios, FR-013..FR-016, SC-002, SC-007, upgrade edge cases | `test_conversion.py`, `test_deprecated.py` |
-| US3 scenarios, FR-005..FR-008a, SC-001 arithmetic | `test_calculations.py`, `test_values.py`, `test_views.py` (contract detail), `test_api.py` |
+| US3 scenarios, FR-005..FR-008a | `test_calculations.py`, `test_values.py`, `test_views.py` (contract detail), `test_api.py` |
 | US4 scenarios, FR-009..FR-012, SC-003 | `test_currency.py`, `test_reports.py` |
 | US5 scenarios, FR-017..FR-020, FR-017a, SC-004 | `test_calculations.py` (amounts), `test_prefill.py` (view) |
 | US6 scenarios, FR-021..FR-025, SC-006 | `test_generation.py`, `test_calculations.py` (invoice line amounts), `test_api.py` |
+| FR-030 (amendment of a price or quantity) | `test_amendments.py` |
+| FR-031 (Draft default, Posted lock) | `test_posted.py`, `test_convergence.py` (bulk edit) |
+| FR-032 (preview of the lines of a new invoice) | `test_invoice_preview.py` |
+| FR-011, FR-009 through bulk edit; contract values of API lists | `test_convergence.py` |
 | FR-026..FR-028, SC-005 | CI workflow pinned to a NetBox 4.6 tag; the full suite |
 | Spec edge cases (open-ended, zero/negative, rounding, cancelled invoices, hierarchy changes, repeated upgrade, deprecated fields via import/API, hidden/mandatory settings) | the module named for the behaviour, listed one by one in `tasks.md` |

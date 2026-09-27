@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import timedelta
 from decimal import Decimal
 
@@ -423,41 +424,23 @@ class Contract(ContactsMixin, NetBoxModel):
 
     # Computed values (FR-006, FR-007)
 
-    def _lines(self):
-        return self.lines.select_related('unit')
-
-    def _current_lines(self):
-        """Lines not replaced by an amendment: the yearly values count only the current price (FR-030)."""
-        return self._lines().filter(replaced_by__isnull=True)
-
     @property
     def total_contract_value(self):
         """Total value of the contract's own lines; None when not available (open-ended recurring line)."""
-        total = Decimal(0)
-        for line in self._lines():
-            value = line.total_value
-            if value is None:
-                return None
-            total += value
-        return calculations.round_amount(total)
+        return contract_values([self])[self.pk]['total_contract_value']
 
     @property
     def yearly_contract_value(self):
-        """Twelve-month equivalent of the contract's own recurring lines."""
+        """Twelve-month equivalent of the contract's own current recurring lines."""
         annotated = self.__dict__.get('yearly_value')
         if annotated is not None:
             return annotated
-        return calculations.round_amount(sum((line.yearly_value for line in self._current_lines()), Decimal(0)))
+        return contract_values([self])[self.pk]['yearly_contract_value']
 
     @property
     def yearly_billable_value(self):
         """Yearly value of the lines invoiced under this contract; zero for a non-billable contract."""
-        if not self.billable:
-            return calculations.round_amount(0)
-        lines = ContractLine.objects.filter(
-            contract__in=self.billing_scope(), replaced_by__isnull=True
-        ).select_related('unit')
-        return calculations.round_amount(sum((line.yearly_value for line in lines), Decimal(0)))
+        return contract_values([self])[self.pk]['yearly_billable_value']
 
     # Validation
 
@@ -635,15 +618,37 @@ class Invoice(NetBoxModel):
 
     def clean(self):
         super().clean()
-        if self.locked_in_database():
+        errors = {}
+        locked = self.locked_in_database()
+        if locked:
             original = Invoice.objects.filter(pk=self.pk).values(*self.POSTED_LOCKED_FIELDS).first()
             errors = {
                 field: POSTED_INVOICE_MESSAGE
                 for field in self.POSTED_LOCKED_FIELDS
                 if original[field] != getattr(self, field)
             }
-            if errors:
-                raise ValidationError(errors)
+        errors.update(self._clean_new_contracts(locked))
+        if errors:
+            raise ValidationError(errors)
+
+    def _clean_new_contracts(self, locked):
+        """
+        Contracts about to be set on a saved invoice, as given by NetBox's bulk edit and REST API (`_m2m_values`):
+        no more contracts than it has (FR-011), their currency (FR-009), none changed when posted (FR-031).
+        """
+        from .validators import check_invoice_contracts
+
+        contracts = getattr(self, '_m2m_values', {}).get('contracts')
+        if not self.pk or contracts is None:
+            return {}
+        previous_ids = list(Invoice.objects.get(pk=self.pk).contracts.values_list('pk', flat=True))
+        errors = check_invoice_contracts(
+            False, contracts, self.currency, previous_contract_ids=previous_ids,
+            previous_currency=Invoice.objects.filter(pk=self.pk).values_list('currency', flat=True).first(),
+        )
+        if locked and {contract.pk for contract in contracts} != set(previous_ids):
+            errors.append(POSTED_INVOICE_MESSAGE)
+        return {'contracts': errors} if errors else {}
 
     @property
     def total_invoicelines_amount(self):
@@ -1101,3 +1106,55 @@ def yearly_value_annotation():
         models.Value(Decimal('0.00')),
         output_field=models.DecimalField(max_digits=16, decimal_places=2),
     )
+
+
+def contract_values(contracts):
+    """
+    Computed values of saved contracts (FR-006, FR-007), in three queries whatever their number, so that lists
+    do not run a query per contract: {pk: {'total_contract_value', 'yearly_contract_value',
+    'yearly_billable_value'}}. The total counts each line over its own dates (None when not available); the
+    yearly values count only the lines not replaced by an amendment (FR-030); the billable value adds the lines
+    of the non-billable descendants of a billable contract, stopping at billable children (FR-022).
+    """
+    contracts = [contract for contract in contracts if contract.pk]
+    if not contracts:
+        return {}
+
+    children, billable = defaultdict(list), {}
+    for pk, parent_id, is_billable in Contract.objects.values_list('pk', 'parent_id', 'billable'):
+        children[parent_id].append(pk)
+        billable[pk] = is_billable
+
+    scopes = {}
+    for contract in contracts:
+        scope, seen, level = [], {contract.pk}, [contract.pk]
+        while contract.billable and level:
+            scope.extend(level)
+            level = [
+                child for pk in level for child in children[pk] if not billable[child] and child not in seen
+            ]
+            seen.update(level)
+        scopes[contract.pk] = scope
+
+    lines_by_contract = defaultdict(list)
+    needed = {contract.pk for contract in contracts}.union(*scopes.values())
+    lines = ContractLine.objects.filter(contract__in=needed).select_related('unit', 'contract').annotate(
+        is_replaced=models.Exists(ContractLine.objects.filter(replaces=models.OuterRef('pk')))
+    )
+    for line in lines:
+        lines_by_contract[line.contract_id].append(line)
+
+    def yearly(pks):
+        return calculations.round_amount(sum(
+            (line.yearly_value for pk in pks for line in lines_by_contract[pk] if not line.is_replaced), Decimal(0)
+        ))
+
+    values = {}
+    for contract in contracts:
+        totals = [line.total_value for line in lines_by_contract[contract.pk]]
+        values[contract.pk] = {
+            'total_contract_value': None if None in totals else calculations.round_amount(sum(totals, Decimal(0))),
+            'yearly_contract_value': yearly([contract.pk]),
+            'yearly_billable_value': yearly(scopes[contract.pk]),
+        }
+    return values

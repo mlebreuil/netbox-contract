@@ -4,11 +4,12 @@ Written 2026-09-26 at the end of the specification phase, to start a fresh Claud
 
 ## Where things stand
 
-- Updated 2026-09-26 after `/speckit-implement`: tasks T001-T060 are done and marked in `tasks.md`; T061 is open only for the SC-001 timing by a person (the scripted walkthrough on an upgraded copy of the dev database passed).
-- Nothing is committed yet: all changes are in the working tree of branch `278-replace-invoice-templates-with-contract-lines`.
-- Checks at hand-over: `ruff check` clean, `makemigrations --check` reports nothing, 530 tests pass on the local NetBox 4.6.8 and on a clone of the pinned `v4.6.10` tag.
+- Updated 2026-09-27: all tasks of `tasks.md` are done (T001-T073), including the adjustments after the upgrade test (T062-T068: invoice line name, editable dimensions of locked lines, amendment of a price or quantity, invoice line unit and unit price, Posted lock and Draft default, preview of the lines of a new invoice) and the convergence phase (T069-T073). SC-001 was removed from the spec by the maintainer.
+- Everything is committed and pushed on branch `278-replace-invoice-templates-with-contract-lines`, apart from the changes of the last `/speckit-implement` run until they are committed.
+- Checks: `ruff check` clean, `makemigrations --check` reports nothing (migrations 0044-0048), the full suite passes on the local NetBox 4.6.8 and on a clone of the pinned `v4.6.10` tag.
 - Run the tests in the dev container with `NETBOX_CONFIGURATION=netbox.configuration_testing` (the default configuration has DEBUG on, which the debug toolbar refuses in tests).
-- Spec Kit artifacts: `spec.md`, `plan.md`, `research.md`, `data-model.md`, `contracts/`, `quickstart.md`, `tasks.md`, `checklists/requirements.md`. Project rules: `.specify/memory/constitution.md` 1.0.0.
+- Spec Kit artifacts: `spec.md` (FR-001-FR-032), `plan.md`, `research.md` (decisions D1-D12, I1-I13), `data-model.md`, `contracts/`, `quickstart.md`, `tasks.md`, `checklists/requirements.md`. Project rules: `.specify/memory/constitution.md` 1.0.0.
+- The dev database `netbox` is migrated to 0048 and contains the `MIG-` test data; `netbox_premigration_testdata` (test data, before the upgrade) and `netbox_before_0044` (original data) are copies to reset from.
 
 ## Start here
 

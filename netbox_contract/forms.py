@@ -653,6 +653,12 @@ class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
 
     model = Invoice
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Invoice templates are deprecated: the flag is offered only when deprecated fields are shown
+        if not plugin_settings.get('show_deprecated_fields'):
+            del self.fields['template']
+
 
 # service Provider forms
 

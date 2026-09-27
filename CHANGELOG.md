@@ -27,7 +27,7 @@
 
 For existing users and API clients:
 
-* A new invoice can no longer be linked to more than one contract. Existing invoices linked to several contracts stay as they are and can be edited, but no contract can be added to them.
+* A new invoice can no longer be linked to more than one contract. Existing invoices linked to several contracts stay as they are and can be edited, but no contract can be added to them. These rules also apply to bulk edits of invoices, whose Template field is offered only when `show_deprecated_fields` is `True`.
 * A new invoice must have the currency of its contract, and cannot be created for a non-billable contract.
 * Creating an invoice (web interface or `POST invoices/`) now generates its invoice lines from the contract lines, and is refused when the invoice amount is lower than their total. Invoice lines are not generated when an invoice is edited or imported.
 * The copy of invoice template lines onto a new invoice is removed. Invoice templates are no longer used to pre-fill invoices; the pre-fill uses the contract lines instead of `mrc` and `yrc`.

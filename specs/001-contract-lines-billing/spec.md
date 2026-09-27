@@ -252,7 +252,8 @@ Compatibility and quality
 
 ### Measurable Outcomes
 
-- **SC-001**: A user familiar with the plugin can record a contract with at least three contract lines of different natures (one-time, recurring, usage-based) and read its total, yearly and yearly billable values in under 10 minutes, without creating extra contracts or using outside spreadsheets.
+_SC-001 (time to record a contract with three lines of different natures) was removed on 2026-09-27 by the maintainer; the other criteria keep their numbers._
+
 - **SC-002**: After the upgrade of a reference dataset, 100% of contracts with a non-zero recurring or one-time cost and 100% of invoice templates are represented as contract lines whose amounts equal the originals, and no existing invoice or invoice line changes.
 - **SC-003**: 0 records with mismatching currencies (contract line, invoice, invoice line, non-billable child) can be newly saved, and 100% of pre-existing mismatches appear in the report.
 - **SC-004**: For the reference scenarios of this specification (full and partial periods, quantity, unit months, one-time lines partly and fully invoiced), the proposed invoice amounts match the hand-computed values to the cent in 100% of cases.

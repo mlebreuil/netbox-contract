@@ -23,11 +23,23 @@ from .serializers import (
 
 
 class ContractViewSet(NetBoxModelViewSet):
-    queryset = models.Contract.objects.prefetch_related('parent', 'tags').annotate(
+    queryset = models.Contract.objects.prefetch_related(
+        'parent', 'tags', 'external_party_object', 'parent__external_party_object'
+    ).annotate(
         yearly_value=models.yearly_value_annotation()
     )
     serializer_class = ContractSerializer
     filterset_class = filtersets.ContractFilterSet
+
+    def get_serializer(self, *args, **kwargs):
+        # A list computes the contract values of its whole page at once instead of once per contract
+        if kwargs.get('many') and args and 'data' not in kwargs:
+            instances = list(args[0])
+            kwargs['context'] = {
+                **self.get_serializer_context(), 'contract_values': models.contract_values(instances)
+            }
+            args = (instances, *args[1:])
+        return super().get_serializer(*args, **kwargs)
 
 
 class InvoiceViewSet(NetBoxModelViewSet):

@@ -76,23 +76,27 @@ specs/001-contract-lines-billing/
 ```text
 netbox_contract/
 ├── __init__.py                 # min_version 4.6.0, version, new setting
-├── models.py                   # + Unit, ContractLine, Contract.billable, InvoiceLine.contract_line/quantity/calculated amount, clean() rules, lock signal
+├── models.py                   # + Unit, ContractLine (+ replaces), Contract.billable and contract_values(), InvoiceLine.contract_line/unit/unit_price/quantity/calculated amount, Invoice Draft default and Posted lock, clean() rules
 ├── calculations.py             # NEW pure functions (months, proration, totals, yearly)
 ├── validators.py               # NEW shared invoice/contract currency and cardinality checks
 ├── conversion.py               # NEW idempotent conversion of legacy costs and templates
 ├── reports.py                  # NEW currency mismatch detection
-├── services/invoicing.py       # NEW propose_invoice, generate_invoice_lines
+├── signals.py                  # NEW pre_delete guards (locked contract lines, lines of posted invoices)
+├── services/invoicing.py       # NEW propose_invoice, lines_to_generate (+ preview overrides and added lines), generate_invoice_lines
+├── services/amendments.py      # NEW amend_contract_line (FR-030)
 ├── management/commands/convert_contract_lines.py   # NEW
 ├── forms.py, views.py, tables.py, filtersets.py, urls.py, navigation.py, search.py   # new screens, pre-fill, hidden deprecated fields
 ├── api/serializers.py, api/views.py, api/urls.py   # new endpoints, new fields, validation
-├── templates/netbox_contract/  # unit.html, contractline.html, contract.html, invoice.html changes
-├── migrations/                 # 0044 schema, 0045 data conversion
+├── templates/netbox_contract/  # unit.html, contractline.html, contractline_edit.html, contractline_amend.html, invoice_edit.html, inc/invoice_lines_preview.html; contract.html, invoice.html, invoiceline.html changes
+├── migrations/                 # 0044 schema, 0045 data conversion, 0046 ContractLine.replaces, 0047 InvoiceLine unit/unit price (copied from the contract line), 0048 Invoice status Draft by default
 └── tests/
     ├── test_views.py           # updated + Unit/ContractLine cases
     ├── test_calculations.py, test_currency.py, test_conversion.py,
     ├── test_contract_lines.py, test_values.py, test_prefill.py, test_api.py,
     ├── test_reports.py, test_generation.py, test_locking.py,
     ├── test_deprecated.py      # NEW (deprecated fields and invoice templates, US2)
+    ├── test_amendments.py, test_posted.py, test_invoice_preview.py   # NEW (FR-030, FR-031, FR-032)
+    ├── test_convergence.py     # NEW (gaps found by /speckit-converge: bulk edit rules, contract values of API lists)
     ├── helpers.py              # NEW shared test factories (not a test module)
     └── query_counts.json       # regenerated
 scripts/netbox-contract.py      # + currency report script, - two stale scripts
