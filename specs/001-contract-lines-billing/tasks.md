@@ -230,3 +230,9 @@
 - [X] T071 Serve `total_contract_value` and `yearly_billable_value` in the contracts API list without a query per contract (prefetch the lines and the hierarchy, or annotations) and add a query-count test for the contracts API list, per plan Performance Goals (partial)
 - [X] T072 Update `plan.md` (project structure: migrations 0046-0048, `services/amendments.py`, tests `test_amendments.py`, `test_posted.py`, `test_invoice_preview.py`), `data-model.md` (`ContractLine.replaces`, `InvoiceLine.unit` and `unit_price`, Draft default and Posted lock) and the traceability table of `quickstart.md` (FR-030 to FR-032) to the implemented design, per T060 and Constitution VII (partial)
 - [X] T073 Run the full suite on the pinned NetBox `v4.6.10` tag again now that FR-030 to FR-032 are implemented, per SC-005 and FR-028 (partial)
+
+---
+
+## Phase 11: Convergence
+
+- [X] T074 Update the design documents to the implemented design: `contracts/rest-api.md` (base path `/api/plugins/contracts/`, writable `unit` and `unit_price` of invoice lines, read-only `replaces` of contract lines, action `POST contract-lines/{id}/amend/`, Draft default and Posted lock of invoices), `contracts/ui-and-settings.md` (Amend action and buttons, editable dimensions, comments and tags of locked lines, Posted lock, preview of the lines of a new invoice) and the summary of `plan.md` (`InvoiceLine` gets contract line, quantity, unit and unit price), per plan `contracts/` and Constitution VII (partial)
