@@ -7,12 +7,12 @@
 ### Version 2.5.0
 
 > [!WARNING]
-> This version requires Netbox 4.6.0 or later
+> This version requires Netbox 4.6.0 or later.
 
 * [#278](https://github.com/mlebreuil/netbox-contract/issues/278) Contract lines replace the contract costs and the invoice templates.
   * New models **Unit** (billing method one-time, recurring or usage-based, and the months one unit price covers) and **Contract line** (description, quantity, unit price, unit, currency, dates and accounting dimensions), with list, detail, edit, bulk import, bulk edit and bulk delete screens, and the REST API endpoints `units/` and `contract-lines/`.
   * Contracts get a **billable** flag and three computed values: total contract value, yearly value and yearly billable value (which includes the lines of non-billable descendants).
-  * The invoice add screen proposes the amount from the contract lines, and creating an invoice generates its invoice lines from them. Invoice lines get a reference to their contract line and a quantity; their amount is calculated from it.
+  * The invoice add screen proposes the amount from the contract lines, and creating an invoice generates its invoice lines from them. Invoice lines get a reference to their contract line and a quantity, unit and unit price; their amount is calculated from it.
   * Currency consistency: contract lines, invoices and invoice lines must have the currency of their contract or invoice; a non-billable child has the currency of its parent. The new read-only custom script "Report currency mismatches" lists existing mismatches without changing them.
   * Upgrade: the migration converts the monthly, yearly and non-recurring costs and the invoice templates into contract lines (units "One-time", "Monthly", "Yearly") and prints a report. It can be run again with `python manage.py convert_contract_lines`. Every existing contract is billable. Invoices and invoice lines are not changed.
   * Deprecated, kept and hidden by default: the contract fields `mrc`, `yrc` and `nrc` and the invoice templates (never deleted, shown with a "deprecated" badge). The new plugin setting `show_deprecated_fields` (default `False`) shows them again. They remain in the bulk import and the REST API.
