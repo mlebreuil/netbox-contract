@@ -137,18 +137,18 @@
           <tr>
             <th scope="row">{% trans "Total contract value" %}</th>
             <td>
-              {% with total=object.total_contract_value %}
+              {% with total=contract_values.total_contract_value %}
                 {% if total is None %}{% trans "Not available" %}{% else %}{{ total }} {{ object.get_currency_display }}{% endif %}
               {% endwith %}
             </td>
           </tr>
           <tr>
             <th scope="row">{% trans "Yearly value" %}</th>
-            <td>{{ object.yearly_contract_value }} {{ object.get_currency_display }}</td>
+            <td>{{ contract_values.yearly_contract_value }} {{ object.get_currency_display }}</td>
           </tr>
           <tr>
             <th scope="row">{% trans "Yearly billable value" %}</th>
-            <td>{{ object.yearly_billable_value }} {{ object.get_currency_display }}</td>
+            <td>{{ contract_values.yearly_billable_value }} {{ object.get_currency_display }}</td>
           </tr>
         </table>
       </div>

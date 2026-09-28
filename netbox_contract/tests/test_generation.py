@@ -296,7 +296,7 @@ class GenerationRulesTestCase(TestCase):
 
     def test_recurring_line_without_period_counts_the_invoice_frequency(self):
         """Decision 2026-09-26: without an invoice period, a recurring line counts for one invoice frequency."""
-        contract = make_contract(start_date=None, invoice_frequency=3)
+        contract = make_contract(start_date=None, end_date=None, invoice_frequency=3)
         make_line(contract, monthly(), 100)
         errors = invoicing.check_new_invoice(contract, Decimal(299), None, None)
         self.assertEqual(len(errors), 1)

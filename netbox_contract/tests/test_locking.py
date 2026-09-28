@@ -90,7 +90,7 @@ class ContractLineLockTestCase(TestCase):
     def test_deleting_a_parent_contract_cascades_to_the_lines_of_its_children(self):
         child = make_contract(name='Child', parent=self.contract, billable=False)
         child_line = make_line(child, monthly(), 10)
-        invoice = make_invoice(self.contract, amount=100)
+        invoice = make_invoice(self.contract, amount=100, status=InvoiceStatusChoices.STATUS_DRAFT)
         make_invoice_line(invoice, amount=10, contract_line=child_line, quantity=1)
         Contract.objects.filter(pk=self.contract.pk).delete()
         self.assertFalse(ContractLine.objects.filter(pk=child_line.pk).exists())

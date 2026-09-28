@@ -33,6 +33,7 @@ from .models import (
     InvoiceLine,
     ServiceProvider,
     Unit,
+    contract_values,
     yearly_value_annotation,
 )
 from .services import amendments, invoicing
@@ -327,6 +328,7 @@ class ContractView(generic.ObjectView):
 
         return {
             'hidden_fields': hidden_fields,
+            'contract_values': contract_values([instance])[instance.pk],
             'show_deprecated_fields': plugin_settings.get('show_deprecated_fields'),
             'lines_table': lines_table,
             'lines_locked': lines_locked,
@@ -448,7 +450,7 @@ def _format_number(value):
     return '' if value is None else f'{value.normalize():f}'
 
 
-def build_lines_preview(data):
+def build_lines_preview(data, user):
     """
     Lines a new invoice would get, from the contract, period, amount and the quantities and unit prices typed
     in the preview (FR-032). None for an invoice template.
@@ -464,7 +466,8 @@ def build_lines_preview(data):
     if not isinstance(contract_ids, (list, tuple)):
         contract_ids = [contract_ids]
     contract_ids = [value for value in contract_ids if str(value).isdigit()]
-    contract = Contract.objects.filter(pk=contract_ids[0]).first() if contract_ids else None
+    contracts = Contract.objects.restrict(user, 'view')
+    contract = contracts.filter(pk=contract_ids[0]).first() if contract_ids else None
     if contract is None:
         preview['message'] = _('Choose a contract to see the lines generated for it.')
         return preview
@@ -533,7 +536,7 @@ class InvoiceLinesPreviewView(BaseObjectView):
 
     def post(self, request):
         return render(request, 'netbox_contract/inc/invoice_lines_preview.html', {
-            'lines_preview': build_lines_preview(request.POST),
+            'lines_preview': build_lines_preview(request.POST, request.user),
         })
 
 
@@ -544,7 +547,7 @@ class InvoiceEditView(generic.ObjectEditView):
 
     def get_extra_context(self, request, instance):
         if request.method == 'POST' and not instance.pk:
-            return {'lines_preview': build_lines_preview(request.POST)}
+            return {'lines_preview': build_lines_preview(request.POST, request.user)}
         return {}
 
     def get(self, request, *args, **kwargs):
@@ -562,11 +565,15 @@ class InvoiceEditView(generic.ObjectEditView):
 
         initial_data = normalize_querydict(request.GET)
         initial_data['date'] = date.today()
-        if 'contracts' in initial_data.keys():
-            contract = Contract.objects.get(pk=initial_data['contracts'])
-
+        contract_id = initial_data.get('contracts')
+        # Only a contract the user may view is used to pre-fill the invoice
+        contract = (
+            Contract.objects.restrict(request.user, 'view').filter(pk=contract_id).first()
+            if str(contract_id).isdigit() else None
+        )
+        if contract is not None:
             try:
-                last_invoice = contract.invoices.exclude(template=True).latest(
+                last_invoice = contract.invoices.exclude(template=True).filter(period_end__isnull=False).latest(
                     'period_end'
                 )
                 new_period_start = last_invoice.period_end + timedelta(days=1)
@@ -606,7 +613,7 @@ class InvoiceEditView(generic.ObjectEditView):
                 'form': form,
                 'return_url': self.get_return_url(request, obj),
                 'prerequisite_model': get_prerequisite_model(self.queryset),
-                'lines_preview': None if obj.pk else build_lines_preview(initial_data),
+                'lines_preview': None if obj.pk else build_lines_preview(initial_data, request.user),
                 **self.get_extra_context(request, obj),
             },
         )
@@ -782,6 +789,10 @@ class ContractLineAmendView(BaseObjectView):
 
     def get_required_permission(self):
         return 'netbox_contract.change_contractline'
+
+    def has_permission(self):
+        # The amendment also creates a contract line, as the REST action requires
+        return super().has_permission() and self.request.user.has_perm('netbox_contract.add_contractline')
 
     def render_form(self, request, line, form):
         return render(request, self.template_name, {

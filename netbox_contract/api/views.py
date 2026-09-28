@@ -32,13 +32,15 @@ class ContractViewSet(NetBoxModelViewSet):
     filterset_class = filtersets.ContractFilterSet
 
     def get_serializer(self, *args, **kwargs):
-        # A list computes the contract values of its whole page at once instead of once per contract
-        if kwargs.get('many') and args and 'data' not in kwargs:
-            instances = list(args[0])
-            kwargs['context'] = {
-                **self.get_serializer_context(), 'contract_values': models.contract_values(instances)
-            }
-            args = (instances, *args[1:])
+        # The contract values are computed once for a detail and for the whole page of a list
+        if args and 'data' not in kwargs:
+            instances = list(args[0]) if kwargs.get('many') else [args[0]]
+            if all(isinstance(instance, models.Contract) for instance in instances):
+                kwargs['context'] = {
+                    **self.get_serializer_context(), 'contract_values': models.contract_values(instances)
+                }
+                if kwargs.get('many'):
+                    args = (instances, *args[1:])
         return super().get_serializer(*args, **kwargs)
 
 

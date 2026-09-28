@@ -8,7 +8,8 @@
 - Invoice frequency : The number of month that each invoice covers. It is used to propose the period of a new invoice.
 - Parent: Contrats can be arranged in a parent / child hierarchie.
 - Billable: whether invoices are issued for this contract (default: yes). The lines of a non-billable contract are invoiced through its closest billable parent. The flag cannot change once the contract, one of its parents or one of its children has invoices, or once an invoice line references one of its lines.
-- Currency: contract lines and invoices of the contract use the same currency. The currency cannot change once the contract has invoices (or invoice lines referencing its lines); without invoices, its contract lines follow the new currency. A non-billable child must have the currency of its parent.
+- Currency: contract lines and invoices of the contract use the same currency. The currency cannot change once the contract, or one of its non-billable descendants, has invoices (or invoice lines referencing their lines); otherwise its contract lines and its non-billable descendants of the same currency, with their lines, follow the new currency. A non-billable child must have the currency of its parent.
+- Deleting a contract deletes its lines and child contracts; it is refused while its lines, or those of its child contracts, are on posted invoices.
 
 What a contract bills for is described by its [contract lines](contract_lines.md).
 

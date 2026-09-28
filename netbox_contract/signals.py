@@ -4,7 +4,14 @@ from django.dispatch import receiver
 from django.utils.html import escape
 from utilities.exceptions import AbortRequest
 
-from .models import POSTED_INVOICE_MESSAGE, ContractLine, InvoiceLine
+from .models import (
+    CONTRACT_ON_POSTED_INVOICES_MESSAGE,
+    POSTED_INVOICE_MESSAGE,
+    Contract,
+    ContractLine,
+    InvoiceLine,
+    _first_names,
+)
 
 
 def _deleted_directly(origin):
@@ -33,3 +40,12 @@ def protect_posted_invoice_line(sender, instance, origin=None, **kwargs):
         direct = isinstance(origin, InvoiceLine)
     if direct and instance.invoice_locked():
         raise AbortRequest(escape(POSTED_INVOICE_MESSAGE))
+
+
+@receiver(pre_delete, sender=Contract)
+def protect_contract_on_posted_invoices(sender, instance, origin=None, **kwargs):
+    """Refuse a queryset deletion of a contract whose lines are on posted invoices (FR-031)."""
+    if isinstance(origin, QuerySet) and issubclass(origin.model, Contract):
+        numbers = instance.posted_invoice_numbers()
+        if numbers:
+            raise AbortRequest(escape(CONTRACT_ON_POSTED_INVOICES_MESSAGE.format(numbers=_first_names(numbers))))

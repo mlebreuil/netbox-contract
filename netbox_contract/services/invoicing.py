@@ -5,6 +5,7 @@ generated when an invoice is created (FR-021..FR-025). Both use the rules of cal
 
 import re
 from dataclasses import dataclass, field
+from datetime import date
 from decimal import Decimal, InvalidOperation
 
 from django.db.models import Sum
@@ -76,8 +77,14 @@ def _plan(contract, period_start, period_end, for_generation):
     posted = posted_totals(lines)
     proposal = Proposal()
 
+    # Without an invoice period, only the lines active today are invoiced (not the ended ones, nor those
+    # replaced by an amendment)
+    today = date.today()
+    window = (today, today) if period_start is None or period_end is None else None
     for line in lines:
         start, end = line.effective_start_date, line.effective_end_date
+        if window and not calculations.ranges_overlap(*window, start, end):
+            continue
         if not calculations.ranges_overlap(period_start, period_end, start, end):
             continue
         method = line.unit.billing_method
@@ -274,7 +281,8 @@ def lines_to_generate(contract, period_start, period_end, overrides=None):
             continue
         line = planned.contract_line
         planned.quantity = override.get('quantity', planned.quantity)
-        planned.unit_price = override.get('unit_price') or planned.unit_price
+        if override.get('unit_price') is not None:
+            planned.unit_price = override['unit_price']
         planned.amount = calculations.invoice_line_amount(
             line.unit.billing_method, planned.quantity, planned.unit_price, line.unit.months, period_start,
             period_end, line.effective_start_date, line.effective_end_date,

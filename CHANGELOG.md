@@ -34,6 +34,8 @@ For existing users and API clients:
 * Contract lines are locked once their contract has an invoice (any status) or once an invoice line references them: a new contract must be created. Their accounting dimensions, comments and tags remain editable, and their price or quantity can be amended from a date after the last invoiced period. The billing method and months of a unit used by such lines are locked too.
 * The billable flag of a contract cannot change once the contract, one of its parents or one of its children has invoices. The currency of a contract cannot change once it has invoices or invoice lines; without invoices, its contract lines follow the new currency.
 * The amount of an invoice line that has a unit price (always the case when it references a contract line) is calculated, and a value sent for it is ignored.
+* A contract whose lines (or those of its child contracts) are on posted invoices can no longer be deleted.
+* Changing the currency of a contract also changes its non-billable descendants of the same currency, unless one of them has invoices.
 * New invoices are Draft by default (previously Posted), in the web interface and the REST API; imports still set the status given in the file.
 * Posted invoices are locked: their amount, currency, period and contracts cannot change, lines cannot be added or deleted, and the unit, unit price, quantity and amount of their lines cannot change. Set an invoice back to Draft to correct it.
 * The contract cost fields and new invoice templates are hidden unless `show_deprecated_fields` is `True`. The mandatory and hidden field settings ignore a deprecated field that is not shown (with a warning in the log) instead of failing.

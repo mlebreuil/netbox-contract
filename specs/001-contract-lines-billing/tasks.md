@@ -236,3 +236,17 @@
 ## Phase 11: Convergence
 
 - [X] T074 Update the design documents to the implemented design: `contracts/rest-api.md` (base path `/api/plugins/contracts/`, writable `unit` and `unit_price` of invoice lines, read-only `replaces` of contract lines, action `POST contract-lines/{id}/amend/`, Draft default and Posted lock of invoices), `contracts/ui-and-settings.md` (Amend action and buttons, editable dimensions, comments and tags of locked lines, Posted lock, preview of the lines of a new invoice) and the summary of `plan.md` (`InvoiceLine` gets contract line, quantity, unit and unit price), per plan `contracts/` and Constitution VII (partial)
+
+---
+
+## Phase 12: Code review fixes (2026-09-27)
+
+- [X] T075 Without an invoice period, propose and generate only the contract lines active today (ended lines and lines replaced by an amendment are no longer billed), per FR-018 and FR-030
+- [X] T076 Ignore invoices without end date when the pre-fill looks for the last invoiced period (no server error), per FR-017
+- [X] T077 Restrict the contract of the invoice pre-fill and of the lines preview to the contracts the user may view (NetBox object permissions), per FR-032 and Constitution I
+- [X] T078 Let a contract change currency when its non-billable descendants have the same currency and no invoice or referencing invoice line; they and their lines follow, per FR-009a and FR-010
+- [X] T079 Keep a unit price of 0 typed in the preview of a new invoice, per FR-032
+- [X] T081 Require the add and change contract line permissions on the amend screen, as the REST action does, per FR-030
+- [X] T082 Refuse deleting a contract (or a parent of it) whose lines are referenced by lines of Posted invoices, per FR-031
+- [X] T083 Compute the values of a contract once per contract page and API detail, per plan Performance Goals
+

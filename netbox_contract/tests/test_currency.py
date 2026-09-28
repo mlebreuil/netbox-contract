@@ -114,13 +114,14 @@ class ModelCurrencyTestCase(TestCase):
         with self.assertRaises(ValidationError):
             child.full_clean()
 
-    def test_parent_currency_change_checked_against_non_billable_children(self):
+    def test_parent_currency_change_carries_non_billable_children(self):
         parent = make_contract(name='Parent', currency='eur')
-        make_contract(name='Child', currency='eur', parent=parent, billable=False)
+        child = make_contract(name='Child', currency='eur', parent=parent, billable=False)
         parent.currency = 'chf'
-        with self.assertRaises(ValidationError) as cm:
-            parent.full_clean()
-        self.assertIn('Child', all_messages(cm.exception))
+        parent.full_clean()
+        parent.save()
+        child.refresh_from_db()
+        self.assertEqual(child.currency, 'chf')
 
 
 class InvoiceFormCurrencyTestCase(NetBoxTestCase):

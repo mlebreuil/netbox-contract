@@ -30,6 +30,10 @@ REFERENCED_LINE_MESSAGE = _(
 POSTED_INVOICE_MESSAGE = _(
     'This invoice is posted: its amounts and its lines are locked. Set it back to draft to change them.'
 )
+CONTRACT_ON_POSTED_INVOICES_MESSAGE = _(
+    'This contract cannot be deleted: its lines, or those of its child contracts, are on the posted invoices '
+    '{numbers}.'
+)
 INTERNAL_FIELDS_NOTE = _('Its accounting dimensions, comments and tags can still be edited.')
 
 # Contract terms of a contract line, locked once it is invoiced (FR-029); its accounting dimensions, comments
@@ -458,10 +462,13 @@ class Contract(ContactsMixin, NetBoxModel):
     def save(self, *args, **kwargs):
         previous_currency = self._original('currency').get('currency') if self.pk else None
         super().save(*args, **kwargs)
-        # The contract lines follow a new currency (FR-009a). A queryset update skips the per-line validation
-        # and the lock, which is safe because clean() only allows the change when the contract has no invoice.
+        # The contract lines and the non-billable descendants follow a new currency (FR-009a, FR-010). Queryset
+        # updates skip the per-record validation and the lock, which is safe because clean() only allows the
+        # change when neither the contract nor these descendants have invoices.
         if previous_currency and previous_currency != self.currency and not self.invoices.exists():
-            ContractLine.objects.filter(contract=self.pk).exclude(currency=self.currency).update(
+            family = [self.pk, *self.currency_followers(previous_currency)]
+            Contract.objects.filter(pk__in=family[1:]).update(currency=self.currency)
+            ContractLine.objects.filter(contract__in=family).exclude(currency=self.currency).update(
                 currency=self.currency
             )
 
@@ -470,12 +477,16 @@ class Contract(ContactsMixin, NetBoxModel):
         original = self._original('currency')
         if not original or original['currency'] == self.currency:
             return {}
+        # The non-billable descendants of the old currency change with the contract (FR-010)
+        family = [self.pk, *self.currency_followers(original['currency'])]
         blocking = []
-        invoices = list(Invoice.objects.filter(contracts=self.pk).values_list('number', flat=True)[:6])
+        invoices = list(
+            Invoice.objects.filter(contracts__in=family).values_list('number', flat=True).distinct()[:6]
+        )
         if invoices:
             blocking.append(_('invoices {numbers}').format(numbers=_first_names(invoices)))
         invoice_lines = list(
-            InvoiceLine.objects.filter(contract_line__contract=self.pk)
+            InvoiceLine.objects.filter(contract_line__contract__in=family)
             .values_list('invoice__number', flat=True)
             .distinct()[:6]
         )
@@ -483,23 +494,43 @@ class Contract(ContactsMixin, NetBoxModel):
             blocking.append(_('invoice lines of invoices {numbers}').format(numbers=_first_names(invoice_lines)))
         if blocking:
             return {
-                'currency': _('The currency cannot change because this contract has {records}.').format(
-                    records=_(' and ').join(str(item) for item in blocking)
-                )
-            }
-        children = list(
-            Contract.objects.filter(parent=self.pk, billable=False)
-            .exclude(currency=self.currency)
-            .values_list('name', flat=True)[:6]
-        )
-        if children:
-            return {
                 'currency': _(
-                    'The currency cannot change: the non-billable child contracts {names} have the currency {found} '
-                    'and must have the currency of their parent.'
-                ).format(names=_first_names(children), found=original['currency'].upper())
+                    'The currency cannot change because this contract or its non-billable descendants have '
+                    '{records}.'
+                ).format(records=_(' and ').join(str(item) for item in blocking))
             }
         return {}
+
+    def posted_invoice_numbers(self):
+        """Posted invoices with lines of this contract or of its descendants, which block its deletion (FR-031)."""
+        return list(
+            Invoice.objects.filter(
+                invoicelines__contract_line__contract__in=[self.pk, *(c.pk for c in self.descendants())],
+                status=InvoiceStatusChoices.STATUS_POSTED,
+            )
+            .exclude(template=True)
+            .values_list('number', flat=True)
+            .distinct()[:6]
+        )
+
+    def delete(self, *args, **kwargs):
+        # Checked before Django's deletion collector opens its transaction; signals.py covers queryset deletions
+        numbers = self.posted_invoice_numbers()
+        if numbers:
+            raise AbortRequest(escape(CONTRACT_ON_POSTED_INVOICES_MESSAGE.format(numbers=_first_names(numbers))))
+        return super().delete(*args, **kwargs)
+
+    def currency_followers(self, currency):
+        """Non-billable descendants of the given currency, which follow a currency change of this contract."""
+        followers, level = [], [self.pk]
+        while level:
+            level = list(
+                Contract.objects.filter(parent__in=level, billable=False, currency=currency)
+                .exclude(pk__in=[self.pk, *followers])
+                .values_list('pk', flat=True)
+            )
+            followers.extend(level)
+        return followers
 
     def _clean_parent_currency(self):
         """A non-billable child has the currency of its parent (FR-010)."""
