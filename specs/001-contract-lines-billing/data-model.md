@@ -67,7 +67,7 @@ Yearly billable value: 0 when the contract is not billable; otherwise the yearly
 | new `contract_line` | FK `ContractLine`, null, `SET_NULL` (FR-021); the contract line's contract must be the invoice's contract or one of its non-billable descendants |
 | new `quantity` | `DecimalField(12, 4)`, null; defined at the invoice line (FR-024) |
 | new `unit`, `unit_price` | FK `Unit` (null, `PROTECT`) and `DecimalField(12, 2)` (null); default to those of the contract line and can change while the invoice is not posted (FR-024, decisions I11 and I12); migration 0047 copies them from the contract line for existing lines |
-| `amount` | calculated from `quantity` and `unit_price` when the line has a unit price (FR-024, research D7) and not entered by the user; otherwise it stays a manually entered amount; never recalculated on a Posted invoice |
+| `amount` | always calculated from `quantity` and `unit_price` (FR-024, research D7, decision I14) and not entered by the user; an amount given alone at creation is taken as the unit price; never recalculated on a Posted invoice |
 | `currency` | must equal the invoice's currency (FR-009) |
 
 The existing rule that the sum of invoice lines cannot exceed the invoice amount is kept.
@@ -95,3 +95,4 @@ Invoice 1 ── * InvoiceLine * ── 0..1 ContractLine
 3. `0046_contractline_replaces` (schema): `ContractLine.replaces`.
 4. `0047_invoiceline_unit_unit_price` (schema and data): `InvoiceLine.unit` and `InvoiceLine.unit_price`, copied from the contract line for existing lines; amounts unchanged.
 5. `0048_invoice_status_draft_default` (schema): `Invoice.status` defaults to Draft.
+6. `0049_invoiceline_derived_amounts` (data): existing invoice lines without unit price get one (amount / quantity when exact, otherwise the amount with quantity 1); amounts unchanged (decision I14).

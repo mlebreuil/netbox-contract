@@ -33,7 +33,7 @@ For existing users and API clients:
 * The copy of invoice template lines onto a new invoice is removed. Invoice templates are no longer used to pre-fill invoices; the pre-fill uses the contract lines instead of `mrc` and `yrc`.
 * Contract lines are locked once their contract has an invoice (any status) or once an invoice line references them: a new contract must be created. Their accounting dimensions, comments and tags remain editable, and their price or quantity can be amended from a date after the last invoiced period. The billing method and months of a unit used by such lines are locked too.
 * The billable flag of a contract cannot change once the contract, one of its parents or one of its children has invoices. The currency of a contract cannot change once it has invoices or invoice lines; without invoices, its contract lines follow the new currency.
-* The amount of an invoice line that has a unit price (always the case when it references a contract line) is calculated, and a value sent for it is ignored.
+* The amount of every invoice line is quantity x unit price and can no longer be typed, as in most ERPs; the unit price is required and the quantity defaults to 1. An import or API call that gives only an amount still works: the amount becomes the unit price with quantity 1. Migration 0049 gives existing lines a unit price without changing any amount.
 * A contract whose lines (or those of its child contracts) are on posted invoices can no longer be deleted.
 * Changing the currency of a contract also changes its non-billable descendants of the same currency, unless one of them has invoices.
 * New invoices are Draft by default (previously Posted), in the web interface and the REST API; imports still set the status given in the file.

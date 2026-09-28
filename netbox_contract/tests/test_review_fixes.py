@@ -1,26 +1,32 @@
 """Fixes after the code review of 2026-09-27 (tasks T075 to T083)."""
 
+import importlib
 from datetime import date, timedelta
 from decimal import Decimal
 
 from core.models import ObjectType
+from django.apps import apps
 from django.core.exceptions import ValidationError
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
+from rest_framework import status
 from users.models import ObjectPermission
 from utilities.exceptions import AbortRequest
 from utilities.testing import TestCase
 
-from netbox_contract.models import Contract, ContractLine, InvoiceStatusChoices
+from netbox_contract.models import Contract, ContractLine, InvoiceLine, InvoiceStatusChoices
 from netbox_contract.services import invoicing
 from netbox_contract.services.amendments import amend_contract_line
+from netbox_contract.tests.custom import APITestCase
 from netbox_contract.tests.helpers import (
     make_contract,
     make_invoice,
     make_invoice_line,
     make_line,
     monthly,
+    one_time,
+    usage,
 )
 
 DRAFT = InvoiceStatusChoices.STATUS_DRAFT
@@ -135,6 +141,105 @@ class ZeroPriceTestCase(TestCase):
         self.assertEqual((planned.unit_price, planned.amount), (Decimal(0), Decimal('0.00')))
         overrides, errors = invoicing.parse_line_overrides({f'line-{line.pk}-unit_price': '0'})
         self.assertEqual(overrides, {line.pk: {'unit_price': Decimal(0)}})
+
+
+class DerivedAmountTestCase(TestCase):
+    """T080: every invoice line amount is quantity x unit price (decision I14)."""
+
+    def setUp(self):
+        super().setUp()
+        self.contract = make_contract()
+        self.invoice = make_invoice(self.contract, amount=10000, status=DRAFT)
+
+    def new_line(self, **kwargs):
+        line = InvoiceLine(invoice=self.invoice, currency='usd', **kwargs)
+        line.full_clean()
+        line.save()
+        return line
+
+    def test_quantity_defaults(self):
+        self.assertEqual(self.new_line(unit_price=Decimal(15)).quantity, 1)
+        one_time_line = make_line(self.contract, one_time(), 500, quantity=2)
+        created = self.new_line(contract_line=one_time_line)
+        self.assertEqual((created.quantity, created.amount), (Decimal(2), Decimal('1000.00')))
+        usage_line = make_line(self.contract, usage(), 20)
+        created = self.new_line(contract_line=usage_line)
+        self.assertEqual((created.quantity, created.amount), (None, Decimal('0.00')))
+
+    def test_amount_is_derived(self):
+        line = self.new_line(unit_price=Decimal(15), quantity=Decimal(3), amount=Decimal(999))
+        self.assertEqual(line.amount, Decimal('45.00'))
+
+    def test_amount_alone_on_creation(self):
+        line = self.new_line(amount=Decimal('12.34'))
+        self.assertEqual((line.quantity, line.unit_price, line.amount), (1, Decimal('12.34'), Decimal('12.34')))
+        line = self.new_line(amount=Decimal(100), quantity=Decimal(4))
+        self.assertEqual((line.unit_price, line.amount), (Decimal(25), Decimal('100.00')))
+        with self.assertRaises(ValidationError) as cm:
+            self.new_line(amount=Decimal(100), quantity=Decimal(3))
+        self.assertIn('unit_price', cm.exception.message_dict)
+
+    def test_unit_price_required(self):
+        with self.assertRaises(ValidationError) as cm:
+            self.new_line(quantity=Decimal(2))
+        self.assertIn('unit_price', cm.exception.message_dict)
+
+    def test_amount_is_read_only_on_an_existing_line(self):
+        line = self.new_line(unit_price=Decimal(10), quantity=Decimal(2))
+        line.amount = Decimal(1)
+        line.full_clean()
+        line.save()
+        self.assertEqual(line.amount, Decimal('20.00'))
+
+    def test_migration_gives_existing_lines_a_unit_price(self):
+        exact = self.new_line(unit_price=Decimal(50), quantity=Decimal(2))
+        inexact = self.new_line(unit_price=Decimal(10), quantity=Decimal(3))
+        plain = self.new_line(unit_price=Decimal(7))
+        InvoiceLine.objects.filter(pk=exact.pk).update(unit_price=None, amount=Decimal(100))
+        InvoiceLine.objects.filter(pk=inexact.pk).update(unit_price=None, amount=Decimal(100), comments='Note')
+        InvoiceLine.objects.filter(pk=plain.pk).update(unit_price=None, quantity=None, amount=Decimal('7.50'))
+        migration = importlib.import_module('netbox_contract.migrations.0049_invoiceline_derived_amounts')
+        migration.derive_invoice_line_amounts(apps, None)
+        rows = {row['pk']: row for row in InvoiceLine.objects.values('pk', 'quantity', 'unit_price', 'amount',
+                                                                          'comments')}
+        self.assertEqual((rows[exact.pk]['quantity'], rows[exact.pk]['unit_price']), (Decimal(2), Decimal(50)))
+        self.assertEqual((rows[inexact.pk]['quantity'], rows[inexact.pk]['unit_price']), (1, Decimal(100)))
+        self.assertIn('3', rows[inexact.pk]['comments'])
+        self.assertTrue(rows[inexact.pk]['comments'].startswith('Note'))
+        self.assertEqual((rows[plain.pk]['quantity'], rows[plain.pk]['unit_price']), (1, Decimal('7.50')))
+        self.assertEqual([rows[pk]['amount'] for pk in (exact.pk, inexact.pk, plain.pk)],
+                         [Decimal(100), Decimal(100), Decimal('7.50')])
+
+    def test_form(self):
+        self.user.is_superuser = True
+        self.user.save()
+        url = reverse('plugins:netbox_contract:invoiceline_add')
+        response = self.client.get(f'{url}?invoice={self.invoice.pk}')
+        form = response.context['form']
+        self.assertTrue(form.fields['amount'].disabled)
+        response = self.client.post(url, {'invoice': self.invoice.pk, 'unit_price': '12', 'quantity': '',
+                                          'currency': 'usd', 'amount': '500'})
+        self.assertEqual(response.status_code, 302, response.content.decode()[-1500:])
+        created = InvoiceLine.objects.get(invoice=self.invoice)
+        self.assertEqual((created.quantity, created.amount), (1, Decimal('12.00')))
+
+
+class DerivedAmountAPITestCase(APITestCase):
+    model = InvoiceLine
+
+    def test_api(self):
+        self.add_permissions('netbox_contract.add_invoiceline', 'netbox_contract.view_invoiceline')
+        invoice = make_invoice(make_contract(), amount=1000, status=DRAFT)
+        url = self._get_list_url()
+        response = self.client.post(url, {'invoice': invoice.pk, 'currency': 'usd', 'amount': '40'},
+                                    format='json', **self.header)
+        self.assertHttpStatus(response, status.HTTP_201_CREATED)
+        self.assertEqual((Decimal(response.data['unit_price']), Decimal(response.data['quantity'])),
+                         (Decimal(40), Decimal(1)))
+        response = self.client.post(url, {'invoice': invoice.pk, 'currency': 'usd', 'quantity': 2},
+                                    format='json', **self.header)
+        self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('unit_price', response.data)
 
 
 class AmendPermissionTestCase(TestCase):

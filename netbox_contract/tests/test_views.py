@@ -233,6 +233,7 @@ class InvoiceLineTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTest
         cls.form_data = {
             'invoice': invoices[1].pk,
             'contract_line': None,
+            'unit_price': Decimal(50),
             'quantity': Decimal(2),
             'currency': 'usd',
             'amount': Decimal(100),

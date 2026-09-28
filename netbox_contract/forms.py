@@ -787,19 +787,20 @@ class InvoiceLineForm(NetBoxModelForm):
         label=_('Accounting dimensions'),
     )
 
-    # Fields fixed once a line with a unit price is created (FR-024, decision I11): only its quantity and
-    # internal fields change afterwards
+    # Fields fixed on a saved line that references a contract line (FR-024)
     CALCULATED_LINE_FIXED_FIELDS = ('invoice', 'contract_line', 'currency', 'amount')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['unit'].help_text = _('Defaults to the unit of the contract line')
-        self.fields['unit_price'].help_text = _('Defaults to the unit price of the contract line')
+        self.fields['unit_price'].help_text = _('Required; defaults to the unit price of the contract line')
+        self.fields['quantity'].help_text = _(
+            'Defaults to 1, or to the quantity of the contract line; usage-based lines are entered per invoice'
+        )
+        # The amount is always quantity x unit price (FR-024, decision I14)
+        self.fields['amount'].disabled = True
+        self.fields['amount'].help_text = _('Calculated from the quantity and the unit price when the line is saved')
         if not self.instance.pk:
-            self.fields['amount'].help_text = _(
-                'Calculated from the quantity and the unit price when the line has a unit price (ignored then); '
-                'entered manually otherwise'
-            )
             return
 
         # Lines of a posted invoice: only their accounting dimensions, comments and tags change (FR-031)
@@ -810,12 +811,10 @@ class InvoiceLineForm(NetBoxModelForm):
             return
 
         # A calculated line keeps its invoice, contract line and currency; its unit, unit price and quantity change
-        if self.instance.unit_price is not None or self.instance.contract_line_id:
+        # A line generated from a contract line keeps its invoice, contract line and currency
+        if self.instance.contract_line_id:
             for field in self.CALCULATED_LINE_FIXED_FIELDS:
                 self.fields[field].disabled = True
-            self.fields['amount'].help_text = _(
-                'Calculated from the quantity and the unit price when the line is saved'
-            )
 
     def clean(self):
         super().clean()

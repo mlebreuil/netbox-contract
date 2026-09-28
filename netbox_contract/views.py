@@ -676,7 +676,9 @@ class InvoiceLineEditView(generic.ObjectEditView):
         initial_data = normalize_querydict(request.GET)
         if 'invoice' in initial_data.keys():
             invoice = Invoice.objects.get(pk=initial_data['invoice'])
-            initial_data['amount'] = invoice.amount - invoice.total_invoicelines_amount
+            # propose the rest of the invoice amount as the unit price of one unit
+            initial_data.setdefault('unit_price', invoice.amount - invoice.total_invoicelines_amount)
+            initial_data.setdefault('quantity', 1)
             initial_data.setdefault('currency', invoice.currency)
 
         form = self.form(instance=obj, initial=initial_data)

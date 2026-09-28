@@ -154,9 +154,10 @@ class GenerationViewTestCase(HierarchyMixin, NetBoxTestCase):
         invoice = make_invoice(None, number='MANUAL', amount=100, status=DRAFT)
         line = make_invoice_line(invoice, amount=40)
         form = self.client.get(reverse('plugins:netbox_contract:invoiceline_edit', args=[line.pk])).context['form']
-        self.assertFalse(form.fields['amount'].disabled)
+        self.assertTrue(form.fields['amount'].disabled)
         self.assertFalse(form.fields['unit'].disabled)
         self.assertFalse(form.fields['unit_price'].disabled)
+        self.assertEqual(form.initial['unit_price'], Decimal(40))
 
     def test_non_billable_contract_refused(self):
         """Scenario 4."""
@@ -372,12 +373,12 @@ class InvoiceLineRulesTestCase(TestCase):
         invoice_line.save()
         self.assertEqual(invoice_line.amount, Decimal('40.00'))
 
-    def test_amount_required_without_a_contract_line(self):
+    def test_unit_price_required_without_a_contract_line(self):
         invoice_line = InvoiceLine(invoice=self.invoice, currency='usd')
         with self.assertRaises(ValidationError) as cm:
             invoice_line.full_clean()
-        self.assertIn('amount', cm.exception.message_dict)
-        invoice_line.amount = Decimal(5)
+        self.assertIn('unit_price', cm.exception.message_dict)
+        invoice_line.unit_price = Decimal(5)
         invoice_line.full_clean()
 
     def test_invoice_line_name(self):
@@ -466,7 +467,7 @@ class GenerationAPITestCase(HierarchyMixin, APITestCase):
             url, {'invoice': invoice.pk, 'currency': 'usd', 'comments': 'no amount'}, format='json', **self.header
         )
         self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('amount', response.data)
+        self.assertIn('unit_price', response.data)
 
 
 class InvoiceLineUnitPriceTestCase(TestCase):
@@ -509,9 +510,9 @@ class InvoiceLineUnitPriceTestCase(TestCase):
                          Decimal('100.00'))
         self.assertEqual(self.new_line(unit_price=Decimal(15), quantity=Decimal(2)).amount, Decimal('30.00'))
 
-    def test_manual_line_without_price_keeps_a_free_amount(self):
-        line = self.new_line(amount=Decimal('12.34'), quantity=Decimal(5))
-        self.assertEqual(line.amount, Decimal('12.34'))
+    def test_manual_line_amount_alone_becomes_its_unit_price(self):
+        line = self.new_line(amount=Decimal('12.34'))
+        self.assertEqual((line.quantity, line.unit_price, line.amount), (1, Decimal('12.34'), Decimal('12.34')))
 
     def test_unit_and_price_editable_until_the_invoice_is_posted(self):
         line = self.new_line(contract_line=self.usage_line, quantity=Decimal(3))
@@ -557,7 +558,8 @@ class InvoiceLineUnitPriceTestCase(TestCase):
         self.assertEqual(
             (line.unit, line.unit_price, line.amount), (self.usage_line.unit, Decimal(20), Decimal('60.00'))
         )
-        self.assertEqual((manual.unit, manual.unit_price), (None, None))
+        # a manual line got its amount as unit price when it was created (decision I14)
+        self.assertEqual((manual.unit, manual.unit_price), (None, Decimal(5)))
 
 
 class InvoiceLineFormUnitPriceTestCase(NetBoxTestCase):

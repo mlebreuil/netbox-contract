@@ -508,7 +508,8 @@ class InvoiceLineSerializer(NetBoxModelSerializer):
     )
     amount = serializers.DecimalField(
         max_digits=10, decimal_places=2, required=False,
-        help_text='Calculated (and ignored if sent) when the line has a unit price; required otherwise',
+        help_text='Quantity x unit price, calculated. Given alone when a line is created, it is taken as the unit '
+                  'price with quantity 1 (compatibility)',
     )
     accounting_dimensions = SerializedPKRelatedField(
         queryset=AccountingDimension.objects.all(),

@@ -228,7 +228,7 @@ class ExtraLinesTestCase(TestCase):
 
     def test_incomplete_extra_line_refused(self):
         response = self.client.post(reverse(ADD_URL), self.data(**{
-            'extra-0-description': 'Installation', 'extra-0-unit_price': '120',
+            'extra-0-description': 'Installation', 'extra-0-quantity': '2',
         }))
         self.assertEqual(response.status_code, 200)
         self.assertIn('Installation', response.content.decode())

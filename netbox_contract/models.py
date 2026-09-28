@@ -968,8 +968,7 @@ class InvoiceLine(NetBoxModel):
         decimal_places=2,
         blank=True,
         verbose_name=_('amount'),
-        help_text=_('Calculated from the quantity and the unit price when the line has a unit price; entered '
-                    'manually otherwise'),
+        help_text=_('Calculated from the quantity and the unit price'),
     )
     accounting_dimensions = models.ManyToManyField(
         AccountingDimension, blank=True, verbose_name=_('accounting dimensions')
@@ -991,14 +990,41 @@ class InvoiceLine(NetBoxModel):
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:invoiceline', args=[self.pk])
 
-    def apply_contract_line_defaults(self):
-        """A new line takes the unit and unit price of its contract line when they are not given (FR-024)."""
-        if self.pk or not self.contract_line_id:
-            return
-        if self.unit_id is None:
-            self.unit = self.contract_line.unit
-        if self.unit_price is None:
-            self.unit_price = self.contract_line.unit_price
+    def apply_line_defaults(self, strict=True):
+        """
+        Defaults of an invoice line whose amount derives from quantity x unit price (FR-024, decision I14):
+
+        - a new line takes the unit and unit price of its contract line, and its quantity for recurring and one-time
+          lines (usage-based lines keep no quantity until it is entered); other lines get quantity 1;
+        - a line with an amount but no unit price takes the amount as unit price (divided by its quantity when that
+          is exact), so that clients and imports giving only an amount keep working.
+
+        Returns an error message when `strict` and the amount cannot be divided by the quantity; otherwise such a
+        line keeps its amount as unit price with quantity 1.
+        """
+        line = self.contract_line if self.contract_line_id else None
+        if not self.pk and line:
+            if self.unit_id is None:
+                self.unit = line.unit
+            if self.unit_price is None:
+                self.unit_price = line.unit_price
+
+        if self.unit_price is None and self.amount is not None:
+            quantity = self.quantity if self.quantity else Decimal(1)
+            unit_price = (self.amount / quantity).quantize(Decimal('0.01'))
+            if unit_price * quantity == self.amount:
+                self.quantity, self.unit_price = quantity, unit_price
+            elif strict:
+                return _('Give a unit price: the amount {amount} cannot be divided by the quantity {quantity}.').format(
+                    amount=self.amount, quantity=quantity
+                )
+            else:
+                self.quantity, self.unit_price = Decimal(1), self.amount
+
+        usage = self.unit_id is not None and self.unit.billing_method == BillingMethodChoices.USAGE
+        if not self.pk and self.quantity is None and not usage:
+            self.quantity = line.quantity if line else Decimal(1)
+        return None
 
     def calculate_amount(self):
         """
@@ -1052,7 +1078,9 @@ class InvoiceLine(NetBoxModel):
                 raise ValidationError({field: POSTED_INVOICE_MESSAGE for field in changed})
             return
 
-        self.apply_contract_line_defaults()
+        error = self.apply_line_defaults()
+        if error:
+            raise ValidationError({'unit_price': error})
 
         if self.contract_line_id:
             if not original or (original['invoice'], original['contract_line']) != (
@@ -1070,10 +1098,9 @@ class InvoiceLine(NetBoxModel):
                             'non-billable descendants.'
                         )
                     })
-        if self.unit_price is not None:
-            self.amount = self.calculate_amount()
-        elif self.amount is None:
-            raise ValidationError({'amount': _('This field is required when the line has no unit price.')})
+        if self.unit_price is None:
+            raise ValidationError({'unit_price': _('This field is required: the amount is quantity x unit price.')})
+        self.amount = self.calculate_amount()
         currency_changed = not original or (original['invoice'], original['currency']) != (
             self.invoice_id, self.currency
         )
@@ -1096,10 +1123,13 @@ class InvoiceLine(NetBoxModel):
                 raise ValidationError('Sum of invoice line amount greater than invoice amount')
 
     def save(self, *args, **kwargs):
-        self.apply_contract_line_defaults()
         # The amount of a line of a posted invoice never moves (FR-031)
-        if self.unit_price is not None and not (self.pk and self.invoice_locked()):
-            self.amount = self.calculate_amount()
+        if not (self.pk and self.invoice_locked()):
+            self.apply_line_defaults(strict=False)
+            if self.unit_price is not None:
+                self.amount = self.calculate_amount()
+            elif self.amount is None:
+                self.amount = Decimal(0)
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):

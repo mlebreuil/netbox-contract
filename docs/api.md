@@ -26,4 +26,4 @@ note: When creating invoices and invoice lines through the API, the correspondin
 
 - `contract_line` (id, optional), `unit` (id) and `unit_price` (default to those of the contract line), `quantity`.
 - Lines of a Posted invoice cannot be created or deleted, and their unit, unit price, quantity, amount, currency and contract line cannot change (400).
-- When the line has a unit price, `amount` is calculated and ignored if sent; otherwise it is required.
+- `amount` is always quantity x unit price and ignored if sent; `unit_price` is required, except that an `amount` given alone when a line is created is taken as its unit price with quantity 1 (compatibility). `quantity` defaults to 1.

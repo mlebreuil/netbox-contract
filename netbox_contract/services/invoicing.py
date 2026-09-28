@@ -242,12 +242,12 @@ def parse_extra_lines(data):
                 errors.append(_('Unknown unit for {line}.').format(line=label))
         try:
             line.unit_price = Decimal(values['unit_price']) if values.get('unit_price') else None
-            line.quantity = Decimal(values['quantity']) if values.get('quantity') else None
+            line.quantity = Decimal(values['quantity']) if values.get('quantity') else Decimal(1)
         except InvalidOperation:
             errors.append(_('The unit price and the quantity of {line} must be numbers.').format(line=label))
             continue
-        if line.unit_price is None or line.quantity is None:
-            errors.append(_('{line} needs a unit price and a quantity.').format(line=label))
+        if line.unit_price is None:
+            errors.append(_('{line} needs a unit price.').format(line=label))
     return lines, errors
 
 
