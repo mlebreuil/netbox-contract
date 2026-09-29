@@ -23,6 +23,13 @@
   * Posted invoices are locked: their amounts, period and contracts, and the amounts of their lines, can no longer change, and lines can no longer be added or deleted (accounting dimensions, comments and tags remain editable; the status can change back to Draft).
   * Invoice lines have a readable name (`<invoice number> line <id>`) in search results, the change log and reports.
 
+* [#307](https://github.com/mlebreuil/netbox-contract/issues/307) Fixes found in the NetBox 4.6 review.
+  * The Contracts tab of assigned objects (sites, devices, circuits, ...) is shown to users with the view contract assignment permission; it was shown to superusers only, because it checked a permission of a non-existent `contracts` app.
+  * The REST endpoints `serviceproviders/`, `contracttype/`, `accountingdimension/` and `contractassignment/` apply their filters (`name`, `q`, `tag`, `contract`, ...); they ignored them and always returned the whole list.
+  * The OpenAPI schema documents `external_party_object` (contracts, and the contract nested in contract lines and assignments) and `content_object` (contract assignments) as objects instead of strings. The plugin no longer depends on `drf_yasg`, which NetBox does not use.
+  * The invoice line add form pre-fills the unit price and currency only from an invoice the user may view, and no longer fails with a server error when the `invoice` parameter is unknown or not a number.
+  * The **Amend** button of contract lines is shown only to users with both the add and change contract line permissions, which the amendment requires; users with the change permission alone saw it and got a "forbidden" page.
+
 #### Behaviour changes
 
 For existing users and API clients:
@@ -40,6 +47,8 @@ For existing users and API clients:
 * Posted invoices are locked: their amount, currency, period and contracts cannot change, lines cannot be added or deleted, and the unit, unit price, quantity and amount of their lines cannot change. Set an invoice back to Draft to correct it.
 * The contract cost fields and new invoice templates are hidden unless `show_deprecated_fields` is `True`. The mandatory and hidden field settings ignore a deprecated field that is not shown (with a warning in the log) instead of failing.
 * The custom scripts `create_invoice_template` and `create_invoice_lines` are removed: they read fields that no longer exist and are superseded by the conversion.
+* API clients that passed filters to `serviceproviders/`, `contracttype/`, `accountingdimension/` or `contractassignment/` now get the filtered list instead of every object.
+* Non-superusers with the view contract assignment permission now see the Contracts tab.
 
 ### Version v2.4.7
 

@@ -4,6 +4,8 @@ The plugin API is under `/api/plugins/contracts/`.
 
 note: When creating invoices and invoice lines through the API, the corresponding contracts respectively accounting dimensions, must be referenced as a list of id.
 
+Every list endpoint accepts the standard NetBox filters (`id`, `q`, `tag`, `created`, `last_updated`, ...) and the filters of its model, for example `serviceproviders/?name=`, `contracttype/?name=`, `accountingdimension/?name=&value=&status=` and `contractassignment/?contract=`.
+
 ## Units and contract lines
 
 - `units/`: `name`, `description`, `billing_method` (`one_time`, `recurring`, `usage`), `months` (required for `recurring`, empty otherwise). Deleting a unit used by contract lines returns 409.
