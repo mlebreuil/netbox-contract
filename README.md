@@ -10,9 +10,9 @@ NetBox plugin to manage contracts.
 
 The plugin adds contracts and invoices model to NetBox.  
 It allows to link contract with objects.  
-And link invoice templates and invoices with contracts.  
-Invoice lines can be linked to each invoice / invoice template.  
-Accounting dimensions can be linked with invoice lines.  
+Each contract is described by contract lines (one-time, recurring or usage-based, through units).  
+Invoices are linked with contracts; their amount is proposed and their invoice lines are generated from the contract lines.  
+Accounting dimensions can be linked with contract lines and invoice lines.  
 
 ## Compatibility
 
@@ -23,7 +23,9 @@ Accounting dimensions can be linked with invoice lines.
 |     4.3        |      2.4       |
 |     4.4        |      2.4       |
 |     4.5        |      2.4       |
-|     4.6        |      2.4       |
+|     4.6        |   2.4, 2.5     |
+
+Version 2.5 requires NetBox 4.6 or later.
 
 ## Installing
 
@@ -77,6 +79,7 @@ PLUGINS_CONFIG = {
             'ipam.prefix',
         ],
         'contract_assignments_display': 'both',  # options: 'tab', 'inline', 'both'
+        'show_deprecated_fields': False,
     }
 }
 
@@ -89,7 +92,8 @@ PLUGINS_CONFIG = {
   * `'both'` - both tab and inline table are shown (default behavior).
 * default_accounting_dimensions: The accounting dimensions which will appear in the field' background when empty. Note that accounting dimensions are now managed as individual objects. The use of this field is deprecated.  
 * mandatory_contract_fields, mandatory_invoice_fields: Fields which are not required by default and can be set as such. The list of fields is at the bottom of the contract import form.
-* hidden_contract_fields, hidden_invoice_fields: List of fields to be hidden. Fields should not be required to be hidden.
+* hidden_contract_fields, hidden_invoice_fields: List of fields to be hidden. Fields should not be required to be hidden. A deprecated field that is not shown is ignored, with a warning in the log.
+* show_deprecated_fields: show the deprecated contract cost fields (monthly, yearly and non-recurring costs, replaced by contract lines) in the contract form, detail page and tables, and allow creating new invoice templates. Default: `False`.
 
 ### Customize the plugin fields choices
 
@@ -129,3 +133,13 @@ FIELD_CHOICES = {
 (venv) $ cd /opt/netbox/netbox/
 (venv) $ python3 manage.py migrate
 ```
+
+### Upgrading to version 2.5
+
+The migration to version 2.5 converts the monthly, yearly and non-recurring costs and the invoice templates of existing contracts into contract lines, and prints a report of the judgement calls it made (for example an invoice template whose total differs from the recurring cost). Invoices, invoice lines, invoice templates and the deprecated fields are not changed. The conversion can be run again at any time; contracts that already have contract lines are skipped:
+
+```bash
+(venv) $ python3 manage.py convert_contract_lines
+```
+
+The custom script "Report currency mismatches" (in `scripts/netbox-contract.py`) lists existing records whose currency does not match their contract or invoice, without changing them.

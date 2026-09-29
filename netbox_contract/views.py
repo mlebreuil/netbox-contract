@@ -1,33 +1,42 @@
 import logging
 from datetime import date, timedelta
+from decimal import Decimal, InvalidOperation
 
 from dateutil.relativedelta import relativedelta
+from django import forms as django_forms
 from django.apps import apps
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import Case, F, When
 from django.db.models.functions import Round
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 from netbox.object_actions import *
 from netbox.views import generic
+from netbox.views.generic.base import BaseObjectView
 from netbox.views.generic.utils import get_prerequisite_model
 from utilities.forms import restrict_form_fields
 from utilities.querydict import normalize_querydict
 from utilities.views import ViewTab, get_action_url, register_model_view
 
-from . import filtersets, forms, tables
+from . import calculations, filtersets, forms, tables
 from .constants import ASSIGNEMENT_TYPES
 from .models import (
     AccountingDimension,
     Contract,
     ContractAssignment,
+    ContractLine,
     ContractType,
     Invoice,
     InvoiceLine,
     ServiceProvider,
+    Unit,
+    contract_values,
+    yearly_value_annotation,
 )
+from .services import amendments, invoicing
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 
@@ -298,6 +307,7 @@ class ContractView(generic.ObjectView):
             invoicelines_table.columns.hide('invoice')
             invoicelines_table.columns.hide('currency')
             invoicelines_table.configure(request)
+            invoicelines_table.columns.hide('actions')
         else:
             invoicelines_table = None
         assignments_table.configure(request)
@@ -309,8 +319,19 @@ class ContractView(generic.ObjectView):
 
         hidden_fields = plugin_settings.get('hidden_contract_fields')
 
+        lines_locked = instance.invoices.exists()
+        table_class = tables.ContractLineLockedContractTable if lines_locked else tables.ContractLineContractTable
+        lines_table = table_class(
+            instance.lines.select_related('unit').prefetch_related('accounting_dimensions', 'tags', 'replaced_by')
+        )
+        lines_table.configure(request)
+
         return {
             'hidden_fields': hidden_fields,
+            'contract_values': contract_values([instance])[instance.pk],
+            'show_deprecated_fields': plugin_settings.get('show_deprecated_fields'),
+            'lines_table': lines_table,
+            'lines_locked': lines_locked,
             'invoices_table': invoices_table,
             'invoice_template': invoice_template,
             'invoicelines_table': invoicelines_table,
@@ -320,12 +341,7 @@ class ContractView(generic.ObjectView):
 
 
 class ContractListView(generic.ObjectListView):
-    queryset = Contract.objects.annotate(
-        calculated_rc=Round(
-            Case(When(yrc__gt=0, then=F('yrc') / 12), default=F('mrc') * 12),
-            precision=2,
-        )
-    )
+    queryset = Contract.objects.annotate(yearly_value=yearly_value_annotation())
     table = tables.ContractListTable
     filterset = filtersets.ContractFilterSet
     filterset_form = forms.ContractFilterForm
@@ -396,9 +412,11 @@ class InvoiceView(generic.ObjectView):
     queryset = Invoice.objects.all()
 
     def get_extra_context(self, request, instance):
-        contracts_table = tables.ContractListTable(instance.contracts.all())
+        contracts_table = tables.ContractListTable(instance.contracts.annotate(yearly_value=yearly_value_annotation()))
         contracts_table.configure(request)
-        invoicelines_table = tables.InvoiceLineListTable(instance.invoicelines.all())
+        invoicelines_table = tables.InvoiceLineListTable(
+            instance.invoicelines.select_related('contract_line', 'unit').prefetch_related('accounting_dimensions')
+        )
         invoicelines_table.columns.hide('invoice')
         invoicelines_table.configure(request)
         hidden_fields = plugin_settings.get('hidden_invoice_fields')
@@ -417,9 +435,120 @@ class InvoiceListView(generic.ObjectListView):
     filterset_form = forms.InvoiceFilterForm
 
 
+def _parse_date(value):
+    if value in (None, ''):
+        return None
+    if isinstance(value, date):
+        return value
+    try:
+        return django_forms.DateField().to_python(value)
+    except ValidationError:
+        return None
+
+
+def _format_number(value):
+    return '' if value is None else f'{value.normalize():f}'
+
+
+def build_lines_preview(data, user):
+    """
+    Lines a new invoice would get, from the contract, period, amount and the quantities and unit prices typed
+    in the preview (FR-032). None for an invoice template.
+    """
+    if str(data.get('template', '')).lower() in ('on', 'true', '1'):
+        return None
+    preview = {
+        'rows': [], 'extra_rows': [], 'units': Unit.objects.order_by('name'), 'total': None, 'message': None,
+        'errors': [], 'amount_too_low': False, 'contract': None,
+    }
+
+    contract_ids = data.getlist('contracts') if hasattr(data, 'getlist') else data.get('contracts')
+    if not isinstance(contract_ids, (list, tuple)):
+        contract_ids = [contract_ids]
+    contract_ids = [value for value in contract_ids if str(value).isdigit()]
+    contracts = Contract.objects.restrict(user, 'view')
+    contract = contracts.filter(pk=contract_ids[0]).first() if contract_ids else None
+    if contract is None:
+        preview['message'] = _('Choose a contract to see the lines generated for it.')
+        return preview
+    preview['contract'] = contract
+
+    overrides, preview['errors'] = invoicing.parse_line_overrides(data)
+    try:
+        lines = invoicing.lines_to_generate(
+            contract, _parse_date(data.get('period_start')), _parse_date(data.get('period_end')), overrides
+        )
+    except invoicing.InvoicingError as e:
+        preview['message'] = e.message
+        return preview
+
+    for line in lines:
+        prefix = f'line-{line.contract_line.pk}'
+        preview['rows'].append({
+            'line': line,
+            'prefix': prefix,
+            'dimensions_form': forms.InvoiceLineDimensionsForm(
+                prefix=prefix, initial={'accounting_dimensions': [d.pk for d in line.accounting_dimensions]}
+            ),
+            'quantity_value': data.get(f'{prefix}-quantity', _format_number(line.quantity)),
+            'unit_price_value': data.get(f'{prefix}-unit_price') or _format_number(line.unit_price),
+        })
+    # Lines added without contract line, with the buttons that add or remove one
+    period_start, period_end = _parse_date(data.get('period_start')), _parse_date(data.get('period_end'))
+    # incomplete rows simply have no amount yet; they are checked when the invoice is saved
+    extra_lines, _errors = invoicing.parse_extra_lines(data)
+    remove = str(data.get('remove_line', ''))
+    extra_lines = [line for line in extra_lines if str(line.index) != remove]
+    if data.get('add_line'):
+        extra_lines.append(invoicing.ExtraLine(index=max((line.index for line in extra_lines), default=-1) + 1))
+    added = invoicing.price_extra_lines(contract, period_start, period_end, extra_lines)
+    for line in extra_lines:
+        preview['extra_rows'].append({
+            'index': line.index,
+            'prefix': f'extra-{line.index}',
+            'dimensions_form': forms.InvoiceLineDimensionsForm(
+                prefix=f'extra-{line.index}',
+                initial={'accounting_dimensions': [d.pk for d in line.accounting_dimensions]},
+            ),
+            'description': line.description,
+            'unit_id': line.raw.get('unit', ''),
+            'unit_price_value': line.raw.get('unit_price', ''),
+            'quantity_value': line.raw.get('quantity', ''),
+            'amount': line.amount,
+        })
+
+    preview['total'] = calculations.round_amount(sum((line.amount for line in [*lines, *added]), Decimal(0)))
+    try:
+        amount = Decimal(str(data.get('amount') or ''))
+    except InvalidOperation:
+        amount = None
+    preview['amount_too_low'] = amount is not None and amount < preview['total']
+    return preview
+
+
+class InvoiceLinesPreviewView(BaseObjectView):
+    """Refresh the preview of the lines of a new invoice when its form changes (FR-032)."""
+
+    queryset = Invoice.objects.all()
+
+    def get_required_permission(self):
+        return 'netbox_contract.add_invoice'
+
+    def post(self, request):
+        return render(request, 'netbox_contract/inc/invoice_lines_preview.html', {
+            'lines_preview': build_lines_preview(request.POST, request.user),
+        })
+
+
 class InvoiceEditView(generic.ObjectEditView):
     queryset = Invoice.objects.all()
     form = forms.InvoiceForm
+    template_name = 'netbox_contract/invoice_edit.html'
+
+    def get_extra_context(self, request, instance):
+        if request.method == 'POST' and not instance.pk:
+            return {'lines_preview': build_lines_preview(request.POST, request.user)}
+        return {}
 
     def get(self, request, *args, **kwargs):
         """
@@ -436,11 +565,15 @@ class InvoiceEditView(generic.ObjectEditView):
 
         initial_data = normalize_querydict(request.GET)
         initial_data['date'] = date.today()
-        if 'contracts' in initial_data.keys():
-            contract = Contract.objects.get(pk=initial_data['contracts'])
-
+        contract_id = initial_data.get('contracts')
+        # Only a contract the user may view is used to pre-fill the invoice
+        contract = (
+            Contract.objects.restrict(request.user, 'view').filter(pk=contract_id).first()
+            if str(contract_id).isdigit() else None
+        )
+        if contract is not None:
             try:
-                last_invoice = contract.invoices.exclude(template=True).latest(
+                last_invoice = contract.invoices.exclude(template=True).filter(period_end__isnull=False).latest(
                     'period_end'
                 )
                 new_period_start = last_invoice.period_end + timedelta(days=1)
@@ -450,21 +583,21 @@ class InvoiceEditView(generic.ObjectEditView):
                 else:
                     new_period_start = None
 
+            new_period_end = None
             if new_period_start:
                 initial_data['period_start'] = new_period_start
                 delta = relativedelta(months=contract.invoice_frequency)
                 new_period_end = new_period_start + delta - timedelta(days=1)
                 initial_data['period_end'] = new_period_end
 
-            if contract.yrc:
-                if contract.invoice_frequency == 12:
-                    initial_data['amount'] = contract.yrc
-                else:
-                    initial_data['amount'] = round(
-                        contract.yrc / 12 * contract.invoice_frequency, 2
-                    )
+            # Amount proposed from the contract lines (not from the deprecated cost fields)
+            try:
+                proposal = invoicing.propose_invoice(contract, new_period_start, new_period_end)
+            except invoicing.InvoicingError as e:
+                messages.error(request, e.message)
             else:
-                initial_data['amount'] = contract.mrc * contract.invoice_frequency
+                if proposal.lines:
+                    initial_data['amount'] = proposal.total
 
             initial_data['currency'] = contract.currency
 
@@ -480,6 +613,7 @@ class InvoiceEditView(generic.ObjectEditView):
                 'form': form,
                 'return_url': self.get_return_url(request, obj),
                 'prerequisite_model': get_prerequisite_model(self.queryset),
+                'lines_preview': None if obj.pk else build_lines_preview(initial_data, request.user),
                 **self.get_extra_context(request, obj),
             },
         )
@@ -516,7 +650,7 @@ class InvoiceLineView(generic.ObjectView):
 
 
 class InvoiceLineListView(generic.ObjectListView):
-    queryset = InvoiceLine.objects.all()
+    queryset = InvoiceLine.objects.select_related('invoice', 'contract_line', 'unit')
     table = tables.InvoiceLineListTable
     filterset = filtersets.InvoiceLineFilterSet
     filterset_form = forms.InvoiceLineFilterForm
@@ -542,7 +676,10 @@ class InvoiceLineEditView(generic.ObjectEditView):
         initial_data = normalize_querydict(request.GET)
         if 'invoice' in initial_data.keys():
             invoice = Invoice.objects.get(pk=initial_data['invoice'])
-            initial_data['amount'] = invoice.amount - invoice.total_invoicelines_amount
+            # propose the rest of the invoice amount as the unit price of one unit
+            initial_data.setdefault('unit_price', invoice.amount - invoice.total_invoicelines_amount)
+            initial_data.setdefault('quantity', 1)
+            initial_data.setdefault('currency', invoice.currency)
 
         form = self.form(instance=obj, initial=initial_data)
         restrict_form_fields(form, request.user)
@@ -582,6 +719,150 @@ class InvoiceLineBulkDeleteView(generic.BulkDeleteView):
     queryset = InvoiceLine.objects.annotate()
     filterset = filtersets.InvoiceLineFilterSet
     table = tables.InvoiceLineListTable
+
+
+# Unit
+
+
+@register_model_view(Unit)
+class UnitView(generic.ObjectView):
+    queryset = Unit.objects.all()
+
+    def get_extra_context(self, request, instance):
+        lines_table = tables.ContractLineListTable(
+            instance.contract_lines.select_related('contract', 'unit').prefetch_related('accounting_dimensions')
+        )
+        lines_table.configure(request)
+        return {'lines_table': lines_table}
+
+
+class UnitListView(generic.ObjectListView):
+    queryset = Unit.objects.all()
+    table = tables.UnitListTable
+    filterset = filtersets.UnitFilterSet
+    filterset_form = forms.UnitFilterForm
+
+
+class UnitEditView(generic.ObjectEditView):
+    queryset = Unit.objects.all()
+    form = forms.UnitForm
+
+
+class UnitDeleteView(generic.ObjectDeleteView):
+    queryset = Unit.objects.all()
+
+
+class UnitBulkImportView(generic.BulkImportView):
+    queryset = Unit.objects.all()
+    model_form = forms.UnitImportForm
+    table = tables.UnitListTable
+
+
+class UnitBulkEditView(generic.BulkEditView):
+    queryset = Unit.objects.all()
+    filterset = filtersets.UnitFilterSet
+    table = tables.UnitListTable
+    form = forms.UnitBulkEditForm
+
+
+class UnitBulkDeleteView(generic.BulkDeleteView):
+    queryset = Unit.objects.all()
+    filterset = filtersets.UnitFilterSet
+    table = tables.UnitListTable
+
+
+# ContractLine
+
+
+@register_model_view(ContractLine)
+class ContractLineView(generic.ObjectView):
+    queryset = ContractLine.objects.select_related('contract', 'unit')
+
+    def get_extra_context(self, request, instance):
+        return {'lock_message': instance.lock_message()}
+
+
+@register_model_view(ContractLine, 'amend', path='amend')
+class ContractLineAmendView(BaseObjectView):
+    """End a contract line and create the line that replaces it with a new unit price or quantity (FR-030)."""
+
+    queryset = ContractLine.objects.select_related('contract', 'unit')
+    template_name = 'netbox_contract/contractline_amend.html'
+
+    def get_required_permission(self):
+        return 'netbox_contract.change_contractline'
+
+    def has_permission(self):
+        # The amendment also creates a contract line, as the REST action requires
+        return super().has_permission() and self.request.user.has_perm('netbox_contract.add_contractline')
+
+    def render_form(self, request, line, form):
+        return render(request, self.template_name, {
+            'object': line,
+            'form': form,
+            'last_invoiced_date': amendments.last_invoiced_date(line),
+            'return_url': line.get_absolute_url(),
+        })
+
+    def get(self, request, pk):
+        line = self.get_object(pk=pk)
+        form = forms.ContractLineAmendForm(initial={'unit_price': line.unit_price, 'quantity': line.quantity})
+        return self.render_form(request, line, form)
+
+    def post(self, request, pk):
+        line = self.get_object(pk=pk)
+        form = forms.ContractLineAmendForm(request.POST)
+        if form.is_valid():
+            try:
+                new = amendments.amend_contract_line(line, **form.cleaned_data)
+            except amendments.AmendmentError as e:
+                for field, message in e.errors.items():
+                    form.add_error(None if field == '__all__' else field, message)
+            else:
+                messages.success(request, _('Contract line amended from {date}.').format(date=new.start_date))
+                return redirect(new.get_absolute_url())
+        return self.render_form(request, line, form)
+
+
+class ContractLineListView(generic.ObjectListView):
+    queryset = ContractLine.objects.select_related('contract', 'unit').prefetch_related('accounting_dimensions')
+    table = tables.ContractLineListTable
+    filterset = filtersets.ContractLineFilterSet
+    filterset_form = forms.ContractLineFilterForm
+
+
+class ContractLineEditView(generic.ObjectEditView):
+    """The add view accepts ?contract=<id> to pre-select the contract."""
+
+    queryset = ContractLine.objects.all()
+    form = forms.ContractLineForm
+    template_name = 'netbox_contract/contractline_edit.html'
+
+    def get_extra_context(self, request, instance):
+        return {'lock_message': instance.lock_message() if instance.pk else None}
+
+
+class ContractLineDeleteView(generic.ObjectDeleteView):
+    queryset = ContractLine.objects.all()
+
+
+class ContractLineBulkImportView(generic.BulkImportView):
+    queryset = ContractLine.objects.all()
+    model_form = forms.ContractLineImportForm
+    table = tables.ContractLineListTable
+
+
+class ContractLineBulkEditView(generic.BulkEditView):
+    queryset = ContractLine.objects.select_related('contract', 'unit')
+    filterset = filtersets.ContractLineFilterSet
+    table = tables.ContractLineListTable
+    form = forms.ContractLineBulkEditForm
+
+
+class ContractLineBulkDeleteView(generic.BulkDeleteView):
+    queryset = ContractLine.objects.select_related('contract', 'unit')
+    filterset = filtersets.ContractLineFilterSet
+    table = tables.ContractLineListTable
 
 
 # Accounting dimension

@@ -92,9 +92,40 @@ urlpatterns = (
         name='contract_changelog',
         kwargs={'model': models.Contract},
     ),
+    # Unit
+    path('units/', views.UnitListView.as_view(), name='unit_list'),
+    path('units/add/', views.UnitEditView.as_view(), name='unit_add'),
+    path('units/import/', views.UnitBulkImportView.as_view(), name='unit_bulk_import'),
+    path('units/edit/', views.UnitBulkEditView.as_view(), name='unit_bulk_edit'),
+    path('units/delete/', views.UnitBulkDeleteView.as_view(), name='unit_bulk_delete'),
+    path('units/<int:pk>/', include(get_model_urls('netbox_contract', 'unit')), name='unit'),
+    path('units/<int:pk>/edit/', views.UnitEditView.as_view(), name='unit_edit'),
+    path('units/<int:pk>/delete/', views.UnitDeleteView.as_view(), name='unit_delete'),
+    path(
+        'units/<int:pk>/changelog/',
+        ObjectChangeLogView.as_view(),
+        name='unit_changelog',
+        kwargs={'model': models.Unit},
+    ),
+    # ContractLine
+    path('contract-lines/', views.ContractLineListView.as_view(), name='contractline_list'),
+    path('contract-lines/add/', views.ContractLineEditView.as_view(), name='contractline_add'),
+    path('contract-lines/import/', views.ContractLineBulkImportView.as_view(), name='contractline_bulk_import'),
+    path('contract-lines/edit/', views.ContractLineBulkEditView.as_view(), name='contractline_bulk_edit'),
+    path('contract-lines/delete/', views.ContractLineBulkDeleteView.as_view(), name='contractline_bulk_delete'),
+    path('contract-lines/<int:pk>/', include(get_model_urls('netbox_contract', 'contractline')), name='contractline'),
+    path('contract-lines/<int:pk>/edit/', views.ContractLineEditView.as_view(), name='contractline_edit'),
+    path('contract-lines/<int:pk>/delete/', views.ContractLineDeleteView.as_view(), name='contractline_delete'),
+    path(
+        'contract-lines/<int:pk>/changelog/',
+        ObjectChangeLogView.as_view(),
+        name='contractline_changelog',
+        kwargs={'model': models.ContractLine},
+    ),
     # Contract invoices
     path('invoices/', views.InvoiceListView.as_view(), name='invoice_list'),
     path('invoices/add/', views.InvoiceEditView.as_view(), name='invoice_add'),
+    path('invoices/lines-preview/', views.InvoiceLinesPreviewView.as_view(), name='invoice_lines_preview'),
     path(
         'invoices/import/', views.InvoiceBulkImportView.as_view(), name='invoice_bulk_import'
     ),

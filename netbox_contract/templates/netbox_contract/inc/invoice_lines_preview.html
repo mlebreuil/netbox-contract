@@ -1,0 +1,148 @@
+{% load i18n %}
+<div id="invoice-lines-preview" class="field-group my-5"
+     hx-post="{% url 'plugins:netbox_contract:invoice_lines_preview' %}"
+     hx-trigger="change from:closest form delay:200ms"
+     hx-include="closest form"
+     hx-target="this"
+     hx-swap="outerHTML"
+     hx-sync="this:replace">
+  <div class="row">
+    <h2 class="col-9 offset-3">{% trans "Lines to generate" %}</h2>
+  </div>
+  <div class="row">
+    <div class="col-9 offset-3">
+      {% if lines_preview.message %}
+        <div class="alert alert-info" role="alert">{{ lines_preview.message }}</div>
+      {% else %}
+        {% for error in lines_preview.errors %}
+          <div class="alert alert-danger" role="alert">{{ error }}</div>
+        {% endfor %}
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>{% trans "Contract line" %}</th>
+              <th>{% trans "Unit" %}</th>
+              <th style="width: 9rem">{% trans "Unit price" %}</th>
+              <th style="width: 8rem">{% trans "Quantity" %}</th>
+              <th class="text-end">{% trans "Amount" %}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in lines_preview.rows %}
+              <tr>
+                <td>
+                  {{ row.line.contract_line }}
+                  {% if row.line.contract_line.contract_id != lines_preview.contract.pk %}
+                    <br /><small class="text-muted">{{ row.line.contract_line.contract }}</small>
+                  {% endif %}
+                </td>
+                <td>{{ row.line.contract_line.unit }}</td>
+                <td>
+                  <input type="number" step="0.01" class="form-control form-control-sm"
+                         name="{{ row.prefix }}-unit_price" value="{{ row.unit_price_value }}"
+                         aria-label="{% trans 'Unit price' %}" />
+                </td>
+                <td>
+                  <input type="number" step="0.0001" class="form-control form-control-sm"
+                         name="{{ row.prefix }}-quantity" value="{{ row.quantity_value }}"
+                         aria-label="{% trans 'Quantity' %}" />
+                </td>
+                <td class="text-end">{{ row.line.amount }}</td>
+                <td></td>
+              </tr>
+              <tr class="border-top-0">
+                <td colspan="6" class="pt-0">
+                  <input type="hidden" name="{{ row.prefix }}-dimensions" value="1" />
+                  <div class="d-flex align-items-center gap-2">
+                    <small class="text-muted text-nowrap">{% trans "Accounting dimensions" %}</small>
+                    <div class="flex-grow-1">{{ row.dimensions_form.accounting_dimensions }}</div>
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              {% if not lines_preview.extra_rows %}
+              <tr>
+                <td colspan="6" class="text-muted">{% trans "No contract line to invoice for this period." %}</td>
+              </tr>
+              {% endif %}
+            {% endfor %}
+            {% for row in lines_preview.extra_rows %}
+              <tr>
+                <td>
+                  <input type="text" class="form-control form-control-sm" name="{{ row.prefix }}-description"
+                         value="{{ row.description }}" placeholder="{% trans 'Description' %}"
+                         aria-label="{% trans 'Description' %}" />
+                </td>
+                <td>
+                  <select class="form-select form-select-sm" name="{{ row.prefix }}-unit" aria-label="{% trans 'Unit' %}">
+                    <option value="">---------</option>
+                    {% for unit in lines_preview.units %}
+                      <option value="{{ unit.pk }}"{% if row.unit_id == unit.pk|stringformat:"s" %} selected{% endif %}>{{ unit }}</option>
+                    {% endfor %}
+                  </select>
+                </td>
+                <td>
+                  <input type="number" step="0.01" class="form-control form-control-sm"
+                         name="{{ row.prefix }}-unit_price" value="{{ row.unit_price_value }}"
+                         aria-label="{% trans 'Unit price' %}" />
+                </td>
+                <td>
+                  <input type="number" step="0.0001" class="form-control form-control-sm"
+                         name="{{ row.prefix }}-quantity" value="{{ row.quantity_value }}"
+                         aria-label="{% trans 'Quantity' %}" />
+                </td>
+                <td class="text-end">{{ row.amount|default_if_none:"—" }}</td>
+                <td class="text-end">
+                  <button type="button" class="btn btn-sm btn-ghost-danger" title="{% trans 'Remove this line' %}"
+                          hx-post="{% url 'plugins:netbox_contract:invoice_lines_preview' %}" hx-include="closest form"
+                          hx-vals='{"remove_line": "{{ row.index }}"}' hx-target="#invoice-lines-preview"
+                          hx-swap="outerHTML">
+                    <i class="mdi mdi-trash-can-outline" aria-hidden="true"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr class="border-top-0">
+                <td colspan="6" class="pt-0">
+                  <input type="hidden" name="{{ row.prefix }}-dimensions" value="1" />
+                  <div class="d-flex align-items-center gap-2">
+                    <small class="text-muted text-nowrap">{% trans "Accounting dimensions" %}</small>
+                    <div class="flex-grow-1">{{ row.dimensions_form.accounting_dimensions }}</div>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="6">
+                <button type="button" class="btn btn-sm btn-outline-primary"
+                        hx-post="{% url 'plugins:netbox_contract:invoice_lines_preview' %}" hx-include="closest form"
+                        hx-vals='{"add_line": "1"}' hx-target="#invoice-lines-preview" hx-swap="outerHTML">
+                  <i class="mdi mdi-plus-thick" aria-hidden="true"></i> {% trans "Add a line" %}
+                </button>
+              </td>
+            </tr>
+            {% if lines_preview.rows or lines_preview.extra_rows %}
+              <tr>
+                <th colspan="4">{% trans "Total" %}</th>
+                <th class="text-end">{{ lines_preview.total }}</th>
+                <th></th>
+              </tr>
+            {% endif %}
+          </tfoot>
+        </table>
+        {% if lines_preview.amount_too_low %}
+          <div class="alert alert-warning" role="alert">
+            {% blocktrans trimmed with total=lines_preview.total %}
+              The invoice amount is lower than the total of these lines ({{ total }}): raise it before saving.
+            {% endblocktrans %}
+          </div>
+        {% endif %}
+        <small class="form-text text-muted">
+          {% trans "These lines are created when the invoice is saved. Quantities and unit prices changed here apply to this invoice only; amounts are recalculated when you change a value. Added lines need a unit price (quantity 1 when left empty); empty ones are ignored." %}
+        </small>
+      {% endif %}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,6 @@
+name,description,billing_method,months
+Monthly,Price per month,recurring,1
+Quarterly,Price per quarter,recurring,3
+Yearly,Price per year,recurring,12
+One-time,Paid once,one_time,
+Gigabyte,Price per gigabyte used,usage,

@@ -5,6 +5,9 @@ plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 
 ASSIGNEMENT_TYPES = plugin_settings.get('supported_models')
 
+# Contract cost fields replaced by contract lines; kept, hidden unless the show_deprecated_fields setting is true
+DEPRECATED_CONTRACT_FIELDS = ('mrc', 'yrc', 'nrc')
+
 SERVICE_PROVIDER_TYPES = (
     'circuits.provider',
     'netbox_contract.serviceprovider',

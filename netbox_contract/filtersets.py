@@ -8,8 +8,10 @@ from tenancy.filtersets import ContactModelFilterSet, TenancyFilterSet
 from .models import (
     AccountingDimension,
     AccountingDimensionStatusChoices,
+    BillingMethodChoices,
     Contract,
     ContractAssignment,
+    ContractLine,
     ContractType,
     CurrencyChoices,
     InternalEntityChoices,
@@ -18,6 +20,7 @@ from .models import (
     InvoiceStatusChoices,
     ServiceProvider,
     StatusChoices,
+    Unit,
 )
 
 
@@ -57,6 +60,7 @@ class ContractFilterSet(ContactModelFilterSet, NetBoxModelFilterSet, TenancyFilt
             'external_party_object_id',
             'external_reference',
             'parent',
+            'billable',
         )
 
     def search(self, queryset, name, value):
@@ -167,3 +171,55 @@ class AccountingDimensionFilterSet(NetBoxModelFilterSet):
 
     def search(self, queryset, name, value):
         return queryset.filter(Q(comments__icontains=value) | Q(name__icontains=value))
+
+
+class UnitFilterSet(NetBoxModelFilterSet):
+    billing_method = django_filters.MultipleChoiceFilter(choices=BillingMethodChoices, null_value=None)
+
+    class Meta:
+        model = Unit
+        fields = ('id', 'name', 'description', 'months')
+
+    def search(self, queryset, name, value):
+        return queryset.filter(Q(name__icontains=value) | Q(description__icontains=value))
+
+
+class ContractLineFilterSet(NetBoxModelFilterSet):
+    contract_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='contract', queryset=Contract.objects.all(), label='Contract (ID)'
+    )
+    unit_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='unit', queryset=Unit.objects.all(), label='Unit (ID)'
+    )
+    unit = django_filters.ModelMultipleChoiceFilter(
+        field_name='unit__name', to_field_name='name', queryset=Unit.objects.all(), label='Unit (name)'
+    )
+    billing_method = django_filters.MultipleChoiceFilter(
+        field_name='unit__billing_method', choices=BillingMethodChoices, label='Billing method'
+    )
+    currency = django_filters.MultipleChoiceFilter(choices=CurrencyChoices, null_value=None)
+    accounting_dimensions = django_filters.ModelMultipleChoiceFilter(
+        queryset=AccountingDimension.objects.all(), label='Accounting dimension (ID)'
+    )
+    invoice_id = django_filters.NumberFilter(
+        method='filter_by_invoice',
+        label='Invoice (ID): lines of its contract and of their non-billable descendants',
+    )
+
+    class Meta:
+        model = ContractLine
+        fields = ('id', 'description', 'quantity', 'unit_price', 'start_date', 'end_date', 'invoiced_at_conversion')
+
+    def search(self, queryset, name, value):
+        return queryset.filter(
+            Q(description__icontains=value) | Q(comments__icontains=value) | Q(contract__name__icontains=value)
+        )
+
+    def filter_by_invoice(self, queryset, name, value):
+        invoice = Invoice.objects.filter(pk=value).first()
+        if invoice is None:
+            return queryset.none()
+        contract_ids = {
+            contract.pk for invoice_contract in invoice.contracts.all() for contract in invoice_contract.billing_scope()
+        }
+        return queryset.filter(contract__in=contract_ids)

@@ -1,4 +1,6 @@
+from collections import defaultdict
 from datetime import timedelta
+from decimal import Decimal
 
 from dcim.choices import DeviceStatusChoices, SiteStatusChoices
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -6,13 +8,64 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
+from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
 from netbox.choices import ColorChoices
 from netbox.models import NetBoxModel
 from netbox.models.features import ContactsMixin
 from utilities.choices import ChoiceSet
+from utilities.exceptions import AbortRequest
 from utilities.fields import ColorField
 from virtualization.choices import VirtualMachineStatusChoices
+
+from . import calculations
+
+LOCKED_CONTRACT_MESSAGE = _(
+    'This contract already has invoices: its lines cannot be added, changed or deleted. '
+    'A new contract must be created.'
+)
+REFERENCED_LINE_MESSAGE = _(
+    'This contract line is used by invoice lines: it cannot be changed or deleted. A new contract must be created.'
+)
+POSTED_INVOICE_MESSAGE = _(
+    'This invoice is posted: its amounts and its lines are locked. Set it back to draft to change them.'
+)
+CONTRACT_ON_POSTED_INVOICES_MESSAGE = _(
+    'This contract cannot be deleted: its lines, or those of its child contracts, are on the posted invoices '
+    '{numbers}.'
+)
+INTERNAL_FIELDS_NOTE = _('Its accounting dimensions, comments and tags can still be edited.')
+
+# Contract terms of a contract line, locked once it is invoiced (FR-029); its accounting dimensions, comments
+# and tags are internal classification and stay editable (decision I9)
+CONTRACT_LINE_LOCKED_FIELDS = (
+    'contract',
+    'description',
+    'quantity',
+    'unit_price',
+    'unit',
+    'currency',
+    'start_date',
+    'end_date',
+    'custom_field_data',
+)
+
+
+def _format_date(value, default):
+    return value.isoformat() if value else default
+
+
+def _first_names(names, limit=5):
+    names = [str(name) for name in names]
+    text = ', '.join(names[:limit])
+    return f'{text}, ...' if len(names) > limit else text
+
+
+def _contract_period(contract):
+    return _('{start} to {end}').format(
+        start=_format_date(contract.start_date, _('no start date')),
+        end=_format_date(contract.end_date, _('no end date')),
+    )
 
 
 class StatusChoices(ChoiceSet):
@@ -71,6 +124,20 @@ class InvoiceStatusChoices(ChoiceSet):
         (STATUS_DRAFT, 'Draft', 'yellow'),
         (STATUS_POSTED, 'Posted', 'green'),
         (STATUS_CANCELED, 'Canceled', 'red'),
+    ]
+
+
+class BillingMethodChoices(ChoiceSet):
+    key = 'Unit.billing_method'
+
+    ONE_TIME = calculations.ONE_TIME
+    RECURRING = calculations.RECURRING
+    USAGE = calculations.USAGE
+
+    CHOICES = [
+        (ONE_TIME, 'One-time', 'blue'),
+        (RECURRING, 'Recurring', 'green'),
+        (USAGE, 'Usage-based', 'orange'),
     ]
 
 
@@ -259,7 +326,7 @@ class Contract(ContactsMixin, NetBoxModel):
         decimal_places=2,
         blank=True,
         null=True,
-        help_text=_('Use either this field of the monthly recuring cost field'),
+        help_text=_('Deprecated: replaced by contract lines. Use either this field of the monthly recuring cost field'),
     )
     mrc = models.DecimalField(
         verbose_name=_('monthly recuring cost'),
@@ -267,9 +334,15 @@ class Contract(ContactsMixin, NetBoxModel):
         decimal_places=2,
         blank=True,
         null=True,
-        help_text=_('Use either this field of the yearly recuring cost field'),
+        help_text=_('Deprecated: replaced by contract lines. Use either this field of the yearly recuring cost field'),
     )
-    nrc = models.DecimalField(verbose_name=_('none recuring cost'), default=0, max_digits=10, decimal_places=2)
+    nrc = models.DecimalField(
+        verbose_name=_('none recuring cost'),
+        default=0,
+        max_digits=10,
+        decimal_places=2,
+        help_text=_('Deprecated: replaced by contract lines'),
+    )
     invoice_frequency = models.IntegerField(
         help_text=_('The frequency of invoices in month'),
         default=1,
@@ -288,6 +361,12 @@ class Contract(ContactsMixin, NetBoxModel):
         null=True,
         blank=True,
         verbose_name=_('parent'),
+    )
+    billable = models.BooleanField(
+        default=True,
+        verbose_name=_('billable'),
+        help_text=_('Whether invoices are issued for this contract. The lines of a non-billable contract are '
+                    'invoiced through its closest billable parent.'),
     )
 
     def get_absolute_url(self):
@@ -311,6 +390,200 @@ class Contract(ContactsMixin, NetBoxModel):
     def __str__(self):
         return self.name
 
+    # Hierarchy
+
+    def ancestors(self):
+        """Parent, grand-parent, ... of this contract."""
+        result, seen, parent = [], {self.pk}, self.parent
+        while parent is not None and parent.pk not in seen:
+            result.append(parent)
+            seen.add(parent.pk)
+            parent = parent.parent
+        return result
+
+    def descendants(self):
+        """Children, grand-children, ... of this contract."""
+        result, seen, level = [], {self.pk}, [self.pk]
+        while level:
+            children = [child for child in Contract.objects.filter(parent__in=level) if child.pk not in seen]
+            result.extend(children)
+            seen.update(child.pk for child in children)
+            level = [child.pk for child in children]
+        return result
+
+    def billing_scope(self):
+        """
+        Contracts invoiced under this contract: itself and its non-billable descendants, stopping at any
+        billable child, which invoices itself and its own non-billable descendants (FR-022).
+        """
+        result, seen, level = [self], {self.pk}, [self.pk]
+        while level:
+            children = [
+                child for child in Contract.objects.filter(parent__in=level, billable=False) if child.pk not in seen
+            ]
+            result.extend(children)
+            seen.update(child.pk for child in children)
+            level = [child.pk for child in children]
+        return result
+
+    # Computed values (FR-006, FR-007)
+
+    @property
+    def total_contract_value(self):
+        """Total value of the contract's own lines; None when not available (open-ended recurring line)."""
+        return contract_values([self])[self.pk]['total_contract_value']
+
+    @property
+    def yearly_contract_value(self):
+        """Twelve-month equivalent of the contract's own current recurring lines."""
+        annotated = self.__dict__.get('yearly_value')
+        if annotated is not None:
+            return annotated
+        return contract_values([self])[self.pk]['yearly_contract_value']
+
+    @property
+    def yearly_billable_value(self):
+        """Yearly value of the lines invoiced under this contract; zero for a non-billable contract."""
+        return contract_values([self])[self.pk]['yearly_billable_value']
+
+    # Validation
+
+    def clean(self):
+        super().clean()
+        errors = {}
+        if self.pk:
+            errors.update(self._clean_line_dates())
+            errors.update(self._clean_billable())
+            errors.update(self._clean_currency_change())
+        errors.update(self._clean_parent_currency())
+        if errors:
+            raise ValidationError(errors)
+
+    def save(self, *args, **kwargs):
+        previous_currency = self._original('currency').get('currency') if self.pk else None
+        super().save(*args, **kwargs)
+        # The contract lines and the non-billable descendants follow a new currency (FR-009a, FR-010). Queryset
+        # updates skip the per-record validation and the lock, which is safe because clean() only allows the
+        # change when neither the contract nor these descendants have invoices.
+        if previous_currency and previous_currency != self.currency and not self.invoices.exists():
+            family = [self.pk, *self.currency_followers(previous_currency)]
+            Contract.objects.filter(pk__in=family[1:]).update(currency=self.currency)
+            ContractLine.objects.filter(contract__in=family).exclude(currency=self.currency).update(
+                currency=self.currency
+            )
+
+    def _clean_currency_change(self):
+        """A contract's currency cannot change once it has invoices or invoice lines (FR-009a, FR-010)."""
+        original = self._original('currency')
+        if not original or original['currency'] == self.currency:
+            return {}
+        # The non-billable descendants of the old currency change with the contract (FR-010)
+        family = [self.pk, *self.currency_followers(original['currency'])]
+        blocking = []
+        invoices = list(
+            Invoice.objects.filter(contracts__in=family).values_list('number', flat=True).distinct()[:6]
+        )
+        if invoices:
+            blocking.append(_('invoices {numbers}').format(numbers=_first_names(invoices)))
+        invoice_lines = list(
+            InvoiceLine.objects.filter(contract_line__contract__in=family)
+            .values_list('invoice__number', flat=True)
+            .distinct()[:6]
+        )
+        if invoice_lines:
+            blocking.append(_('invoice lines of invoices {numbers}').format(numbers=_first_names(invoice_lines)))
+        if blocking:
+            return {
+                'currency': _(
+                    'The currency cannot change because this contract or its non-billable descendants have '
+                    '{records}.'
+                ).format(records=_(' and ').join(str(item) for item in blocking))
+            }
+        return {}
+
+    def posted_invoice_numbers(self):
+        """Posted invoices with lines of this contract or of its descendants, which block its deletion (FR-031)."""
+        return list(
+            Invoice.objects.filter(
+                invoicelines__contract_line__contract__in=[self.pk, *(c.pk for c in self.descendants())],
+                status=InvoiceStatusChoices.STATUS_POSTED,
+            )
+            .exclude(template=True)
+            .values_list('number', flat=True)
+            .distinct()[:6]
+        )
+
+    def delete(self, *args, **kwargs):
+        # Checked before Django's deletion collector opens its transaction; signals.py covers queryset deletions
+        numbers = self.posted_invoice_numbers()
+        if numbers:
+            raise AbortRequest(escape(CONTRACT_ON_POSTED_INVOICES_MESSAGE.format(numbers=_first_names(numbers))))
+        return super().delete(*args, **kwargs)
+
+    def currency_followers(self, currency):
+        """Non-billable descendants of the given currency, which follow a currency change of this contract."""
+        followers, level = [], [self.pk]
+        while level:
+            level = list(
+                Contract.objects.filter(parent__in=level, billable=False, currency=currency)
+                .exclude(pk__in=[self.pk, *followers])
+                .values_list('pk', flat=True)
+            )
+            followers.extend(level)
+        return followers
+
+    def _clean_parent_currency(self):
+        """A non-billable child has the currency of its parent (FR-010)."""
+        if not self.parent_id or self.billable:
+            return {}
+        original = self._original('parent', 'billable', 'currency') if self.pk else {}
+        unchanged = original and (original['parent'], original['billable'], original['currency']) == (
+            self.parent_id, self.billable, self.currency
+        )
+        if unchanged or self.parent.currency == self.currency:
+            return {}
+        return {
+            'parent': _(
+                'A non-billable contract must have the currency of its parent: {found} differs from {expected} '
+                'of {parent}.'
+            ).format(found=self.currency.upper(), expected=self.parent.currency.upper(), parent=self.parent)
+        }
+
+    def _original(self, *fields):
+        return Contract.objects.filter(pk=self.pk).values(*fields).first() or {}
+
+    def _clean_billable(self):
+        """The billable flag cannot change once the contract's family is invoiced (FR-008a)."""
+        original = self._original('billable')
+        if not original or original['billable'] == self.billable:
+            return {}
+        family = [self.pk, *(c.pk for c in self.ancestors()), *(c.pk for c in self.descendants())]
+        if (
+            Invoice.objects.filter(contracts__in=family).exists()
+            or InvoiceLine.objects.filter(contract_line__contract=self.pk).exists()
+        ):
+            return {
+                'billable': _(
+                    'The billable flag cannot change: this contract, one of its parents or one of its children '
+                    'already has invoices. A new contract must be created.'
+                )
+            }
+        return {}
+
+    def _clean_line_dates(self):
+        """Refuse contract dates that would leave existing contract lines outside them (FR-002a)."""
+        errors = {}
+        lines = ContractLine.objects.filter(contract=self.pk)
+        if self.start_date and lines.filter(
+            models.Q(start_date__lt=self.start_date) | models.Q(end_date__lt=self.start_date)
+        ).exists():
+            errors['start_date'] = _('Some contract lines start before this date; change their dates first.')
+        if self.end_date and lines.filter(
+            models.Q(end_date__gt=self.end_date) | models.Q(start_date__gt=self.end_date)
+        ).exists():
+            errors['end_date'] = _('Some contract lines end after this date; change their dates first.')
+        return errors
+
 
 class Invoice(NetBoxModel):
     number = models.CharField(max_length=100, verbose_name=_('number'))
@@ -319,13 +592,15 @@ class Invoice(NetBoxModel):
         null=True,
         default=False,
         verbose_name=_('template'),
-        help_text=_('Wether this invoice is a template or not'),
+        help_text=_('Deprecated: invoice lines are generated from the contract lines. Wether this invoice is a '
+                    'template or not'),
     )
     status = models.CharField(
         max_length=50,
         choices=InvoiceStatusChoices,
-        default=InvoiceStatusChoices.STATUS_POSTED,
+        default=InvoiceStatusChoices.STATUS_DRAFT,
         verbose_name=_('status'),
+        help_text=_('A posted invoice is locked: set it back to draft to change its amounts or its lines'),
     )
     date = models.DateField(blank=True, null=True, verbose_name=_('date'))
     contracts = models.ManyToManyField(Contract, related_name='invoices', blank=True, verbose_name=_('contracts'))
@@ -359,12 +634,292 @@ class Invoice(NetBoxModel):
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:invoice', args=[self.pk])
 
+    # Fields of a posted invoice that cannot change (FR-031); its status can
+    POSTED_LOCKED_FIELDS = ('amount', 'currency', 'period_start', 'period_end')
+
+    @property
+    def is_locked(self):
+        """A posted invoice (not a deprecated template) is locked (FR-031)."""
+        return self.status == InvoiceStatusChoices.STATUS_POSTED and not self.template
+
+    def locked_in_database(self):
+        """Whether the saved version of this invoice is locked."""
+        original = Invoice.objects.filter(pk=self.pk).values('status', 'template').first() if self.pk else None
+        return bool(original) and original['status'] == InvoiceStatusChoices.STATUS_POSTED and not original['template']
+
+    def clean(self):
+        super().clean()
+        errors = {}
+        locked = self.locked_in_database()
+        if locked:
+            original = Invoice.objects.filter(pk=self.pk).values(*self.POSTED_LOCKED_FIELDS).first()
+            errors = {
+                field: POSTED_INVOICE_MESSAGE
+                for field in self.POSTED_LOCKED_FIELDS
+                if original[field] != getattr(self, field)
+            }
+        errors.update(self._clean_new_contracts(locked))
+        if errors:
+            raise ValidationError(errors)
+
+    def _clean_new_contracts(self, locked):
+        """
+        Contracts about to be set on a saved invoice, as given by NetBox's bulk edit and REST API (`_m2m_values`):
+        no more contracts than it has (FR-011), their currency (FR-009), none changed when posted (FR-031).
+        """
+        from .validators import check_invoice_contracts
+
+        contracts = getattr(self, '_m2m_values', {}).get('contracts')
+        if not self.pk or contracts is None:
+            return {}
+        previous_ids = list(Invoice.objects.get(pk=self.pk).contracts.values_list('pk', flat=True))
+        errors = check_invoice_contracts(
+            False, contracts, self.currency, previous_contract_ids=previous_ids,
+            previous_currency=Invoice.objects.filter(pk=self.pk).values_list('currency', flat=True).first(),
+        )
+        if locked and {contract.pk for contract in contracts} != set(previous_ids):
+            errors.append(POSTED_INVOICE_MESSAGE)
+        return {'contracts': errors} if errors else {}
+
     @property
     def total_invoicelines_amount(self):
         """
         Calculates the total amount for all related InvoiceLines.
         """
         return sum(invoiceline.amount for invoiceline in self.invoicelines.all())
+
+
+class Unit(NetBoxModel):
+    name = models.CharField(max_length=100, unique=True, verbose_name=_('name'))
+    description = models.TextField(blank=True, verbose_name=_('description'))
+    billing_method = models.CharField(
+        max_length=20,
+        choices=BillingMethodChoices,
+        verbose_name=_('billing method'),
+    )
+    months = models.PositiveSmallIntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_('months'),
+        help_text=_('Number of months covered by one unit price. Required for recurring units only.'),
+    )
+    comments = models.TextField(blank=True, verbose_name=_('comments'))
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = _('unit')
+        verbose_name_plural = _('units')
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_contract:unit', args=[self.pk])
+
+    def get_billing_method_color(self):
+        return BillingMethodChoices.colors.get(self.billing_method)
+
+    def clean(self):
+        super().clean()
+        errors = {}
+        if self.billing_method == BillingMethodChoices.RECURRING:
+            if not self.months:
+                errors['months'] = _('A recurring unit needs the number of months (at least 1) one unit price covers.')
+        elif self.months is not None:
+            errors['months'] = _('Only a recurring unit covers a number of months.')
+
+        if self.pk and not errors:
+            original = Unit.objects.filter(pk=self.pk).values('billing_method', 'months').first()
+            changed = [
+                field for field in ('billing_method', 'months')
+                if original and original[field] != getattr(self, field)
+            ]
+            if changed and (self.invoiced_lines().exists() or InvoiceLine.objects.filter(unit=self.pk).exists()):
+                message = _('This unit is used by contracts that have invoices: its billing method and months '
+                            'cannot change. Create a new unit instead.')
+                errors.update({field: message for field in changed})
+        if errors:
+            raise ValidationError(errors)
+
+    def invoiced_lines(self):
+        """Contract lines using this unit that are locked because of invoices (FR-001a, FR-029)."""
+        return ContractLine.objects.filter(
+            models.Q(contract__invoices__isnull=False) | models.Q(invoicelines__isnull=False), unit=self.pk
+        )
+
+
+class ContractLine(NetBoxModel):
+    contract = models.ForeignKey(
+        to='Contract',
+        on_delete=models.CASCADE,
+        related_name='lines',
+        verbose_name=_('contract'),
+    )
+    description = models.CharField(max_length=200, verbose_name=_('description'))
+    quantity = models.DecimalField(max_digits=12, decimal_places=4, default=1, verbose_name=_('quantity'))
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('unit price'))
+    unit = models.ForeignKey(
+        to='Unit',
+        on_delete=models.PROTECT,
+        related_name='contract_lines',
+        verbose_name=_('unit'),
+    )
+    currency = models.CharField(
+        max_length=3,
+        choices=CurrencyChoices,
+        blank=True,
+        verbose_name=_('currency'),
+        help_text=_("Defaults to the contract's currency"),
+    )
+    start_date = models.DateField(
+        blank=True, null=True, verbose_name=_('start date'), help_text=_("Defaults to the contract's start date")
+    )
+    end_date = models.DateField(
+        blank=True, null=True, verbose_name=_('end date'), help_text=_("Defaults to the contract's end date")
+    )
+    accounting_dimensions = models.ManyToManyField(
+        AccountingDimension, blank=True, related_name='contract_lines', verbose_name=_('accounting dimensions')
+    )
+    comments = models.TextField(blank=True, verbose_name=_('comments'))
+    replaces = models.ForeignKey(
+        to='self',
+        on_delete=models.SET_NULL,
+        related_name='replaced_by',
+        blank=True,
+        null=True,
+        editable=False,
+        verbose_name=_('replaces'),
+        help_text=_('The line this line replaces after an amendment of its price or quantity'),
+    )
+    invoiced_at_conversion = models.BooleanField(
+        default=False,
+        editable=False,
+        verbose_name=_('invoiced at conversion'),
+        help_text=_('Set by the upgrade conversion for a one-time line of a contract that already had a posted '
+                    'invoice: the line is considered fully invoiced.'),
+    )
+
+    clone_fields = ('contract', 'unit', 'currency', 'start_date', 'end_date')
+
+    class Meta:
+        ordering = ('contract', 'start_date', 'description')
+        verbose_name = _('contract line')
+        verbose_name_plural = _('contract lines')
+
+    def __str__(self):
+        return self.description
+
+    def get_absolute_url(self):
+        return reverse('plugins:netbox_contract:contractline', args=[self.pk])
+
+    @property
+    def effective_start_date(self):
+        return self.start_date or self.contract.start_date
+
+    @property
+    def effective_end_date(self):
+        return self.end_date or self.contract.end_date
+
+    @property
+    def total_value(self):
+        return calculations.line_total_value(
+            self.unit.billing_method,
+            self.quantity,
+            self.unit_price,
+            self.unit.months,
+            self.effective_start_date,
+            self.effective_end_date,
+        )
+
+    @property
+    def yearly_value(self):
+        return calculations.line_yearly_value(
+            self.unit.billing_method, self.quantity, self.unit_price, self.unit.months
+        )
+
+    @property
+    def can_be_amended(self):
+        """Whether the amend action applies: a saved recurring or usage-based line not replaced yet (FR-030)."""
+        return (
+            bool(self.pk)
+            and self.unit.billing_method != BillingMethodChoices.ONE_TIME
+            and not self.replaced_by.exists()
+        )
+
+    def apply_contract_defaults(self):
+        """Take the dates and the currency of the contract when they are not set (FR-002)."""
+        if not self.contract_id:
+            return
+        if not self.currency:
+            self.currency = self.contract.currency
+        if self.start_date is None:
+            self.start_date = self.contract.start_date
+        if self.end_date is None:
+            self.end_date = self.contract.end_date
+
+    def lock_message(self):
+        """Why this line can no longer be changed or deleted (FR-029), or None."""
+        if self.pk:
+            if InvoiceLine.objects.filter(contract_line=self.pk).exists():
+                return REFERENCED_LINE_MESSAGE
+            original = ContractLine.objects.filter(pk=self.pk).values_list('contract', flat=True).first()
+            if original and Invoice.objects.filter(contracts=original).exists():
+                return LOCKED_CONTRACT_MESSAGE
+        if self.contract_id and Invoice.objects.filter(contracts=self.contract_id).exists():
+            return LOCKED_CONTRACT_MESSAGE
+        return None
+
+    def locked_fields_changed(self):
+        """Whether a contract term of this saved line differs from the database."""
+        attnames = [self._meta.get_field(name).attname for name in CONTRACT_LINE_LOCKED_FIELDS]
+        original = ContractLine.objects.filter(pk=self.pk).values(*attnames).first()
+        return original is None or any(original[name] != getattr(self, name) for name in attnames)
+
+    def clean(self):
+        super().clean()
+        if not self.contract_id:
+            return
+        self.apply_contract_defaults()
+
+        message = self.lock_message()
+        if message and (not self.pk or self.locked_fields_changed()):
+            raise ValidationError(f'{message} {INTERNAL_FIELDS_NOTE}' if self.pk else message)
+
+        errors = {}
+        contract = self.contract
+        outside = _('A contract line must lie within the dates of its contract ({period}).').format(
+            period=_contract_period(contract)
+        )
+        if self.start_date and (
+            (contract.start_date and self.start_date < contract.start_date)
+            or (contract.end_date and self.start_date > contract.end_date)
+        ):
+            errors['start_date'] = outside
+        if self.end_date and (
+            (contract.end_date and self.end_date > contract.end_date)
+            or (contract.start_date and self.end_date < contract.start_date)
+        ):
+            errors['end_date'] = outside
+        if self.start_date and self.end_date and self.end_date < self.start_date and 'end_date' not in errors:
+            errors['end_date'] = _('The end date cannot be before the start date.')
+        if self.currency != contract.currency:
+            errors['currency'] = _(
+                'The currency {found} of a contract line must be the currency {expected} of its contract.'
+            ).format(found=self.currency.upper(), expected=contract.currency.upper())
+        if errors:
+            raise ValidationError(errors)
+
+    def save(self, *args, **kwargs):
+        self.apply_contract_defaults()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        # Checked here, before Django's deletion collector opens its transaction; the pre_delete
+        # receiver in signals.py covers queryset deletions.
+        message = self.lock_message()
+        if message:
+            raise AbortRequest(escape(message))
+        return super().delete(*args, **kwargs)
 
 
 class InvoiceLine(NetBoxModel):
@@ -374,13 +929,47 @@ class InvoiceLine(NetBoxModel):
         related_name='invoicelines',
         verbose_name=_('invoice'),
     )
+    contract_line = models.ForeignKey(
+        to='ContractLine',
+        on_delete=models.SET_NULL,
+        related_name='invoicelines',
+        blank=True,
+        null=True,
+        verbose_name=_('contract line'),
+    )
+    unit = models.ForeignKey(
+        to='Unit',
+        on_delete=models.PROTECT,
+        related_name='invoicelines',
+        blank=True,
+        null=True,
+        verbose_name=_('unit'),
+        help_text=_('Defaults to the unit of the contract line; fixed once the line is created'),
+    )
+    unit_price = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name=_('unit price'),
+        help_text=_('Defaults to the unit price of the contract line; fixed once the line is created'),
+    )
+    quantity = models.DecimalField(
+        max_digits=12, decimal_places=4, blank=True, null=True, verbose_name=_('quantity')
+    )
     currency = models.CharField(
         max_length=3,
         choices=CurrencyChoices,
         default=CURRENCY_DEFAULT,
         verbose_name=_('currency'),
     )
-    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('amount'))
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        verbose_name=_('amount'),
+        help_text=_('Calculated from the quantity and the unit price'),
+    )
     accounting_dimensions = models.ManyToManyField(
         AccountingDimension, blank=True, verbose_name=_('accounting dimensions')
     )
@@ -391,11 +980,136 @@ class InvoiceLine(NetBoxModel):
         verbose_name = _('invoice line')
         verbose_name_plural = _('invoice lines')
 
+    # Fields of a line of a posted invoice that cannot change (FR-031)
+    POSTED_LOCKED_FIELDS = ('invoice', 'contract_line', 'unit', 'unit_price', 'quantity', 'amount', 'currency')
+
+    def __str__(self):
+        number = self.invoice.number if self.invoice_id else ''
+        return f'{number} line {self.pk}' if self.pk else f'{number} new line'
+
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:invoiceline', args=[self.pk])
 
+    def apply_line_defaults(self, strict=True):
+        """
+        Defaults of an invoice line whose amount derives from quantity x unit price (FR-024, decision I14):
+
+        - a new line takes the unit and unit price of its contract line, and its quantity for recurring and one-time
+          lines (usage-based lines keep no quantity until it is entered); other lines get quantity 1;
+        - a line with an amount but no unit price takes the amount as unit price (divided by its quantity when that
+          is exact), so that clients and imports giving only an amount keep working.
+
+        Returns an error message when `strict` and the amount cannot be divided by the quantity; otherwise such a
+        line keeps its amount as unit price with quantity 1.
+        """
+        line = self.contract_line if self.contract_line_id else None
+        if not self.pk and line:
+            if self.unit_id is None:
+                self.unit = line.unit
+            if self.unit_price is None:
+                self.unit_price = line.unit_price
+
+        if self.unit_price is None and self.amount is not None:
+            quantity = self.quantity if self.quantity else Decimal(1)
+            unit_price = (self.amount / quantity).quantize(Decimal('0.01'))
+            if unit_price * quantity == self.amount:
+                self.quantity, self.unit_price = quantity, unit_price
+            elif strict:
+                return _('Give a unit price: the amount {amount} cannot be divided by the quantity {quantity}.').format(
+                    amount=self.amount, quantity=quantity
+                )
+            else:
+                self.quantity, self.unit_price = Decimal(1), self.amount
+
+        usage = self.unit_id is not None and self.unit.billing_method == BillingMethodChoices.USAGE
+        if not self.pk and self.quantity is None and not usage:
+            self.quantity = line.quantity if line else Decimal(1)
+        return None
+
+    def calculate_amount(self):
+        """
+        Amount from the quantity and the unit price of the line (research D7, decision I11): recurring units
+        are prorated to the invoice period and the dates of the contract line, as for the pre-fill; without an
+        invoice period, a recurring line counts for one invoice frequency of the invoice's contract. None when
+        the line has no unit price (manual amount).
+        """
+        if self.unit_price is None:
+            return None
+        line = self.contract_line if self.contract_line_id else None
+        unit = self.unit if self.unit_id else None
+        invoiced_contract = self.invoice.contracts.first() or (line.contract if line else None)
+        return calculations.invoice_line_amount(
+            unit.billing_method if unit else calculations.USAGE,
+            self.quantity,
+            self.unit_price,
+            unit.months if unit else None,
+            self.invoice.period_start,
+            self.invoice.period_end,
+            line.effective_start_date if line else None,
+            line.effective_end_date if line else None,
+            default_months=(invoiced_contract.invoice_frequency if invoiced_contract else None) or 1,
+        )
+
+    def invoice_locked(self):
+        """Whether this line belongs, or belonged when last saved, to a posted invoice (FR-031)."""
+        if self.invoice_id and self.invoice.is_locked:
+            return True
+        if not self.pk:
+            return False
+        original_invoice = InvoiceLine.objects.filter(pk=self.pk).values_list('invoice', flat=True).first()
+        return bool(original_invoice) and Invoice(pk=original_invoice).locked_in_database()
+
     def clean(self):
         super().clean()
+        if not self.invoice_id:
+            return
+
+        original = (
+            InvoiceLine.objects.filter(pk=self.pk).values(*self.POSTED_LOCKED_FIELDS).first() if self.pk else None
+        )
+
+        # Lines of a posted invoice: none added, and only their internal fields change (FR-031)
+        if self.invoice_locked():
+            if not original:
+                raise ValidationError(POSTED_INVOICE_MESSAGE)
+            attnames = {field: self._meta.get_field(field).attname for field in self.POSTED_LOCKED_FIELDS}
+            changed = [field for field, attname in attnames.items() if original[field] != getattr(self, attname)]
+            if changed:
+                raise ValidationError({field: POSTED_INVOICE_MESSAGE for field in changed})
+            return
+
+        error = self.apply_line_defaults()
+        if error:
+            raise ValidationError({'unit_price': error})
+
+        if self.contract_line_id:
+            if not original or (original['invoice'], original['contract_line']) != (
+                self.invoice_id, self.contract_line_id
+            ):
+                allowed = {
+                    contract.pk
+                    for invoice_contract in self.invoice.contracts.all()
+                    for contract in invoice_contract.billing_scope()
+                }
+                if self.contract_line.contract_id not in allowed:
+                    raise ValidationError({
+                        'contract_line': _(
+                            'The contract line must belong to the contract of the invoice or to one of its '
+                            'non-billable descendants.'
+                        )
+                    })
+        if self.unit_price is None:
+            raise ValidationError({'unit_price': _('This field is required: the amount is quantity x unit price.')})
+        self.amount = self.calculate_amount()
+        currency_changed = not original or (original['invoice'], original['currency']) != (
+            self.invoice_id, self.currency
+        )
+        if currency_changed and self.currency != self.invoice.currency:
+            raise ValidationError({
+                'currency': _('The currency {found} of an invoice line must be the currency {expected} of its '
+                              'invoice.').format(found=self.currency.upper(), expected=self.invoice.currency.upper())
+            })
+
         # Check that the sum of the invoice line amount is not greater the invoice amount
         amount = self.amount
         invoice = self.invoice
@@ -407,3 +1121,101 @@ class InvoiceLine(NetBoxModel):
             previous_amount = self.__class__.objects.get(pk=self.pk).amount
             if amount > (invoice.amount - invoice.total_invoicelines_amount + previous_amount):
                 raise ValidationError('Sum of invoice line amount greater than invoice amount')
+
+    def save(self, *args, **kwargs):
+        # The amount of a line of a posted invoice never moves (FR-031)
+        if not (self.pk and self.invoice_locked()):
+            self.apply_line_defaults(strict=False)
+            if self.unit_price is not None:
+                self.amount = self.calculate_amount()
+            elif self.amount is None:
+                self.amount = Decimal(0)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        # Checked before Django's deletion collector opens its transaction; signals.py covers queryset deletions
+        if self.invoice_locked():
+            raise AbortRequest(escape(POSTED_INVOICE_MESSAGE))
+        return super().delete(*args, **kwargs)
+
+
+def yearly_value_annotation():
+    """
+    SQL expression of a contract's yearly value (sum of its current recurring lines, each rounded to two decimals),
+    for list views and the API so that the value does not cost one query per contract (research D6).
+    """
+    line_yearly = models.functions.Round(
+        models.ExpressionWrapper(
+            models.F('quantity') * models.F('unit_price') * models.Value(12) / models.F('unit__months'),
+            output_field=models.DecimalField(max_digits=24, decimal_places=8),
+        ),
+        precision=2,
+    )
+    per_contract = (
+        ContractLine.objects.filter(
+            contract=models.OuterRef('pk'),
+            unit__billing_method=BillingMethodChoices.RECURRING,
+            replaced_by__isnull=True,
+        )
+        .order_by()
+        .values('contract')
+        .annotate(total=models.Sum(line_yearly))
+        .values('total')
+    )
+    return models.functions.Coalesce(
+        models.Subquery(per_contract, output_field=models.DecimalField(max_digits=16, decimal_places=2)),
+        models.Value(Decimal('0.00')),
+        output_field=models.DecimalField(max_digits=16, decimal_places=2),
+    )
+
+
+def contract_values(contracts):
+    """
+    Computed values of saved contracts (FR-006, FR-007), in three queries whatever their number, so that lists
+    do not run a query per contract: {pk: {'total_contract_value', 'yearly_contract_value',
+    'yearly_billable_value'}}. The total counts each line over its own dates (None when not available); the
+    yearly values count only the lines not replaced by an amendment (FR-030); the billable value adds the lines
+    of the non-billable descendants of a billable contract, stopping at billable children (FR-022).
+    """
+    contracts = [contract for contract in contracts if contract.pk]
+    if not contracts:
+        return {}
+
+    children, billable = defaultdict(list), {}
+    for pk, parent_id, is_billable in Contract.objects.values_list('pk', 'parent_id', 'billable'):
+        children[parent_id].append(pk)
+        billable[pk] = is_billable
+
+    scopes = {}
+    for contract in contracts:
+        scope, seen, level = [], {contract.pk}, [contract.pk]
+        while contract.billable and level:
+            scope.extend(level)
+            level = [
+                child for pk in level for child in children[pk] if not billable[child] and child not in seen
+            ]
+            seen.update(level)
+        scopes[contract.pk] = scope
+
+    lines_by_contract = defaultdict(list)
+    needed = {contract.pk for contract in contracts}.union(*scopes.values())
+    lines = ContractLine.objects.filter(contract__in=needed).select_related('unit', 'contract').annotate(
+        is_replaced=models.Exists(ContractLine.objects.filter(replaces=models.OuterRef('pk')))
+    )
+    for line in lines:
+        lines_by_contract[line.contract_id].append(line)
+
+    def yearly(pks):
+        return calculations.round_amount(sum(
+            (line.yearly_value for pk in pks for line in lines_by_contract[pk] if not line.is_replaced), Decimal(0)
+        ))
+
+    values = {}
+    for contract in contracts:
+        totals = [line.total_value for line in lines_by_contract[contract.pk]]
+        values[contract.pk] = {
+            'total_contract_value': None if None in totals else calculations.round_amount(sum(totals, Decimal(0))),
+            'yearly_contract_value': yearly([contract.pk]),
+            'yearly_billable_value': yearly(scopes[contract.pk]),
+        }
+    return values

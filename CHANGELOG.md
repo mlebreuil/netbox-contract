@@ -4,6 +4,43 @@
 
 ## Version 2
 
+### Version 2.5.0
+
+> [!WARNING]
+> This version requires Netbox 4.6.0 or later.
+
+* [#278](https://github.com/mlebreuil/netbox-contract/issues/278) Contract lines replace the contract costs and the invoice templates.
+  * New models **Unit** (billing method one-time, recurring or usage-based, and the months one unit price covers) and **Contract line** (description, quantity, unit price, unit, currency, dates and accounting dimensions), with list, detail, edit, bulk import, bulk edit and bulk delete screens, and the REST API endpoints `units/` and `contract-lines/`.
+  * Contracts get a **billable** flag and three computed values: total contract value, yearly value and yearly billable value (which includes the lines of non-billable descendants).
+  * The invoice add screen proposes the amount from the contract lines, and creating an invoice generates its invoice lines from them. Invoice lines get a reference to their contract line and a quantity, unit and unit price; their amount is calculated from it.
+  * Currency consistency: contract lines, invoices and invoice lines must have the currency of their contract or invoice; a non-billable child has the currency of its parent. The new read-only custom script "Report currency mismatches" lists existing mismatches without changing them.
+  * Upgrade: the migration converts the monthly, yearly and non-recurring costs and the invoice templates into contract lines (units "One-time", "Monthly", "Yearly") and prints a report. It can be run again with `python manage.py convert_contract_lines`. Every existing contract is billable. Invoices and invoice lines are not changed.
+  * Deprecated, kept and hidden by default: the contract fields `mrc`, `yrc` and `nrc` and the invoice templates (never deleted, shown with a "deprecated" badge). The new plugin setting `show_deprecated_fields` (default `False`) shows them again. They remain in the bulk import and the REST API.
+  * CI runs the tests against the NetBox v4.6.10 tag.
+  * The unit price or quantity of a recurring or usage-based line can be amended from a date ("Amend" button, REST `POST contract-lines/{id}/amend/`): the line ends the day before and a new line replaces it, invoiced periods keep their price, and the required reason is recorded in the change log.
+  * Invoice lines carry their own unit and unit price, taken from the contract line by default and editable as long as the invoice is not posted (for example a discount on one invoice); the amount is calculated from quantity x unit price. Migration 0047 copies the unit and unit price of the contract line into existing lines without changing their amounts.
+  * The new invoice screen previews the lines that will be generated, with their amounts and total, and lets you change their quantities, unit prices and accounting dimensions, or add lines without contract line, before saving; the invoice and its lines are created in one step.
+  * Posted invoices are locked: their amounts, period and contracts, and the amounts of their lines, can no longer change, and lines can no longer be added or deleted (accounting dimensions, comments and tags remain editable; the status can change back to Draft).
+  * Invoice lines have a readable name (`<invoice number> line <id>`) in search results, the change log and reports.
+
+#### Behaviour changes
+
+For existing users and API clients:
+
+* A new invoice can no longer be linked to more than one contract. Existing invoices linked to several contracts stay as they are and can be edited, but no contract can be added to them. These rules also apply to bulk edits of invoices, whose Template field is offered only when `show_deprecated_fields` is `True`.
+* A new invoice must have the currency of its contract, and cannot be created for a non-billable contract.
+* Creating an invoice (web interface or `POST invoices/`) now generates its invoice lines from the contract lines, and is refused when the invoice amount is lower than their total. Invoice lines are not generated when an invoice is edited or imported.
+* The copy of invoice template lines onto a new invoice is removed. Invoice templates are no longer used to pre-fill invoices; the pre-fill uses the contract lines instead of `mrc` and `yrc`.
+* Contract lines are locked once their contract has an invoice (any status) or once an invoice line references them: a new contract must be created. Their accounting dimensions, comments and tags remain editable, and their price or quantity can be amended from a date after the last invoiced period. The billing method and months of a unit used by such lines are locked too.
+* The billable flag of a contract cannot change once the contract, one of its parents or one of its children has invoices. The currency of a contract cannot change once it has invoices or invoice lines; without invoices, its contract lines follow the new currency.
+* The amount of every invoice line is quantity x unit price and can no longer be typed, as in most ERPs; the unit price is required and the quantity defaults to 1. An import or API call that gives only an amount still works: the amount becomes the unit price with quantity 1. Migration 0049 gives existing lines a unit price without changing any amount.
+* A contract whose lines (or those of its child contracts) are on posted invoices can no longer be deleted.
+* Changing the currency of a contract also changes its non-billable descendants of the same currency, unless one of them has invoices.
+* New invoices are Draft by default (previously Posted), in the web interface and the REST API; imports still set the status given in the file.
+* Posted invoices are locked: their amount, currency, period and contracts cannot change, lines cannot be added or deleted, and the unit, unit price, quantity and amount of their lines cannot change. Set an invoice back to Draft to correct it.
+* The contract cost fields and new invoice templates are hidden unless `show_deprecated_fields` is `True`. The mandatory and hidden field settings ignore a deprecated field that is not shown (with a warning in the log) instead of failing.
+* The custom scripts `create_invoice_template` and `create_invoice_lines` are removed: they read fields that no longer exist and are superseded by the conversion.
+
 ### Version v2.4.7
 
 * [#303](https://github.com/mlebreuil/netbox-contract/issues/303) Gracefully skip `supported_models` entries that don't resolve to a registered Django model instead of raising an unhandled `LookupError` during app startup (which previously crashed *every* management command, including `migrate`). This most commonly affects models created dynamically by other plugins (e.g. `netbox_custom_objects` custom object types), whose registration order relative to `netbox_contract` is not guaranteed. A clear error is now logged (`netbox.plugins.netbox_contract`) naming the offending entry, and the rest of the plugin continues to load normally.

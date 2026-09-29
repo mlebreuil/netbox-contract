@@ -1,5 +1,4 @@
 from django.contrib.auth.models import ContentType
-from django.core.exceptions import ObjectDoesNotExist
 from drf_yasg.utils import swagger_serializer_method
 from netbox.api.fields import ContentTypeField, SerializedPKRelatedField
 from netbox.api.serializers import NetBoxModelSerializer, WritableNestedSerializer
@@ -8,14 +7,20 @@ from tenancy.api.serializers_.tenants import TenantSerializer
 from utilities.api import get_serializer_for_model
 
 from ..models import (
+    POSTED_INVOICE_MESSAGE,
     AccountingDimension,
     Contract,
     ContractAssignment,
+    ContractLine,
     ContractType,
+    CurrencyChoices,
     Invoice,
     InvoiceLine,
     ServiceProvider,
+    Unit,
 )
+from ..services import invoicing
+from ..validators import check_invoice_contracts
 
 
 class NestedContractSerializer(WritableNestedSerializer):
@@ -109,12 +114,36 @@ class ContractTypeSerializer(NetBoxModelSerializer):
         brief_fields = ('id', 'name', 'description', 'url', 'display')
 
 
+class ContractValueField(serializers.DecimalField):
+    """A computed contract value, taken from the values computed once for a whole list when available."""
+
+    def get_attribute(self, instance):
+        values = self.context.get('contract_values') or {}
+        if instance.pk in values:
+            return values[instance.pk][self.source]
+        return super().get_attribute(instance)
+
+
+DEPRECATED_COST_HELP = 'Deprecated: replaced by contract lines. Kept for compatibility.'
+
+
 class ContractSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_contract-api:contract-detail'
     )
     contract_type = ContractTypeSerializer(nested=True, required=False, allow_null=True)
-    yrc = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    yrc = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True, help_text=DEPRECATED_COST_HELP)
+    total_contract_value = ContractValueField(
+        max_digits=16, decimal_places=2, read_only=True, allow_null=True,
+        help_text='Total value of the contract lines; null when not available (open-ended recurring line)',
+    )
+    yearly_contract_value = ContractValueField(
+        max_digits=16, decimal_places=2, read_only=True, help_text='Twelve-month value of the recurring lines'
+    )
+    yearly_billable_value = ContractValueField(
+        max_digits=16, decimal_places=2, read_only=True,
+        help_text='Yearly value invoiced under this contract, including its non-billable descendants',
+    )
     parent = NestedContractSerializer(many=False, required=False)
     tenant = TenantSerializer(nested=True, required=False, allow_null=True)
     external_party_object_type = ContentTypeField(queryset=ContentType.objects.all())
@@ -145,6 +174,10 @@ class ContractSerializer(NetBoxModelSerializer):
             'yrc',
             'nrc',
             'invoice_frequency',
+            'billable',
+            'total_contract_value',
+            'yearly_contract_value',
+            'yearly_billable_value',
             'comments',
             'documents',
             'parent',
@@ -153,6 +186,10 @@ class ContractSerializer(NetBoxModelSerializer):
             'created',
             'last_updated',
         )
+        extra_kwargs = {
+            'mrc': {'help_text': DEPRECATED_COST_HELP},
+            'nrc': {'help_text': DEPRECATED_COST_HELP},
+        }
         brief_fields = (
             'id',
             'url',
@@ -175,6 +212,7 @@ class ContractSerializer(NetBoxModelSerializer):
             'yrc',
             'nrc',
             'invoice_frequency',
+            'billable',
             'comments',
             'parent',
         )
@@ -223,6 +261,9 @@ class InvoiceSerializer(NetBoxModelSerializer):
             'created',
             'last_updated',
         )
+        extra_kwargs = {
+            'template': {'help_text': 'Deprecated: invoice lines are generated from the contract lines.'},
+        }
         brief_fields = (
             'id',
             'url',
@@ -239,12 +280,39 @@ class InvoiceSerializer(NetBoxModelSerializer):
         )
 
     def validate(self, data):
+        is_new = self.instance is None
+        previous_contract_ids = [] if is_new else list(self.instance.contracts.values_list('pk', flat=True))
+        previous_currency = None if is_new else Invoice.objects.get(pk=self.instance.pk).currency
+
         data = super().validate(data)
 
-        # template checks
-        if data['template']:
-            # Check that there is only one invoice template per contract
+        # contracts and currency (the relation is saved after the invoice, so it is checked here)
+        if 'contracts' in data:
             contracts = data['contracts']
+        else:
+            contracts = [] if is_new else list(Contract.objects.filter(pk__in=previous_contract_ids))
+        currency = data.get('currency', previous_currency or Invoice._meta.get_field('currency').default)
+        errors = check_invoice_contracts(
+            is_new, contracts, currency, previous_contract_ids=previous_contract_ids,
+            previous_currency=previous_currency,
+        )
+        locked = not is_new and self.instance.locked_in_database()
+        if locked and {contract.pk for contract in contracts} != set(previous_contract_ids):
+            errors.append(POSTED_INVOICE_MESSAGE)
+        if errors:
+            raise serializers.ValidationError({'contracts': errors})
+
+        # a new invoice gets its lines from the contract lines (FR-021, FR-023)
+        if is_new and not data.get('template') and len(contracts) == 1:
+            errors = invoicing.check_new_invoice(
+                contracts[0], data.get('amount'), data.get('period_start'), data.get('period_end')
+            )
+            if errors:
+                raise serializers.ValidationError({'non_field_errors': errors})
+
+        # template checks
+        if data.get('template'):
+            # Check that there is only one invoice template per contract
             for contract in contracts:
                 for invoice in contract.invoices.all():
                     if invoice.template and invoice != self.instance:
@@ -253,7 +321,8 @@ class InvoiceSerializer(NetBoxModelSerializer):
                         )
 
             # Prefix the invoice name with _template
-            data['number'] = '_invoice_template_' + contract.name
+            if contracts:
+                data['number'] = '_invoice_template_' + contracts[-1].name
 
             # set the periode start and end date to null
             data['period_start'] = None
@@ -263,44 +332,9 @@ class InvoiceSerializer(NetBoxModelSerializer):
     def create(self, validated_data):
         instance = super().create(validated_data)
 
+        # Invoice lines are generated from the contract lines; invoice templates are no longer copied
         if not instance.template:
-            contracts = instance.contracts.all()
-
-            for contract in contracts:
-                try:
-                    template_exists = True
-                    invoice_template = Invoice.objects.get(
-                        template=True, contracts=contract
-                    )
-                except ObjectDoesNotExist:
-                    template_exists = False
-
-                if template_exists:
-                    first = True
-                    for line in invoice_template.invoicelines.all():
-                        dimensions = line.accounting_dimensions.all()
-                        line.pk = None
-                        line.id = None
-                        line._state.adding = True
-                        line.invoice = instance
-
-                        # adjust the first invoice line amount
-                        amount = validated_data['amount']
-                        if (
-                            first
-                            and amount != invoice_template.total_invoicelines_amount
-                        ):
-                            line.amount = (
-                                line.amount
-                                + amount
-                                - invoice_template.total_invoicelines_amount
-                            )
-
-                        line.save()
-
-                        for dimension in dimensions:
-                            line.accounting_dimensions.add(dimension)
-                        first = False
+            invoicing.generate_invoice_lines(instance)
 
         return instance
 
@@ -360,11 +394,123 @@ class ContractAssignmentSerializer(NetBoxModelSerializer):
         return serializer(instance.content_object, nested=True, context=context).data
 
 
+class UnitSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:unit-detail')
+
+    class Meta:
+        model = Unit
+        fields = (
+            'id',
+            'url',
+            'display',
+            'name',
+            'description',
+            'billing_method',
+            'months',
+            'comments',
+            'tags',
+            'custom_fields',
+            'created',
+            'last_updated',
+        )
+        brief_fields = ('id', 'url', 'display', 'name', 'description', 'billing_method', 'months')
+
+
+class NestedContractLineSerializer(WritableNestedSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:contractline-detail')
+
+    class Meta:
+        model = ContractLine
+        fields = ('id', 'url', 'display', 'description', 'quantity', 'unit_price', 'start_date', 'end_date')
+
+
+class ContractLineAmendmentSerializer(serializers.Serializer):
+    """Input of the amend action (FR-030)."""
+
+    effective_date = serializers.DateField(help_text='First day of the new terms')
+    unit_price = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True)
+    quantity = serializers.DecimalField(max_digits=12, decimal_places=4, required=False, allow_null=True)
+    reason = serializers.CharField(help_text='Recorded in the change log and on the new line')
+
+
+class ContractLineSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:contractline-detail')
+    contract = NestedContractSerializer()
+    unit = UnitSerializer(nested=True)
+    currency = serializers.ChoiceField(
+        choices=CurrencyChoices,
+        required=False,
+        allow_blank=True,
+        help_text="Defaults to the contract's currency",
+    )
+    accounting_dimensions = SerializedPKRelatedField(
+        queryset=AccountingDimension.objects.all(),
+        serializer=NestedAccountingDimensionSerializer,
+        required=False,
+        many=True,
+    )
+    total_value = serializers.DecimalField(
+        max_digits=14, decimal_places=2, read_only=True, allow_null=True,
+        help_text='Null when not available (recurring line without end date on an open-ended contract)',
+    )
+    yearly_value = serializers.DecimalField(max_digits=14, decimal_places=2, read_only=True)
+    replaces = NestedContractLineSerializer(read_only=True, help_text='The line replaced by an amendment')
+
+    class Meta:
+        model = ContractLine
+        fields = (
+            'id',
+            'url',
+            'display',
+            'contract',
+            'description',
+            'quantity',
+            'unit_price',
+            'unit',
+            'currency',
+            'start_date',
+            'end_date',
+            'accounting_dimensions',
+            'total_value',
+            'yearly_value',
+            'replaces',
+            'invoiced_at_conversion',
+            'comments',
+            'tags',
+            'custom_fields',
+            'created',
+            'last_updated',
+        )
+        brief_fields = ('id', 'url', 'display', 'contract', 'description', 'quantity', 'unit', 'unit_price',
+                        'currency')
+
+    def validate(self, data):
+        data = super().validate(data)
+        names = [dimension.name for dimension in data.get('accounting_dimensions') or ()]
+        if len(names) != len(set(names)):
+            raise serializers.ValidationError('duplicate accounting dimension')
+        return data
+
+
 class InvoiceLineSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_contract-api:invoiceline-detail'
     )
     invoice = NestedInvoiceSerializer(many=False, required=False)
+    contract_line = ContractLineSerializer(nested=True, required=False, allow_null=True)
+    unit = UnitSerializer(
+        nested=True, required=False, allow_null=True,
+        help_text='Defaults to the unit of the contract line; fixed once the line is created',
+    )
+    unit_price = serializers.DecimalField(
+        max_digits=12, decimal_places=2, required=False, allow_null=True,
+        help_text='Defaults to the unit price of the contract line; fixed once the line is created',
+    )
+    amount = serializers.DecimalField(
+        max_digits=10, decimal_places=2, required=False,
+        help_text='Quantity x unit price, calculated. Given alone when a line is created, it is taken as the unit '
+                  'price with quantity 1 (compatibility)',
+    )
     accounting_dimensions = SerializedPKRelatedField(
         queryset=AccountingDimension.objects.all(),
         serializer=NestedAccountingDimensionSerializer,
@@ -379,6 +525,10 @@ class InvoiceLineSerializer(NetBoxModelSerializer):
             'url',
             'display',
             'invoice',
+            'contract_line',
+            'quantity',
+            'unit',
+            'unit_price',
             'amount',
             'currency',
             'accounting_dimensions',
@@ -398,9 +548,9 @@ class InvoiceLineSerializer(NetBoxModelSerializer):
         )
 
     def validate(self, data):
-        super().validate(data)
+        data = super().validate(data)
         # check for duplicate dimensions
-        accounting_dimensions = data['accounting_dimensions']
+        accounting_dimensions = data.get('accounting_dimensions') or []
         dimensions_names = []
         for dimension in accounting_dimensions:
             if dimension.name in dimensions_names:

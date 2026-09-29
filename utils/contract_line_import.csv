@@ -1,0 +1,4 @@
+contract,description,quantity,unit_price,unit,currency,start_date,end_date,accounting_dimensions
+1,Setup fee,1,500,One-time,usd,,,
+1,Hosting,2,100,Monthly,usd,2025-01-01,2025-12-31,"1,2"
+1,Traffic,10,20,Gigabyte,,,,

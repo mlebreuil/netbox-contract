@@ -84,22 +84,24 @@
               <th scope="row">{% trans "Currency" %}</th>
               <td>{{ object.get_currency_display  }}</td>
             </tr>
+            {% if show_deprecated_fields %}
             <tr>
-              <th scope="row">{% trans "Monthly recuring costs" %}</th>
+              <th scope="row">{% trans "Monthly recuring costs" %} <span class="badge text-bg-warning">{% trans "deprecated" %}</span></th>
               <td>{{ object.mrc }}</td>
             </tr>
             <tr>
-              <th scope="row">{% trans "Yearly recuring costs" %}</th>
+              <th scope="row">{% trans "Yearly recuring costs" %} <span class="badge text-bg-warning">{% trans "deprecated" %}</span></th>
               <td>{{ object.yrc }}</td>
             </tr>
             <tr>
-              <th scope="row">{% trans "Calculated corresponding Yearly or Monthly value" %}</th>
+              <th scope="row">{% trans "Calculated corresponding Yearly or Monthly value" %} <span class="badge text-bg-warning">{% trans "deprecated" %}</span></th>
               <td>{{ object.calculated_rc }}</td>
             </tr>
             <tr>
-              <th scope="row">{% trans "Non recuring costs" %}</th>
+              <th scope="row">{% trans "Non recuring costs" %} <span class="badge text-bg-warning">{% trans "deprecated" %}</span></th>
               <td>{{ object.nrc }}</td>
             </tr>
+            {% endif %}
             <tr>
               <th scope="row">{% trans "Invoice frequency" %}</th>
               <td>{{ object.invoice_frequency }}</td>
@@ -125,12 +127,38 @@
       {% include 'inc/panels/custom_fields.html' %}
     </div>
     <div class="col col-md-6">
+      <div class="card">
+        <h5 class="card-header">{% trans "Values" %}</h5>
+        <table class="table table-hover attr-table">
+          <tr>
+            <th scope="row">{% trans "Billable" %}</th>
+            <td>{% checkmark object.billable %}</td>
+          </tr>
+          <tr>
+            <th scope="row">{% trans "Total contract value" %}</th>
+            <td>
+              {% with total=contract_values.total_contract_value %}
+                {% if total is None %}{% trans "Not available" %}{% else %}{{ total }} {{ object.get_currency_display }}{% endif %}
+              {% endwith %}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">{% trans "Yearly value" %}</th>
+            <td>{{ contract_values.yearly_contract_value }} {{ object.get_currency_display }}</td>
+          </tr>
+          <tr>
+            <th scope="row">{% trans "Yearly billable value" %}</th>
+            <td>{{ contract_values.yearly_billable_value }} {{ object.get_currency_display }}</td>
+          </tr>
+        </table>
+      </div>
       {% include 'inc/panels/tags.html' %}
       {% include 'inc/panels/comments.html' %}
       {% if invoice_template %}
       <div class="card">
         <h5 class="card-header">
-          {% trans "Invoice template" %}
+          {% trans "Invoice templates (kept for reference)" %}
+          <span class="badge text-bg-warning">{% trans "deprecated" %}</span>
         </h5>
         <table class="table table-hover attr-table">
           <tr>
@@ -156,6 +184,33 @@
       {% endif %}
     </div>
   </div>
+  {% if perms.netbox_contract.view_contractline %}
+  <div class="row">
+    <div class="col col-md-12">
+      <div class="card">
+        <h5 class="card-header">
+          {% trans "Contract lines" %}
+          {% if perms.netbox_contract.add_contractline and not lines_locked %}
+          <div class="card-actions">
+            <a href="{% url 'plugins:netbox_contract:contractline_add' %}?contract={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
+              <i class="mdi mdi-plus-thick" aria-hidden="true"></i>
+              {% trans "Add a contract line" %}
+            </a>
+          </div>
+          {% endif %}
+        </h5>
+        {% if lines_locked %}
+        <div class="card-body">
+          <div class="alert alert-info mb-0" role="alert">
+            {% trans "This contract has invoices, so its lines can no longer be added, deleted or have their terms changed: a new contract must be created. Their accounting dimensions, comments and tags can still be edited, and the price or quantity of a recurring or usage-based line can be changed from a date with its Amend button." %}
+          </div>
+        </div>
+        {% endif %}
+        {% render_table lines_table %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
   <div class="row">
     <div class="col col-md-12">
       <div class="card">

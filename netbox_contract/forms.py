@@ -1,3 +1,5 @@
+import logging
+
 from circuits.models import Provider
 from django import forms
 from django.conf import settings
@@ -29,12 +31,20 @@ from utilities.forms.fields import (
 from utilities.forms.widgets import DatePicker, HTMXSelect
 from utilities.templatetags.builtins.filters import bettertitle
 
-from .constants import ASSIGNEMENT_MODELS, SERVICE_PROVIDER_MODELS, SERVICE_PROVIDER_TYPES
+from .constants import (
+    ASSIGNEMENT_MODELS,
+    DEPRECATED_CONTRACT_FIELDS,
+    SERVICE_PROVIDER_MODELS,
+    SERVICE_PROVIDER_TYPES,
+)
 from .models import (
+    CONTRACT_LINE_LOCKED_FIELDS,
     AccountingDimension,
     AccountingDimensionStatusChoices,
+    BillingMethodChoices,
     Contract,
     ContractAssignment,
+    ContractLine,
     ContractType,
     CurrencyChoices,
     InternalEntityChoices,
@@ -43,9 +53,30 @@ from .models import (
     InvoiceStatusChoices,
     ServiceProvider,
     StatusChoices,
+    Unit,
 )
+from .services import invoicing
+from .validators import check_invoice_contracts
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
+
+logger = logging.getLogger('netbox.plugins.netbox_contract')
+
+
+def apply_field_settings(form, mandatory_setting, hidden_setting):
+    """Apply the mandatory and hidden field settings, ignoring (with a warning) fields the form does not have."""
+    for field in plugin_settings.get(mandatory_setting) or []:
+        if field not in form.fields:
+            logger.warning('%s: field "%s" is not in the form (deprecated or unknown), ignored', mandatory_setting,
+                           field)
+            continue
+        form.fields[field].required = True
+    for field in plugin_settings.get(hidden_setting) or []:
+        if field not in form.fields:
+            logger.warning('%s: field "%s" is not in the form (deprecated or unknown), ignored', hidden_setting, field)
+            continue
+        if not form.fields[field].required:
+            form.fields[field].widget = forms.HiddenInput()
 
 
 # Contract
@@ -101,14 +132,16 @@ class ContractForm(NetBoxModelForm):
             self.fields['external_party_object'].queryset = ServiceProvider.objects.all()
             self.fields['external_party_object'].initial = None
 
+        # Deprecated cost fields are replaced by contract lines
+        if plugin_settings.get('show_deprecated_fields'):
+            for field in DEPRECATED_CONTRACT_FIELDS:
+                self.fields[field].help_text = _('Deprecated: use contract lines instead.')
+        else:
+            for field in DEPRECATED_CONTRACT_FIELDS:
+                del self.fields[field]
+
         # Initialise fields settings
-        mandatory_fields = plugin_settings.get('mandatory_contract_fields')
-        for field in mandatory_fields:
-            self.fields[field].required = True
-        hidden_fields = plugin_settings.get('hidden_contract_fields')
-        for field in hidden_fields:
-            if not self.fields[field].required:
-                self.fields[field].widget = forms.HiddenInput()
+        apply_field_settings(self, 'mandatory_contract_fields', 'hidden_contract_fields')
 
     class Meta:
         model = Contract
@@ -131,6 +164,7 @@ class ContractForm(NetBoxModelForm):
             'mrc',
             'nrc',
             'invoice_frequency',
+            'billable',
             'parent',
             'documents',
             'comments',
@@ -145,7 +179,7 @@ class ContractForm(NetBoxModelForm):
     def clean(self):
         super().clean()
 
-        if self.cleaned_data['mrc'] and self.cleaned_data['yrc']:
+        if self.cleaned_data.get('mrc') and self.cleaned_data.get('yrc'):
             raise ValidationError('you should set monthly OR yearly recuring costs not both')
 
 
@@ -196,6 +230,12 @@ class ContractFilterForm(ContactModelFilterForm, TenancyFilterForm, NetBoxModelF
         required=False,
         selector=True,
         label=_('Parent'),
+    )
+
+    billable = forms.NullBooleanField(
+        required=False,
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_('Billable'),
     )
 
     tag = TagFilterField(model)
@@ -253,6 +293,7 @@ class ContractCSVForm(NetBoxModelImportForm):
             'mrc',
             'nrc',
             'invoice_frequency',
+            'billable',
             'documents',
             'comments',
             'parent',
@@ -298,6 +339,11 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
         required=False,
         selector=True,
         label=_('Parent'),
+    )
+    billable = forms.NullBooleanField(
+        required=False,
+        widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
+        label=_('Billable'),
     )
 
     nullable_fields = ('comments',)
@@ -361,7 +407,6 @@ class ContractTypeFilterForm(NetBoxModelFilterSetForm):
 class InvoiceForm(NetBoxModelForm):
     number = forms.CharField(
         max_length=100,
-        help_text='Invoice template name will be overriden to _invoice_template_contract name',
         label=_('Number'),
     )
     contracts = DynamicModelMultipleChoiceField(
@@ -374,29 +419,69 @@ class InvoiceForm(NetBoxModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Invoice templates are deprecated: new ones are offered only when deprecated fields are shown
+        if not plugin_settings.get('show_deprecated_fields'):
+            del self.fields['template']
+        else:
+            self.fields['template'].help_text = _(
+                'Deprecated: invoice lines are generated from the contract lines. The number of a template is '
+                'replaced by _invoice_template_<contract name>.'
+            )
+
         # Initialise fields settings
-        mandatory_fields = plugin_settings.get('mandatory_invoice_fields')
-        for field in mandatory_fields:
-            self.fields[field].required = True
-        hidden_fields = plugin_settings.get('hidden_invoice_fields')
-        for field in hidden_fields:
-            if not self.fields[field].required:
-                self.fields[field].widget = forms.HiddenInput()
+        apply_field_settings(self, 'mandatory_invoice_fields', 'hidden_invoice_fields')
+
+        # A posted invoice keeps its amounts, period and contracts; its status can change (FR-031)
+        if self.instance.pk and self.instance.locked_in_database():
+            for field in (*Invoice.POSTED_LOCKED_FIELDS, 'contracts'):
+                if field in self.fields:
+                    self.fields[field].disabled = True
 
     def clean(self):
         super().clean()
 
+        # contracts and currency (the relation is saved after the invoice, so it is checked here)
+        is_new = not self.instance.pk
+        errors = check_invoice_contracts(
+            is_new,
+            self.cleaned_data.get('contracts'),
+            self.cleaned_data.get('currency'),
+            previous_contract_ids=[] if is_new else list(self.instance.contracts.values_list('pk', flat=True)),
+            previous_currency=None if is_new else Invoice.objects.get(pk=self.instance.pk).currency,
+        )
+        # a new invoice gets its lines from the contract lines (FR-021, FR-023)
+        contracts = list(self.cleaned_data.get('contracts') or [])
+        self.line_overrides = None
+        if is_new and not self.cleaned_data.get('template') and len(contracts) == 1 and not errors:
+            # quantities and unit prices typed in the preview of the lines (FR-032)
+            self.line_overrides, errors = invoicing.parse_line_overrides(self.data)
+            self.extra_lines, extra_errors = invoicing.parse_extra_lines(self.data)
+            errors += extra_errors
+            if not errors:
+                errors = invoicing.check_new_invoice(
+                    contracts[0],
+                    self.cleaned_data.get('amount'),
+                    self.cleaned_data.get('period_start'),
+                    self.cleaned_data.get('period_end'),
+                    self.line_overrides,
+                    self.extra_lines,
+                    check_line_dimensions=True,
+                )
+        if errors:
+            raise ValidationError(errors)
+
         # template checks
-        if self.cleaned_data['template']:
+        if self.cleaned_data.get('template'):
             # Check that there is only one invoice template per contract
-            contracts = self.cleaned_data['contracts']
+            contracts = list(self.cleaned_data.get('contracts') or [])
             for contract in contracts:
                 for invoice in contract.invoices.all():
                     if invoice.template and invoice.pk != self.instance.pk:
                         raise ValidationError('Only one invoice template allowed per contract')
 
             # Prefix the invoice name with _template
-            self.cleaned_data['number'] = '_invoice_template_' + contract.name
+            if contracts:
+                self.cleaned_data['number'] = '_invoice_template_' + contracts[-1].name
 
             # set the periode start and end date to null
             self.cleaned_data['period_start'] = None
@@ -407,35 +492,12 @@ class InvoiceForm(NetBoxModelForm):
 
         instance = super().save(*args, **kwargs)
 
-        if is_new and not self.cleaned_data['template']:
-            contracts = self.cleaned_data['contracts']
-
-            for contract in contracts:
-                try:
-                    template_exists = True
-                    invoice_template = Invoice.objects.get(template=True, contracts=contract)
-                except ObjectDoesNotExist:
-                    template_exists = False
-
-                if template_exists:
-                    first = True
-                    for line in invoice_template.invoicelines.all():
-                        dimensions = line.accounting_dimensions.all()
-                        line.pk = None
-                        line.id = None
-                        line._state.adding = True
-                        line.invoice = self.instance
-
-                        # adjust the first invoice line amount
-                        amount = self.cleaned_data['amount']
-                        if first and amount != invoice_template.total_invoicelines_amount:
-                            line.amount = line.amount + amount - invoice_template.total_invoicelines_amount
-
-                        line.save()
-
-                        for dimension in dimensions:
-                            line.accounting_dimensions.add(dimension)
-                        first = False
+        # Invoice lines are generated from the contract lines of a new invoice only; invoice templates are
+        # no longer copied (they are kept for reference)
+        if is_new and not instance.template:
+            invoicing.generate_invoice_lines(
+                instance, getattr(self, 'line_overrides', None), getattr(self, 'extra_lines', ())
+            )
 
         return instance
 
@@ -460,6 +522,16 @@ class InvoiceForm(NetBoxModelForm):
             'period_start': DatePicker(),
             'period_end': DatePicker(),
         }
+
+
+class InvoiceLineDimensionsForm(forms.Form):
+    """Accounting dimensions of one row of the preview of a new invoice (FR-032)."""
+
+    accounting_dimensions = DynamicModelMultipleChoiceField(
+        queryset=AccountingDimension.objects.all(),
+        required=False,
+        label=_('Accounting dimensions'),
+    )
 
 
 class InvoiceFilterForm(NetBoxModelFilterSetForm):
@@ -499,6 +571,22 @@ class InvoiceCSVForm(NetBoxModelImportForm):
         label=_('Contracts'),
     )
     status = CSVChoiceField(choices=InvoiceStatusChoices, help_text='Invoice status', label=_('Status'))
+
+    def clean(self):
+        super().clean()
+        # Imported invoices follow the contract and currency rules; their lines are not generated
+        is_new = not self.instance.pk
+        if 'contracts' not in self.cleaned_data and not is_new:
+            return
+        errors = check_invoice_contracts(
+            is_new,
+            self.cleaned_data.get('contracts'),
+            self.cleaned_data.get('currency', self.instance.currency),
+            previous_contract_ids=[] if is_new else list(self.instance.contracts.values_list('pk', flat=True)),
+            previous_currency=None if is_new else Invoice.objects.get(pk=self.instance.pk).currency,
+        )
+        if errors:
+            raise ValidationError(errors)
 
     class Meta:
         model = Invoice
@@ -564,6 +652,12 @@ class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
     nullable_fields = ('comments',)
 
     model = Invoice
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Invoice templates are deprecated: the flag is offered only when deprecated fields are shown
+        if not plugin_settings.get('show_deprecated_fields'):
+            del self.fields['template']
 
 
 # service Provider forms
@@ -672,6 +766,20 @@ class InvoiceLineForm(NetBoxModelForm):
         selector=True,
         label=_('Invoice'),
     )
+    contract_line = DynamicModelChoiceField(
+        queryset=ContractLine.objects.all(),
+        required=False,
+        query_params={'invoice_id': '$invoice'},
+        label=_('Contract line'),
+        help_text=_('Lines of the invoice contract and of its non-billable descendants. When a contract line is '
+                    'chosen, the unit and unit price default to its own.'),
+    )
+    unit = DynamicModelChoiceField(
+        queryset=Unit.objects.all(),
+        required=False,
+        label=_('Unit'),
+        help_text=_('Defaults to the unit of the contract line; fixed once the line is created'),
+    )
     accounting_dimensions = DynamicModelMultipleChoiceField(
         queryset=AccountingDimension.objects.all(),
         required=False,
@@ -679,11 +787,40 @@ class InvoiceLineForm(NetBoxModelForm):
         label=_('Accounting dimensions'),
     )
 
+    # Fields fixed on a saved line that references a contract line (FR-024)
+    CALCULATED_LINE_FIXED_FIELDS = ('invoice', 'contract_line', 'currency', 'amount')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['unit'].help_text = _('Defaults to the unit of the contract line')
+        self.fields['unit_price'].help_text = _('Required; defaults to the unit price of the contract line')
+        self.fields['quantity'].help_text = _(
+            'Defaults to 1, or to the quantity of the contract line; usage-based lines are entered per invoice'
+        )
+        # The amount is always quantity x unit price (FR-024, decision I14)
+        self.fields['amount'].disabled = True
+        self.fields['amount'].help_text = _('Calculated from the quantity and the unit price when the line is saved')
+        if not self.instance.pk:
+            return
+
+        # Lines of a posted invoice: only their accounting dimensions, comments and tags change (FR-031)
+        if self.instance.invoice_locked():
+            for field in InvoiceLine.POSTED_LOCKED_FIELDS:
+                self.fields[field].disabled = True
+            self.fields['amount'].help_text = _('The invoice is posted: set it back to draft to change this line')
+            return
+
+        # A calculated line keeps its invoice, contract line and currency; its unit, unit price and quantity change
+        # A line generated from a contract line keeps its invoice, contract line and currency
+        if self.instance.contract_line_id:
+            for field in self.CALCULATED_LINE_FIXED_FIELDS:
+                self.fields[field].disabled = True
+
     def clean(self):
         super().clean()
 
         # check for duplicate dimensions
-        accounting_dimensions = self.cleaned_data['accounting_dimensions']
+        accounting_dimensions = self.cleaned_data.get('accounting_dimensions') or []
         dimensions_names = []
         for dimension in accounting_dimensions:
             if dimension.name in dimensions_names:
@@ -700,6 +837,10 @@ class InvoiceLineForm(NetBoxModelForm):
         model = InvoiceLine
         fields = [
             'invoice',
+            'contract_line',
+            'unit',
+            'unit_price',
+            'quantity',
             'currency',
             'amount',
             'accounting_dimensions',
@@ -737,6 +878,19 @@ class InvoiceLineImportForm(NetBoxModelImportForm):
         help_text='Invoice number',
         label=_('Invoice'),
     )
+    contract_line = CSVModelChoiceField(
+        queryset=ContractLine.objects.all(),
+        required=False,
+        help_text='Contract line id; the unit and unit price default to its own',
+        label=_('Contract line'),
+    )
+    unit = CSVModelChoiceField(
+        queryset=Unit.objects.all(),
+        to_field_name='name',
+        required=False,
+        help_text='Unit name',
+        label=_('Unit'),
+    )
     accounting_dimensions = CSVModelMultipleChoiceField(
         queryset=AccountingDimension.objects.all(),
         to_field_name='id',
@@ -749,6 +903,10 @@ class InvoiceLineImportForm(NetBoxModelImportForm):
         model = InvoiceLine
         fields = [
             'invoice',
+            'contract_line',
+            'unit',
+            'unit_price',
+            'quantity',
             'currency',
             'amount',
             'accounting_dimensions',
@@ -768,6 +926,177 @@ class InvoiceLineBulkEditForm(NetBoxModelBulkEditForm):
     comments = CommentField(label=_('Comments'))
     nullable_fields = ('comments',)
     model = InvoiceLine
+
+
+# Unit
+
+
+class UnitForm(NetBoxModelForm):
+    comments = CommentField(label=_('Comments'))
+
+    class Meta:
+        model = Unit
+        fields = ('name', 'description', 'billing_method', 'months', 'comments', 'tags')
+
+
+class UnitFilterForm(NetBoxModelFilterSetForm):
+    model = Unit
+    name = forms.CharField(required=False, label=_('Name'))
+    billing_method = forms.MultipleChoiceField(
+        choices=BillingMethodChoices, required=False, label=_('Billing method')
+    )
+    tag = TagFilterField(model)
+
+
+class UnitImportForm(NetBoxModelImportForm):
+    billing_method = CSVChoiceField(
+        choices=BillingMethodChoices, help_text='one_time, recurring or usage', label=_('Billing method')
+    )
+
+    class Meta:
+        model = Unit
+        fields = ('name', 'description', 'billing_method', 'months', 'comments', 'tags')
+
+
+class UnitBulkEditForm(NetBoxModelBulkEditForm):
+    description = forms.CharField(required=False, label=_('Description'))
+    comments = CommentField(required=False, label=_('Comments'))
+    nullable_fields = ('description', 'comments')
+    model = Unit
+
+
+# ContractLine
+
+
+def check_duplicate_dimensions(accounting_dimensions):
+    names = [dimension.name for dimension in accounting_dimensions or ()]
+    if len(names) != len(set(names)):
+        raise ValidationError(_('duplicate accounting dimension'))
+
+
+class ContractLineForm(NetBoxModelForm):
+    contract = DynamicModelChoiceField(queryset=Contract.objects.all(), selector=True, label=_('Contract'))
+    unit = DynamicModelChoiceField(queryset=Unit.objects.all(), selector=True, label=_('Unit'))
+    accounting_dimensions = DynamicModelMultipleChoiceField(
+        queryset=AccountingDimension.objects.all(),
+        required=False,
+        selector=True,
+        label=_('Accounting dimensions'),
+    )
+    comments = CommentField(label=_('Comments'))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Once invoiced, only the internal fields of a line can change: the contract terms are shown disabled
+        if self.instance.pk and self.instance.lock_message():
+            for field in CONTRACT_LINE_LOCKED_FIELDS:
+                if field in self.fields:
+                    self.fields[field].disabled = True
+        # Propose the currency of the contract given in the URL (?contract=<id>)
+        contract_id = self.initial.get('contract')
+        if contract_id and not self.initial.get('currency') and not self.instance.pk:
+            contract = Contract.objects.filter(pk=contract_id).first()
+            if contract:
+                self.initial['currency'] = contract.currency
+
+    def clean(self):
+        super().clean()
+        check_duplicate_dimensions(self.cleaned_data.get('accounting_dimensions'))
+
+    class Meta:
+        model = ContractLine
+        fields = (
+            'contract',
+            'description',
+            'quantity',
+            'unit_price',
+            'unit',
+            'currency',
+            'start_date',
+            'end_date',
+            'accounting_dimensions',
+            'comments',
+            'tags',
+        )
+        widgets = {
+            'start_date': DatePicker(),
+            'end_date': DatePicker(),
+        }
+
+
+class ContractLineAmendForm(forms.Form):
+    """New unit price and/or quantity of a contract line from a date (FR-030)."""
+
+    effective_date = forms.DateField(
+        widget=DatePicker(), label=_('Applies from'), help_text=_('First day of the new terms')
+    )
+    unit_price = forms.DecimalField(max_digits=12, decimal_places=2, required=False, label=_('New unit price'))
+    quantity = forms.DecimalField(max_digits=12, decimal_places=4, required=False, label=_('New quantity'))
+    reason = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 3}),
+        label=_('Reason'),
+        help_text=_('Recorded in the change log and on the new line'),
+    )
+
+
+class ContractLineFilterForm(NetBoxModelFilterSetForm):
+    model = ContractLine
+    contract_id = DynamicModelMultipleChoiceField(
+        queryset=Contract.objects.all(), required=False, selector=True, label=_('Contract')
+    )
+    unit_id = DynamicModelMultipleChoiceField(
+        queryset=Unit.objects.all(), required=False, selector=True, label=_('Unit')
+    )
+    billing_method = forms.MultipleChoiceField(
+        choices=BillingMethodChoices, required=False, label=_('Billing method')
+    )
+    currency = forms.MultipleChoiceField(choices=CurrencyChoices, required=False, label=_('Currency'))
+    accounting_dimensions = DynamicModelMultipleChoiceField(
+        queryset=AccountingDimension.objects.all(), required=False, selector=True, label=_('Accounting dimensions')
+    )
+    tag = TagFilterField(model)
+
+
+class ContractLineImportForm(NetBoxModelImportForm):
+    contract = CSVModelChoiceField(queryset=Contract.objects.all(), help_text='Contract id', label=_('Contract'))
+    unit = CSVModelChoiceField(
+        queryset=Unit.objects.all(), to_field_name='name', help_text='Unit name', label=_('Unit')
+    )
+    accounting_dimensions = CSVModelMultipleChoiceField(
+        queryset=AccountingDimension.objects.all(),
+        to_field_name='id',
+        required=False,
+        help_text='accounting dimension id',
+        label=_('Accounting dimensions'),
+    )
+
+    class Meta:
+        model = ContractLine
+        fields = (
+            'contract',
+            'description',
+            'quantity',
+            'unit_price',
+            'unit',
+            'currency',
+            'start_date',
+            'end_date',
+            'accounting_dimensions',
+            'comments',
+            'tags',
+        )
+
+
+class ContractLineBulkEditForm(NetBoxModelBulkEditForm):
+    description = forms.CharField(max_length=200, required=False, label=_('Description'))
+    quantity = forms.DecimalField(max_digits=12, decimal_places=4, required=False, label=_('Quantity'))
+    unit_price = forms.DecimalField(max_digits=12, decimal_places=2, required=False, label=_('Unit price'))
+    unit = DynamicModelChoiceField(queryset=Unit.objects.all(), required=False, selector=True, label=_('Unit'))
+    start_date = forms.DateField(required=False, widget=DatePicker(), label=_('Start date'))
+    end_date = forms.DateField(required=False, widget=DatePicker(), label=_('End date'))
+    comments = CommentField(required=False, label=_('Comments'))
+    nullable_fields = ('comments',)
+    model = ContractLine
 
 
 # AccountingDimension
