@@ -105,24 +105,28 @@ fields in sections (renders empty labelled rows).
 
 ## D5. Invoice and invoice line pre-fill without copying `ObjectEditView.get`
 
-**Decision**: `InvoiceEditView.get` and `InvoiceLineEditView.get` compute the pre-filled values exactly as today, put
-them into a copy of `request.GET` (`request.GET = merged_querydict`) and return `super().get(request, *args, **kwargs)`.
-A value already in the query string wins for both screens (clarification Q5, as core does): the derived values are
-only set when absent (`setdefault`). For invoices this changes today's behaviour, where the contract-derived values
-and today's date replaced query-string values; it is listed as a behaviour change. The lookups stay restricted with
-`restrict(request.user, 'view')` (#307). Values are written as strings (`isoformat()` for dates, `str()` for
-decimals), which is what the form receives from a query string. The new-invoice preview moves to
+**Decision**: `InvoiceEditView.get` and `InvoiceLineEditView.get` compute the pre-filled values as today (restricted
+lookups with `restrict(request.user, 'view')`, #307), then set `self.form` to a per-request subclass of the form whose
+`__init__` merges them under the `initial` core passes (`initial={**defaults, **(initial or {})}`), and return
+`super().get(request, *args, **kwargs)`. A small helper in `views.py` builds that subclass. Because core's `initial`
+comes from the query string, a value in the address wins for both screens (clarification Q5, as core does); for
+invoices this changes today's behaviour, where the contract-derived values and today's date replaced query-string
+values, and it is listed as a behaviour change. The values keep their Python types (`date`, `Decimal`), so the
+existing pre-fill tests (`test_prefill.py`, `test_issue_307.py`) pass unchanged. The new-invoice preview moves to
 `InvoiceEditView.get_extra_context`, which already returns it on POST: on GET for a new invoice it returns
-`build_lines_preview(request.GET, request.user)` (it already reads a `QueryDict`, as it does for POST data). Nothing is pre-filled for an existing object
-(`kwargs` holds `pk`).
+`build_lines_preview({**defaults, **normalize_querydict(request.GET)}, request.user)`, the same merged data as the
+form. Nothing is pre-filled for an existing object (`kwargs` holds `pk`). The view instance is created per request by
+`as_view()`, so setting `self.form` does not leak between requests.
 
 **Rationale**: core `get()` builds `initial` from `normalize_querydict(request.GET)`, applies the `quickadd` prefix,
-returns `htmx/quick_add.html` for `_quickadd` and `htmx/form.html` for HTMX partial requests (FR-009). Feeding the
-values through `request.GET` reuses all of that with no copy. The form's `__init__` cannot do it: it has no access to
+returns `htmx/quick_add.html` for `_quickadd` and `htmx/form.html` for HTMX partial requests (FR-009). Wrapping the
+form class reuses all of that with no copy. The form's `__init__` cannot do it: it has no access to
 the user, so it could not apply the #307 restriction. `alter_object()` is rejected because it also runs on POST.
 
-**Alternatives considered**: pre-fill in `InvoiceForm.__init__` (no user); `alter_object` setting instance attributes
-(runs on POST and cannot set the `contracts` many-to-many on an unsaved instance).
+**Alternatives considered**: writing the values into a copy of `request.GET` (suggested in the issue; rejected because
+the values become strings, which changes the form's `initial` types and breaks the existing pre-fill tests);
+pre-fill in `InvoiceForm.__init__` (no user); `alter_object` setting instance attributes (runs on POST and cannot set
+the `contracts` many-to-many on an unsaved instance).
 
 ## D6. Templates under `templates/netbox_contract/`
 

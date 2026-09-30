@@ -11,7 +11,7 @@ REST API, settings or import columns, in the not-yet-released 2.5.0 (patch-level
 with `register_model_view` and reduce `urls.py` to `get_model_urls` includes (which brings the Journal tab to the four
 models that lack it), register the nine filtersets with `register_filterset` (lookup modifiers on filter forms), add
 `fieldsets` to model, bulk-edit and filter forms while keeping fields hidden by settings out of them, feed the invoice
-and invoice line pre-fill through `request.GET` and call core `ObjectEditView.get()` (quick add and HTMX partials),
+and invoice line pre-fill as form defaults under the address values and call core `ObjectEditView.get()` (quick add and HTMX partials),
 move the root template under `templates/netbox_contract/inc/` and delete the unused one, and look up the deprecated
 invoice template on the contract page only when deprecated fields are shown. Details:
 [research.md](research.md), [data-model.md](data-model.md), [contracts/](contracts/), [quickstart.md](quickstart.md).
