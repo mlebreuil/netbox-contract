@@ -4,10 +4,14 @@ from dcim.models import Site
 from django.contrib.contenttypes.models import ContentType
 from django.urls import resolve, reverse
 from extras.models import JournalEntry
+from netbox.registry import registry
+from utilities.forms.widgets import FilterModifierWidget
 from utilities.testing import TestCase
 
+from netbox_contract import filtersets, forms
 from netbox_contract.models import (
     AccountingDimension,
+    Contract,
     ContractAssignment,
     ContractType,
     InvoiceStatusChoices,
@@ -176,3 +180,53 @@ class JournalTabTestCase(TestCase):
         self.assertContains(self.client.get(line.get_absolute_url()), amend_url)
         site_pk = self.objects['contractassignment'].object_id
         self.assertEqual(resolve(reverse('dcim:site_contracts', kwargs={'pk': site_pk})).url_name, 'site_contracts')
+
+
+FILTERSETS = (
+    ('contract', filtersets.ContractFilterSet, forms.ContractFilterForm),
+    ('contractline', filtersets.ContractLineFilterSet, forms.ContractLineFilterForm),
+    ('contracttype', filtersets.ContractTypeFilterSet, forms.ContractTypeFilterForm),
+    ('contractassignment', filtersets.ContractAssignmentFilterSet, forms.ContractAssignmentFilterForm),
+    ('invoice', filtersets.InvoiceFilterSet, forms.InvoiceFilterForm),
+    ('invoiceline', filtersets.InvoiceLineFilterSet, forms.InvoiceLineFilterForm),
+    ('unit', filtersets.UnitFilterSet, forms.UnitFilterForm),
+    ('accountingdimension', filtersets.AccountingDimensionFilterSet, forms.AccountingDimensionFilterForm),
+    ('serviceprovider', filtersets.ServiceProviderFilterSet, forms.ServiceProviderFilterForm),
+)
+
+
+class FilterModifierTestCase(TestCase):
+    """The filter forms offer NetBox's lookup modifiers (FR-004, FR-005, SC-002, US2)."""
+
+    def test_filtersets_registered(self):
+        for model_name, filterset, _form in FILTERSETS:
+            with self.subTest(model=model_name):
+                self.assertIs(registry['filtersets'].get(f'netbox_contract.{model_name}'), filterset)
+
+    def test_every_filter_form_offers_modifiers(self):
+        for model_name, _filterset, form_class in FILTERSETS:
+            with self.subTest(model=model_name):
+                form = form_class()
+                modified = [name for name, field in form.fields.items()
+                            if isinstance(field.widget, FilterModifierWidget)]
+                # Not always 'tag': the contract type, assignment and dimension filter forms have no tag filter
+                self.assertTrue(modified)
+        form = forms.ContractFilterForm()
+        self.assertIsInstance(form.fields['external_reference'].widget, FilterModifierWidget)
+
+    def test_contains_modifier_filters_the_list(self):
+        wanted = make_contract(name='Fiber', external_reference='ALPHA-FIBER-01')
+        make_contract(name='Power', external_reference='BETA-POWER-02')
+        self.add_permissions('netbox_contract.view_contract')
+        response = self.client.get(f"{reverse('plugins:netbox_contract:contract_list')}?external_reference__ic=FIBER")
+        self.assertHttpStatus(response, 200)
+        self.assertEqual([contract.pk for contract in response.context['table'].data], [wanted.pk])
+
+    def test_existing_query_strings_unchanged(self):
+        make_contract(name='Dollars', currency='usd')
+        make_contract(name='Euros', currency='eur')
+        self.add_permissions('netbox_contract.view_contract')
+        response = self.client.get(f"{reverse('plugins:netbox_contract:contract_list')}?status=active&currency=usd")
+        expected = filtersets.ContractFilterSet({'status': ['active'], 'currency': ['usd']}, Contract.objects.all()).qs
+        listed = {contract.pk for contract in response.context['table'].data}
+        self.assertEqual(listed, set(expected.values_list('pk', flat=True)))

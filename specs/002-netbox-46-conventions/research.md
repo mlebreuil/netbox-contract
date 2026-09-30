@@ -54,7 +54,8 @@ modified.
   Import (CSV) forms get none: core import forms do not render sections.
 - `comments` is left out of the sections of model and bulk-edit forms: `htmx/form.html` and `generic/bulk_edit.html`
   render `form.comments` on their own after the sections; listing it would render it twice.
-- Filter forms start with `FieldSet('q', 'filter_id', 'tag')`; the tenancy and contact mixins' fields get their core
+- Filter forms start with `FieldSet('q', 'filter_id', 'tag')` (without `tag` for the contract type, contract assignment
+  and accounting dimension filter forms, which have no tag filter; adding one is out of scope, FR-007); the tenancy and contact mixins' fields get their core
   sections (`FieldSet('tenant_group_id', 'tenant_id', name=_('Tenant'))`,
   `FieldSet('contact', 'contact_role', 'contact_group', name=_('Contacts'))`).
 - Deprecated fields (`mrc`, `yrc`, `nrc` on the contract form, `template` on the invoice model and bulk-edit forms)

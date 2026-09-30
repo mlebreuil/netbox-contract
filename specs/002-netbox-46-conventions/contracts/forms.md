@@ -13,7 +13,8 @@ User-visible form layout introduced by FR-004, FR-006 to FR-008. The section-by-
 4. With `show_deprecated_fields` off, `mrc`, `yrc`, `nrc` (contract) and `template` (invoice) are absent and no
    `Deprecated` section is rendered; with it on, they are in a `Deprecated` section.
 5. No section without a field is rendered.
-6. Filter forms start with the section `q`, `filter_id`, `tag`.
+6. Filter forms start with the section `q`, `filter_id`, `tag` (`q`, `filter_id` for the contract type, contract
+   assignment and accounting dimension filter forms, which have no tag filter).
 7. `ContractTypeFilterForm`, `ContractTypeCSVForm` and `ContractTypeBulkEditForm` render `description` as a single-line
    text input.
 
