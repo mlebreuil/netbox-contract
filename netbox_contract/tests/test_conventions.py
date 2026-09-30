@@ -1,11 +1,17 @@
 """Alignment with the NetBox 4.6 plugin conventions (issue #308, specs/002-netbox-46-conventions)."""
 
+import inspect
+from unittest import mock
+
 from dcim.models import Site
+from django import forms as django_forms
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.urls import resolve, reverse
 from extras.models import JournalEntry
+from netbox.forms import NetBoxModelBulkEditForm, NetBoxModelFilterSetForm, NetBoxModelForm, NetBoxModelImportForm
 from netbox.registry import registry
-from utilities.forms.widgets import FilterModifierWidget
+from utilities.forms.widgets import FilterModifierWidget, MarkdownWidget
 from utilities.testing import TestCase
 
 from netbox_contract import filtersets, forms
@@ -230,3 +236,96 @@ class FilterModifierTestCase(TestCase):
         expected = filtersets.ContractFilterSet({'status': ['active'], 'currency': ['usd']}, Contract.objects.all()).qs
         listed = {contract.pk for contract in response.context['table'].data}
         self.assertEqual(listed, set(expected.values_list('pk', flat=True)))
+
+
+# Fields NetBox renders outside the form sections
+OUTSIDE_SECTIONS = {
+    'comments', 'changelog_message', 'background_job', 'add_tags', 'remove_tags', 'owner', 'owner_group',
+}
+
+
+def plugin_forms():
+    """The model, bulk-edit and filter form classes of the plugin (import forms have no sections)."""
+    bases = (NetBoxModelForm, NetBoxModelBulkEditForm, NetBoxModelFilterSetForm)
+    return [
+        cls for _name, cls in inspect.getmembers(forms, inspect.isclass)
+        if cls.__module__ == forms.__name__ and issubclass(cls, bases) and not issubclass(cls, NetBoxModelImportForm)
+    ]
+
+
+def section_names(form):
+    return [name for fieldset in form.fieldsets for name in fieldset.items]
+
+
+class FormSectionsTestCase(TestCase):
+    """Forms group their fields into titled sections, with the same fields as before (FR-006 to FR-008, US3)."""
+
+    def test_every_visible_field_in_exactly_one_section(self):
+        classes = plugin_forms()
+        self.assertEqual(len(classes), 27)
+        for form_class in classes:
+            with self.subTest(form=form_class.__name__):
+                form = form_class()
+                self.assertTrue(form.fieldsets)
+                names = section_names(form)
+                visible = [
+                    name for name, field in form.fields.items()
+                    if not field.widget.is_hidden and not name.startswith('cf_') and name not in OUTSIDE_SECTIONS
+                ]
+                for name in visible:
+                    self.assertEqual(names.count(name), 1, name)
+                for name in names:
+                    self.assertIn(name, visible)
+                for fieldset in form.fieldsets:
+                    self.assertTrue(fieldset.items)
+                if isinstance(form, NetBoxModelFilterSetForm):
+                    expected = ('q', 'filter_id', 'tag') if 'tag' in form.fields else ('q', 'filter_id')
+                    self.assertEqual(tuple(form.fieldsets[0].items), expected)
+
+    def test_hidden_contract_fields_are_in_no_section(self):
+        # Optional fields only: the setting never hides a required field
+        hidden = ['external_reference', 'documents']
+        with mock.patch.dict(settings.PLUGINS_CONFIG['netbox_contract'], {'hidden_contract_fields': hidden}):
+            form = forms.ContractForm()
+            for name in hidden:
+                self.assertTrue(form.fields[name].widget.is_hidden)
+                self.assertNotIn(name, section_names(form))
+            self.add_permissions('netbox_contract.add_contract')
+            response = self.client.get(reverse('plugins:netbox_contract:contract_add'))
+        content = response.content.decode()
+        for name in hidden:
+            self.assertEqual(content.count(f'name="{name}"'), 1, name)
+
+    def deprecated_sections(self, form_class):
+        return [fieldset for fieldset in form_class().fieldsets if str(fieldset.name) == 'Deprecated']
+
+    def test_deprecated_section_follows_the_setting(self):
+        deprecated = {
+            forms.ContractForm: ['mrc', 'yrc', 'nrc'],
+            forms.InvoiceForm: ['template'],
+            forms.InvoiceBulkEditForm: ['template'],
+        }
+        with mock.patch.dict(settings.PLUGINS_CONFIG['netbox_contract'], {'show_deprecated_fields': False}):
+            for form_class in deprecated:
+                with self.subTest(form=form_class.__name__, setting=False):
+                    self.assertEqual(self.deprecated_sections(form_class), [])
+            # The invoice filter form never removed its template filter
+            self.assertEqual(len(self.deprecated_sections(forms.InvoiceFilterForm)), 1)
+        with mock.patch.dict(settings.PLUGINS_CONFIG['netbox_contract'], {'show_deprecated_fields': True}):
+            for form_class, names in deprecated.items():
+                with self.subTest(form=form_class.__name__, setting=True):
+                    sections = self.deprecated_sections(form_class)
+                    self.assertEqual(len(sections), 1)
+                    self.assertEqual(list(sections[0].items), names)
+        self.assertEqual(self.deprecated_sections(forms.ContractBulkEditForm), [])
+
+    def test_contract_type_description_is_plain_text(self):
+        for form_class in (forms.ContractTypeFilterForm, forms.ContractTypeCSVForm, forms.ContractTypeBulkEditForm):
+            with self.subTest(form=form_class.__name__):
+                field = form_class().fields['description']
+                # The filter form wraps the widget with the lookup modifier selector
+                widget = getattr(field.widget, 'original_widget', field.widget)
+                self.assertIsInstance(widget, django_forms.TextInput)
+                self.assertNotIsInstance(widget, MarkdownWidget)
+                self.assertFalse(field.required)
+        self.assertEqual(tuple(forms.ContractTypeBulkEditForm.nullable_fields), ('description',))
