@@ -320,7 +320,10 @@ class ContractView(generic.ObjectView):
         assignments_table = tables.ContractAssignmentContractTable(
             instance.assignments.all()
         )
-        invoice_template = instance.invoices.filter(template=True).first()
+        # Invoice templates are deprecated: looked up only when deprecated fields are shown
+        invoice_template = None
+        if plugin_settings.get('show_deprecated_fields'):
+            invoice_template = instance.invoices.filter(template=True).first()
         if invoice_template:
             invoicelines_table = tables.InvoiceLineListTable(
                 invoice_template.invoicelines.all()

@@ -150,12 +150,12 @@ partial request return the short forms.
 
 ### Tests for User Story 5 (write first, must fail)
 
-- [ ] T035 [US5] In `netbox_contract/tests/test_conventions.py`, class `ContractTemplateSectionTestCase`: a contract with an invoice template (`make_invoice(..., template=True)`); with `show_deprecated_fields` False, the contract page context has `invoice_template` None and the template's number is not in the response, and the page runs fewer queries than with the setting True (compare `CaptureQueriesContext` counts); with True, the section and number are shown
+- [X] T035 [US5] In `netbox_contract/tests/test_conventions.py`, class `ContractTemplateSectionTestCase`: a contract with an invoice template (`make_invoice(..., template=True)`); with `show_deprecated_fields` False, the contract page context has `invoice_template` None and the template's number is not in the response, and the page runs fewer queries than with the setting True (compare `CaptureQueriesContext` counts); with True, the section and number are shown
 
 ### Implementation for User Story 5
 
-- [ ] T036 [US5] In `netbox_contract/views.py` `ContractView.get_extra_context`, look up `invoice_template` and build `invoicelines_table` only when `plugin_settings.get('show_deprecated_fields')` is true, else both `None`
-- [ ] T037 [US5] Run `test_conventions.ContractTemplateSectionTestCase`, `test_deprecated`, `test_views` and `ruff check`; all pass
+- [X] T036 [US5] In `netbox_contract/views.py` `ContractView.get_extra_context`, look up `invoice_template` and build `invoicelines_table` only when `plugin_settings.get('show_deprecated_fields')` is true, else both `None`
+- [X] T037 [US5] Run `test_conventions.ContractTemplateSectionTestCase`, `test_deprecated`, `test_views` and `ruff check`; all pass. `test_deprecated.test_template_invoice_badge_and_panel` (#278) asserted the panel with the default setting; it now checks both settings, the one existing test changed by this feature (maintainer decision, spec clarification Q1)
 
 **Checkpoint**: all user stories complete.
 

@@ -9,6 +9,8 @@ from django import forms as django_forms
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages import get_messages
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 from django.urls import resolve, reverse
 from extras.models import JournalEntry
 from netbox.forms import NetBoxModelBulkEditForm, NetBoxModelFilterSetForm, NetBoxModelForm, NetBoxModelImportForm
@@ -410,3 +412,33 @@ class EditViewTestCase(TestCase):
         self.assertEqual(initial['period_start'], date(2025, 1, 1))
         self.assertEqual(initial['currency'], 'usd')
         self.assertIsNone(initial.get('amount'))
+
+
+class ContractTemplateSectionTestCase(TestCase):
+    """The deprecated invoice template is looked up on the contract page only when deprecated fields are shown."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.contract = make_contract(name='Templated contract')
+        make_invoice(cls.contract, number='TEMPLATE-NUMBER-1', status=InvoiceStatusChoices.STATUS_DRAFT, template=True)
+
+    def setUp(self):
+        super().setUp()
+        self.user.is_superuser = True
+        self.user.save()
+
+    def get_page(self, show_deprecated):
+        with mock.patch.dict(settings.PLUGINS_CONFIG['netbox_contract'], {'show_deprecated_fields': show_deprecated}):
+            with CaptureQueriesContext(connection) as queries:
+                response = self.client.get(self.contract.get_absolute_url())
+        self.assertHttpStatus(response, 200)
+        return response, len(queries)
+
+    def test_section_follows_the_setting(self):
+        hidden, hidden_queries = self.get_page(False)
+        self.assertIsNone(hidden.context['invoice_template'])
+        self.assertNotContains(hidden, 'TEMPLATE-NUMBER-1')
+        shown, shown_queries = self.get_page(True)
+        self.assertEqual(shown.context['invoice_template'].number, 'TEMPLATE-NUMBER-1')
+        self.assertContains(shown, 'TEMPLATE-NUMBER-1')
+        self.assertLess(hidden_queries, shown_queries)
