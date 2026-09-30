@@ -20,6 +20,7 @@ This is a conformance change delivered in one patch release (the next 2.5.x vers
 - Q: Should the list, add, import, bulk edit and delete pages also be registered through NetBox's model view registration, so that the URL configuration is reduced to one include per model? → A: Yes, for all nine object types; every existing route name and address is kept and covered by a test.
 - Q: What should happen to `templates/contract_list_bottom.html`, which the plugin's code never uses? → A: Delete it (its last use was removed in commit 9784e95); only `contract_assignments_bottom.html` is moved; the removal is mentioned in the changelog.
 - Q: Should this ship as a patch release (2.5.x) or a minor release (2.6.0)? → A: A patch release (next 2.5.x): the changes are conformance fixes with no migration and no new setting, field or endpoint.
+- Q: When the add-invoice or add-invoice-line address already carries a value (for example `?date=` or `?period_start=`) and the contract or invoice would propose another, which wins? → A: The address wins, as on NetBox core forms; the contract or invoice only fills the fields the address leaves empty. For invoices this is a behaviour change (today the contract-derived values and today's date replace the address values) and is listed in the changelog.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -42,7 +43,7 @@ A contract manager opens an invoice line, an accounting dimension, a contract ty
 
 ### User Story 2 - Lookup modifiers on the plugin's filter forms (Priority: P2)
 
-A user filtering the contract, invoice or invoice line list wants the lookup modifiers that NetBox 4.5+ offers on its own filter forms (for example "contains", "starts with", "not equal", "empty"), for example to find every contract whose name contains a word.
+A user filtering the contract, invoice or invoice line list wants the lookup modifiers that NetBox 4.5+ offers on its own filter forms (for example "contains", "starts with", "not equal", "empty"), for example to find every contract whose external reference contains a word.
 
 **Why this priority**: it brings the plugin's lists to the same filtering power as NetBox core lists; it is not a missing feature but a visible gap with core.
 
@@ -51,7 +52,7 @@ A user filtering the contract, invoice or invoice line list wants the lookup mod
 **Acceptance Scenarios**:
 
 1. **Given** the filter form of any of the nine plugin object lists, **When** it is displayed, **Then** fields that NetBox supports modifiers for (text, number, date and choice fields) offer the modifier selector as on core lists.
-2. **Given** contracts named "Alpha fiber" and "Beta power", **When** the contract list is filtered on name "contains fiber", **Then** only "Alpha fiber" is listed.
+2. **Given** contracts with external references "ALPHA-FIBER-01" and "BETA-POWER-02", **When** the contract list is filtered on external reference "contains FIBER" from the filter form, **Then** only the first contract is listed.
 3. **Given** a filtered list address saved before the upgrade, **When** it is opened after the upgrade, **Then** it returns the same results.
 
 ---
@@ -115,6 +116,7 @@ A user viewing a contract with the deprecated fields setting off does not see th
 - The contract assignments shown at the bottom of an assignable NetBox object page (inline display) still render after their template moves; a template with the same name in another plugin does not replace them.
 - A filter form field that the plugin defines itself (for example a choice of contract or a date) still filters as before when no modifier is chosen.
 - The invoice add form opened with an identifier that is not a number, or of a contract that does not exist, opens empty without error, as before.
+- The invoice add form opened from a contract with `?date=2026-01-15` in the address keeps 15 January 2026 as the invoice date and fills the other fields from the contract.
 - The invoice add form opened with a contract whose lines cannot be proposed (invoicing error) still shows the error message and the rest of the pre-fill.
 - Query-count baselines of list views change only if a list view's queries change; any re-recording states the reason.
 
@@ -131,12 +133,12 @@ A user viewing a contract with the deprecated fields setting off does not see th
 - **FR-007**: No form field MAY be added, removed or renamed by the grouping; fields hidden by `hidden_contract_fields` or `show_deprecated_fields` MUST stay hidden under the same conditions.
 - **FR-008**: The contract type description MUST be a single-line text field in the filter, bulk-edit and import forms.
 - **FR-009**: The invoice and invoice line add/edit screens MUST answer quick-add and partial-refresh requests like other NetBox edit screens.
-- **FR-010**: The pre-fill of a new invoice from a contract and of a new invoice line from an invoice MUST propose the same values as before, only from a contract or invoice the user may view, and MUST NOT change an existing invoice or invoice line opened for editing.
+- **FR-010**: The pre-fill of a new invoice from a contract and of a new invoice line from an invoice MUST propose the same values as before for the fields the page address leaves empty; a value given in the address MUST be kept. Values are only taken from a contract or invoice the user may view, and an existing invoice or invoice line opened for editing MUST NOT be pre-filled.
 - **FR-011**: The contract assignment template used on other NetBox objects' pages MUST live in the plugin's own template folder so that another plugin cannot replace it by accident. The unused `contract_list_bottom.html` template MUST be deleted, with its translation entries, and no plugin template MAY remain at the root of the template folder.
 - **FR-012**: The contract page MUST NOT look up or show the deprecated invoice template when `show_deprecated_fields` is off, and MUST show it as before when it is on.
 - **FR-013**: No REST field, endpoint, plugin setting, import column or stored data MAY change (Constitution IV and V).
 - **FR-014**: Every acceptance scenario above MUST be covered by an automated test that fails before the change where the behaviour changes (Constitution II).
-- **FR-015**: `CHANGELOG.md` MUST have a "Changed" entry for these changes, with a "Behaviour changes" note for the invoice template section hidden when deprecated fields are off and a mention of the removed unused `contract_list_bottom.html` template; `docs/` MUST be updated where form descriptions or screenshots change (Constitution VII).
+- **FR-015**: `CHANGELOG.md` MUST have a "Changed" entry for these changes, with a "Behaviour changes" note for the invoice template section hidden when deprecated fields are off a mention of the removed unused `contract_list_bottom.html` template, and the invoice pre-fill keeping values given in the page address; `docs/` MUST be updated where form descriptions or screenshots change (Constitution VII).
 
 ### Key Entities
 
