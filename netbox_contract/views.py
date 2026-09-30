@@ -230,7 +230,7 @@ class BaseObjectContractAssignmentView(generic.ObjectChildrenView):
         badge=lambda obj: ContractAssignment.objects.filter(
             content_type=ContentType.objects.get_for_model(obj), object_id=obj.id
         ).count(),
-        permission='contracts.view_contractassignment',
+        permission='netbox_contract.view_contractassignment',
         weight=550,
         hide_if_empty=True,
     )
@@ -674,8 +674,13 @@ class InvoiceLineEditView(generic.ObjectEditView):
         model = self.queryset.model
 
         initial_data = normalize_querydict(request.GET)
-        if 'invoice' in initial_data.keys():
-            invoice = Invoice.objects.get(pk=initial_data['invoice'])
+        invoice_id = initial_data.get('invoice')
+        # Only an invoice the user may view is used to pre-fill the line
+        invoice = (
+            Invoice.objects.restrict(request.user, 'view').filter(pk=invoice_id).first()
+            if str(invoice_id).isdigit() else None
+        )
+        if invoice is not None:
             # propose the rest of the invoice amount as the unit price of one unit
             initial_data.setdefault('unit_price', invoice.amount - invoice.total_invoicelines_amount)
             initial_data.setdefault('quantity', 1)

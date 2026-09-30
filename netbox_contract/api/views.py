@@ -53,11 +53,13 @@ class InvoiceViewSet(NetBoxModelViewSet):
 class ServiceProviderViewSet(NetBoxModelViewSet):
     queryset = models.ServiceProvider.objects.prefetch_related('tags')
     serializer_class = ServiceProviderSerializer
+    filterset_class = filtersets.ServiceProviderFilterSet
 
 
 class ContractAssignmentViewSet(NetBoxModelViewSet):
     queryset = models.ContractAssignment.objects.prefetch_related('contract', 'tags')
     serializer_class = ContractAssignmentSerializer
+    filterset_class = filtersets.ContractAssignmentFilterSet
 
 
 class InvoiceLineViewSet(NetBoxModelViewSet):
@@ -71,11 +73,13 @@ class InvoiceLineViewSet(NetBoxModelViewSet):
 class AccountingDimensionViewSet(NetBoxModelViewSet):
     queryset = models.AccountingDimension.objects.prefetch_related('tags')
     serializer_class = AccountingDimensionSerializer
+    filterset_class = filtersets.AccountingDimensionFilterSet
 
 
 class ContractTypeViewSet(NetBoxModelViewSet):
     queryset = models.ContractType.objects.prefetch_related('tags')
     serializer_class = ContractTypeSerializer
+    filterset_class = filtersets.ContractTypeFilterSet
 
 
 class UnitViewSet(NetBoxModelViewSet):

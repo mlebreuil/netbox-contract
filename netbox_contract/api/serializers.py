@@ -1,5 +1,6 @@
-from django.contrib.auth.models import ContentType
-from drf_yasg.utils import swagger_serializer_method
+from django.contrib.contenttypes.models import ContentType
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from netbox.api.fields import ContentTypeField, SerializedPKRelatedField
 from netbox.api.serializers import NetBoxModelSerializer, WritableNestedSerializer
 from rest_framework import serializers
@@ -61,7 +62,7 @@ class NestedContractSerializer(WritableNestedSerializer):
             'documents',
         )
 
-    @swagger_serializer_method(serializer_or_field=serializers.JSONField)
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_external_party_object(self, instance):
         serializer = get_serializer_for_model(
             instance.external_party_object_type.model_class()
@@ -217,7 +218,7 @@ class ContractSerializer(NetBoxModelSerializer):
             'parent',
         )
 
-    @swagger_serializer_method(serializer_or_field=serializers.JSONField)
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_external_party_object(self, instance):
         serializer = get_serializer_for_model(
             instance.external_party_object_type.model_class()
@@ -387,7 +388,7 @@ class ContractAssignmentSerializer(NetBoxModelSerializer):
         )
         brief_fields = ('id', 'url', 'display', 'content_object', 'contract', 'tags', 'custom_fields')
 
-    @swagger_serializer_method(serializer_or_field=serializers.JSONField)
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_content_object(self, instance):
         serializer = get_serializer_for_model(instance.content_type.model_class())
         context = {'request': self.context['request']}

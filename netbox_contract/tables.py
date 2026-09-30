@@ -432,7 +432,7 @@ class ContractLineContractTable(ContractLineListTable):
 
 
 AMEND_BUTTON = """
-{% if perms.netbox_contract.change_contractline and record.can_be_amended %}
+{% if perms.netbox_contract.change_contractline and perms.netbox_contract.add_contractline and record.can_be_amended %}
   <a href="{% url 'plugins:netbox_contract:contractline_amend' pk=record.pk %}"
      class="btn btn-sm btn-primary" title="Amend price or quantity">
     <i class="mdi mdi-cash-sync" aria-hidden="true"></i> Amend

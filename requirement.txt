@@ -1,2 +1,1 @@
 python-dateutil
-drf_yasg
