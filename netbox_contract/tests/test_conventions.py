@@ -1,12 +1,14 @@
 """Alignment with the NetBox 4.6 plugin conventions (issue #308, specs/002-netbox-46-conventions)."""
 
 import inspect
+from datetime import date
 from unittest import mock
 
 from dcim.models import Site
 from django import forms as django_forms
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.messages import get_messages
 from django.urls import resolve, reverse
 from extras.models import JournalEntry
 from netbox.forms import NetBoxModelBulkEditForm, NetBoxModelFilterSetForm, NetBoxModelForm, NetBoxModelImportForm
@@ -329,3 +331,82 @@ class FormSectionsTestCase(TestCase):
                 self.assertNotIsInstance(widget, MarkdownWidget)
                 self.assertFalse(field.required)
         self.assertEqual(tuple(forms.ContractTypeBulkEditForm.nullable_fields), ('description',))
+
+
+class EditViewTestCase(TestCase):
+    """The invoice and invoice line edit screens answer like core edit views (FR-009, FR-010, SC-006, US4)."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.contract = make_contract(name='Edit views contract')
+        make_line(cls.contract, monthly(), '100')
+        cls.invoice = make_invoice(cls.contract, number='EDIT-1', status=InvoiceStatusChoices.STATUS_DRAFT,
+                                   amount=300, period_start=date(2024, 12, 1), period_end=date(2024, 12, 31))
+
+    def setUp(self):
+        super().setUp()
+        self.user.is_superuser = True
+        self.user.save()
+
+    def get(self, name, query='', **kwargs):
+        url = reverse(f'plugins:netbox_contract:{name}', kwargs=kwargs)
+        return self.client.get(f'{url}?{query}' if query else url, **getattr(self, 'headers', {}))
+
+    def template_names(self, response):
+        return [template.name for template in response.templates]
+
+    def test_quick_add(self):
+        response = self.get('invoice_add', f'contracts={self.contract.pk}&_quickadd=true')
+        self.assertIn('htmx/quick_add.html', self.template_names(response))
+        form = response.context['form']
+        self.assertEqual(form.prefix, 'quickadd')
+        self.assertEqual(form.initial['period_start'], date(2025, 1, 1))
+        response = self.get('invoiceline_add', f'invoice={self.invoice.pk}&_quickadd=true')
+        self.assertIn('htmx/quick_add.html', self.template_names(response))
+        self.assertEqual(response.context['form'].initial['quantity'], 1)
+
+    def test_htmx_partial(self):
+        self.headers = {'HTTP_HX_REQUEST': 'true'}
+        for name, query in (('invoice_add', f'contracts={self.contract.pk}'),
+                            ('invoiceline_add', f'invoice={self.invoice.pk}')):
+            with self.subTest(view=name):
+                response = self.get(name, query)
+                self.assertIn('htmx/form.html', self.template_names(response))
+                self.assertNotIn('generic/object_edit.html', self.template_names(response))
+
+    def test_address_values_win(self):
+        initial = self.get('invoice_add', f'contracts={self.contract.pk}&date=2026-01-15').context['form'].initial
+        self.assertEqual(str(initial['date']), '2026-01-15')
+        self.assertEqual(initial['period_start'], date(2025, 1, 1))
+        self.assertEqual(initial['currency'], 'usd')
+        initial = self.get('invoiceline_add', f'invoice={self.invoice.pk}&quantity=3').context['form'].initial
+        self.assertEqual(str(initial['quantity']), '3')
+        self.assertEqual(initial['currency'], 'usd')
+
+    def test_no_prefill_on_edit(self):
+        other = make_contract(name='Other contract', currency='eur')
+        initial = self.get('invoice_edit', f'contracts={other.pk}', pk=self.invoice.pk).context['form'].initial
+        self.assertEqual(initial['date'], self.invoice.date)
+        self.assertEqual(initial['period_start'], date(2024, 12, 1))
+        self.assertEqual(initial['currency'], 'usd')
+        line = make_invoice_line(self.invoice, amount=100)
+        other_invoice = make_invoice(other, number='EDIT-2', status=InvoiceStatusChoices.STATUS_DRAFT, amount=999)
+        initial = self.get('invoiceline_edit', f'invoice={other_invoice.pk}', pk=line.pk).context['form'].initial
+        self.assertEqual(initial['currency'], 'usd')
+
+    def test_invalid_or_unknown_contract(self):
+        for value in ('abc', '999999'):
+            with self.subTest(contracts=value):
+                response = self.get('invoice_add', f'contracts={value}')
+                self.assertHttpStatus(response, 200)
+                self.assertIsNone(response.context['form'].initial.get('period_start'))
+
+    def test_invoicing_error_keeps_the_rest_of_the_prefill(self):
+        child = make_contract(name='Not billable', parent=self.contract, billable=False)
+        response = self.get('invoice_add', f'contracts={child.pk}')
+        messages = [str(message) for message in get_messages(response.wsgi_request)]
+        self.assertTrue(any('not billable' in message for message in messages), messages)
+        initial = response.context['form'].initial
+        self.assertEqual(initial['period_start'], date(2025, 1, 1))
+        self.assertEqual(initial['currency'], 'usd')
+        self.assertIsNone(initial.get('amount'))

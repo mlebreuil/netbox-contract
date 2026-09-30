@@ -16,8 +16,6 @@ from django.utils.translation import gettext_lazy as _
 from netbox.object_actions import *
 from netbox.views import generic
 from netbox.views.generic.base import BaseObjectView
-from netbox.views.generic.utils import get_prerequisite_model
-from utilities.forms import restrict_form_fields
 from utilities.querydict import normalize_querydict
 from utilities.views import ViewTab, get_action_url, register_model_view
 
@@ -571,6 +569,18 @@ class InvoiceLinesPreviewView(BaseObjectView):
         })
 
 
+def form_with_defaults(form_class, defaults):
+    """
+    The form class with extra initial values that the initial values passed by the view (the page address) override.
+    Used to pre-fill a new object and still let core ObjectEditView.get() handle quick add and HTMX requests.
+    """
+    class FormWithDefaults(form_class):
+        def __init__(self, *args, initial=None, **kwargs):
+            super().__init__(*args, initial={**defaults, **(initial or {})}, **kwargs)
+
+    return FormWithDefaults
+
+
 @register_model_view(Invoice, 'add', detail=False)
 @register_model_view(Invoice, 'edit')
 class InvoiceEditView(generic.ObjectEditView):
@@ -579,77 +589,58 @@ class InvoiceEditView(generic.ObjectEditView):
     template_name = 'netbox_contract/invoice_edit.html'
 
     def get_extra_context(self, request, instance):
-        if request.method == 'POST' and not instance.pk:
+        if instance.pk:
+            return {}
+        if request.method == 'POST':
             return {'lines_preview': build_lines_preview(request.POST, request.user)}
-        return {}
+        # New invoice: the preview uses the same values as the form, the address winning over the pre-fill
+        data = {**getattr(self, 'prefill', {}), **normalize_querydict(request.GET)}
+        return {'lines_preview': build_lines_preview(data, request.user)}
 
     def get(self, request, *args, **kwargs):
-        """
-        GET request handler
-            Overrides the ObjectEditView function to include form initialization
-            with data from the parent contract object
+        """Pre-fill a new invoice from the contract given in the address, then render as core does."""
+        if not kwargs:
+            self.prefill = self.invoice_prefill(request)
+            self.form = form_with_defaults(self.form, self.prefill)
+        return super().get(request, *args, **kwargs)
 
-        Args:
-            request: The current request
-        """
-        obj = self.get_object(**kwargs)
-        obj = self.alter_object(obj, request, args, kwargs)
-        model = self.queryset.model
-
-        initial_data = normalize_querydict(request.GET)
-        initial_data['date'] = date.today()
-        contract_id = initial_data.get('contracts')
+    def invoice_prefill(self, request):
+        """Values proposed for a new invoice; values given in the address are kept (they override these)."""
+        prefill = {'date': date.today()}
+        contract_id = request.GET.get('contracts')
         # Only a contract the user may view is used to pre-fill the invoice
         contract = (
             Contract.objects.restrict(request.user, 'view').filter(pk=contract_id).first()
             if str(contract_id).isdigit() else None
         )
-        if contract is not None:
-            try:
-                last_invoice = contract.invoices.exclude(template=True).filter(period_end__isnull=False).latest(
-                    'period_end'
-                )
-                new_period_start = last_invoice.period_end + timedelta(days=1)
-            except ObjectDoesNotExist:
-                if contract.start_date:
-                    new_period_start = contract.start_date
-                else:
-                    new_period_start = None
+        if contract is None:
+            return prefill
 
-            new_period_end = None
-            if new_period_start:
-                initial_data['period_start'] = new_period_start
-                delta = relativedelta(months=contract.invoice_frequency)
-                new_period_end = new_period_start + delta - timedelta(days=1)
-                initial_data['period_end'] = new_period_end
+        try:
+            last_invoice = contract.invoices.exclude(template=True).filter(period_end__isnull=False).latest(
+                'period_end'
+            )
+            new_period_start = last_invoice.period_end + timedelta(days=1)
+        except ObjectDoesNotExist:
+            new_period_start = contract.start_date or None
 
-            # Amount proposed from the contract lines (not from the deprecated cost fields)
-            try:
-                proposal = invoicing.propose_invoice(contract, new_period_start, new_period_end)
-            except invoicing.InvoicingError as e:
-                messages.error(request, e.message)
-            else:
-                if proposal.lines:
-                    initial_data['amount'] = proposal.total
+        new_period_end = None
+        if new_period_start:
+            prefill['period_start'] = new_period_start
+            new_period_end = new_period_start + relativedelta(months=contract.invoice_frequency) - timedelta(days=1)
+            prefill['period_end'] = new_period_end
 
-            initial_data['currency'] = contract.currency
+        # Amount proposed from the contract lines (not from the deprecated cost fields)
+        try:
+            proposal = invoicing.propose_invoice(contract, new_period_start, new_period_end)
+        except invoicing.InvoicingError as e:
+            messages.error(request, e.message)
+        else:
+            if proposal.lines:
+                prefill['amount'] = proposal.total
 
-        form = self.form(instance=obj, initial=initial_data)
-        restrict_form_fields(form, request.user)
-
-        return render(
-            request,
-            self.template_name,
-            {
-                'model': model,
-                'object': obj,
-                'form': form,
-                'return_url': self.get_return_url(request, obj),
-                'prerequisite_model': get_prerequisite_model(self.queryset),
-                'lines_preview': None if obj.pk else build_lines_preview(initial_data, request.user),
-                **self.get_extra_context(request, obj),
-            },
-        )
+        prefill['currency'] = contract.currency
+        return prefill
 
 
 @register_model_view(Invoice, 'delete')
@@ -702,46 +693,24 @@ class InvoiceLineEditView(generic.ObjectEditView):
     form = forms.InvoiceLineForm
 
     def get(self, request, *args, **kwargs):
-        """
-        GET request handler
-            Overrides the ObjectEditView function to include form initialization
-            with data from the parent invoice object
-
-        Args:
-            request: The current request
-        """
-        obj = self.get_object(**kwargs)
-        obj = self.alter_object(obj, request, args, kwargs)
-        model = self.queryset.model
-
-        initial_data = normalize_querydict(request.GET)
-        invoice_id = initial_data.get('invoice')
-        # Only an invoice the user may view is used to pre-fill the line
-        invoice = (
-            Invoice.objects.restrict(request.user, 'view').filter(pk=invoice_id).first()
-            if str(invoice_id).isdigit() else None
-        )
-        if invoice is not None:
-            # propose the rest of the invoice amount as the unit price of one unit
-            initial_data.setdefault('unit_price', invoice.amount - invoice.total_invoicelines_amount)
-            initial_data.setdefault('quantity', 1)
-            initial_data.setdefault('currency', invoice.currency)
-
-        form = self.form(instance=obj, initial=initial_data)
-        restrict_form_fields(form, request.user)
-
-        return render(
-            request,
-            self.template_name,
-            {
-                'model': model,
-                'object': obj,
-                'form': form,
-                'return_url': self.get_return_url(request, obj),
-                'prerequisite_model': get_prerequisite_model(self.queryset),
-                **self.get_extra_context(request, obj),
-            },
-        )
+        """Pre-fill a new invoice line from the invoice given in the address, then render as core does."""
+        if not kwargs:
+            prefill = {}
+            invoice_id = request.GET.get('invoice')
+            # Only an invoice the user may view is used to pre-fill the line
+            invoice = (
+                Invoice.objects.restrict(request.user, 'view').filter(pk=invoice_id).first()
+                if str(invoice_id).isdigit() else None
+            )
+            if invoice is not None:
+                # propose the rest of the invoice amount as the unit price of one unit
+                prefill = {
+                    'unit_price': invoice.amount - invoice.total_invoicelines_amount,
+                    'quantity': 1,
+                    'currency': invoice.currency,
+                }
+            self.form = form_with_defaults(self.form, prefill)
+        return super().get(request, *args, **kwargs)
 
 
 @register_model_view(InvoiceLine, 'delete')
