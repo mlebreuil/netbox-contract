@@ -135,8 +135,10 @@ the `contracts` many-to-many on an unsaved instance).
 
 **Decision**: move `templates/contract_assignments_bottom.html` to
 `templates/netbox_contract/inc/contract_assignments_bottom.html` and update `template_content.py`; delete
-`templates/contract_list_bottom.html` (clarification Q3). New section titles are translated in `locale/fr` (for
-example Parties → Parties, Dates and terms → Dates et conditions, Billing → Facturation). Refresh the `.po` references with `makemessages` and
+`templates/contract_list_bottom.html` (clarification Q3). The catalogs are refreshed and every untranslated or fuzzy
+French entry is translated, including those of #278/#307 (maintainer decision during implementation); for a msgid
+NetBox core also translates, NetBox's catalog takes precedence, so the plugin uses the same wording (Tenancy →
+Utilisateur). Refresh the `.po` references with `makemessages` and
 recompile the `.mo` files; the only message of the deleted template (`Contracts`) is used elsewhere, so no
 translation is lost.
 
@@ -150,7 +152,9 @@ template of another app could shadow it. `inc/` is where the plugin keeps its pa
 `contract.html` (`{% if invoice_template %}`) is not rendered (clarification Q1).
 
 **Rationale**: consistent with the rest of the deprecated data; saves one query (two with a template) per contract
-page when the setting is off, which is the default.
+page when the setting is off, which is the default. #278 had added the panel on purpose (templates "kept for
+reference"); the maintainer confirmed hiding it during implementation, and templates stay reachable from the invoice
+list.
 
 ## D8. Tests and baselines
 

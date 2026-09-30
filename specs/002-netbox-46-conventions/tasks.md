@@ -178,9 +178,9 @@ partial request return the short forms.
 
 ### Validation
 
-- [ ] T045 Run the whole suite (`netbox_contract.tests`), `ruff check`, and `makemigrations netbox_contract --check --dry-run` (nothing pending); if a list view query-count test fails, re-record serially with `UPDATE_QUERY_COUNTS=1` and state the reason in the commit (Constitution II)
-- [ ] T046 Walk the manual checks of [quickstart.md](quickstart.md) in the dev NetBox (Journal tab, filter modifiers, contract form sections, add invoice from a contract, `invoiceline/add/?_quickadd=true` returning the short form)
-- [ ] T047 Update `spec.md`, `research.md` and this file if implementation deviated from them (CLAUDE.md workflow rule)
+- [X] T045 Run the whole suite (`netbox_contract.tests`), `ruff check`, and `makemigrations netbox_contract --check --dry-run` (nothing pending); if a list view query-count test fails, re-record serially with `UPDATE_QUERY_COUNTS=1` and state the reason in the commit (Constitution II)
+- [X] T046 Walk the manual checks of [quickstart.md](quickstart.md) in the dev NetBox (Journal tab, filter modifiers, contract form sections, add invoice from a contract, `invoiceline/add/?_quickadd=true` returning the short form). Done without a browser: the same checks run with Django's test client as a superuser against the dev NetBox database (sections on the contract add form, modifier selector on the contract list, Journal tab on a contract type, short quick-add form for an invoice line, invoice pre-fill from a contract); a visual check in the browser is left to the maintainer
+- [X] T047 Update `spec.md`, `research.md` and this file if implementation deviated from them (CLAUDE.md workflow rule)
 
 ---
 

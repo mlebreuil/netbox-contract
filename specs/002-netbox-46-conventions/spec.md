@@ -152,11 +152,11 @@ No entity is added or changed. The change touches how the nine existing plugin o
 - **SC-002**: 9 out of 9 plugin filter forms offer lookup modifiers (today 0 out of 9).
 - **SC-003**: 100% of the plugin page addresses and route names used before the change still resolve to the same page.
 - **SC-004**: 100% of the plugin's add/edit, bulk-edit and filter forms show their fields in titled sections, with the same set of fields as before.
-- **SC-005**: The existing automated test suite passes unchanged apart from tests added for this feature; query-count baselines change only with a stated reason.
+- **SC-005**: The existing automated test suite passes unchanged apart from tests added for this feature and the #278 test of the invoice template panel, adapted to clarification Q1; query-count baselines change only with a stated reason.
 - **SC-006**: 2 out of 2 screens (invoice and invoice line add/edit) return the short quick-add form and the partial form when asked, as every core add/edit screen does (today 0 out of 2).
 
 ## Assumptions
 
 - The minimum NetBox version stays 4.6; every NetBox facility used (model view registration, filterset registration, form sections, quick add) exists in 4.6.
 - Section names and field grouping follow NetBox core forms for similar objects (for example circuits and providers); the exact grouping is a design decision recorded in the plan and not a user requirement.
-- Translations (`locale/`) are updated for moved templates and new section titles as part of the normal message extraction.
+- Translations (`locale/`) are refreshed with `makemessages`; at the maintainer's request every untranslated or fuzzy French entry is translated, including the strings added by #278 and #307.
