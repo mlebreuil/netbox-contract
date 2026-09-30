@@ -46,10 +46,12 @@ logger = logging.getLogger('netbox.plugins.netbox_contract')
 # ContractType views
 
 
+@register_model_view(ContractType)
 class ContractTypeView(generic.ObjectView):
     queryset = ContractType.objects.all()
 
 
+@register_model_view(ContractType, 'list', path='', detail=False)
 class ContractTypeListView(generic.ObjectListView):
     queryset = ContractType.objects.all()
     table = tables.ContractTypeListTable
@@ -57,17 +59,21 @@ class ContractTypeListView(generic.ObjectListView):
     filterset_form = forms.ContractTypeFilterForm
 
 
+@register_model_view(ContractType, 'add', detail=False)
+@register_model_view(ContractType, 'edit')
 class ContractTypeEditView(generic.ObjectEditView):
     queryset = ContractType.objects.all()
     form = forms.ContractTypeForm
 
 
+@register_model_view(ContractType, 'bulk_import', path='import', detail=False)
 class ContractTypeBulkImportView(generic.BulkImportView):
     queryset = ContractType.objects.all()
     model_form = forms.ContractTypeCSVForm
     table = tables.ContractTypeListTable
 
 
+@register_model_view(ContractType, 'bulk_edit', path='edit', detail=False)
 class ContractTypeBulkEditView(generic.BulkEditView):
     queryset = ContractType.objects.annotate()
     filterset = filtersets.ContractTypeFilterSet
@@ -75,10 +81,12 @@ class ContractTypeBulkEditView(generic.BulkEditView):
     form = forms.ContractTypeBulkEditForm
 
 
+@register_model_view(ContractType, 'delete')
 class ContractTypeDeleteView(generic.ObjectDeleteView):
     queryset = ContractType.objects.all()
 
 
+@register_model_view(ContractType, 'bulk_delete', path='delete', detail=False)
 class ContractTypeBulkDeleteView(generic.BulkDeleteView):
     queryset = ContractType.objects.annotate()
     filterset = filtersets.ContractTypeFilterSet
@@ -105,6 +113,7 @@ class ServiceProviderView(generic.ObjectView):
         }
 
 
+@register_model_view(ServiceProvider, 'list', path='', detail=False)
 class ServiceProviderListView(generic.ObjectListView):
     queryset = ServiceProvider.objects.all()
     table = tables.ServiceProviderListTable
@@ -112,21 +121,26 @@ class ServiceProviderListView(generic.ObjectListView):
     filterset_form = forms.ServiceProviderFilterForm
 
 
+@register_model_view(ServiceProvider, 'add', detail=False)
+@register_model_view(ServiceProvider, 'edit')
 class ServiceProviderEditView(generic.ObjectEditView):
     queryset = ServiceProvider.objects.all()
     form = forms.ServiceProviderForm
 
 
+@register_model_view(ServiceProvider, 'delete')
 class ServiceProviderDeleteView(generic.ObjectDeleteView):
     queryset = ServiceProvider.objects.all()
 
 
+@register_model_view(ServiceProvider, 'bulk_import', path='import', detail=False)
 class ServiceProviderBulkImportView(generic.BulkImportView):
     queryset = ServiceProvider.objects.all()
     model_form = forms.ServiceProviderCSVForm
     table = tables.ServiceProviderListTable
 
 
+@register_model_view(ServiceProvider, 'bulk_edit', path='edit', detail=False)
 class ServiceProviderBulkEditView(generic.BulkEditView):
     queryset = ServiceProvider.objects.annotate()
     filterset = filtersets.ServiceProviderFilterSet
@@ -134,6 +148,7 @@ class ServiceProviderBulkEditView(generic.BulkEditView):
     form = forms.ServiceProviderBulkEditForm
 
 
+@register_model_view(ServiceProvider, 'bulk_delete', path='delete', detail=False)
 class ServiceProviderBulkDeleteView(generic.BulkDeleteView):
     queryset = ServiceProvider.objects.annotate()
     filterset = filtersets.ServiceProviderFilterSet
@@ -143,10 +158,12 @@ class ServiceProviderBulkDeleteView(generic.BulkDeleteView):
 # Contract assignment view
 
 
+@register_model_view(ContractAssignment)
 class ContractAssignmentView(generic.ObjectView):
     queryset = ContractAssignment.objects.all()
 
 
+@register_model_view(ContractAssignment, 'list', path='', detail=False)
 class ContractAssignmentListView(generic.ObjectListView):
     queryset = ContractAssignment.objects.all()
     table = tables.ContractAssignmentListTable
@@ -154,6 +171,8 @@ class ContractAssignmentListView(generic.ObjectListView):
     filterset_form = forms.ContractAssignmentFilterForm
 
 
+@register_model_view(ContractAssignment, 'add', detail=False)
+@register_model_view(ContractAssignment, 'edit')
 class ContractAssignmentEditView(generic.ObjectEditView):
     queryset = ContractAssignment.objects.all()
     form = forms.ContractAssignmentForm
@@ -176,16 +195,19 @@ class ContractAssignmentEditView(generic.ObjectEditView):
         }
 
 
+@register_model_view(ContractAssignment, 'delete')
 class ContractAssignmentDeleteView(generic.ObjectDeleteView):
     queryset = ContractAssignment.objects.all()
 
 
+@register_model_view(ContractAssignment, 'bulk_import', path='import', detail=False)
 class ContractAssignmentBulkImportView(generic.BulkImportView):
     queryset = ContractAssignment.objects.all()
     model_form = forms.ContractAssignmentImportForm
     table = tables.ContractAssignmentListTable
 
 
+@register_model_view(ContractAssignment, 'bulk_edit', path='edit', detail=False)
 class ContractAssignmentBulkEditView(generic.BulkEditView):
     queryset = ContractAssignment.objects.annotate()
     filterset = filtersets.ContractAssignmentFilterSet
@@ -193,6 +215,7 @@ class ContractAssignmentBulkEditView(generic.BulkEditView):
     form = forms.ContractAssignmentBulkEditForm
 
 
+@register_model_view(ContractAssignment, 'bulk_delete', path='delete', detail=False)
 class ContractAssignmentBulkDeleteView(generic.BulkDeleteView):
     queryset = ContractAssignment.objects.annotate()
     filterset = filtersets.ContractAssignmentFilterSet
@@ -340,6 +363,7 @@ class ContractView(generic.ObjectView):
         }
 
 
+@register_model_view(Contract, 'list', path='', detail=False)
 class ContractListView(generic.ObjectListView):
     queryset = Contract.objects.annotate(yearly_value=yearly_value_annotation())
     table = tables.ContractListTable
@@ -347,6 +371,8 @@ class ContractListView(generic.ObjectListView):
     filterset_form = forms.ContractFilterForm
 
 
+@register_model_view(Contract, 'add', detail=False)
+@register_model_view(Contract, 'edit')
 class ContractEditView(generic.ObjectEditView):
     queryset = Contract.objects.all()
     form = forms.ContractForm
@@ -381,16 +407,19 @@ class ContractEditView(generic.ObjectEditView):
         return obj
 
 
+@register_model_view(Contract, 'delete')
 class ContractDeleteView(generic.ObjectDeleteView):
     queryset = Contract.objects.all()
 
 
+@register_model_view(Contract, 'bulk_import', path='import', detail=False)
 class ContractBulkImportView(generic.BulkImportView):
     queryset = Contract.objects.all()
     model_form = forms.ContractCSVForm
     table = tables.ContractListTable
 
 
+@register_model_view(Contract, 'bulk_edit', path='edit', detail=False)
 class ContractBulkEditView(generic.BulkEditView):
     queryset = Contract.objects.all()
     filterset = filtersets.ContractFilterSet
@@ -398,6 +427,7 @@ class ContractBulkEditView(generic.BulkEditView):
     form = forms.ContractBulkEditForm
 
 
+@register_model_view(Contract, 'bulk_delete', path='delete', detail=False)
 class ContractBulkDeleteView(generic.BulkDeleteView):
     queryset = Contract.objects.all()
     filterset = filtersets.ContractFilterSet
@@ -428,6 +458,7 @@ class InvoiceView(generic.ObjectView):
         }
 
 
+@register_model_view(Invoice, 'list', path='', detail=False)
 class InvoiceListView(generic.ObjectListView):
     queryset = Invoice.objects.all()
     table = tables.InvoiceListTable
@@ -540,6 +571,8 @@ class InvoiceLinesPreviewView(BaseObjectView):
         })
 
 
+@register_model_view(Invoice, 'add', detail=False)
+@register_model_view(Invoice, 'edit')
 class InvoiceEditView(generic.ObjectEditView):
     queryset = Invoice.objects.all()
     form = forms.InvoiceForm
@@ -619,16 +652,19 @@ class InvoiceEditView(generic.ObjectEditView):
         )
 
 
+@register_model_view(Invoice, 'delete')
 class InvoiceDeleteView(generic.ObjectDeleteView):
     queryset = Invoice.objects.all()
 
 
+@register_model_view(Invoice, 'bulk_import', path='import', detail=False)
 class InvoiceBulkImportView(generic.BulkImportView):
     queryset = Invoice.objects.all()
     model_form = forms.InvoiceCSVForm
     table = tables.InvoiceListTable
 
 
+@register_model_view(Invoice, 'bulk_edit', path='edit', detail=False)
 class InvoiceBulkEditView(generic.BulkEditView):
     queryset = Invoice.objects.all()
     filterset = filtersets.InvoiceFilterSet
@@ -636,6 +672,7 @@ class InvoiceBulkEditView(generic.BulkEditView):
     form = forms.InvoiceBulkEditForm
 
 
+@register_model_view(Invoice, 'bulk_delete', path='delete', detail=False)
 class InvoiceBulkDeleteView(generic.BulkDeleteView):
     queryset = Invoice.objects.all()
     filterset = filtersets.InvoiceFilterSet
@@ -645,10 +682,12 @@ class InvoiceBulkDeleteView(generic.BulkDeleteView):
 # InvoiceLine
 
 
+@register_model_view(InvoiceLine)
 class InvoiceLineView(generic.ObjectView):
     queryset = InvoiceLine.objects.all()
 
 
+@register_model_view(InvoiceLine, 'list', path='', detail=False)
 class InvoiceLineListView(generic.ObjectListView):
     queryset = InvoiceLine.objects.select_related('invoice', 'contract_line', 'unit')
     table = tables.InvoiceLineListTable
@@ -656,6 +695,8 @@ class InvoiceLineListView(generic.ObjectListView):
     filterset_form = forms.InvoiceLineFilterForm
 
 
+@register_model_view(InvoiceLine, 'add', detail=False)
+@register_model_view(InvoiceLine, 'edit')
 class InvoiceLineEditView(generic.ObjectEditView):
     queryset = InvoiceLine.objects.all()
     form = forms.InvoiceLineForm
@@ -703,16 +744,19 @@ class InvoiceLineEditView(generic.ObjectEditView):
         )
 
 
+@register_model_view(InvoiceLine, 'delete')
 class InvoiceLineDeleteView(generic.ObjectDeleteView):
     queryset = InvoiceLine.objects.all()
 
 
+@register_model_view(InvoiceLine, 'bulk_import', path='import', detail=False)
 class InvoiceLineBulkImportView(generic.BulkImportView):
     queryset = InvoiceLine.objects.all()
     model_form = forms.InvoiceLineImportForm
     table = tables.InvoiceLineListTable
 
 
+@register_model_view(InvoiceLine, 'bulk_edit', path='edit', detail=False)
 class InvoiceLineBulkEditView(generic.BulkEditView):
     queryset = InvoiceLine.objects.annotate()
     filterset = filtersets.InvoiceLineFilterSet
@@ -720,6 +764,7 @@ class InvoiceLineBulkEditView(generic.BulkEditView):
     form = forms.InvoiceLineBulkEditForm
 
 
+@register_model_view(InvoiceLine, 'bulk_delete', path='delete', detail=False)
 class InvoiceLineBulkDeleteView(generic.BulkDeleteView):
     queryset = InvoiceLine.objects.annotate()
     filterset = filtersets.InvoiceLineFilterSet
@@ -741,6 +786,7 @@ class UnitView(generic.ObjectView):
         return {'lines_table': lines_table}
 
 
+@register_model_view(Unit, 'list', path='', detail=False)
 class UnitListView(generic.ObjectListView):
     queryset = Unit.objects.all()
     table = tables.UnitListTable
@@ -748,21 +794,26 @@ class UnitListView(generic.ObjectListView):
     filterset_form = forms.UnitFilterForm
 
 
+@register_model_view(Unit, 'add', detail=False)
+@register_model_view(Unit, 'edit')
 class UnitEditView(generic.ObjectEditView):
     queryset = Unit.objects.all()
     form = forms.UnitForm
 
 
+@register_model_view(Unit, 'delete')
 class UnitDeleteView(generic.ObjectDeleteView):
     queryset = Unit.objects.all()
 
 
+@register_model_view(Unit, 'bulk_import', path='import', detail=False)
 class UnitBulkImportView(generic.BulkImportView):
     queryset = Unit.objects.all()
     model_form = forms.UnitImportForm
     table = tables.UnitListTable
 
 
+@register_model_view(Unit, 'bulk_edit', path='edit', detail=False)
 class UnitBulkEditView(generic.BulkEditView):
     queryset = Unit.objects.all()
     filterset = filtersets.UnitFilterSet
@@ -770,6 +821,7 @@ class UnitBulkEditView(generic.BulkEditView):
     form = forms.UnitBulkEditForm
 
 
+@register_model_view(Unit, 'bulk_delete', path='delete', detail=False)
 class UnitBulkDeleteView(generic.BulkDeleteView):
     queryset = Unit.objects.all()
     filterset = filtersets.UnitFilterSet
@@ -829,6 +881,7 @@ class ContractLineAmendView(BaseObjectView):
         return self.render_form(request, line, form)
 
 
+@register_model_view(ContractLine, 'list', path='', detail=False)
 class ContractLineListView(generic.ObjectListView):
     queryset = ContractLine.objects.select_related('contract', 'unit').prefetch_related('accounting_dimensions')
     table = tables.ContractLineListTable
@@ -836,6 +889,8 @@ class ContractLineListView(generic.ObjectListView):
     filterset_form = forms.ContractLineFilterForm
 
 
+@register_model_view(ContractLine, 'add', detail=False)
+@register_model_view(ContractLine, 'edit')
 class ContractLineEditView(generic.ObjectEditView):
     """The add view accepts ?contract=<id> to pre-select the contract."""
 
@@ -847,16 +902,19 @@ class ContractLineEditView(generic.ObjectEditView):
         return {'lock_message': instance.lock_message() if instance.pk else None}
 
 
+@register_model_view(ContractLine, 'delete')
 class ContractLineDeleteView(generic.ObjectDeleteView):
     queryset = ContractLine.objects.all()
 
 
+@register_model_view(ContractLine, 'bulk_import', path='import', detail=False)
 class ContractLineBulkImportView(generic.BulkImportView):
     queryset = ContractLine.objects.all()
     model_form = forms.ContractLineImportForm
     table = tables.ContractLineListTable
 
 
+@register_model_view(ContractLine, 'bulk_edit', path='edit', detail=False)
 class ContractLineBulkEditView(generic.BulkEditView):
     queryset = ContractLine.objects.select_related('contract', 'unit')
     filterset = filtersets.ContractLineFilterSet
@@ -864,6 +922,7 @@ class ContractLineBulkEditView(generic.BulkEditView):
     form = forms.ContractLineBulkEditForm
 
 
+@register_model_view(ContractLine, 'bulk_delete', path='delete', detail=False)
 class ContractLineBulkDeleteView(generic.BulkDeleteView):
     queryset = ContractLine.objects.select_related('contract', 'unit')
     filterset = filtersets.ContractLineFilterSet
@@ -873,10 +932,12 @@ class ContractLineBulkDeleteView(generic.BulkDeleteView):
 # Accounting dimension
 
 
+@register_model_view(AccountingDimension)
 class AccountingDimensionView(generic.ObjectView):
     queryset = AccountingDimension.objects.all()
 
 
+@register_model_view(AccountingDimension, 'list', path='', detail=False)
 class AccountingDimensionListView(generic.ObjectListView):
     queryset = AccountingDimension.objects.all()
     table = tables.AccountingDimensionListTable
@@ -884,21 +945,26 @@ class AccountingDimensionListView(generic.ObjectListView):
     filterset_form = forms.AccountingDimensionFilterForm
 
 
+@register_model_view(AccountingDimension, 'add', detail=False)
+@register_model_view(AccountingDimension, 'edit')
 class AccountingDimensionEditView(generic.ObjectEditView):
     queryset = AccountingDimension.objects.all()
     form = forms.AccountingDimensionForm
 
 
+@register_model_view(AccountingDimension, 'delete')
 class AccountingDimensionDeleteView(generic.ObjectDeleteView):
     queryset = AccountingDimension.objects.all()
 
 
+@register_model_view(AccountingDimension, 'bulk_import', path='import', detail=False)
 class AccountingDimensionBulkImportView(generic.BulkImportView):
     queryset = AccountingDimension.objects.all()
     model_form = forms.AccountingDimensionImportForm
     table = tables.AccountingDimensionListTable
 
 
+@register_model_view(AccountingDimension, 'bulk_edit', path='edit', detail=False)
 class AccountingDimensionBulkEditView(generic.BulkEditView):
     queryset = AccountingDimension.objects.annotate()
     filterset = filtersets.AccountingDimensionFilterSet
@@ -906,6 +972,7 @@ class AccountingDimensionBulkEditView(generic.BulkEditView):
     form = forms.AccountingDimensionBulkEditForm
 
 
+@register_model_view(AccountingDimension, 'bulk_delete', path='delete', detail=False)
 class AccountingDimensionBulkDeleteView(generic.BulkDeleteView):
     queryset = AccountingDimension.objects.annotate()
     filterset = filtersets.AccountingDimensionFilterSet

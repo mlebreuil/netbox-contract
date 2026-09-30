@@ -28,8 +28,8 @@ Commands (from `CLAUDE.md`): tests run from `/workspaces/netbox/netbox` with
 
 **Purpose**: baseline and shared test scaffolding
 
-- [ ] T001 Run the whole suite (`netbox_contract.tests`) and `ruff check` on the branch before any change and note the result (all green expected) in the commit message of T002
-- [ ] T002 Create `netbox_contract/tests/test_conventions.py` with a module docstring referencing spec 002 and a `setUpTestData` fixture helper building one object of each of the nine models with `tests/helpers.py` factories (`make_contract`, `make_line`, `make_invoice` with `status=InvoiceStatusChoices.STATUS_DRAFT`, `monthly()`), plus a `ContractType`, `AccountingDimension`, `ServiceProvider`, `InvoiceLine` and a `ContractAssignment` to a `dcim.Site`
+- [X] T001 Run the whole suite (`netbox_contract.tests`) and `ruff check` on the branch before any change and note the result (all green expected) in the commit message of T002
+- [X] T002 Create `netbox_contract/tests/test_conventions.py` with a module docstring referencing spec 002 and a `setUpTestData` fixture helper building one object of each of the nine models with `tests/helpers.py` factories (`make_contract`, `make_line`, `make_invoice` with `status=InvoiceStatusChoices.STATUS_DRAFT`, `monthly()`), plus a `ContractType`, `AccountingDimension`, `ServiceProvider`, `InvoiceLine` and a `ContractAssignment` to a `dcim.Site`
 
 ---
 
@@ -50,18 +50,18 @@ Changelog tabs shown, a journal entry can be added; every old route name resolve
 
 ### Tests for User Story 1 (write first, must fail)
 
-- [ ] T003 [US1] In `netbox_contract/tests/test_conventions.py`, class `RouteTestCase`: for each of the 82 route names of `contracts/routes.md`, `reverse('plugins:netbox_contract:<name>', kwargs={'pk': 1} when the address has `<int:pk>`)` returns `/plugins/contracts/<address>` and `resolve()` of it returns the listed view class (`ObjectChangeLogView` for `*_changelog`); `invoice_lines_preview` included. Passes before the change too (guard for the refactor); record that in the test docstring
-- [ ] T004 [US1] Same file, class `JournalTabTestCase`: as a superuser, GET the detail page of each of the nine models and assert the links to `<model>_journal` and `<model>_changelog` are in the response (fails today for `invoiceline`, `accountingdimension`, `contracttype`, `contractassignment`: `NoReverseMatch` on `<model>_journal`). The Journal view is registered by NetBox core through `register_model_view`, so this also covers FR-002 and the edge case "views registered by other code work for the four models"; say so in the test docstring
-- [ ] T005 [US1] Same class: POST a journal entry to NetBox's `extras:journalentry_add` for an invoice line (`assigned_object_type`, `assigned_object_id`, `kind`, `comments`) and assert it is listed by `plugins:netbox_contract:invoiceline_journal`
-- [ ] T006 [US1] Same class: `contractline_amend` still resolves and the Amend button is on the contract line page; the `contracts` tab is still registered for `dcim.site` (`dcim:site_contracts` resolves) (US1-4)
+- [X] T003 [US1] In `netbox_contract/tests/test_conventions.py`, class `RouteTestCase`: for each of the 82 route names of `contracts/routes.md`, `reverse('plugins:netbox_contract:<name>', kwargs={'pk': 1} when the address has `<int:pk>`)` returns `/plugins/contracts/<address>` and `resolve()` of it returns the listed view class (`ObjectChangeLogView` for `*_changelog`); `invoice_lines_preview` included. Passes before the change too (guard for the refactor); record that in the test docstring
+- [X] T004 [US1] Same file, class `JournalTabTestCase`: as a superuser, GET the detail page of each of the nine models and assert the links to `<model>_journal` and `<model>_changelog` are in the response (fails today for `invoiceline`, `accountingdimension`, `contracttype`, `contractassignment`: `NoReverseMatch` on `<model>_journal`). The Journal view is registered by NetBox core through `register_model_view`, so this also covers FR-002 and the edge case "views registered by other code work for the four models"; say so in the test docstring
+- [X] T005 [US1] Same class: create a journal entry for an invoice line and assert it is listed by `plugins:netbox_contract:invoiceline_journal` (implemented with the ORM instead of a POST to core's `extras:journalentry_add`: the add form is core's, the plugin's Journal tab is what is tested)
+- [X] T006 [US1] Same class: `contractline_amend` still resolves and the Amend button is on the contract line page; the `contracts` tab is still registered for `dcim.site` (`dcim:site_contracts` resolves) (US1-4)
 
 ### Implementation for User Story 1
 
-- [ ] T007 [US1] In `netbox_contract/views.py`, decorate the ServiceProvider list, add/edit (stacked `'add', detail=False` and `'edit'`), delete, bulk import (`path='import'`), bulk edit (`path='edit'`), bulk delete (`path='delete'`) views with `@register_model_view` as in research D1 (detail view already registered)
-- [ ] T008 [US1] Same for Contract, Unit, ContractLine and Invoice views in `netbox_contract/views.py` (detail views already registered; keep `ContractLineAmendView`)
-- [ ] T009 [US1] Same for ContractAssignment, InvoiceLine, AccountingDimension and ContractType views in `netbox_contract/views.py`, including `@register_model_view(Model)` on their detail views; check `ContractAssignmentEditView.alter_object` and `get_extra_addanother_params` still behave for `add` (list-level route, empty URL kwargs)
-- [ ] T010 [US1] Rewrite `netbox_contract/urls.py`: per model `path('<prefix>/', include(get_model_urls('netbox_contract', '<model>', detail=False)))` and `path('<prefix>/<int:pk>/', include(get_model_urls('netbox_contract', '<model>')))` with today's prefixes; keep `path('invoices/lines-preview/', views.InvoiceLinesPreviewView.as_view(), name='invoice_lines_preview')` before the invoice includes; remove all hand-written `*_changelog` paths and the `ObjectChangeLogView`/`models` imports
-- [ ] T011 [US1] Run `test_conventions.RouteTestCase`, `test_conventions.JournalTabTestCase`, `test_views`, `test_issue_307` and `ruff check`; all pass
+- [X] T007 [US1] In `netbox_contract/views.py`, decorate the ServiceProvider list, add/edit (stacked `'add', detail=False` and `'edit'`), delete, bulk import (`path='import'`), bulk edit (`path='edit'`), bulk delete (`path='delete'`) views with `@register_model_view` as in research D1 (detail view already registered)
+- [X] T008 [US1] Same for Contract, Unit, ContractLine and Invoice views in `netbox_contract/views.py` (detail views already registered; keep `ContractLineAmendView`)
+- [X] T009 [US1] Same for ContractAssignment, InvoiceLine, AccountingDimension and ContractType views in `netbox_contract/views.py`, including `@register_model_view(Model)` on their detail views; check `ContractAssignmentEditView.alter_object` and `get_extra_addanother_params` still behave for `add` (list-level route, empty URL kwargs)
+- [X] T010 [US1] Rewrite `netbox_contract/urls.py`: per model `path('<prefix>/', include(get_model_urls('netbox_contract', '<model>', detail=False)))` and `path('<prefix>/<int:pk>/', include(get_model_urls('netbox_contract', '<model>')))` with today's prefixes; keep `path('invoices/lines-preview/', views.InvoiceLinesPreviewView.as_view(), name='invoice_lines_preview')` before the invoice includes; remove all hand-written `*_changelog` paths and the `ObjectChangeLogView`/`models` imports
+- [X] T011 [US1] Run `test_conventions.RouteTestCase`, `test_conventions.JournalTabTestCase`, `test_views`, `test_issue_307` and `ruff check`; all pass
 
 **Checkpoint**: US1 complete; Journal tab on 9/9 models (SC-001), routes unchanged (SC-003).
 
