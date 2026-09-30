@@ -2,6 +2,7 @@
 
 import inspect
 from datetime import date
+from pathlib import Path
 from unittest import mock
 
 from dcim.models import Site
@@ -442,3 +443,28 @@ class ContractTemplateSectionTestCase(TestCase):
         self.assertEqual(shown.context['invoice_template'].number, 'TEMPLATE-NUMBER-1')
         self.assertContains(shown, 'TEMPLATE-NUMBER-1')
         self.assertLess(hidden_queries, shown_queries)
+
+
+class TemplateLocationTestCase(TestCase):
+    """
+    Plugin templates live under templates/netbox_contract/ (FR-011). This covers the edge case "a template with the
+    same name in another plugin does not replace them": only namespaced template paths remain.
+    """
+
+    def test_no_template_at_the_root(self):
+        root = Path(forms.__file__).parent / 'templates'
+        self.assertEqual(sorted(path.name for path in root.glob('*.html')), [])
+
+    def test_inline_assignments_on_an_assigned_object(self):
+        site = Site.objects.create(name='Inline site', slug='inline-site')
+        contract = make_contract(name='Inline contract')
+        ContractAssignment.objects.create(
+            content_type=ContentType.objects.get_for_model(Site), object_id=site.pk, contract=contract
+        )
+        self.add_permissions(
+            'dcim.view_site', 'netbox_contract.view_contract', 'netbox_contract.view_contractassignment'
+        )
+        with mock.patch.dict(settings.PLUGINS_CONFIG['netbox_contract'], {'contract_assignments_display': 'both'}):
+            response = self.client.get(site.get_absolute_url())
+        self.assertHttpStatus(response, 200)
+        self.assertContains(response, 'Inline contract')

@@ -31,7 +31,7 @@ class ObjectContractAssignments(PluginTemplateExtension):
             assignments_table.configure(self.context['request'])
 
             return self.render(
-                'contract_assignments_bottom.html',
+                'netbox_contract/inc/contract_assignments_bottom.html',
                 extra_context={
                     'assignments_table': assignments_table,
                 },

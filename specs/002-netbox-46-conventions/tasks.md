@@ -165,9 +165,9 @@ partial request return the short forms.
 
 ### Templates (FR-011, research D6; test first)
 
-- [ ] T038 In `netbox_contract/tests/test_conventions.py`, class `TemplateLocationTestCase`: no `.html` file directly under `netbox_contract/templates/` (covers the edge case "a template with the same name in another plugin does not replace them": only namespaced paths remain); with `contract_assignments_display` `both`, the page of a site with a contract assignment renders the assignments table (the contract name is in the response)
-- [ ] T039 Move `netbox_contract/templates/contract_assignments_bottom.html` to `netbox_contract/templates/netbox_contract/inc/contract_assignments_bottom.html` (`git mv`) and update the path in `netbox_contract/template_content.py`
-- [ ] T040 Delete `netbox_contract/templates/contract_list_bottom.html` (`git rm`, clarification Q3)
+- [X] T038 In `netbox_contract/tests/test_conventions.py`, class `TemplateLocationTestCase`: no `.html` file directly under `netbox_contract/templates/` (covers the edge case "a template with the same name in another plugin does not replace them": only namespaced paths remain); with `contract_assignments_display` `both`, the page of a site with a contract assignment renders the assignments table (the contract name is in the response)
+- [X] T039 Move `netbox_contract/templates/contract_assignments_bottom.html` to `netbox_contract/templates/netbox_contract/inc/contract_assignments_bottom.html` (`git mv`) and update the path in `netbox_contract/template_content.py`
+- [X] T040 Delete `netbox_contract/templates/contract_list_bottom.html` (`git rm`, clarification Q3)
 
 ### Translations, documentation, release notes
 
