@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-04 16:10+0000\n"
+"POT-Creation-Date: 2026-09-30 21:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,455 +18,1088 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: forms.py:63 forms.py:275 forms.py:499 forms.py:514 forms.py:529 forms.py:542
+#: forms.py:103 forms.py:376 forms.py:721 forms.py:746 forms.py:770
+#: forms.py:779 forms.py:1039 forms.py:1052 forms.py:1088 forms.py:1115
+#: forms.py:1237 forms.py:1300
 msgid "Comments"
 msgstr ""
 
-#: forms.py:69
+#: forms.py:109
 msgid "External party object type"
 msgstr ""
 
-#: forms.py:71
+#: forms.py:111
 msgid "External party object"
 msgstr ""
 
-#: forms.py:73 forms.py:173 forms.py:199 forms.py:267
-#: templates/netbox_contract/contract.html:43
-msgid "Tenant"
-msgstr ""
-
-#: forms.py:76 forms.py:180 forms.py:211 forms.py:281
-#: templates/netbox_contract/contract.html:109
-msgid "Parent"
-msgstr ""
-
-#: forms.py:78 forms.py:271 forms.py:303 forms.py:485 forms.py:601 forms.py:646
-#: forms.py:667 forms.py:688 navigation.py:75
-#: templates/netbox_contract/contract.html:83
-#: templates/netbox_contract/invoice.html:47
-#: templates/netbox_contract/invoiceline.html:32
-msgid "Accounting dimensions"
-msgstr ""
-
-#: forms.py:175 forms.py:256 templates/netbox_contract/contract.html:34
-msgid "External reference"
-msgstr ""
-
-#: forms.py:176 forms.py:261 templates/netbox_contract/contract.html:38
+#: forms.py:115 forms.py:257 forms.py:374
+#: templates/netbox_contract/contract.html:44
 msgid "Internal party"
 msgstr ""
 
-#: forms.py:177 forms.py:204 forms.py:716
-#: templates/netbox_contract/accountingdimension.html:21
-#: templates/netbox_contract/contract.html:30
-msgid "Status"
+#: forms.py:117 forms.py:225 forms.py:298 forms.py:375
+#: templates/netbox_contract/contract.html:49
+msgid "Tenant"
 msgstr ""
 
-#: forms.py:178 forms.py:418 forms.py:481 forms.py:651
-#: templates/netbox_contract/contract.html:78
-#: templates/netbox_contract/contract.html:143
-#: templates/netbox_contract/invoice.html:42
-#: templates/netbox_contract/invoiceline.html:28
-msgid "Currency"
+#: forms.py:122 forms.py:272 forms.py:306 forms.py:381
+#: templates/netbox_contract/contract.html:111
+msgid "Parent"
 msgstr ""
 
-#: forms.py:192
-msgid "External party name"
+#: forms.py:125 forms.py:233 forms.py:313 forms.py:420 forms.py:448
+#: navigation.py:88 templates/netbox_contract/contract.html:20
+#: templates/netbox_contract/contracttype.html:10
+msgid "Contract type"
 msgstr ""
 
-#: forms.py:252 forms.py:523 forms.py:540 forms.py:711 forms.py:735
-#: templates/netbox_contract/accountingdimension.html:13
-#: templates/netbox_contract/contract.html:16
-#: templates/netbox_contract/serviceprovider.html:12
-msgid "Name"
-msgstr ""
-
-#: forms.py:298 forms.py:411 forms.py:455
-#: templates/netbox_contract/contract.html:137
-#: templates/netbox_contract/invoice.html:24
-msgid "Number"
-msgstr ""
-
-#: forms.py:301 forms.py:423 forms.py:433 navigation.py:54 navigation.py:103
-#: templates/contract_list_bottom.html:6
-#: templates/netbox_contract/invoice.html:91
-msgid "Contracts"
-msgstr ""
-
-#: forms.py:416 forms.py:458
-msgid "Template"
-msgstr ""
-
-#: forms.py:459 models.py:331
-msgid "Wether this invoice is a template or not"
-msgstr ""
-
-#: forms.py:463 templates/netbox_contract/invoice.html:28
-msgid "Date"
-msgstr ""
-
-#: forms.py:472 templates/netbox_contract/invoice.html:33
-msgid "Period start"
-msgstr ""
-
-#: forms.py:476 templates/netbox_contract/invoice.html:37
-msgid "Period end"
-msgstr ""
-
-#: forms.py:491 templates/netbox_contract/invoice.html:52
-#: templates/netbox_contract/invoiceline.html:24
-msgid "Amount"
-msgstr ""
-
-#: forms.py:495 templates/netbox_contract/contract.html:117
-#: templates/netbox_contract/contract.html:119
-#: templates/netbox_contract/invoice.html:57
-#: templates/netbox_contract/invoice.html:59
-msgid "Documents"
-msgstr ""
-
-#: forms.py:496 models.py:285 models.py:372
-msgid "URL to the contract documents"
-msgstr ""
-
-#: forms.py:513 forms.py:528
-msgid "Slug"
-msgstr ""
-
-#: forms.py:551 forms.py:567 forms.py:580
+#: forms.py:131 forms.py:391 forms.py:802 forms.py:827 forms.py:841
+#: forms.py:854 forms.py:1107 forms.py:1185 forms.py:1201
 #: templates/netbox_contract/contract.html:13
 #: templates/netbox_contract/contractassignment.html:18
+#: templates/netbox_contract/contractline.html:33
 msgid "Contract"
 msgstr ""
 
-#: forms.py:575
-msgid "Content type"
+#: forms.py:133 forms.py:223 forms.py:392
+msgid "Parties"
 msgstr ""
 
-#: forms.py:595 forms.py:640 forms.py:661
-#: templates/netbox_contract/invoice.html:20
+#: forms.py:134
+msgid "Dates and terms"
+msgstr ""
+
+#: forms.py:135 forms.py:224 forms.py:393 forms.py:607 forms.py:965
+#: forms.py:1182
+msgid "Billing"
+msgstr ""
+
+#: forms.py:136 forms.py:394
+msgid "Tenancy"
+msgstr ""
+
+#: forms.py:137 forms.py:481 forms.py:608 forms.py:728
+msgid "Deprecated"
+msgstr ""
+
+#: forms.py:167
+msgid "Deprecated: use contract lines instead."
+msgstr ""
+
+#: forms.py:221 forms.py:458 forms.py:606 forms.py:761 forms.py:821
+#: forms.py:964 forms.py:1067 forms.py:1181 forms.py:1271
+msgid "Attributes"
+msgstr ""
+
+#: forms.py:226 forms.py:762
+msgid "Contacts"
+msgstr ""
+
+#: forms.py:240 forms.py:749 forms.py:782
+#: templates/netbox_contract/serviceprovider.html:11
+msgid "Service provider"
+msgstr ""
+
+#: forms.py:241
+msgid "Filter by Service Provider"
+msgstr ""
+
+#: forms.py:248
+msgid "Circuit Provider"
+msgstr ""
+
+#: forms.py:249
+msgid "Filter by Circuit Provider"
+msgstr ""
+
+#: forms.py:252 forms.py:373 templates/netbox_contract/contract.html:40
+msgid "External reference"
+msgstr ""
+
+#: forms.py:260 forms.py:300 forms.py:619 forms.py:644 forms.py:1279
+#: templates/netbox_contract/accountingdimension.html:21
+#: templates/netbox_contract/contract.html:36
+#: templates/netbox_contract/invoice.html:40
+msgid "Status"
+msgstr ""
+
+#: forms.py:265 forms.py:620 forms.py:707 forms.py:982 forms.py:1193
+#: templates/netbox_contract/contract.html:84
+#: templates/netbox_contract/contract.html:171
+#: templates/netbox_contract/invoice.html:54
+#: templates/netbox_contract/invoiceline.html:56
+msgid "Currency"
+msgstr ""
+
+#: forms.py:278 forms.py:386 templates/netbox_contract/contract.html:134
+msgid "Billable"
+msgstr ""
+
+#: forms.py:291
+msgid "External party name"
+msgstr ""
+
+#: forms.py:351 forms.py:434 forms.py:460 forms.py:764 forms.py:778
+#: forms.py:1069 forms.py:1274 forms.py:1298
+#: templates/netbox_contract/accountingdimension.html:13
+#: templates/netbox_contract/contract.html:16
+#: templates/netbox_contract/contracttype.html:13
+#: templates/netbox_contract/serviceprovider.html:14
+#: templates/netbox_contract/unit.html:13
+msgid "Name"
+msgstr ""
+
+#: forms.py:356
+msgid "Contract Type"
+msgstr ""
+
+#: forms.py:363 templates/netbox_contract/contract.html:26
+msgid "External party type"
+msgstr ""
+
+#: forms.py:366 templates/netbox_contract/contract.html:30
+msgid "External party"
+msgstr ""
+
+#: forms.py:417 forms.py:436 forms.py:446
+#: templates/netbox_contract/contracttype.html:21
+msgid "Color"
+msgstr ""
+
+#: forms.py:435 forms.py:444 forms.py:461 forms.py:1087 forms.py:1231
+#: templates/netbox_contract/contractline.html:37
+#: templates/netbox_contract/contracttype.html:17
+#: templates/netbox_contract/inc/invoice_lines_preview.html:74
+#: templates/netbox_contract/inc/invoice_lines_preview.html:75
+#: templates/netbox_contract/unit.html:17
+msgid "Description"
+msgstr ""
+
+#: forms.py:469 forms.py:612 forms.py:681
+#: templates/netbox_contract/contract.html:165
+#: templates/netbox_contract/invoice.html:32
+msgid "Number"
+msgstr ""
+
+#: forms.py:475 forms.py:625 forms.py:642 navigation.py:81 navigation.py:154
+#: templates/netbox_contract/invoice.html:106
+#: templates/netbox_contract/serviceprovider.html:39 views.py:249
+msgid "Contracts"
+msgstr ""
+
+#: forms.py:479 forms.py:726 forms.py:870 forms.py:971 forms.py:992
+#: templates/netbox_contract/invoice.html:28
 #: templates/netbox_contract/invoiceline.html:18
 msgid "Invoice"
 msgstr ""
 
-#: forms.py:712 forms.py:736
-#: templates/netbox_contract/accountingdimension.html:17
-msgid "Value"
+#: forms.py:480 forms.py:727
+msgid "Period and amount"
 msgstr ""
 
-#: models.py:65
-msgid "dimension name"
+#: forms.py:492
+msgid ""
+"Deprecated: invoice lines are generated from the contract lines. The number "
+"of a template is replaced by _invoice_template_<contract name>."
 msgstr ""
 
-#: models.py:66
-msgid "Accounting dimension name. Ex: Department, Location, etc."
+#: forms.py:598 forms.py:890 forms.py:977 forms.py:1012 forms.py:1037
+#: forms.py:1113 forms.py:1195 forms.py:1210 navigation.py:123
+#: templates/netbox_contract/contractline.html:64
+#: templates/netbox_contract/inc/invoice_lines_preview.html:58
+#: templates/netbox_contract/inc/invoice_lines_preview.html:109
+#: templates/netbox_contract/invoiceline.html:60
+msgid "Accounting dimensions"
 msgstr ""
 
-#: models.py:70
-msgid "value"
+#: forms.py:617 forms.py:684
+msgid "Template"
 msgstr ""
 
-#: models.py:76 models.py:212
-msgid "status"
+#: forms.py:631
+msgid "Accounting Dimensions"
 msgstr ""
 
-#: models.py:80 models.py:120 models.py:289 models.py:376 models.py:423
-msgid "comments"
+#: forms.py:685
+msgid "Wether this invoice is a template or not"
 msgstr ""
 
-#: models.py:100
-msgid "accounting dimension"
+#: forms.py:689 templates/netbox_contract/invoice.html:36
+msgid "Date"
 msgstr ""
 
-#: models.py:101 models.py:252 models.py:362 models.py:419
-msgid "accounting dimensions"
+#: forms.py:698 templates/netbox_contract/invoice.html:45
+msgid "Period start"
 msgstr ""
 
-#: models.py:107 models.py:171
-msgid "name"
+#: forms.py:702 templates/netbox_contract/invoice.html:49
+msgid "Period end"
 msgstr ""
 
-#: models.py:112 templates/netbox_contract/serviceprovider.html:16
-msgid "slug"
+#: forms.py:713 forms.py:898
+#: templates/netbox_contract/inc/invoice_lines_preview.html:27
+#: templates/netbox_contract/invoice.html:58
+#: templates/netbox_contract/invoiceline.html:49
+msgid "Amount"
 msgstr ""
 
-#: models.py:116
-msgid "portal URL"
+#: forms.py:717 templates/netbox_contract/contract.html:119
+#: templates/netbox_contract/contract.html:121
+#: templates/netbox_contract/invoice.html:63
+#: templates/netbox_contract/invoice.html:65
+msgid "Documents"
 msgstr ""
 
-#: models.py:125
-msgid "service provider"
+#: forms.py:718 models.py:354 models.py:619
+msgid "URL to the contract documents"
 msgstr ""
 
-#: models.py:126
-msgid "service providers"
+#: forms.py:745 forms.py:769
+msgid "Slug"
 msgstr ""
 
-#: models.py:139
-msgid "content type"
+#: forms.py:796
+msgid "object type"
 msgstr ""
 
-#: models.py:142
-msgid "object ID"
+#: forms.py:805 forms.py:857
+msgid "Assignment"
 msgstr ""
 
-#: models.py:152 models.py:310
-msgid "contract"
+#: forms.py:836
+msgid "Content type"
 msgstr ""
 
-#: models.py:161
-msgid "contract assignment"
+#: forms.py:876 forms.py:998 forms.py:1118 forms.py:1240
+#: templates/netbox_contract/contractline.html:30
+#: templates/netbox_contract/inc/invoice_lines_preview.html:23
+#: templates/netbox_contract/invoiceline.html:24
+msgid "Contract line"
 msgstr ""
 
-#: models.py:162
-msgid "contract assignments"
+#: forms.py:877
+msgid ""
+"Lines of the invoice contract and of its non-billable descendants. When a "
+"contract line is chosen, the unit and unit price default to its own."
 msgstr ""
 
-#: models.py:178
-msgid "external party object type"
+#: forms.py:883 forms.py:1005 forms.py:1055 forms.py:1091 forms.py:1108
+#: forms.py:1188 forms.py:1203 forms.py:1234
+#: templates/netbox_contract/contractline.html:45
+#: templates/netbox_contract/inc/invoice_lines_preview.html:24
+#: templates/netbox_contract/inc/invoice_lines_preview.html:78
+#: templates/netbox_contract/invoiceline.html:39
+#: templates/netbox_contract/unit.html:10
+msgid "Unit"
 msgstr ""
 
-#: models.py:183
-msgid "external party object ID"
+#: forms.py:884 models.py:947
+msgid ""
+"Defaults to the unit of the contract line; fixed once the line is created"
 msgstr ""
 
-#: models.py:193
-msgid "external reference"
+#: forms.py:897 forms.py:1042
+msgid "Invoice line"
 msgstr ""
 
-#: models.py:198
-msgid "internal party"
+#: forms.py:903
+msgid "Defaults to the unit of the contract line"
 msgstr ""
 
-#: models.py:206
-msgid "tenant"
+#: forms.py:904
+msgid "Required; defaults to the unit price of the contract line"
 msgstr ""
 
-#: models.py:217
-msgid "start date"
+#: forms.py:906
+msgid ""
+"Defaults to 1, or to the quantity of the contract line; usage-based lines "
+"are entered per invoice"
 msgstr ""
 
-#: models.py:222
-msgid "end date"
+#: forms.py:910
+msgid "Calculated from the quantity and the unit price when the line is saved"
 msgstr ""
 
-#: models.py:225 models.py:232
-msgid "In month"
+#: forms.py:918
+msgid "The invoice is posted: set it back to draft to change this line"
 msgstr ""
 
-#: models.py:229
-msgid "initial term"
+#: forms.py:1071 forms.py:1078 forms.py:1191
+#: templates/netbox_contract/unit.html:21
+msgid "Billing method"
 msgstr ""
 
-#: models.py:236
-msgid "renewal term"
+#: forms.py:1103
+msgid "duplicate accounting dimension"
 msgstr ""
 
-#: models.py:239
-msgid "Contract notice period. Default to 90 days"
+#: forms.py:1119 forms.py:1241
+msgid "Price"
 msgstr ""
 
-#: models.py:241
-msgid "notice period"
+#: forms.py:1120 forms.py:1242
+msgid "Dates"
 msgstr ""
 
-#: models.py:247 models.py:358 models.py:409
-msgid "currency"
+#: forms.py:1166
+msgid "Applies from"
 msgstr ""
 
-#: models.py:253
-msgid "This field is deprecated and will be removed in version 3"
+#: forms.py:1166
+msgid "First day of the new terms"
 msgstr ""
 
-#: models.py:256
-msgid "yearly recuring cost"
+#: forms.py:1168
+msgid "New unit price"
 msgstr ""
 
-#: models.py:261
-msgid "Use either this field of the monthly recuring cost field"
+#: forms.py:1169
+msgid "New quantity"
 msgstr ""
 
-#: models.py:264
-msgid "monthly recuring cost"
+#: forms.py:1172
+msgid "Reason"
 msgstr ""
 
-#: models.py:269
-msgid "Use either this field of the yearly recuring cost field"
+#: forms.py:1173
+msgid "Recorded in the change log and on the new line"
 msgstr ""
 
-#: models.py:272
-msgid "none recuring cost"
+#: forms.py:1232 templates/netbox_contract/contractline.html:41
+#: templates/netbox_contract/inc/invoice_lines_preview.html:26
+#: templates/netbox_contract/inc/invoice_lines_preview.html:49
+#: templates/netbox_contract/inc/invoice_lines_preview.html:93
+#: templates/netbox_contract/invoiceline.html:35
+msgid "Quantity"
 msgstr ""
 
-#: models.py:278
-msgid "The frequency of invoices in month"
+#: forms.py:1233 templates/netbox_contract/contractline.html:52
+#: templates/netbox_contract/inc/invoice_lines_preview.html:25
+#: templates/netbox_contract/inc/invoice_lines_preview.html:44
+#: templates/netbox_contract/inc/invoice_lines_preview.html:88
+#: templates/netbox_contract/invoiceline.html:45
+msgid "Unit price"
 msgstr ""
 
-#: models.py:280
-msgid "invoice frequency"
+#: forms.py:1235 templates/netbox_contract/contract.html:55
+#: templates/netbox_contract/contractline.html:56
+msgid "Start date"
 msgstr ""
 
-#: models.py:284 models.py:371
-msgid "documents"
+#: forms.py:1236 templates/netbox_contract/contract.html:61
+#: templates/netbox_contract/contractline.html:60
+msgid "End date"
 msgstr ""
 
-#: models.py:297
-msgid "parent"
-msgstr ""
-
-#: models.py:311 models.py:342
-msgid "contracts"
-msgstr ""
-
-#: models.py:324
-msgid "number"
-msgstr ""
-
-#: models.py:330
-msgid "template"
-msgstr ""
-
-#: models.py:336
-msgid "date"
-msgstr ""
-
-#: models.py:347
-msgid "period start"
-msgstr ""
-
-#: models.py:352
-msgid "period end"
-msgstr ""
-
-#: models.py:367 models.py:414
-msgid "amount"
-msgstr ""
-
-#: models.py:381 models.py:403
-msgid "invoice"
-msgstr ""
-
-#: models.py:382
-msgid "invoices"
-msgstr ""
-
-#: models.py:428
-msgid "invoice line"
-msgstr ""
-
-#: models.py:429
-msgid "invoice lines"
-msgstr ""
-
-#: navigation.py:10 navigation.py:19 navigation.py:28 navigation.py:37
-#: navigation.py:46
-msgid "Add"
-msgstr ""
-
-#: navigation.py:61 templates/netbox_contract/contract.html:182
-msgid "Invoices"
-msgstr ""
-
-#: navigation.py:68 templates/netbox_contract/invoice.html:77
-#: templates/netbox_contract/invoiceline.html:15
-msgid "Invoice lines"
-msgstr ""
-
-#: navigation.py:82
-msgid "Service providers"
-msgstr ""
-
-#: navigation.py:88 templates/contract_assignments_bottom.html:7
-msgid "Contracts assignments"
-msgstr ""
-
-#: templates/contract_assignments_bottom.html:12
-msgid "Add assignment"
-msgstr ""
-
+#: forms.py:1253 forms.py:1303
 #: templates/netbox_contract/accountingdimension.html:10
 msgid "Accounting dimension"
 msgstr ""
 
-#: templates/netbox_contract/contract.html:20
-msgid "External party type"
+#: forms.py:1275 forms.py:1299
+#: templates/netbox_contract/accountingdimension.html:17
+msgid "Value"
 msgstr ""
 
-#: templates/netbox_contract/contract.html:24
-msgid "External party"
+#: models.py:24
+msgid ""
+"This contract already has invoices: its lines cannot be added, changed or "
+"deleted. A new contract must be created."
 msgstr ""
 
-#: templates/netbox_contract/contract.html:49
-msgid "Start date"
+#: models.py:28
+msgid ""
+"This contract line is used by invoice lines: it cannot be changed or "
+"deleted. A new contract must be created."
 msgstr ""
 
-#: templates/netbox_contract/contract.html:55
-msgid "End date"
+#: models.py:31
+msgid ""
+"This invoice is posted: its amounts and its lines are locked. Set it back to "
+"draft to change them."
 msgstr ""
 
-#: templates/netbox_contract/contract.html:61
-msgid "Initial term"
+#: models.py:34
+#, python-brace-format
+msgid ""
+"This contract cannot be deleted: its lines, or those of its child contracts, "
+"are on the posted invoices {numbers}."
 msgstr ""
 
-#: templates/netbox_contract/contract.html:62
-#: templates/netbox_contract/contract.html:68
-msgid "month"
+#: models.py:37 templates/netbox_contract/contractline.html:21
+msgid "Its accounting dimensions, comments and tags can still be edited."
+msgstr ""
+
+#: models.py:65
+#, python-brace-format
+msgid "{start} to {end}"
+msgstr ""
+
+#: models.py:66
+msgid "no start date"
+msgstr ""
+
+#: models.py:67
+msgid "no end date"
+msgstr ""
+
+#: models.py:148 models.py:203 models.py:257 models.py:693
+msgid "name"
+msgstr ""
+
+#: models.py:149 models.py:694 models.py:758
+msgid "description"
+msgstr ""
+
+#: models.py:150
+msgid "color"
+msgstr ""
+
+#: models.py:154 models.py:264
+msgid "contract type"
+msgstr ""
+
+#: models.py:155
+msgid "contract types"
+msgstr ""
+
+#: models.py:170
+msgid "dimension name"
+msgstr ""
+
+#: models.py:171
+msgid "Accounting dimension name. Ex: Department, Location, etc."
+msgstr ""
+
+#: models.py:173
+msgid "value"
+msgstr ""
+
+#: models.py:178 models.py:294 models.py:602
+msgid "status"
+msgstr ""
+
+#: models.py:180 models.py:206 models.py:356 models.py:621 models.py:706
+#: models.py:783 models.py:976
+msgid "comments"
+msgstr ""
+
+#: models.py:198
+msgid "accounting dimension"
+msgstr ""
+
+#: models.py:199 models.py:781 models.py:974
+msgid "accounting dimensions"
+msgstr ""
+
+#: models.py:204 templates/netbox_contract/serviceprovider.html:18
+msgid "slug"
+msgstr ""
+
+#: models.py:205
+msgid "portal URL"
+msgstr ""
+
+#: models.py:210
+msgid "service provider"
+msgstr ""
+
+#: models.py:211
+msgid "service providers"
+msgstr ""
+
+#: models.py:221
+msgid "content type"
+msgstr ""
+
+#: models.py:222
+msgid "object ID"
+msgstr ""
+
+#: models.py:228 models.py:383 models.py:756
+msgid "contract"
+msgstr ""
+
+#: models.py:237
+msgid "contract assignment"
+msgstr ""
+
+#: models.py:238
+msgid "contract assignments"
+msgstr ""
+
+#: models.py:271
+msgid "external party object type"
+msgstr ""
+
+#: models.py:274
+msgid "external party object ID"
+msgstr ""
+
+#: models.py:280
+msgid "external reference"
+msgstr ""
+
+#: models.py:281
+msgid "internal party"
+msgstr ""
+
+#: models.py:288
+msgid "tenant"
+msgstr ""
+
+#: models.py:296 models.py:775
+msgid "start date"
+msgstr ""
+
+#: models.py:297 models.py:778
+msgid "end date"
+msgstr ""
+
+#: models.py:299 models.py:306
+msgid "In month"
+msgstr ""
+
+#: models.py:303
+msgid "initial term"
+msgstr ""
+
+#: models.py:310
+msgid "renewal term"
+msgstr ""
+
+#: models.py:313
+msgid "Contract notice period. Default to 90 days"
+msgstr ""
+
+#: models.py:315
+msgid "notice period"
+msgstr ""
+
+#: models.py:321 models.py:613 models.py:771 models.py:964
+msgid "currency"
+msgstr ""
+
+#: models.py:324
+msgid "yearly recuring cost"
+msgstr ""
+
+#: models.py:329
+msgid ""
+"Deprecated: replaced by contract lines. Use either this field of the monthly "
+"recuring cost field"
+msgstr ""
+
+#: models.py:332
+msgid "monthly recuring cost"
+msgstr ""
+
+#: models.py:337
+msgid ""
+"Deprecated: replaced by contract lines. Use either this field of the yearly "
+"recuring cost field"
+msgstr ""
+
+#: models.py:340
+msgid "none recuring cost"
+msgstr ""
+
+#: models.py:344
+msgid "Deprecated: replaced by contract lines"
+msgstr ""
+
+#: models.py:347
+msgid "The frequency of invoices in month"
+msgstr ""
+
+#: models.py:349
+msgid "invoice frequency"
+msgstr ""
+
+#: models.py:353 models.py:618
+msgid "documents"
+msgstr ""
+
+#: models.py:363
+msgid "parent"
+msgstr ""
+
+#: models.py:367
+msgid "billable"
+msgstr ""
+
+#: models.py:368
+msgid ""
+"Whether invoices are issued for this contract. The lines of a non-billable "
+"contract are invoiced through its closest billable parent."
+msgstr ""
+
+#: models.py:384 models.py:606
+msgid "contracts"
+msgstr ""
+
+#: models.py:487
+#, python-brace-format
+msgid "invoices {numbers}"
+msgstr ""
+
+#: models.py:494
+#, python-brace-format
+msgid "invoice lines of invoices {numbers}"
+msgstr ""
+
+#: models.py:498
+#, python-brace-format
+msgid ""
+"The currency cannot change because this contract or its non-billable "
+"descendants have {records}."
+msgstr ""
+
+#: models.py:500
+msgid " and "
+msgstr ""
+
+#: models.py:547
+#, python-brace-format
+msgid ""
+"A non-billable contract must have the currency of its parent: {found} "
+"differs from {expected} of {parent}."
+msgstr ""
+
+#: models.py:567
+msgid ""
+"The billable flag cannot change: this contract, one of its parents or one of "
+"its children already has invoices. A new contract must be created."
+msgstr ""
+
+#: models.py:580
+msgid "Some contract lines start before this date; change their dates first."
+msgstr ""
+
+#: models.py:584
+msgid "Some contract lines end after this date; change their dates first."
+msgstr ""
+
+#: models.py:589
+msgid "number"
+msgstr ""
+
+#: models.py:594
+msgid "template"
+msgstr ""
+
+#: models.py:595
+msgid ""
+"Deprecated: invoice lines are generated from the contract lines. Wether this "
+"invoice is a template or not"
+msgstr ""
+
+#: models.py:603
+msgid ""
+"A posted invoice is locked: set it back to draft to change its amounts or "
+"its lines"
+msgstr ""
+
+#: models.py:605
+msgid "date"
+msgstr ""
+
+#: models.py:607
+msgid "period start"
+msgstr ""
+
+#: models.py:608
+msgid "period end"
+msgstr ""
+
+#: models.py:615 models.py:970
+msgid "amount"
+msgstr ""
+
+#: models.py:625 models.py:930
+msgid "invoice"
+msgstr ""
+
+#: models.py:626
+msgid "invoices"
+msgstr ""
+
+#: models.py:698
+msgid "billing method"
+msgstr ""
+
+#: models.py:703
+msgid "months"
+msgstr ""
+
+#: models.py:704
+msgid ""
+"Number of months covered by one unit price. Required for recurring units "
+"only."
+msgstr ""
+
+#: models.py:710 models.py:765 models.py:946
+msgid "unit"
+msgstr ""
+
+#: models.py:711
+msgid "units"
+msgstr ""
+
+#: models.py:727
+msgid ""
+"A recurring unit needs the number of months (at least 1) one unit price "
+"covers."
+msgstr ""
+
+#: models.py:729
+msgid "Only a recurring unit covers a number of months."
+msgstr ""
+
+#: models.py:738
+msgid ""
+"This unit is used by contracts that have invoices: its billing method and "
+"months cannot change. Create a new unit instead."
+msgstr ""
+
+#: models.py:759 models.py:958
+msgid "quantity"
+msgstr ""
+
+#: models.py:760 models.py:954
+msgid "unit price"
+msgstr ""
+
+#: models.py:772
+msgid "Defaults to the contract's currency"
+msgstr ""
+
+#: models.py:775
+msgid "Defaults to the contract's start date"
+msgstr ""
+
+#: models.py:778
+msgid "Defaults to the contract's end date"
+msgstr ""
+
+#: models.py:791
+msgid "replaces"
+msgstr ""
+
+#: models.py:792
+msgid "The line this line replaces after an amendment of its price or quantity"
+msgstr ""
+
+#: models.py:797
+msgid "invoiced at conversion"
+msgstr ""
+
+#: models.py:798
+msgid ""
+"Set by the upgrade conversion for a one-time line of a contract that already "
+"had a posted invoice: the line is considered fully invoiced."
+msgstr ""
+
+#: models.py:806 models.py:938
+msgid "contract line"
+msgstr ""
+
+#: models.py:807
+msgid "contract lines"
+msgstr ""
+
+#: models.py:890
+#, python-brace-format
+msgid "A contract line must lie within the dates of its contract ({period})."
+msgstr ""
+
+#: models.py:904
+msgid "The end date cannot be before the start date."
+msgstr ""
+
+#: models.py:907
+#, python-brace-format
+msgid ""
+"The currency {found} of a contract line must be the currency {expected} of "
+"its contract."
+msgstr ""
+
+#: models.py:955
+msgid ""
+"Defaults to the unit price of the contract line; fixed once the line is "
+"created"
+msgstr ""
+
+#: models.py:971
+msgid "Calculated from the quantity and the unit price"
+msgstr ""
+
+#: models.py:980
+msgid "invoice line"
+msgstr ""
+
+#: models.py:981
+msgid "invoice lines"
+msgstr ""
+
+#: models.py:1018
+#, python-brace-format
+msgid ""
+"Give a unit price: the amount {amount} cannot be divided by the quantity "
+"{quantity}."
+msgstr ""
+
+#: models.py:1097
+msgid ""
+"The contract line must belong to the contract of the invoice or to one of "
+"its non-billable descendants."
+msgstr ""
+
+#: models.py:1102
+msgid "This field is required: the amount is quantity x unit price."
+msgstr ""
+
+#: models.py:1109
+#, python-brace-format
+msgid ""
+"The currency {found} of an invoice line must be the currency {expected} of "
+"its invoice."
+msgstr ""
+
+#: navigation.py:10 navigation.py:19 navigation.py:28 navigation.py:37
+#: navigation.py:46 navigation.py:55 navigation.py:64 navigation.py:73
+msgid "Add"
+msgstr ""
+
+#: navigation.py:95 templates/netbox_contract/contract.html:192
+#: templates/netbox_contract/unit.html:40
+msgid "Contract lines"
+msgstr ""
+
+#: navigation.py:102
+msgid "Units"
+msgstr ""
+
+#: navigation.py:109 templates/netbox_contract/contract.html:237
+msgid "Invoices"
+msgstr ""
+
+#: navigation.py:116 templates/netbox_contract/invoice.html:83
+#: templates/netbox_contract/invoiceline.html:15
+msgid "Invoice lines"
+msgstr ""
+
+#: navigation.py:130
+msgid "Service providers"
+msgstr ""
+
+#: navigation.py:136
+#: templates/netbox_contract/inc/contract_assignments_bottom.html:8
+msgid "Contracts assignments"
+msgstr ""
+
+#: services/amendments.py:37
+msgid "A reason is required; it is recorded in the change log."
+msgstr ""
+
+#: services/amendments.py:39
+msgid ""
+"A one-time line is invoiced once; its price or quantity cannot be amended."
+msgstr ""
+
+#: services/amendments.py:41
+msgid "This line was already amended; amend the line that replaces it."
+msgstr ""
+
+#: services/amendments.py:45
+msgid "Give a new unit price or a new quantity."
+msgstr ""
+
+#: services/amendments.py:49
+msgid "This field is required."
+msgstr ""
+
+#: services/amendments.py:51
+#, python-brace-format
+msgid "The new terms must start after the start of the line ({date})."
+msgstr ""
+
+#: services/amendments.py:55
+#, python-brace-format
+msgid "The new terms must start before the end of the line ({date})."
+msgstr ""
+
+#: services/amendments.py:62
+#, python-brace-format
+msgid ""
+"The new terms must start after the last invoiced period, which ends on "
+"{date}."
+msgstr ""
+
+#: services/amendments.py:85
+#, python-brace-format
+msgid "Amended from {date}: {reason}"
+msgstr ""
+
+#: services/invoicing.py:26
+#, python-brace-format
+msgid ""
+"The contract {contract} is not billable: its lines are invoiced through its "
+"closest billable parent."
+msgstr ""
+
+#: services/invoicing.py:158
+#, python-brace-format
+msgid "{line}: two accounting dimensions have the same name."
+msgstr ""
+
+#: services/invoicing.py:161
+#, python-brace-format
+msgid "{line}: the accounting dimension {name} is missing."
+msgstr ""
+
+#: services/invoicing.py:185
+#, python-brace-format
+msgid "\"{value}\" is not a valid number."
+msgstr ""
+
+#: services/invoicing.py:238
+#, python-brace-format
+msgid "added line {number}"
+msgstr ""
+
+#: services/invoicing.py:242
+#, python-brace-format
+msgid "Unknown unit for {line}."
+msgstr ""
+
+#: services/invoicing.py:247
+#, python-brace-format
+msgid "The unit price and the quantity of {line} must be numbers."
+msgstr ""
+
+#: services/invoicing.py:250
+#, python-brace-format
+msgid "{line} needs a unit price."
+msgstr ""
+
+#: services/invoicing.py:311
+msgid "added line"
+msgstr ""
+
+#: services/invoicing.py:321
+#, python-brace-format
+msgid ""
+"The invoice amount {amount} is lower than the total {total} of the invoice "
+"lines generated from the contract lines."
 msgstr ""
 
 #: templates/netbox_contract/contract.html:67
-msgid "Renewal term"
+msgid "Initial term"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:68
+#: templates/netbox_contract/contract.html:74
+msgid "month"
 msgstr ""
 
 #: templates/netbox_contract/contract.html:73
+msgid "Renewal term"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:79
 msgid "Notice period"
 msgstr ""
 
-#: templates/netbox_contract/contract.html:74
+#: templates/netbox_contract/contract.html:80
 msgid "days"
 msgstr ""
 
-#: templates/netbox_contract/contract.html:88
+#: templates/netbox_contract/contract.html:89
 msgid "Monthly recuring costs"
 msgstr ""
 
-#: templates/netbox_contract/contract.html:92
+#: templates/netbox_contract/contract.html:89
+#: templates/netbox_contract/contract.html:93
+#: templates/netbox_contract/contract.html:97
+#: templates/netbox_contract/contract.html:101
+#: templates/netbox_contract/contract.html:161
+#: templates/netbox_contract/invoice.html:20
+msgid "deprecated"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:93
 msgid "Yearly recuring costs"
 msgstr ""
 
-#: templates/netbox_contract/contract.html:96
-msgid "calculated corresponding Yearly or Monthly value"
+#: templates/netbox_contract/contract.html:97
+msgid "Calculated corresponding Yearly or Monthly value"
 msgstr ""
 
-#: templates/netbox_contract/contract.html:100
+#: templates/netbox_contract/contract.html:101
 msgid "Non recuring costs"
 msgstr ""
 
-#: templates/netbox_contract/contract.html:104
+#: templates/netbox_contract/contract.html:106
 msgid "Invoice frequency"
 msgstr ""
 
-#: templates/netbox_contract/contract.html:133
-#: templates/netbox_contract/invoice.html:18
-msgid "Invoice template"
+#: templates/netbox_contract/contract.html:131
+msgid "Values"
 msgstr ""
 
-#: templates/netbox_contract/contract.html:147
+#: templates/netbox_contract/contract.html:138
+msgid "Total contract value"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:141
+#: templates/netbox_contract/contractline.html:75
+msgid "Not available"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:146
+#: templates/netbox_contract/contractline.html:78
+msgid "Yearly value"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:150
+msgid "Yearly billable value"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:160
+msgid "Invoice templates (kept for reference)"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:175
 msgid "Total amount"
 msgstr ""
 
-#: templates/netbox_contract/contract.html:152
+#: templates/netbox_contract/contract.html:180
 msgid "Invoice template lines"
 msgstr ""
 
-#: templates/netbox_contract/contract.html:162
+#: templates/netbox_contract/contract.html:197
+msgid "Add a contract line"
+msgstr ""
+
+#: templates/netbox_contract/contract.html:205
+msgid ""
+"This contract has invoices, so its lines can no longer be added, deleted or "
+"have their terms changed: a new contract must be created. Their accounting "
+"dimensions, comments and tags can still be edited, and the price or quantity "
+"of a recurring or usage-based line can be changed from a date with its Amend "
+"button."
+msgstr ""
+
+#: templates/netbox_contract/contract.html:217
 msgid "Assignments"
 msgstr ""
 
-#: templates/netbox_contract/contract.html:171
+#: templates/netbox_contract/contract.html:226
 msgid "childs"
 msgstr ""
 
-#: templates/netbox_contract/contract.html:187
+#: templates/netbox_contract/contract.html:242
 msgid "Add an invoice"
 msgstr ""
 
@@ -482,18 +1115,167 @@ msgstr ""
 msgid "Object"
 msgstr ""
 
-#: templates/netbox_contract/invoice.html:64
-msgid "Invoice lines total"
+#: templates/netbox_contract/contractline.html:14
+#: templates/netbox_contract/contractline_amend.html:5
+#: templates/netbox_contract/contractline_amend.html:31
+#: templates/netbox_contract/contractline_edit.html:16
+msgid "Amend"
 msgstr ""
 
-#: templates/netbox_contract/invoice.html:80
+#: templates/netbox_contract/contractline.html:23
+msgid ""
+"To change its price or quantity from a date, use Amend: the line then ends "
+"the day before and a new line with the new terms replaces it."
+msgstr ""
+
+#: templates/netbox_contract/contractline.html:74
+msgid "Total value"
+msgstr ""
+
+#: templates/netbox_contract/contractline.html:82
+msgid "Replaces"
+msgstr ""
+
+#: templates/netbox_contract/contractline.html:88
+msgid "Replaced by"
+msgstr ""
+
+#: templates/netbox_contract/contractline.html:90
+msgid "from"
+msgstr ""
+
+#: templates/netbox_contract/contractline.html:94
+msgid "Invoiced at conversion"
+msgstr ""
+
+#: templates/netbox_contract/contractline_amend.html:11
+#, python-format
+msgid ""
+"This line ends the day before the new terms apply, and a new line with the "
+"new unit price or quantity replaces it from that day. Current terms: "
+"quantity %(quantity)s at %(price)s."
+msgstr ""
+
+#: templates/netbox_contract/contractline_amend.html:16
+#, python-format
+msgid ""
+"The last invoiced period ends on %(date)s: the new terms must start after it."
+msgstr ""
+
+#: templates/netbox_contract/contractline_amend.html:30
+msgid "Cancel"
+msgstr ""
+
+#: templates/netbox_contract/contractline_edit.html:9
+msgid ""
+"Its contract terms are shown disabled; its accounting dimensions, comments "
+"and tags can still be edited."
+msgstr ""
+
+#: templates/netbox_contract/contractline_edit.html:11
+msgid "To change its price or quantity from a date, amend it."
+msgstr ""
+
+#: templates/netbox_contract/inc/contract_assignments_bottom.html:13
+msgid "Add assignment"
+msgstr ""
+
+#: templates/netbox_contract/inc/invoice_lines_preview.html:10
+msgid "Lines to generate"
+msgstr ""
+
+#: templates/netbox_contract/inc/invoice_lines_preview.html:66
+msgid "No contract line to invoice for this period."
+msgstr ""
+
+#: templates/netbox_contract/inc/invoice_lines_preview.html:97
+msgid "Remove this line"
+msgstr ""
+
+#: templates/netbox_contract/inc/invoice_lines_preview.html:122
+#: templates/netbox_contract/invoice.html:87
 msgid "Add a line"
 msgstr ""
 
-#: templates/netbox_contract/serviceprovider.html:9
-msgid "Service provider"
+#: templates/netbox_contract/inc/invoice_lines_preview.html:128
+msgid "Total"
 msgstr ""
 
-#: templates/netbox_contract/serviceprovider.html:20
+#: templates/netbox_contract/inc/invoice_lines_preview.html:137
+#, python-format
+msgid ""
+"The invoice amount is lower than the total of these lines (%(total)s): raise "
+"it before saving."
+msgstr ""
+
+#: templates/netbox_contract/inc/invoice_lines_preview.html:143
+msgid ""
+"These lines are created when the invoice is saved. Quantities and unit "
+"prices changed here apply to this invoice only; amounts are recalculated "
+"when you change a value. Added lines need a unit price (quantity 1 when left "
+"empty); empty ones are ignored."
+msgstr ""
+
+#: templates/netbox_contract/invoice.html:19
+msgid "Invoice template"
+msgstr ""
+
+#: templates/netbox_contract/invoice.html:24
+msgid ""
+"Invoice templates are deprecated and kept for reference only: invoice lines "
+"are now generated from the contract lines."
+msgstr ""
+
+#: templates/netbox_contract/invoice.html:70
+msgid "Invoice lines total"
+msgstr ""
+
+#: templates/netbox_contract/invoice.html:95
+msgid ""
+"This invoice is posted: its amounts and its lines are locked, apart from "
+"their accounting dimensions, comments and tags. Set it back to draft to "
+"change them."
+msgstr ""
+
+#: templates/netbox_contract/invoiceline.html:52
+msgid "calculated"
+msgstr ""
+
+#: templates/netbox_contract/serviceprovider.html:22
 msgid "Portal url"
+msgstr ""
+
+#: templates/netbox_contract/unit.html:25
+msgid "Months covered by one unit price"
+msgstr ""
+
+#: validators.py:27
+msgid "A new invoice can be linked to one contract only."
+msgstr ""
+
+#: validators.py:30
+#, python-brace-format
+msgid ""
+"This invoice is linked to {count} contract(s); no contract can be added to "
+"it."
+msgstr ""
+
+#: validators.py:40
+#, python-brace-format
+msgid ""
+"The invoice currency {found} differs from the currency {expected} of the "
+"contract {contract}."
+msgstr ""
+
+#: views.py:224
+msgid "Add contract"
+msgstr ""
+
+#: views.py:504
+msgid "Choose a contract to see the lines generated for it."
+msgstr ""
+
+#: views.py:851
+#, python-brace-format
+msgid "Contract line amended from {date}."
 msgstr ""
