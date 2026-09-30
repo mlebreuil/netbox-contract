@@ -31,4 +31,4 @@ The monthly, yearly and non-recurring cost fields (`mrc`, `yrc`, `nrc`) are repl
 
 - Contract lines: the lines of the contract, with a button to add a new one. The buttons are hidden once the contract has invoices.
 - Assignments: the assignement of contract to objects is managed from each object's detail view.
-- Invoice templates (kept for reference): the deprecated invoice template of the contract, if any.
+- Invoice templates (kept for reference): the deprecated invoice template of the contract, if any. Shown only when the plugin setting `show_deprecated_fields` is `True`; templates remain reachable from the invoice list.

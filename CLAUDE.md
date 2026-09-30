@@ -47,9 +47,16 @@ suite on a pinned NetBox tag (currently `v4.6.10`) for Python 3.12-3.14.
 
 **Standard NetBox plugin stack per model**: `models.py`, `forms.py` (edit, filter, CSV import, bulk edit),
 `filtersets.py`, `tables.py`, `views.py`, `urls.py`, `api/` (serializers, viewsets, router), `search.py`,
-`navigation.py`, templates under `templates/netbox_contract/`. Every model is a `NetBoxModel` with the full stack.
-Views are mostly wired explicitly in `urls.py`; detail views use `register_model_view` + `get_model_urls` so tabs
-and extra actions (e.g. `contractline_amend`) attach to them.
+`navigation.py`, templates under `templates/netbox_contract/` (never at the root of `templates/`). Every model is a
+`NetBoxModel` with the full stack. Every view is registered with `register_model_view` (list, add, import, bulk
+edit/delete with `detail=False`); `urls.py` only includes `get_model_urls` per model plus the non-model
+`invoice_lines_preview`, so NetBox adds changelog and journal and other code can attach tabs and actions (e.g.
+`contractline_amend`). Route names are pinned by `tests/test_conventions.py`. Filtersets are registered with
+`@register_filterset` (lookup modifiers on filter forms). Model, bulk-edit and filter forms declare `fieldsets`: a
+field left out of every section is not rendered, and `prune_fieldsets` removes fields deleted (deprecated) or hidden
+by the settings.
+- New-object pre-fill (invoice, invoice line) uses `form_with_defaults` in `views.py` and then core
+  `ObjectEditView.get()`, so quick add and HTMX partials work; values in the page address win over the pre-fill.
 
 **Where business rules live** (so that the UI, bulk edit, CSV import and REST API enforce them alike):
 - Single-record rules are in model `clean()` — NetBox forms, bulk edit, import forms and `ValidatedModelSerializer`
@@ -112,6 +119,11 @@ in NetBox core, so script logic lives in importable modules).
   `one_time()`, `usage()`). `make_invoice` defaults to a Posted invoice, which is locked — pass
   `status=InvoiceStatusChoices.STATUS_DRAFT` when a test adds or edits its lines.
 - Tests are written first and must fail before the change (Constitution II).
+- With `--parallel`, a failing test can surface only as `TypeError: cannot pickle 'traceback' object`; rerun
+  serially to see the real failure.
+- Translations: `makemessages -l en -l fr` from `netbox_contract/` (NetBox's `manage.py`, test configuration), then
+  `msgfmt` on the plugin's `.po` files (`compilemessages` also rebuilds NetBox's own catalogs). For a msgid NetBox
+  core also translates, NetBox's catalog wins.
 
 ## Workflow
 

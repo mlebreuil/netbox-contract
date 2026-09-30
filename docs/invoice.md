@@ -18,7 +18,7 @@ When an invoice is added from a contract, the form proposes:
 
 When no period can be proposed (a contract without start date and without previous invoice), recurring lines count for one invoice frequency of the contract (for example a monthly line of 100 on a contract invoiced every 3 months gives 300).
 
-Every proposed value can be changed before saving.
+Every proposed value can be changed before saving. A value already given in the page address (for example `?date=2026-01-15` or `?period_start=...`) is kept instead of the proposed one.
 
 ## Generated invoice lines
 
@@ -45,7 +45,7 @@ Lines are generated only when an invoice is created (through the web interface o
 
 ## Invoice templates (deprecated)
 
-Invoice templates (invoices whose "Template" field is true) are replaced by contract lines. The upgrade to version 2.5.0 converts each template into contract lines. Templates are kept for reference and never deleted; they are shown with a "deprecated" badge and are no longer used to pre-fill or to create invoice lines. New templates can only be created when the plugin setting `show_deprecated_fields` is `True`.
+Invoice templates (invoices whose "Template" field is true) are replaced by contract lines. The upgrade to version 2.5.0 converts each template into contract lines. Templates are kept for reference and never deleted; they are shown with a "deprecated" badge and are no longer used to pre-fill or to create invoice lines. They remain in the invoice list; the contract page shows its template only when `show_deprecated_fields` is `True`. New templates can only be created when the plugin setting `show_deprecated_fields` is `True`.
 
 Linked objects:  
 
