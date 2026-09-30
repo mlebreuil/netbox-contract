@@ -57,7 +57,9 @@ modified.
 - Filter forms start with `FieldSet('q', 'filter_id', 'tag')`; the tenancy and contact mixins' fields get their core
   sections (`FieldSet('tenant_group_id', 'tenant_id', name=_('Tenant'))`,
   `FieldSet('contact', 'contact_role', 'contact_group', name=_('Contacts'))`).
-- Deprecated fields (`mrc`, `yrc`, `nrc`, `template`) get a `Deprecated` section of their own; `render_fieldset`
+- Deprecated fields (`mrc`, `yrc`, `nrc` on the contract form, `template` on the invoice model and bulk-edit forms)
+  get a `Deprecated` section of their own (the contract bulk-edit form has no deprecated field; the invoice filter
+  form's `template` filter is shown whatever the setting, as today); `render_fieldset`
   skips names not in `form.fields`, so the section content disappears when the fields are deleted, and the section
   itself is dropped (next point).
 - `apply_field_settings` (hidden contract fields) and the deprecated-field deletion rebuild `form.fieldsets` on the
@@ -77,7 +79,7 @@ NetBox's `TenancyFilterForm` (`tenant_group_id`, `tenant_id`) and `ContactModelF
 | Model | Model and bulk-edit form sections | Filter form sections (after `q, filter_id, tag`) |
 |---|---|---|
 | Contract | Contract (name, contract type, status, external reference, parent, documents, tags); Parties (external party type/object, internal party); Dates and terms (start, end, initial term, renewal term, notice period); Billing (currency, invoice frequency, billable); Tenancy (tenant); Deprecated (mrc, yrc, nrc) | Attributes (contract type, status, external reference, internal party, parent, billable); Parties (service provider, provider); Billing (currency); Tenant (tenant group, tenant); Contacts (contact, contact role, contact group) |
-| Invoice | Invoice (number, date, contracts, status, documents, tags); Period and amount (period start, period end, currency, amount); Deprecated (template) | Attributes (number, status, contracts); Billing (currency, accounting dimensions); Deprecated (template) |
+| Invoice | Invoice (number, date, contracts, status, documents, tags); Period and amount (period start, period end, currency, amount); Deprecated (template) | Attributes (number, status, contracts); Billing (currency, accounting dimensions); Deprecated (template, always shown: the filter form never removed it) |
 | Invoice line | Invoice line (invoice, contract line, accounting dimensions, tags); Amount (unit, unit price, quantity, currency, amount) | Attributes (invoice); Billing (currency, accounting dimensions) |
 | Contract line | Contract line (contract, description, accounting dimensions, tags); Price (quantity, unit price, unit, currency); Dates (start, end) | Attributes (contract); Billing (currency, unit, billing method, accounting dimensions) |
 | Unit | Unit (name, description, billing method, months, tags) | Attributes (name, billing method) |

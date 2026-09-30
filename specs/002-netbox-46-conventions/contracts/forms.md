@@ -6,7 +6,8 @@ User-visible form layout introduced by FR-004, FR-006 to FR-008. The section-by-
 ## Invariants (tested)
 
 1. For every model form, bulk-edit form and filter form of the plugin, each visible field (not a hidden input, not
-   a custom field, not `comments`, `changelog_message`, `owner` or `owner_group`) appears in exactly one section.
+   a custom field, not `comments`, `changelog_message`, `owner`, `owner_group`, nor the bulk-edit `add_tags`/`remove_tags`,
+   which NetBox renders outside the sections) appears in exactly one section.
 2. No field is added, removed or renamed compared with the form before the change.
 3. A field hidden by `hidden_contract_fields` is rendered once, as a hidden input, and in no section.
 4. With `show_deprecated_fields` off, `mrc`, `yrc`, `nrc` (contract) and `template` (invoice) are absent and no

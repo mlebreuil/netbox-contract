@@ -51,7 +51,7 @@ Changelog tabs shown, a journal entry can be added; every old route name resolve
 ### Tests for User Story 1 (write first, must fail)
 
 - [ ] T003 [US1] In `netbox_contract/tests/test_conventions.py`, class `RouteTestCase`: for each of the 82 route names of `contracts/routes.md`, `reverse('plugins:netbox_contract:<name>', kwargs={'pk': 1} when the address has `<int:pk>`)` returns `/plugins/contracts/<address>` and `resolve()` of it returns the listed view class (`ObjectChangeLogView` for `*_changelog`); `invoice_lines_preview` included. Passes before the change too (guard for the refactor); record that in the test docstring
-- [ ] T004 [US1] Same file, class `JournalTabTestCase`: as a superuser, GET the detail page of each of the nine models and assert the links to `<model>_journal` and `<model>_changelog` are in the response (fails today for `invoiceline`, `accountingdimension`, `contracttype`, `contractassignment`: `NoReverseMatch` on `<model>_journal`)
+- [ ] T004 [US1] Same file, class `JournalTabTestCase`: as a superuser, GET the detail page of each of the nine models and assert the links to `<model>_journal` and `<model>_changelog` are in the response (fails today for `invoiceline`, `accountingdimension`, `contracttype`, `contractassignment`: `NoReverseMatch` on `<model>_journal`). The Journal view is registered by NetBox core through `register_model_view`, so this also covers FR-002 and the edge case "views registered by other code work for the four models"; say so in the test docstring
 - [ ] T005 [US1] Same class: POST a journal entry to NetBox's `extras:journalentry_add` for an invoice line (`assigned_object_type`, `assigned_object_id`, `kind`, `comments`) and assert it is listed by `plugins:netbox_contract:invoiceline_journal`
 - [ ] T006 [US1] Same class: `contractline_amend` still resolves and the Amend button is on the contract line page; the `contracts` tab is still registered for `dcim.site` (`dcim:site_contracts` resolves) (US1-4)
 
@@ -76,7 +76,7 @@ filters.
 
 ### Tests for User Story 2 (write first, must fail)
 
-- [ ] T012 [US2] In `netbox_contract/tests/test_conventions.py`, class `FilterModifierTestCase`: `registry['filtersets']['netbox_contract.<model>']` is the plugin filterset for the nine models; for each filter form, one text/choice field (e.g. `ContractFilterForm.external_reference`, `InvoiceFilterForm.number`, `UnitFilterForm.name`, `AccountingDimensionFilterForm.value`, `ContractTypeFilterForm.name`, `ServiceProviderFilterForm.name`, `ContractLineFilterForm.currency`, `InvoiceLineFilterForm.currency`, `ContractAssignmentFilterForm.contract`) has a `utilities.forms.widgets.FilterModifierWidget` widget when the model's filterset supports more than one lookup for it (assert only where `len(lookups) > 1`, computed with the filterset)
+- [ ] T012 [US2] In `netbox_contract/tests/test_conventions.py`, class `FilterModifierTestCase`: `registry['filtersets']['netbox_contract.<model>']` is the plugin filterset for the nine models; for each filter form, one text/choice field (e.g. `ContractFilterForm.external_reference`, `InvoiceFilterForm.number`, `UnitFilterForm.name`, `AccountingDimensionFilterForm.value`, `ContractTypeFilterForm.name`, `ServiceProviderFilterForm.name`, `ContractLineFilterForm.currency`, `InvoiceLineFilterForm.currency`, `ContractAssignmentFilterForm.contract`) has a `utilities.forms.widgets.FilterModifierWidget` widget when the model's filterset supports more than one lookup for it (`len(lookups) > 1`, computed with the filterset); in addition, each of the nine filter forms has at least one field with `FilterModifierWidget` (the `tag` field of every form qualifies), so SC-002 is checked 9/9
 - [ ] T013 [US2] Same class: contracts with external references `ALPHA-FIBER-01` and `BETA-POWER-02`; GET `contract_list?external_reference__ic=FIBER` lists only the first (US2-2); GET with a query string used before the change (`?status=active&currency=usd`) returns the same contracts as the filterset applied directly (US2-3)
 
 ### Implementation for User Story 2
@@ -98,9 +98,9 @@ fields removed from sections; contract type description as a `CharField` (D4). I
 
 ### Tests for User Story 3 (write first, must fail)
 
-- [ ] T016 [US3] In `netbox_contract/tests/test_conventions.py`, class `FormSectionsTestCase`: for each of the 27 model, bulk-edit and filter form classes of `netbox_contract/forms.py` (instantiated unbound; bulk-edit forms with `model` set as the views do), assert `form.fieldsets` is not empty and every visible field name (excluding hidden widgets, custom fields `cf_*`, `comments`, `changelog_message`, `owner`, `owner_group`) appears in exactly one `FieldSet`; filter forms' first fieldset is `('q', 'filter_id', 'tag')`; no `FieldSet` without a field present in `form.fields`
+- [ ] T016 [US3] In `netbox_contract/tests/test_conventions.py`, class `FormSectionsTestCase`: for each of the 27 model, bulk-edit and filter form classes of `netbox_contract/forms.py` (instantiated unbound; bulk-edit forms with `model` set as the views do), assert `form.fieldsets` is not empty and every visible field name (excluding hidden widgets, custom fields `cf_*`, `comments`, `changelog_message`, `owner`, `owner_group`, and the bulk-edit `add_tags`/`remove_tags`, which `generic/bulk_edit.html` renders outside the sections) appears in exactly one `FieldSet`; filter forms' first fieldset is `('q', 'filter_id', 'tag')`; no `FieldSet` without a field present in `form.fields`
 - [ ] T017 [US3] Same class: with `mock.patch.dict(settings.PLUGINS_CONFIG['netbox_contract'], {'hidden_contract_fields': ['external_reference', 'notice_period']})`, a `ContractForm` has both as hidden inputs, in no fieldset, and the rendered `contract_add` page contains each input exactly once (US3-2)
-- [ ] T018 [US3] Same class: `show_deprecated_fields` off → `ContractForm`, `InvoiceForm`, `ContractBulkEditForm`, `InvoiceBulkEditForm` and `InvoiceFilterForm` have no `Deprecated` fieldset; on → `mrc`, `yrc`, `nrc` / `template` are in a `Deprecated` fieldset (US3-3)
+- [ ] T018 [US3] Same class: `show_deprecated_fields` off → `ContractForm` (`mrc`, `yrc`, `nrc`), `InvoiceForm` and `InvoiceBulkEditForm` (`template`) have no `Deprecated` fieldset and none of those fields; on → those fields are in a `Deprecated` fieldset (US3-3). `InvoiceFilterForm` keeps its `template` filter whatever the setting (it is not removed today, FR-007), in a `Deprecated` section that is always shown; `ContractBulkEditForm` has no deprecated field and no `Deprecated` section
 - [ ] T019 [US3] Same class: `ContractTypeFilterForm().fields['description']`, `ContractTypeCSVForm().fields['description']` and `ContractTypeBulkEditForm().fields['description']` are `forms.CharField` with a `TextInput`-based widget (not `MarkdownWidget`), `required=False`; `ContractTypeBulkEditForm.nullable_fields == ('description',)` (US3-4)
 
 ### Implementation for User Story 3
@@ -165,7 +165,7 @@ partial request return the short forms.
 
 ### Templates (FR-011, research D6; test first)
 
-- [ ] T038 In `netbox_contract/tests/test_conventions.py`, class `TemplateLocationTestCase`: no `.html` file directly under `netbox_contract/templates/`; with `contract_assignments_display` `both`, the page of a site with a contract assignment renders the assignments table (the contract name is in the response)
+- [ ] T038 In `netbox_contract/tests/test_conventions.py`, class `TemplateLocationTestCase`: no `.html` file directly under `netbox_contract/templates/` (covers the edge case "a template with the same name in another plugin does not replace them": only namespaced paths remain); with `contract_assignments_display` `both`, the page of a site with a contract assignment renders the assignments table (the contract name is in the response)
 - [ ] T039 Move `netbox_contract/templates/contract_assignments_bottom.html` to `netbox_contract/templates/netbox_contract/inc/contract_assignments_bottom.html` (`git mv`) and update the path in `netbox_contract/template_content.py`
 - [ ] T040 Delete `netbox_contract/templates/contract_list_bottom.html` (`git rm`, clarification Q3)
 
@@ -179,7 +179,7 @@ partial request return the short forms.
 ### Validation
 
 - [ ] T045 Run the whole suite (`netbox_contract.tests`), `ruff check`, and `makemigrations netbox_contract --check --dry-run` (nothing pending); if a list view query-count test fails, re-record serially with `UPDATE_QUERY_COUNTS=1` and state the reason in the commit (Constitution II)
-- [ ] T046 Walk the manual checks of [quickstart.md](quickstart.md) in the dev NetBox (Journal tab, filter modifiers, contract form sections, add invoice from a contract, quick add of an invoice line)
+- [ ] T046 Walk the manual checks of [quickstart.md](quickstart.md) in the dev NetBox (Journal tab, filter modifiers, contract form sections, add invoice from a contract, `invoiceline/add/?_quickadd=true` returning the short form)
 - [ ] T047 Update `spec.md`, `research.md` and this file if implementation deviated from them (CLAUDE.md workflow rule)
 
 ---

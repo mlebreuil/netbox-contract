@@ -10,7 +10,7 @@
 
 ## Delivery Overview
 
-This is a conformance change delivered in one patch release (the next 2.5.x version; no migration, setting, field or endpoint is added). Users see four improvements: a Journal tab on every object, lookup modifiers on every filter form, edit, bulk-edit and filter forms grouped into sections, and quick-add and partial page refreshes working on the invoice and invoice line edit screens. Everything else (URLs, REST API, settings, import columns, stored data) stays the same. The user stories are ordered by user value, which is also the suggested build order.
+This is a conformance change delivered in one patch-level release (2.5.0, not yet released, as a #308 entry; see research D9; no migration, setting, field or endpoint is added). Users see four improvements: a Journal tab on every object, lookup modifiers on every filter form, edit, bulk-edit and filter forms grouped into sections, and quick-add and partial page refreshes working on the invoice and invoice line edit screens. Everything else (URLs, REST API, settings, import columns, stored data) stays the same. The user stories are ordered by user value, which is also the suggested build order.
 
 ## Clarifications
 
@@ -77,7 +77,7 @@ A user creating or editing a contract, an invoice or any other plugin object see
 
 ### User Story 4 - Quick add and partial refresh on invoice and invoice line forms (Priority: P3)
 
-A user filling a form that offers a quick-add button for an invoice or an invoice line (NetBox's "+" next to a selection field), or a screen that refreshes an edit form without a full page load, gets the same form as on every other object. Today the invoice and invoice line edit screens ignore these requests and return the full page. The pre-fill of a new invoice from its contract (date, period, currency, proposed amount, preview of lines) and of a new invoice line from its invoice (quantity, unit price, currency) keeps working, still only from a contract or invoice the user is allowed to view.
+NetBox's quick-add (the "+" next to a selection field, which opens a short add form in a dialog) and its partial refresh of edit forms ask an add or edit screen for a short form instead of the full page. Every core screen answers these requests; the invoice and invoice line screens ignore them and return the full page, so a quick-add of an invoice or invoice line offered by NetBox, another plugin or a future plugin form would not work. Adding a quick-add button to the plugin's own forms is out of scope. The pre-fill of a new invoice from its contract (date, period, currency, proposed amount, preview of lines) and of a new invoice line from its invoice (quantity, unit price, currency) keeps working, still only from a contract or invoice the user is allowed to view.
 
 **Why this priority**: it fixes an inconsistency with NetBox core and removes duplicated code that would drift on each NetBox release, but few users hit it today.
 
@@ -138,7 +138,7 @@ A user viewing a contract with the deprecated fields setting off does not see th
 - **FR-012**: The contract page MUST NOT look up or show the deprecated invoice template when `show_deprecated_fields` is off, and MUST show it as before when it is on.
 - **FR-013**: No REST field, endpoint, plugin setting, import column or stored data MAY change (Constitution IV and V).
 - **FR-014**: Every acceptance scenario above MUST be covered by an automated test that fails before the change where the behaviour changes (Constitution II).
-- **FR-015**: `CHANGELOG.md` MUST have a "Changed" entry for these changes, with a "Behaviour changes" note for the invoice template section hidden when deprecated fields are off a mention of the removed unused `contract_list_bottom.html` template, and the invoice pre-fill keeping values given in the page address; `docs/` MUST be updated where form descriptions or screenshots change (Constitution VII).
+- **FR-015**: `CHANGELOG.md` MUST have a "Changed" entry for these changes, with a "Behaviour changes" note for the invoice template section hidden when deprecated fields are off, a mention of the removed unused `contract_list_bottom.html` template, and the invoice pre-fill keeping values given in the page address; `docs/` MUST be updated where form descriptions or screenshots change (Constitution VII).
 
 ### Key Entities
 
@@ -153,7 +153,7 @@ No entity is added or changed. The change touches how the nine existing plugin o
 - **SC-003**: 100% of the plugin page addresses and route names used before the change still resolve to the same page.
 - **SC-004**: 100% of the plugin's add/edit, bulk-edit and filter forms show their fields in titled sections, with the same set of fields as before.
 - **SC-005**: The existing automated test suite passes unchanged apart from tests added for this feature; query-count baselines change only with a stated reason.
-- **SC-006**: A user can add an invoice or an invoice line through a quick-add button, as for any other NetBox object.
+- **SC-006**: 2 out of 2 screens (invoice and invoice line add/edit) return the short quick-add form and the partial form when asked, as every core add/edit screen does (today 0 out of 2).
 
 ## Assumptions
 

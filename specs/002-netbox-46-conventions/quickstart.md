@@ -35,7 +35,7 @@ stated reason).
 | US4-1, US4-3, US4-6 | GET pre-fill values of invoice and invoice line; no pre-fill on edit | Add invoice from a contract: date, period, currency, amount and preview filled |
 | US4-2 | restricted contract/invoice ignored | – |
 | FR-010, edge: address wins | `?contracts=<id>&date=2026-01-15` keeps that date; other fields from the contract | – |
-| US4-4, SC-006 | `_quickadd` returns the quick-add template | Invoice line add form: "+" next to Invoice (if offered) opens the quick add |
+| US4-4, SC-006 | `_quickadd` returns the quick-add template | Open `/plugins/contracts/invoiceline/add/?_quickadd=true`: the short quick-add form is returned, not the full page |
 | US4-5 | HTMX partial returns `htmx/form.html` | – |
 | US5-1, US5-2 | contract page with setting off (no section, no lookup) and on (section) | – |
 | Edge: moved template | assignable object page renders the inline contract assignments | Device page with an assignment, `contract_assignments_display` = `both` |
