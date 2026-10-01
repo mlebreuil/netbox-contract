@@ -92,7 +92,12 @@ class DeprecatedFieldsViewTestCase(TestCase):
         template = Invoice.objects.create(number='_invoice_template_Contract', template=True, amount=0)
         template.contracts.add(self.contract)
         InvoiceLine.objects.create(invoice=template, amount=Decimal(10), currency='usd')
+        # Shown on the contract page only with the deprecated fields (#308, clarification Q1)
         content = self.get_contract_page()
+        self.assertNotIn(template.get_absolute_url(), content)
+        self.assertNotIn('Invoice templates (kept for reference)', content)
+        with mock.patch.dict(PLUGIN_SETTINGS, {'show_deprecated_fields': True}):
+            content = self.get_contract_page()
         self.assertIn(template.get_absolute_url(), content)
         self.assertIn('Invoice templates (kept for reference)', content)
         response = self.client.get(template.get_absolute_url())

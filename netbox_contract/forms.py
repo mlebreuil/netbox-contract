@@ -28,6 +28,7 @@ from utilities.forms.fields import (
     SlugField,
     TagFilterField,
 )
+from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker, HTMXSelect
 from utilities.templatetags.builtins.filters import bettertitle
 
@@ -77,6 +78,22 @@ def apply_field_settings(form, mandatory_setting, hidden_setting):
             continue
         if not form.fields[field].required:
             form.fields[field].widget = forms.HiddenInput()
+    prune_fieldsets(form)
+
+
+def prune_fieldsets(form):
+    """
+    Keep in the form's sections only the fields it still shows: fields deleted (deprecated) or hidden by the settings
+    are rendered once as hidden inputs, outside the sections; a section left without a field is dropped.
+    """
+    fieldsets = []
+    for fieldset in form.fieldsets:
+        items = [
+            name for name in fieldset.items if name in form.fields and not form.fields[name].widget.is_hidden
+        ]
+        if items:
+            fieldsets.append(FieldSet(*items, name=fieldset.name))
+    form.fieldsets = tuple(fieldsets)
 
 
 # Contract
@@ -106,6 +123,18 @@ class ContractForm(NetBoxModelForm):
     )
     contract_type = DynamicModelChoiceField(
         queryset=ContractType.objects.all(), required=False, selector=True, label=_('Contract type')
+    )
+
+    fieldsets = (
+        FieldSet(
+            'name', 'contract_type', 'status', 'external_reference', 'parent', 'documents', 'tags',
+            name=_('Contract'),
+        ),
+        FieldSet('external_party_object_type', 'external_party_object', 'internal_party', name=_('Parties')),
+        FieldSet('start_date', 'end_date', 'initial_term', 'renewal_term', 'notice_period', name=_('Dates and terms')),
+        FieldSet('currency', 'invoice_frequency', 'billable', name=_('Billing')),
+        FieldSet('tenant', name=_('Tenancy')),
+        FieldSet('mrc', 'yrc', 'nrc', name=_('Deprecated')),
     )
 
     def __init__(self, *args, **kwargs):
@@ -185,6 +214,17 @@ class ContractForm(NetBoxModelForm):
 
 class ContractFilterForm(ContactModelFilterForm, TenancyFilterForm, NetBoxModelFilterSetForm):
     model = Contract
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag'),
+        FieldSet(
+            'contract_type', 'status', 'external_reference', 'internal_party', 'parent', 'billable',
+            name=_('Attributes'),
+        ),
+        FieldSet('service_provider_id', 'provider_id', name=_('Parties')),
+        FieldSet('currency', name=_('Billing')),
+        FieldSet('tenant_group_id', 'tenant_id', name=_('Tenant')),
+        FieldSet('contact', 'contact_role', 'contact_group', name=_('Contacts')),
+    )
 
     contract_type = DynamicModelChoiceField(
         queryset=ContractType.objects.all(),
@@ -347,6 +387,13 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
     )
 
     nullable_fields = ('comments',)
+    fieldsets = (
+        FieldSet('name', 'contract_type', 'external_reference', 'parent', name=_('Contract')),
+        FieldSet('external_party_object_type', 'external_party_object', 'internal_party', name=_('Parties')),
+        FieldSet('billable', name=_('Billing')),
+        FieldSet('tenant', name=_('Tenancy')),
+    )
+
     model = Contract
 
     def __init__(self, *args, **kwargs):
@@ -369,6 +416,10 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
 class ContractTypeForm(NetBoxModelForm):
     color = ColorField(label=_('Color'))
 
+    fieldsets = (
+        FieldSet('name', 'description', 'color', 'tags', name=_('Contract type')),
+    )
+
     class Meta:
         model = ContractType
         fields = (
@@ -381,7 +432,7 @@ class ContractTypeForm(NetBoxModelForm):
 
 class ContractTypeCSVForm(NetBoxModelImportForm):
     name = forms.CharField(max_length=100, label=_('Name'))
-    description = CommentField(label=_('Description'))
+    description = forms.CharField(required=False, label=_('Description'))
     color = ColorField(label=_('Color'))
 
     class Meta:
@@ -390,16 +441,24 @@ class ContractTypeCSVForm(NetBoxModelImportForm):
 
 
 class ContractTypeBulkEditForm(NetBoxModelBulkEditForm):
-    description = CommentField(label=_('Description'))
-    nullable_fields = ('comments',)
+    description = forms.CharField(required=False, label=_('Description'))
+    nullable_fields = ('description',)
     color = ColorField(label=_('Color'), required=False,)
+    fieldsets = (
+        FieldSet('description', 'color', name=_('Contract type')),
+    )
+
     model = ContractType
 
 
 class ContractTypeFilterForm(NetBoxModelFilterSetForm):
     model = ContractType
+    fieldsets = (
+        FieldSet('q', 'filter_id'),
+        FieldSet('name', 'description', name=_('Attributes')),
+    )
     name = forms.CharField(required=False, label=_('Name'))
-    description = CommentField(label=_('Description'))
+    description = forms.CharField(required=False, label=_('Description'))
 
 # Invoice
 
@@ -414,6 +473,12 @@ class InvoiceForm(NetBoxModelForm):
         required=False,
         selector=True,
         label=_('Contracts'),
+    )
+
+    fieldsets = (
+        FieldSet('number', 'date', 'contracts', 'status', 'documents', 'tags', name=_('Invoice')),
+        FieldSet('period_start', 'period_end', 'currency', 'amount', name=_('Period and amount')),
+        FieldSet('template', name=_('Deprecated')),
     )
 
     def __init__(self, *args, **kwargs):
@@ -536,6 +601,12 @@ class InvoiceLineDimensionsForm(forms.Form):
 
 class InvoiceFilterForm(NetBoxModelFilterSetForm):
     model = Invoice
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag'),
+        FieldSet('number', 'status', 'contracts', name=_('Attributes')),
+        FieldSet('currency', 'accounting_dimensions', name=_('Billing')),
+        FieldSet('template', name=_('Deprecated')),
+    )
     number = forms.CharField(
         required=False,
         label=_('Number'),
@@ -651,6 +722,12 @@ class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
     )
     nullable_fields = ('comments',)
 
+    fieldsets = (
+        FieldSet('number', 'date', 'contracts', 'documents', name=_('Invoice')),
+        FieldSet('period_start', 'period_end', 'currency', 'amount', name=_('Period and amount')),
+        FieldSet('template', name=_('Deprecated')),
+    )
+
     model = Invoice
 
     def __init__(self, *args, **kwargs):
@@ -658,6 +735,7 @@ class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
         # Invoice templates are deprecated: the flag is offered only when deprecated fields are shown
         if not plugin_settings.get('show_deprecated_fields'):
             del self.fields['template']
+        prune_fieldsets(self)
 
 
 # service Provider forms
@@ -667,6 +745,10 @@ class ServiceProviderForm(NetBoxModelForm):
     slug = SlugField(label=_('Slug'))
     comments = CommentField(label=_('Comments'))
 
+    fieldsets = (
+        FieldSet('name', 'slug', 'portal_url', 'tags', name=_('Service provider')),
+    )
+
     class Meta:
         model = ServiceProvider
         fields = ('name', 'slug', 'portal_url', 'comments', 'tags')
@@ -674,6 +756,11 @@ class ServiceProviderForm(NetBoxModelForm):
 
 class ServiceProviderFilterForm(ContactModelFilterForm, NetBoxModelFilterSetForm):
     model = ServiceProvider
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag'),
+        FieldSet('name', name=_('Attributes')),
+        FieldSet('contact', 'contact_role', 'contact_group', name=_('Contacts')),
+    )
     name = forms.CharField(required=False, label=_('Name'))
     tag = TagFilterField(model)
 
@@ -691,6 +778,10 @@ class ServiceProviderBulkEditForm(NetBoxModelBulkEditForm):
     name = forms.CharField(max_length=100, required=False, label=_('Name'))
     comments = CommentField(label=_('Comments'))
     nullable_fields = ('comments',)
+    fieldsets = (
+        FieldSet('name', name=_('Service provider')),
+    )
+
     model = ServiceProvider
 
 
@@ -710,6 +801,10 @@ class ContractAssignmentForm(NetBoxModelForm):
         selector=True,
         label=_('Contract'))
 
+    fieldsets = (
+        FieldSet('content_type', 'object_id', 'contract', 'tags', name=_('Assignment')),
+    )
+
     class Meta:
         model = ContractAssignment
         fields = ['content_type', 'object_id', 'contract', 'tags']
@@ -721,6 +816,10 @@ class ContractAssignmentForm(NetBoxModelForm):
 
 class ContractAssignmentFilterForm(NetBoxModelFilterSetForm):
     model = ContractAssignment
+    fieldsets = (
+        FieldSet('q', 'filter_id'),
+        FieldSet('contract', name=_('Attributes')),
+    )
     contract = DynamicModelChoiceField(
         queryset=Contract.objects.all(),
         required=False,
@@ -754,6 +853,10 @@ class ContractAssignmentBulkEditForm(NetBoxModelBulkEditForm):
         selector=True,
         label=_('Contract'),
     )
+    fieldsets = (
+        FieldSet('contract', name=_('Assignment')),
+    )
+
     model = ContractAssignment
 
 
@@ -789,6 +892,11 @@ class InvoiceLineForm(NetBoxModelForm):
 
     # Fields fixed on a saved line that references a contract line (FR-024)
     CALCULATED_LINE_FIXED_FIELDS = ('invoice', 'contract_line', 'currency', 'amount')
+
+    fieldsets = (
+        FieldSet('invoice', 'contract_line', 'accounting_dimensions', 'tags', name=_('Invoice line')),
+        FieldSet('unit', 'unit_price', 'quantity', 'currency', 'amount', name=_('Amount')),
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -851,6 +959,11 @@ class InvoiceLineForm(NetBoxModelForm):
 
 class InvoiceLineFilterForm(NetBoxModelFilterSetForm):
     model = InvoiceLine
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag'),
+        FieldSet('invoice', name=_('Attributes')),
+        FieldSet('currency', 'accounting_dimensions', name=_('Billing')),
+    )
     invoice = DynamicModelChoiceField(
         queryset=Invoice.objects.all(),
         required=False,
@@ -925,6 +1038,10 @@ class InvoiceLineBulkEditForm(NetBoxModelBulkEditForm):
     )
     comments = CommentField(label=_('Comments'))
     nullable_fields = ('comments',)
+    fieldsets = (
+        FieldSet('invoice', 'accounting_dimensions', name=_('Invoice line')),
+    )
+
     model = InvoiceLine
 
 
@@ -934,6 +1051,10 @@ class InvoiceLineBulkEditForm(NetBoxModelBulkEditForm):
 class UnitForm(NetBoxModelForm):
     comments = CommentField(label=_('Comments'))
 
+    fieldsets = (
+        FieldSet('name', 'description', 'billing_method', 'months', 'tags', name=_('Unit')),
+    )
+
     class Meta:
         model = Unit
         fields = ('name', 'description', 'billing_method', 'months', 'comments', 'tags')
@@ -941,6 +1062,10 @@ class UnitForm(NetBoxModelForm):
 
 class UnitFilterForm(NetBoxModelFilterSetForm):
     model = Unit
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag'),
+        FieldSet('name', 'billing_method', name=_('Attributes')),
+    )
     name = forms.CharField(required=False, label=_('Name'))
     billing_method = forms.MultipleChoiceField(
         choices=BillingMethodChoices, required=False, label=_('Billing method')
@@ -962,6 +1087,10 @@ class UnitBulkEditForm(NetBoxModelBulkEditForm):
     description = forms.CharField(required=False, label=_('Description'))
     comments = CommentField(required=False, label=_('Comments'))
     nullable_fields = ('description', 'comments')
+    fieldsets = (
+        FieldSet('description', name=_('Unit')),
+    )
+
     model = Unit
 
 
@@ -984,6 +1113,12 @@ class ContractLineForm(NetBoxModelForm):
         label=_('Accounting dimensions'),
     )
     comments = CommentField(label=_('Comments'))
+
+    fieldsets = (
+        FieldSet('contract', 'description', 'accounting_dimensions', 'tags', name=_('Contract line')),
+        FieldSet('quantity', 'unit_price', 'unit', 'currency', name=_('Price')),
+        FieldSet('start_date', 'end_date', name=_('Dates')),
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1041,6 +1176,11 @@ class ContractLineAmendForm(forms.Form):
 
 class ContractLineFilterForm(NetBoxModelFilterSetForm):
     model = ContractLine
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag'),
+        FieldSet('contract_id', name=_('Attributes')),
+        FieldSet('currency', 'unit_id', 'billing_method', 'accounting_dimensions', name=_('Billing')),
+    )
     contract_id = DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(), required=False, selector=True, label=_('Contract')
     )
@@ -1096,6 +1236,12 @@ class ContractLineBulkEditForm(NetBoxModelBulkEditForm):
     end_date = forms.DateField(required=False, widget=DatePicker(), label=_('End date'))
     comments = CommentField(required=False, label=_('Comments'))
     nullable_fields = ('comments',)
+    fieldsets = (
+        FieldSet('description', name=_('Contract line')),
+        FieldSet('quantity', 'unit_price', 'unit', name=_('Price')),
+        FieldSet('start_date', 'end_date', name=_('Dates')),
+    )
+
     model = ContractLine
 
 
@@ -1103,6 +1249,10 @@ class ContractLineBulkEditForm(NetBoxModelBulkEditForm):
 
 
 class AccountingDimensionForm(NetBoxModelForm):
+    fieldsets = (
+        FieldSet('name', 'value', 'status', 'tags', name=_('Accounting dimension')),
+    )
+
     class Meta:
         model = AccountingDimension
         fields = [
@@ -1116,6 +1266,10 @@ class AccountingDimensionForm(NetBoxModelForm):
 
 class AccountingDimensionFilterForm(NetBoxModelFilterSetForm):
     model = AccountingDimension
+    fieldsets = (
+        FieldSet('q', 'filter_id'),
+        FieldSet('name', 'value', 'status', name=_('Attributes')),
+    )
 
     name = forms.CharField(required=False, label=_('Name'))
     value = forms.CharField(required=False, label=_('Value'))
@@ -1145,4 +1299,8 @@ class AccountingDimensionBulkEditForm(NetBoxModelBulkEditForm):
     value = forms.CharField(max_length=20, required=False, label=_('Value'))
     comments = CommentField(label=_('Comments'))
     nullable_fields = ('comments',)
+    fieldsets = (
+        FieldSet('name', 'value', name=_('Accounting dimension')),
+    )
+
     model = AccountingDimension

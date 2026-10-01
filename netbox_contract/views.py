@@ -16,8 +16,6 @@ from django.utils.translation import gettext_lazy as _
 from netbox.object_actions import *
 from netbox.views import generic
 from netbox.views.generic.base import BaseObjectView
-from netbox.views.generic.utils import get_prerequisite_model
-from utilities.forms import restrict_form_fields
 from utilities.querydict import normalize_querydict
 from utilities.views import ViewTab, get_action_url, register_model_view
 
@@ -46,10 +44,12 @@ logger = logging.getLogger('netbox.plugins.netbox_contract')
 # ContractType views
 
 
+@register_model_view(ContractType)
 class ContractTypeView(generic.ObjectView):
     queryset = ContractType.objects.all()
 
 
+@register_model_view(ContractType, 'list', path='', detail=False)
 class ContractTypeListView(generic.ObjectListView):
     queryset = ContractType.objects.all()
     table = tables.ContractTypeListTable
@@ -57,17 +57,21 @@ class ContractTypeListView(generic.ObjectListView):
     filterset_form = forms.ContractTypeFilterForm
 
 
+@register_model_view(ContractType, 'add', detail=False)
+@register_model_view(ContractType, 'edit')
 class ContractTypeEditView(generic.ObjectEditView):
     queryset = ContractType.objects.all()
     form = forms.ContractTypeForm
 
 
+@register_model_view(ContractType, 'bulk_import', path='import', detail=False)
 class ContractTypeBulkImportView(generic.BulkImportView):
     queryset = ContractType.objects.all()
     model_form = forms.ContractTypeCSVForm
     table = tables.ContractTypeListTable
 
 
+@register_model_view(ContractType, 'bulk_edit', path='edit', detail=False)
 class ContractTypeBulkEditView(generic.BulkEditView):
     queryset = ContractType.objects.annotate()
     filterset = filtersets.ContractTypeFilterSet
@@ -75,10 +79,12 @@ class ContractTypeBulkEditView(generic.BulkEditView):
     form = forms.ContractTypeBulkEditForm
 
 
+@register_model_view(ContractType, 'delete')
 class ContractTypeDeleteView(generic.ObjectDeleteView):
     queryset = ContractType.objects.all()
 
 
+@register_model_view(ContractType, 'bulk_delete', path='delete', detail=False)
 class ContractTypeBulkDeleteView(generic.BulkDeleteView):
     queryset = ContractType.objects.annotate()
     filterset = filtersets.ContractTypeFilterSet
@@ -105,6 +111,7 @@ class ServiceProviderView(generic.ObjectView):
         }
 
 
+@register_model_view(ServiceProvider, 'list', path='', detail=False)
 class ServiceProviderListView(generic.ObjectListView):
     queryset = ServiceProvider.objects.all()
     table = tables.ServiceProviderListTable
@@ -112,21 +119,26 @@ class ServiceProviderListView(generic.ObjectListView):
     filterset_form = forms.ServiceProviderFilterForm
 
 
+@register_model_view(ServiceProvider, 'add', detail=False)
+@register_model_view(ServiceProvider, 'edit')
 class ServiceProviderEditView(generic.ObjectEditView):
     queryset = ServiceProvider.objects.all()
     form = forms.ServiceProviderForm
 
 
+@register_model_view(ServiceProvider, 'delete')
 class ServiceProviderDeleteView(generic.ObjectDeleteView):
     queryset = ServiceProvider.objects.all()
 
 
+@register_model_view(ServiceProvider, 'bulk_import', path='import', detail=False)
 class ServiceProviderBulkImportView(generic.BulkImportView):
     queryset = ServiceProvider.objects.all()
     model_form = forms.ServiceProviderCSVForm
     table = tables.ServiceProviderListTable
 
 
+@register_model_view(ServiceProvider, 'bulk_edit', path='edit', detail=False)
 class ServiceProviderBulkEditView(generic.BulkEditView):
     queryset = ServiceProvider.objects.annotate()
     filterset = filtersets.ServiceProviderFilterSet
@@ -134,6 +146,7 @@ class ServiceProviderBulkEditView(generic.BulkEditView):
     form = forms.ServiceProviderBulkEditForm
 
 
+@register_model_view(ServiceProvider, 'bulk_delete', path='delete', detail=False)
 class ServiceProviderBulkDeleteView(generic.BulkDeleteView):
     queryset = ServiceProvider.objects.annotate()
     filterset = filtersets.ServiceProviderFilterSet
@@ -143,10 +156,12 @@ class ServiceProviderBulkDeleteView(generic.BulkDeleteView):
 # Contract assignment view
 
 
+@register_model_view(ContractAssignment)
 class ContractAssignmentView(generic.ObjectView):
     queryset = ContractAssignment.objects.all()
 
 
+@register_model_view(ContractAssignment, 'list', path='', detail=False)
 class ContractAssignmentListView(generic.ObjectListView):
     queryset = ContractAssignment.objects.all()
     table = tables.ContractAssignmentListTable
@@ -154,6 +169,8 @@ class ContractAssignmentListView(generic.ObjectListView):
     filterset_form = forms.ContractAssignmentFilterForm
 
 
+@register_model_view(ContractAssignment, 'add', detail=False)
+@register_model_view(ContractAssignment, 'edit')
 class ContractAssignmentEditView(generic.ObjectEditView):
     queryset = ContractAssignment.objects.all()
     form = forms.ContractAssignmentForm
@@ -176,16 +193,19 @@ class ContractAssignmentEditView(generic.ObjectEditView):
         }
 
 
+@register_model_view(ContractAssignment, 'delete')
 class ContractAssignmentDeleteView(generic.ObjectDeleteView):
     queryset = ContractAssignment.objects.all()
 
 
+@register_model_view(ContractAssignment, 'bulk_import', path='import', detail=False)
 class ContractAssignmentBulkImportView(generic.BulkImportView):
     queryset = ContractAssignment.objects.all()
     model_form = forms.ContractAssignmentImportForm
     table = tables.ContractAssignmentListTable
 
 
+@register_model_view(ContractAssignment, 'bulk_edit', path='edit', detail=False)
 class ContractAssignmentBulkEditView(generic.BulkEditView):
     queryset = ContractAssignment.objects.annotate()
     filterset = filtersets.ContractAssignmentFilterSet
@@ -193,6 +213,7 @@ class ContractAssignmentBulkEditView(generic.BulkEditView):
     form = forms.ContractAssignmentBulkEditForm
 
 
+@register_model_view(ContractAssignment, 'bulk_delete', path='delete', detail=False)
 class ContractAssignmentBulkDeleteView(generic.BulkDeleteView):
     queryset = ContractAssignment.objects.annotate()
     filterset = filtersets.ContractAssignmentFilterSet
@@ -299,7 +320,10 @@ class ContractView(generic.ObjectView):
         assignments_table = tables.ContractAssignmentContractTable(
             instance.assignments.all()
         )
-        invoice_template = instance.invoices.filter(template=True).first()
+        # Invoice templates are deprecated: looked up only when deprecated fields are shown
+        invoice_template = None
+        if plugin_settings.get('show_deprecated_fields'):
+            invoice_template = instance.invoices.filter(template=True).first()
         if invoice_template:
             invoicelines_table = tables.InvoiceLineListTable(
                 invoice_template.invoicelines.all()
@@ -340,6 +364,7 @@ class ContractView(generic.ObjectView):
         }
 
 
+@register_model_view(Contract, 'list', path='', detail=False)
 class ContractListView(generic.ObjectListView):
     queryset = Contract.objects.annotate(yearly_value=yearly_value_annotation())
     table = tables.ContractListTable
@@ -347,6 +372,8 @@ class ContractListView(generic.ObjectListView):
     filterset_form = forms.ContractFilterForm
 
 
+@register_model_view(Contract, 'add', detail=False)
+@register_model_view(Contract, 'edit')
 class ContractEditView(generic.ObjectEditView):
     queryset = Contract.objects.all()
     form = forms.ContractForm
@@ -381,16 +408,19 @@ class ContractEditView(generic.ObjectEditView):
         return obj
 
 
+@register_model_view(Contract, 'delete')
 class ContractDeleteView(generic.ObjectDeleteView):
     queryset = Contract.objects.all()
 
 
+@register_model_view(Contract, 'bulk_import', path='import', detail=False)
 class ContractBulkImportView(generic.BulkImportView):
     queryset = Contract.objects.all()
     model_form = forms.ContractCSVForm
     table = tables.ContractListTable
 
 
+@register_model_view(Contract, 'bulk_edit', path='edit', detail=False)
 class ContractBulkEditView(generic.BulkEditView):
     queryset = Contract.objects.all()
     filterset = filtersets.ContractFilterSet
@@ -398,6 +428,7 @@ class ContractBulkEditView(generic.BulkEditView):
     form = forms.ContractBulkEditForm
 
 
+@register_model_view(Contract, 'bulk_delete', path='delete', detail=False)
 class ContractBulkDeleteView(generic.BulkDeleteView):
     queryset = Contract.objects.all()
     filterset = filtersets.ContractFilterSet
@@ -428,6 +459,7 @@ class InvoiceView(generic.ObjectView):
         }
 
 
+@register_model_view(Invoice, 'list', path='', detail=False)
 class InvoiceListView(generic.ObjectListView):
     queryset = Invoice.objects.all()
     table = tables.InvoiceListTable
@@ -540,95 +572,93 @@ class InvoiceLinesPreviewView(BaseObjectView):
         })
 
 
+def form_with_defaults(form_class, defaults):
+    """
+    The form class with extra initial values that the initial values passed by the view (the page address) override.
+    Used to pre-fill a new object and still let core ObjectEditView.get() handle quick add and HTMX requests.
+    """
+    class FormWithDefaults(form_class):
+        def __init__(self, *args, initial=None, **kwargs):
+            super().__init__(*args, initial={**defaults, **(initial or {})}, **kwargs)
+
+    return FormWithDefaults
+
+
+@register_model_view(Invoice, 'add', detail=False)
+@register_model_view(Invoice, 'edit')
 class InvoiceEditView(generic.ObjectEditView):
     queryset = Invoice.objects.all()
     form = forms.InvoiceForm
     template_name = 'netbox_contract/invoice_edit.html'
 
     def get_extra_context(self, request, instance):
-        if request.method == 'POST' and not instance.pk:
+        if instance.pk:
+            return {}
+        if request.method == 'POST':
             return {'lines_preview': build_lines_preview(request.POST, request.user)}
-        return {}
+        # New invoice: the preview uses the same values as the form, the address winning over the pre-fill
+        data = {**getattr(self, 'prefill', {}), **normalize_querydict(request.GET)}
+        return {'lines_preview': build_lines_preview(data, request.user)}
 
     def get(self, request, *args, **kwargs):
-        """
-        GET request handler
-            Overrides the ObjectEditView function to include form initialization
-            with data from the parent contract object
+        """Pre-fill a new invoice from the contract given in the address, then render as core does."""
+        if not kwargs:
+            self.prefill = self.invoice_prefill(request)
+            self.form = form_with_defaults(self.form, self.prefill)
+        return super().get(request, *args, **kwargs)
 
-        Args:
-            request: The current request
-        """
-        obj = self.get_object(**kwargs)
-        obj = self.alter_object(obj, request, args, kwargs)
-        model = self.queryset.model
-
-        initial_data = normalize_querydict(request.GET)
-        initial_data['date'] = date.today()
-        contract_id = initial_data.get('contracts')
+    def invoice_prefill(self, request):
+        """Values proposed for a new invoice; values given in the address are kept (they override these)."""
+        prefill = {'date': date.today()}
+        contract_id = request.GET.get('contracts')
         # Only a contract the user may view is used to pre-fill the invoice
         contract = (
             Contract.objects.restrict(request.user, 'view').filter(pk=contract_id).first()
             if str(contract_id).isdigit() else None
         )
-        if contract is not None:
-            try:
-                last_invoice = contract.invoices.exclude(template=True).filter(period_end__isnull=False).latest(
-                    'period_end'
-                )
-                new_period_start = last_invoice.period_end + timedelta(days=1)
-            except ObjectDoesNotExist:
-                if contract.start_date:
-                    new_period_start = contract.start_date
-                else:
-                    new_period_start = None
+        if contract is None:
+            return prefill
 
-            new_period_end = None
-            if new_period_start:
-                initial_data['period_start'] = new_period_start
-                delta = relativedelta(months=contract.invoice_frequency)
-                new_period_end = new_period_start + delta - timedelta(days=1)
-                initial_data['period_end'] = new_period_end
+        try:
+            last_invoice = contract.invoices.exclude(template=True).filter(period_end__isnull=False).latest(
+                'period_end'
+            )
+            new_period_start = last_invoice.period_end + timedelta(days=1)
+        except ObjectDoesNotExist:
+            new_period_start = contract.start_date or None
 
-            # Amount proposed from the contract lines (not from the deprecated cost fields)
-            try:
-                proposal = invoicing.propose_invoice(contract, new_period_start, new_period_end)
-            except invoicing.InvoicingError as e:
-                messages.error(request, e.message)
-            else:
-                if proposal.lines:
-                    initial_data['amount'] = proposal.total
+        new_period_end = None
+        if new_period_start:
+            prefill['period_start'] = new_period_start
+            new_period_end = new_period_start + relativedelta(months=contract.invoice_frequency) - timedelta(days=1)
+            prefill['period_end'] = new_period_end
 
-            initial_data['currency'] = contract.currency
+        # Amount proposed from the contract lines (not from the deprecated cost fields)
+        try:
+            proposal = invoicing.propose_invoice(contract, new_period_start, new_period_end)
+        except invoicing.InvoicingError as e:
+            messages.error(request, e.message)
+        else:
+            if proposal.lines:
+                prefill['amount'] = proposal.total
 
-        form = self.form(instance=obj, initial=initial_data)
-        restrict_form_fields(form, request.user)
-
-        return render(
-            request,
-            self.template_name,
-            {
-                'model': model,
-                'object': obj,
-                'form': form,
-                'return_url': self.get_return_url(request, obj),
-                'prerequisite_model': get_prerequisite_model(self.queryset),
-                'lines_preview': None if obj.pk else build_lines_preview(initial_data, request.user),
-                **self.get_extra_context(request, obj),
-            },
-        )
+        prefill['currency'] = contract.currency
+        return prefill
 
 
+@register_model_view(Invoice, 'delete')
 class InvoiceDeleteView(generic.ObjectDeleteView):
     queryset = Invoice.objects.all()
 
 
+@register_model_view(Invoice, 'bulk_import', path='import', detail=False)
 class InvoiceBulkImportView(generic.BulkImportView):
     queryset = Invoice.objects.all()
     model_form = forms.InvoiceCSVForm
     table = tables.InvoiceListTable
 
 
+@register_model_view(Invoice, 'bulk_edit', path='edit', detail=False)
 class InvoiceBulkEditView(generic.BulkEditView):
     queryset = Invoice.objects.all()
     filterset = filtersets.InvoiceFilterSet
@@ -636,6 +666,7 @@ class InvoiceBulkEditView(generic.BulkEditView):
     form = forms.InvoiceBulkEditForm
 
 
+@register_model_view(Invoice, 'bulk_delete', path='delete', detail=False)
 class InvoiceBulkDeleteView(generic.BulkDeleteView):
     queryset = Invoice.objects.all()
     filterset = filtersets.InvoiceFilterSet
@@ -645,10 +676,12 @@ class InvoiceBulkDeleteView(generic.BulkDeleteView):
 # InvoiceLine
 
 
+@register_model_view(InvoiceLine)
 class InvoiceLineView(generic.ObjectView):
     queryset = InvoiceLine.objects.all()
 
 
+@register_model_view(InvoiceLine, 'list', path='', detail=False)
 class InvoiceLineListView(generic.ObjectListView):
     queryset = InvoiceLine.objects.select_related('invoice', 'contract_line', 'unit')
     table = tables.InvoiceLineListTable
@@ -656,63 +689,46 @@ class InvoiceLineListView(generic.ObjectListView):
     filterset_form = forms.InvoiceLineFilterForm
 
 
+@register_model_view(InvoiceLine, 'add', detail=False)
+@register_model_view(InvoiceLine, 'edit')
 class InvoiceLineEditView(generic.ObjectEditView):
     queryset = InvoiceLine.objects.all()
     form = forms.InvoiceLineForm
 
     def get(self, request, *args, **kwargs):
-        """
-        GET request handler
-            Overrides the ObjectEditView function to include form initialization
-            with data from the parent invoice object
-
-        Args:
-            request: The current request
-        """
-        obj = self.get_object(**kwargs)
-        obj = self.alter_object(obj, request, args, kwargs)
-        model = self.queryset.model
-
-        initial_data = normalize_querydict(request.GET)
-        invoice_id = initial_data.get('invoice')
-        # Only an invoice the user may view is used to pre-fill the line
-        invoice = (
-            Invoice.objects.restrict(request.user, 'view').filter(pk=invoice_id).first()
-            if str(invoice_id).isdigit() else None
-        )
-        if invoice is not None:
-            # propose the rest of the invoice amount as the unit price of one unit
-            initial_data.setdefault('unit_price', invoice.amount - invoice.total_invoicelines_amount)
-            initial_data.setdefault('quantity', 1)
-            initial_data.setdefault('currency', invoice.currency)
-
-        form = self.form(instance=obj, initial=initial_data)
-        restrict_form_fields(form, request.user)
-
-        return render(
-            request,
-            self.template_name,
-            {
-                'model': model,
-                'object': obj,
-                'form': form,
-                'return_url': self.get_return_url(request, obj),
-                'prerequisite_model': get_prerequisite_model(self.queryset),
-                **self.get_extra_context(request, obj),
-            },
-        )
+        """Pre-fill a new invoice line from the invoice given in the address, then render as core does."""
+        if not kwargs:
+            prefill = {}
+            invoice_id = request.GET.get('invoice')
+            # Only an invoice the user may view is used to pre-fill the line
+            invoice = (
+                Invoice.objects.restrict(request.user, 'view').filter(pk=invoice_id).first()
+                if str(invoice_id).isdigit() else None
+            )
+            if invoice is not None:
+                # propose the rest of the invoice amount as the unit price of one unit
+                prefill = {
+                    'unit_price': invoice.amount - invoice.total_invoicelines_amount,
+                    'quantity': 1,
+                    'currency': invoice.currency,
+                }
+            self.form = form_with_defaults(self.form, prefill)
+        return super().get(request, *args, **kwargs)
 
 
+@register_model_view(InvoiceLine, 'delete')
 class InvoiceLineDeleteView(generic.ObjectDeleteView):
     queryset = InvoiceLine.objects.all()
 
 
+@register_model_view(InvoiceLine, 'bulk_import', path='import', detail=False)
 class InvoiceLineBulkImportView(generic.BulkImportView):
     queryset = InvoiceLine.objects.all()
     model_form = forms.InvoiceLineImportForm
     table = tables.InvoiceLineListTable
 
 
+@register_model_view(InvoiceLine, 'bulk_edit', path='edit', detail=False)
 class InvoiceLineBulkEditView(generic.BulkEditView):
     queryset = InvoiceLine.objects.annotate()
     filterset = filtersets.InvoiceLineFilterSet
@@ -720,6 +736,7 @@ class InvoiceLineBulkEditView(generic.BulkEditView):
     form = forms.InvoiceLineBulkEditForm
 
 
+@register_model_view(InvoiceLine, 'bulk_delete', path='delete', detail=False)
 class InvoiceLineBulkDeleteView(generic.BulkDeleteView):
     queryset = InvoiceLine.objects.annotate()
     filterset = filtersets.InvoiceLineFilterSet
@@ -741,6 +758,7 @@ class UnitView(generic.ObjectView):
         return {'lines_table': lines_table}
 
 
+@register_model_view(Unit, 'list', path='', detail=False)
 class UnitListView(generic.ObjectListView):
     queryset = Unit.objects.all()
     table = tables.UnitListTable
@@ -748,21 +766,26 @@ class UnitListView(generic.ObjectListView):
     filterset_form = forms.UnitFilterForm
 
 
+@register_model_view(Unit, 'add', detail=False)
+@register_model_view(Unit, 'edit')
 class UnitEditView(generic.ObjectEditView):
     queryset = Unit.objects.all()
     form = forms.UnitForm
 
 
+@register_model_view(Unit, 'delete')
 class UnitDeleteView(generic.ObjectDeleteView):
     queryset = Unit.objects.all()
 
 
+@register_model_view(Unit, 'bulk_import', path='import', detail=False)
 class UnitBulkImportView(generic.BulkImportView):
     queryset = Unit.objects.all()
     model_form = forms.UnitImportForm
     table = tables.UnitListTable
 
 
+@register_model_view(Unit, 'bulk_edit', path='edit', detail=False)
 class UnitBulkEditView(generic.BulkEditView):
     queryset = Unit.objects.all()
     filterset = filtersets.UnitFilterSet
@@ -770,6 +793,7 @@ class UnitBulkEditView(generic.BulkEditView):
     form = forms.UnitBulkEditForm
 
 
+@register_model_view(Unit, 'bulk_delete', path='delete', detail=False)
 class UnitBulkDeleteView(generic.BulkDeleteView):
     queryset = Unit.objects.all()
     filterset = filtersets.UnitFilterSet
@@ -829,6 +853,7 @@ class ContractLineAmendView(BaseObjectView):
         return self.render_form(request, line, form)
 
 
+@register_model_view(ContractLine, 'list', path='', detail=False)
 class ContractLineListView(generic.ObjectListView):
     queryset = ContractLine.objects.select_related('contract', 'unit').prefetch_related('accounting_dimensions')
     table = tables.ContractLineListTable
@@ -836,6 +861,8 @@ class ContractLineListView(generic.ObjectListView):
     filterset_form = forms.ContractLineFilterForm
 
 
+@register_model_view(ContractLine, 'add', detail=False)
+@register_model_view(ContractLine, 'edit')
 class ContractLineEditView(generic.ObjectEditView):
     """The add view accepts ?contract=<id> to pre-select the contract."""
 
@@ -847,16 +874,19 @@ class ContractLineEditView(generic.ObjectEditView):
         return {'lock_message': instance.lock_message() if instance.pk else None}
 
 
+@register_model_view(ContractLine, 'delete')
 class ContractLineDeleteView(generic.ObjectDeleteView):
     queryset = ContractLine.objects.all()
 
 
+@register_model_view(ContractLine, 'bulk_import', path='import', detail=False)
 class ContractLineBulkImportView(generic.BulkImportView):
     queryset = ContractLine.objects.all()
     model_form = forms.ContractLineImportForm
     table = tables.ContractLineListTable
 
 
+@register_model_view(ContractLine, 'bulk_edit', path='edit', detail=False)
 class ContractLineBulkEditView(generic.BulkEditView):
     queryset = ContractLine.objects.select_related('contract', 'unit')
     filterset = filtersets.ContractLineFilterSet
@@ -864,6 +894,7 @@ class ContractLineBulkEditView(generic.BulkEditView):
     form = forms.ContractLineBulkEditForm
 
 
+@register_model_view(ContractLine, 'bulk_delete', path='delete', detail=False)
 class ContractLineBulkDeleteView(generic.BulkDeleteView):
     queryset = ContractLine.objects.select_related('contract', 'unit')
     filterset = filtersets.ContractLineFilterSet
@@ -873,10 +904,12 @@ class ContractLineBulkDeleteView(generic.BulkDeleteView):
 # Accounting dimension
 
 
+@register_model_view(AccountingDimension)
 class AccountingDimensionView(generic.ObjectView):
     queryset = AccountingDimension.objects.all()
 
 
+@register_model_view(AccountingDimension, 'list', path='', detail=False)
 class AccountingDimensionListView(generic.ObjectListView):
     queryset = AccountingDimension.objects.all()
     table = tables.AccountingDimensionListTable
@@ -884,21 +917,26 @@ class AccountingDimensionListView(generic.ObjectListView):
     filterset_form = forms.AccountingDimensionFilterForm
 
 
+@register_model_view(AccountingDimension, 'add', detail=False)
+@register_model_view(AccountingDimension, 'edit')
 class AccountingDimensionEditView(generic.ObjectEditView):
     queryset = AccountingDimension.objects.all()
     form = forms.AccountingDimensionForm
 
 
+@register_model_view(AccountingDimension, 'delete')
 class AccountingDimensionDeleteView(generic.ObjectDeleteView):
     queryset = AccountingDimension.objects.all()
 
 
+@register_model_view(AccountingDimension, 'bulk_import', path='import', detail=False)
 class AccountingDimensionBulkImportView(generic.BulkImportView):
     queryset = AccountingDimension.objects.all()
     model_form = forms.AccountingDimensionImportForm
     table = tables.AccountingDimensionListTable
 
 
+@register_model_view(AccountingDimension, 'bulk_edit', path='edit', detail=False)
 class AccountingDimensionBulkEditView(generic.BulkEditView):
     queryset = AccountingDimension.objects.annotate()
     filterset = filtersets.AccountingDimensionFilterSet
@@ -906,6 +944,7 @@ class AccountingDimensionBulkEditView(generic.BulkEditView):
     form = forms.AccountingDimensionBulkEditForm
 
 
+@register_model_view(AccountingDimension, 'bulk_delete', path='delete', detail=False)
 class AccountingDimensionBulkDeleteView(generic.BulkDeleteView):
     queryset = AccountingDimension.objects.annotate()
     filterset = filtersets.AccountingDimensionFilterSet

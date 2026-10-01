@@ -30,6 +30,16 @@
   * The invoice line add form pre-fills the unit price and currency only from an invoice the user may view, and no longer fails with a server error when the `invoice` parameter is unknown or not a number.
   * The **Amend** button of contract lines is shown only to users with both the add and change contract line permissions, which the amendment requires; users with the change permission alone saw it and got a "forbidden" page.
 
+* [#308](https://github.com/mlebreuil/netbox-contract/issues/308) Aligned with the NetBox 4.6 plugin conventions.
+  * Invoice lines, accounting dimensions, contract types and contract assignments get the **Journal** tab, like the other objects. Every screen of the plugin is registered the NetBox way, so other plugins can add tabs and actions to any plugin object; page addresses do not change.
+  * Filter forms offer NetBox's lookup modifiers (contains, starts with, is not, is empty, ...).
+  * Add, edit, bulk edit and filter forms group their fields into sections (for contracts: Contract, Parties, Dates and terms, Billing, Tenancy).
+  * The invoice and invoice line add screens support NetBox's quick add and partial refresh. Values given in the page address (for example `?date=`) are kept by the invoice pre-fill instead of being replaced, and editing an existing invoice no longer shows today's date in place of its date.
+  * The contract type description is a plain text field in the filter, bulk edit and import forms, and can be cleared in bulk.
+  * Invoice line tables (list, invoice page) show the linked **ID** by default, so a line can be opened; no other column linked to it. Users who saved their own column choice add it from "Configure Table".
+  * The translations are refreshed and the new texts of 2.5.0 are translated into French.
+  * For plugin developers: the template shown at the bottom of assigned objects moved to `netbox_contract/inc/contract_assignments_bottom.html`, and the unused `contract_list_bottom.html` was removed.
+
 #### Behaviour changes
 
 For existing users and API clients:
@@ -45,10 +55,11 @@ For existing users and API clients:
 * Changing the currency of a contract also changes its non-billable descendants of the same currency, unless one of them has invoices.
 * New invoices are Draft by default (previously Posted), in the web interface and the REST API; imports still set the status given in the file.
 * Posted invoices are locked: their amount, currency, period and contracts cannot change, lines cannot be added or deleted, and the unit, unit price, quantity and amount of their lines cannot change. Set an invoice back to Draft to correct it.
-* The contract cost fields and new invoice templates are hidden unless `show_deprecated_fields` is `True`. The mandatory and hidden field settings ignore a deprecated field that is not shown (with a warning in the log) instead of failing.
+* The contract cost fields, new invoice templates and the invoice template section of the contract page are hidden unless `show_deprecated_fields` is `True`; templates remain reachable from the invoice list. The mandatory and hidden field settings ignore a deprecated field that is not shown (with a warning in the log) instead of failing.
 * The custom scripts `create_invoice_template` and `create_invoice_lines` are removed: they read fields that no longer exist and are superseded by the conversion.
 * API clients that passed filters to `serviceproviders/`, `contracttype/`, `accountingdimension/` or `contractassignment/` now get the filtered list instead of every object.
 * Non-superusers with the view contract assignment permission now see the Contracts tab.
+* The invoice add form keeps the values given in its address (for example `?date=` or `?period_start=`); previously the values proposed from the contract, and today's date, replaced them.
 
 ### Version v2.4.7
 

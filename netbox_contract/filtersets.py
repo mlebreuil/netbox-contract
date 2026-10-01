@@ -4,6 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from netbox.filtersets import NetBoxModelFilterSet
 from tenancy.filtersets import ContactModelFilterSet, TenancyFilterSet
+from utilities.filtersets import register_filterset
 
 from .models import (
     AccountingDimension,
@@ -24,6 +25,7 @@ from .models import (
 )
 
 
+@register_filterset
 class ContractFilterSet(ContactModelFilterSet, NetBoxModelFilterSet, TenancyFilterSet):
     status = django_filters.MultipleChoiceFilter(choices=StatusChoices, null_value=None)
     internal_party = django_filters.MultipleChoiceFilter(
@@ -88,6 +90,7 @@ class ContractFilterSet(ContactModelFilterSet, NetBoxModelFilterSet, TenancyFilt
         )
 
 
+@register_filterset
 class InvoiceFilterSet(NetBoxModelFilterSet):
     status = django_filters.MultipleChoiceFilter(choices=InvoiceStatusChoices, null_value=None)
     currency = django_filters.MultipleChoiceFilter(
@@ -118,6 +121,7 @@ class InvoiceFilterSet(NetBoxModelFilterSet):
         )
 
 
+@register_filterset
 class ServiceProviderFilterSet(ContactModelFilterSet, NetBoxModelFilterSet):
     class Meta:
         model = ServiceProvider
@@ -127,6 +131,7 @@ class ServiceProviderFilterSet(ContactModelFilterSet, NetBoxModelFilterSet):
         return queryset.filter(name__icontains=value)
 
 
+@register_filterset
 class ContractTypeFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = ContractType
@@ -136,6 +141,7 @@ class ContractTypeFilterSet(NetBoxModelFilterSet):
         return queryset.filter(name__icontains=value)
 
 
+@register_filterset
 class ContractAssignmentFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = ContractAssignment
@@ -145,6 +151,7 @@ class ContractAssignmentFilterSet(NetBoxModelFilterSet):
         return queryset.filter(Q(contract__name__icontains=value))
 
 
+@register_filterset
 class InvoiceLineFilterSet(NetBoxModelFilterSet):
     currency = django_filters.MultipleChoiceFilter(
         choices=CurrencyChoices, null_value=None
@@ -160,6 +167,7 @@ class InvoiceLineFilterSet(NetBoxModelFilterSet):
         )
 
 
+@register_filterset
 class AccountingDimensionFilterSet(NetBoxModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=AccountingDimensionStatusChoices, null_value=None
@@ -173,6 +181,7 @@ class AccountingDimensionFilterSet(NetBoxModelFilterSet):
         return queryset.filter(Q(comments__icontains=value) | Q(name__icontains=value))
 
 
+@register_filterset
 class UnitFilterSet(NetBoxModelFilterSet):
     billing_method = django_filters.MultipleChoiceFilter(choices=BillingMethodChoices, null_value=None)
 
@@ -184,6 +193,7 @@ class UnitFilterSet(NetBoxModelFilterSet):
         return queryset.filter(Q(name__icontains=value) | Q(description__icontains=value))
 
 
+@register_filterset
 class ContractLineFilterSet(NetBoxModelFilterSet):
     contract_id = django_filters.ModelMultipleChoiceFilter(
         field_name='contract', queryset=Contract.objects.all(), label='Contract (ID)'
