@@ -19,7 +19,7 @@ from netbox.registry import registry
 from utilities.forms.widgets import FilterModifierWidget, MarkdownWidget
 from utilities.testing import TestCase
 
-from netbox_contract import filtersets, forms
+from netbox_contract import filtersets, forms, tables
 from netbox_contract.models import (
     AccountingDimension,
     Contract,
@@ -468,3 +468,16 @@ class TemplateLocationTestCase(TestCase):
             response = self.client.get(site.get_absolute_url())
         self.assertHttpStatus(response, 200)
         self.assertContains(response, 'Inline contract')
+
+
+class InvoiceLineTableTestCase(TestCase):
+    """The invoice line list shows the linked ID by default, the only link to the line's detail page."""
+
+    def test_id_column_links_to_the_line(self):
+        self.assertIn('id', tables.InvoiceLineListTable.Meta.default_columns)
+        contract = make_contract(name='Table contract')
+        invoice = make_invoice(contract, number='TABLE-1', status=InvoiceStatusChoices.STATUS_DRAFT, amount=100)
+        line = make_invoice_line(invoice, amount=100)
+        self.add_permissions('netbox_contract.view_invoiceline')
+        response = self.client.get(reverse('plugins:netbox_contract:invoiceline_list'))
+        self.assertContains(response, f'href="{line.get_absolute_url()}"')

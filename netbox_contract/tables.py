@@ -306,6 +306,7 @@ class InvoiceLineListTable(NetBoxTable):
         model = InvoiceLine
         fields = (
             'pk',
+            'id',
             'invoice',
             'contract_line',
             'quantity',
@@ -318,6 +319,7 @@ class InvoiceLineListTable(NetBoxTable):
         )
         default_columns = (
             'pk',
+            'id',
             'invoice',
             'contract_line',
             'quantity',

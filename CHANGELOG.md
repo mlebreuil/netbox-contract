@@ -36,6 +36,7 @@
   * Add, edit, bulk edit and filter forms group their fields into sections (for contracts: Contract, Parties, Dates and terms, Billing, Tenancy).
   * The invoice and invoice line add screens support NetBox's quick add and partial refresh. Values given in the page address (for example `?date=`) are kept by the invoice pre-fill instead of being replaced, and editing an existing invoice no longer shows today's date in place of its date.
   * The contract type description is a plain text field in the filter, bulk edit and import forms, and can be cleared in bulk.
+  * Invoice line tables (list, invoice page) show the linked **ID** by default, so a line can be opened; no other column linked to it. Users who saved their own column choice add it from "Configure Table".
   * The translations are refreshed and the new texts of 2.5.0 are translated into French.
   * For plugin developers: the template shown at the bottom of assigned objects moved to `netbox_contract/inc/contract_assignments_bottom.html`, and the unused `contract_list_bottom.html` was removed.
 

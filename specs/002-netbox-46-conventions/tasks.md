@@ -182,6 +182,10 @@ partial request return the short forms.
 - [X] T046 Walk the manual checks of [quickstart.md](quickstart.md) in the dev NetBox (Journal tab, filter modifiers, contract form sections, add invoice from a contract, `invoiceline/add/?_quickadd=true` returning the short form). Done without a browser: the same checks run with Django's test client as a superuser against the dev NetBox database (sections on the contract add form, modifier selector on the contract list, Journal tab on a contract type, short quick-add form for an invoice line, invoice pre-fill from a contract); a visual check in the browser is left to the maintainer
 - [X] T047 Update `spec.md`, `research.md` and this file if implementation deviated from them (CLAUDE.md workflow rule)
 
+### Added after review
+
+- [X] T048 Invoice line tables show the linked `id` column by default (maintainer request on PR #311: no other column opened the line's detail page): test `test_conventions.InvoiceLineTableTestCase` first, then `id` added to `fields` and `default_columns` of `InvoiceLineListTable` in `netbox_contract/tables.py`; CHANGELOG #308 entry
+
 ---
 
 ## Dependencies & Execution Order
