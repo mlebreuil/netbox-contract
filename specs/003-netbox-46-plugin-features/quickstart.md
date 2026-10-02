@@ -30,9 +30,9 @@ env $T venv/bin/python netbox/manage.py test netbox_contract.tests --keepdb
 |---|---|
 | US1 1-7, edge cases (amend without view; per-line button) | `test_amend_permission` |
 | US2 1-9, edge cases (deleted external party, per-line actions, column choices) | `test_detail_layouts` |
-| US3 1-6, edge cases (invoice line brief, unmatched nested dict) | `test_nested_api`, `test_api` brief sets |
+| US3 1-7, edge cases (invoice line brief, unmatched nested dict) | `test_nested_api` (snapshot guard, writes, brief sets, schema, deprecation notice), `test_api` brief sets |
 | US4 1-5, edge case (computed value refused) | `test_graphql`, `test_api` GraphQL cases |
-| US5 1-7, edge cases (empty slug, long description without spaces, no owner) | `test_base_classes` |
+| US5 1-7, edge cases (empty slug, long description without spaces, no owner) | `test_base_classes` (pure helpers, migrate forward/back/forward with `MigrationExecutor`) |
 
 ## Manual checks (dev server)
 
@@ -43,7 +43,7 @@ env $T venv/bin/python netbox/manage.py test netbox_contract.tests --keepdb
    not offered there.
 3. **Contract page.** It shows the same attributes as before. The tables load (HTMX) with column configuration, and
    another plugin's `left_page` content appears.
-4. **Nested contract.** `GET /api/plugins/contracts/contractassignment/` returns a `contract` with 5 keys.
+4. **Nested objects.** `GET /api/plugins/contracts/contractassignment/` returns the same 24-key `contract` as before (`contract_type` an id). `GET .../invoiceline/` returns `invoice` with `id, url, display, number`. `docs/api.md` lists the deprecated nested fields.
 5. **GraphQL.** In `/graphql/`, `{ contract_list(filters: {status: {exact: "active"}}) { name contract_type { name } lines { description } } }`
    returns data. `yearly_contract_value` is rejected as an unknown field.
 6. **Contract types.** After `migrate`, the contract type list shows slugs, and a type created through the API with

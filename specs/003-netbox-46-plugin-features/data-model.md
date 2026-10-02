@@ -40,15 +40,18 @@ Permission name: `netbox_contract.amend_contractline`. NetBox lists it as the ac
 | Migration | Operations | Data |
 |---|---|---|
 | `0050_contractline_amend_permission` | `AlterModelOptions(contractline, permissions=...)` | none |
-| `0051_contracttype_organizational` | add `slug` (null) · add `comments` · add `owner` · `RunPython(fill_slugs_and_shorten_descriptions, noop)` · alter `slug` unique not null · alter `description` to `CharField(200)` | Each empty slug is filled. Each description over 200 characters is shortened, with the full text in `comments`. Prints one report line per slug made unique (`-2`, ...) and per description moved |
+| `0051_contracttype_organizational` | add `slug` (null) · add `comments` · add `owner` · `RunPython(fill_slugs_and_shorten_descriptions, restore_descriptions)` · alter `slug` unique not null · alter `description` to `CharField(200)` | Each empty slug is filled. Each description over 200 characters is shortened, with the full text in `comments`. Prints one report line per slug made unique (`-2`, ...) and per description moved |
 | `0052_serviceprovider_primary` | add `description` · add `owner` | none |
 
 Re-run safety (Constitution IV):
 - The data function only touches rows with an empty slug or a description over 200 characters. A second run finds
   none.
-- Reversing `0051` drops the new columns and restores `TextField` for `description`. The shortened text stays
-  shortened, and the full text was in `comments`, which is dropped. The reverse direction is for development only.
-  This is recorded in the migration docstring.
+- Reversing `0051` restores `TextField` for `description`. `restore_descriptions` then puts the full text from
+  `comments` back into `description` for every moved description (`shorten_description(comments) == description`),
+  and only then are the new columns dropped. Moved descriptions are not lost (spec US5-7). Comments typed after the
+  upgrade are dropped with their column, as the migration docstring says.
+- Both data functions delegate to pure helpers in `netbox_contract/text.py` (`unique_slug`, `shorten_description`,
+  `plan_contract_type_changes`).
 
 ## Computed state used by the UI (no storage)
 

@@ -17,9 +17,10 @@ This feature adopts the NetBox 4.6 plugin features in the unreleased 2.5.0, as a
   - the list views' tables through `ObjectsTablePanel`.
 
   The page templates go, except two breadcrumb-only stubs.
-- **REST.** The four hand-written nested serializers are replaced by `nested=True` with explicit `brief_fields`.
-  Every nested contract shrinks to five fields; this was accepted by the maintainer as an exception to Constitution
-  IV/V.
+- **REST.** Three of the four hand-written nested serializers are replaced by `nested=True` (with `fields=` where
+  needed), with identical output, and every model declares explicit `brief_fields`. No REST field is removed in
+  2.5.0. The nested contract keeps its serializer, deprecated: the fields a later specified release will remove are
+  announced per field in the changelog and the docs (analysis remediation 2026-10-02).
 - **GraphQL.** A schema covers the nine models: stored fields only, and static unions for the two generic relations.
 - **Base classes.** Contract types become `OrganizationalModel` and service providers become `PrimaryModel`. A
   lossless, reported data migration fills the slugs and shortens long descriptions.
@@ -83,19 +84,21 @@ Phase 1:
 | I. NetBox-native plugin | Met | Core layouts and panels (D1-D4), `ObjectAction` and model actions (D6), `nested=True` serializers (D7), the documented plugin GraphQL path (D8), core base classes (D9). Every API exists in 4.6.0, and none is announced for removal |
 | II. Tested behaviour | Met | Five story test modules written first, plus `APIViewTestCase` for nine models. The quickstart scenario map covers every acceptance scenario and edge case. Query-count changes are re-recorded only with a reason |
 | III. Lint-clean | Met | `ruff check` after each story; no rule disabled |
-| IV. Data safety and migrations | **Exception** (REST field removal, see Complexity Tracking). Met for data | 0051 is lossless (long descriptions moved to comments) and reported, and its data step is idempotent. `makemigrations --check` is clean. No stored value changes except the reported description shortening, which keeps the full text |
-| V. Backward-compatible interfaces | **Exception** (nested and brief fields removed without a deprecation release, see Complexity Tracking). Met otherwise | No new required input (the slug is optional, FR-018). Filters, settings, import columns and routes are kept. Writes by id or attributes are unchanged |
-| VI. Simplicity | Met | No dependency. Removes about 700 template lines and 4 serializers. The plugin-specific code is small subclasses of core classes plus one pure helper module (`text.py`) |
-| VII. Documented change | Met | CHANGELOG 2.5.0 #309 entry with "Behaviour changes" (every removed REST field listed), `docs/` pages for amend, API and models, `CLAUDE.md` updated. README unchanged: requirements are unchanged |
+| IV. Data safety and migrations | Met | No field is removed: the nested contract shrink is only announced (D7). 0051 is lossless in both directions (long descriptions moved to comments, restored on reverse) and reported, and its data step is idempotent. `makemigrations --check` is clean. No stored value changes except the reported description shortening, which keeps the full text |
+| V. Backward-compatible interfaces | Met | REST output keeps every field (brief sets only gain fields), and the later removal is announced per field (FR-012a). No new required input (the slug is optional, FR-018). Filters, settings, import columns and routes are kept. Writes by id or attributes are unchanged |
+| VI. Simplicity | Met | No dependency. Removes about 700 template lines and 3 serializers. The plugin-specific code is small subclasses of core classes plus one pure helper module (`text.py`) |
+| VII. Documented change | Met | CHANGELOG 2.5.0 #309 entry with "Behaviour changes" and "Deprecations" (every field to be removed listed). 2.5.0 removes nothing, so a minor version fits, `docs/` pages for amend, API and models, `CLAUDE.md` updated. README unchanged: requirements are unchanged |
 
-Re-check after design: the only violations are the two recorded below. Both were accepted by the maintainer in
-clarification Q2 (2026-10-01) and Q1 (2026-10-02).
+Re-check after design: no violation. The REST field removal, first recorded as an exception, was found CRITICAL by
+`/speckit-analyze` (IV/V and VII) and replaced by the additive option (D7).
+The `AmendContractLine` button declares its permission (D6).
 
 ## Decisions taken with the maintainer
 
 1. **Amend action only**, with no add + change transition, because Amend was never released (Q1, D6).
-2. **Shrink the nested REST objects now**, invoice `contracts` included, with the constitution exception recorded
-   (Q2 and 2026-10-02 Q1, D7).
+2. **Additive REST change in 2.5.0.** The nested contract and invoice contracts are unchanged, and the brief sets
+   only gain fields. The shrink is announced as deprecated and left to a later specified release, which the maintainer
+   named 2.6.0 (Constitution VII asks for 3.0.0 unless it is amended). This supersedes Q2 and 2026-10-02 Q1 (D7).
 3. **GraphQL and base classes in scope** (Q3, D8, D9).
 4. **The list views' configurable tables** on detail pages, with per-line contract line actions (2026-10-02 Q2, D4).
 5. **Long contract type descriptions** cut at a word boundary with "…", with the full text moved to comments
@@ -110,8 +113,9 @@ Points to watch during implementation:
 - **`ObjectsTablePanel` loads the list view through HTMX.** Detail page tests must assert the panel's `hx-get` URL
   and its filters, then call that URL to check the rows. Test the excluded columns and the per-line actions on the
   list response.
-- **`ContractSerializer.parent` refers to `ContractSerializer`.** Define it after the class body (for example in
-  `get_fields()`), or the class is not yet defined.
+- **Keep the REST output byte-for-byte where D7 promises "identical".** Snapshot today's nested invoice, nested
+  dimensions, nested contract and invoice `contracts` in `test_nested_api` before touching the serializers. The
+  snapshot covers keys and value types, and `contract_type` must stay an integer in the nested contract.
 - **The GraphQL type for the model `Contract` is named `ContractType`.** It clashes with the plugin's `ContractType`
   model inside `types.py`, so import models as a module (`from .. import models`).
 - **`fields='__all__'` on GraphQL types must not pick up the deprecated `calculated_rc`.** It is an annotation, not a
@@ -133,7 +137,7 @@ specs/003-netbox-46-plugin-features/
 ├── data-model.md        # Phase 1: contract type, service provider, amend permission, migrations
 ├── quickstart.md        # Phase 1: validation commands and scenario map
 ├── contracts/
-│   ├── rest-api.md      # brief sets, nested fields, removed fields, amend action, new fields
+│   ├── rest-api.md      # brief sets, nested fields, deprecations, amend action, new fields
 │   ├── graphql.md       # queries, types, unions, permissions
 │   └── detail-pages.md  # panels per page, table actions matrix
 ├── checklists/requirements.md
@@ -153,7 +157,7 @@ netbox_contract/
 ├── tables.py                   # ContractLineActionsColumn; locked/contract tables and AMEND_BUTTON removed; owner columns (D4, D9)
 ├── filtersets.py               # ContractFilterSet.invoice_id; Organizational/PrimaryModelFilterSet bases (D5, D9)
 ├── forms.py                    # Organizational/PrimaryModel form bases, slug optional, owner fields in fieldsets (D9)
-├── api/serializers.py          # nested=True, brief_fields, Nested* removed, Organizational/PrimaryModelSerializer (D7, D9)
+├── api/serializers.py          # nested=True for invoice/dimension/line, brief_fields, NestedContractSerializer deprecated, Organizational/PrimaryModelSerializer (D7, D9)
 ├── api/views.py                # amend action permissions; annotations (D4, D6)
 ├── graphql/                    # NEW: __init__.py, filters.py, types.py, schema.py (D8)
 ├── migrations/0050_contractline_amend_permission.py
@@ -180,6 +184,5 @@ CHANGELOG.md, docs/{api,contract_lines,contract,index}.md, CLAUDE.md
 
 ## Complexity Tracking
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|---|---|---|
-| Constitution IV/V: REST nested and brief fields are removed (nested contract 24 → 5 fields; invoice `contracts` full → brief; contract and invoice `brief=true` sets reduced) without a released deprecation period | The maintainer chose to align with core now (clarification Q2 2026-10-01, Q1 2026-10-02). The nested contract spreads the deprecated `mrc`/`yrc`/`nrc` into every related object, and 2.5.0 already changes the API surface (contract lines, units) | The additive approach (keep today's fields in 2.5.0, announce, and shrink in a later specified release) was offered as the recommended option and declined by the maintainer. Mitigation: every removed field is listed per endpoint in the changelog "Behaviour changes" and in `docs/api.md`, and every removed value is still available from the related object's own endpoint |
+No constitution violation to justify. The nested REST shrink, first tracked here, was replaced by the additive option
+(D7) after `/speckit-analyze` (C1, C2).

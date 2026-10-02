@@ -139,8 +139,10 @@ exists today.
   `ContractLine.objects.restrict(user, 'view').restrict(user, 'amend')` (404 when not visible) and raises 403 when the
   user has no amend permission at all.
 - **Buttons.** `AmendContractLine(ObjectAction)` (`netbox_contract/object_actions.py`) is added to
-  `ContractLineView.actions` after the core actions. Its `render()` returns `''` unless `obj.can_be_amended` and
-  `user.has_perm('netbox_contract.amend_contractline', obj)`. `contractline_edit.html` uses the same check, through a
+  `ContractLineView.actions` after the core actions. It declares `permissions_required = {'amend'}`, so
+  `get_permitted_actions()` drops it for users without any amend permission (Constitution: buttons declare their
+  permission). Its `render()` also returns `''` unless `obj.can_be_amended` and
+  `user.has_perm('netbox_contract.amend_contractline', obj)` (object-level). `contractline_edit.html` uses the same check, through a
   `can_amend` template filter in `templatetags/contract_tags.py`.
 
 **Rationale**:
@@ -152,43 +154,48 @@ exists today.
 
 **Alternatives considered**:
 - The transition period accepting add + change: rejected in Q1, because no release had Amend.
-- `permissions_required = {'amend'}` alone: this is model-level, and would show the button on non-amendable lines.
+- `permissions_required = {'amend'}` alone: this is model-level, and would show the button on non-amendable lines and
+  on lines outside the constraints. It is used together with the `render()` check.
 
-## D7. REST nested objects: `Serializer(nested=True)` and explicit `brief_fields` (clarification Q2, 2026-10-02 Q1)
+## D7. REST nested objects: the brief mechanism where output is identical; the nested contract kept and deprecated (analysis remediation 2026-10-02)
 
-**Decision**:
-- **Removed classes.** `NestedContractSerializer`, `NestedInvoiceSerializer`, `NestedAccountingDimensionSerializer` and
-  `NestedContractLineSerializer` are removed.
-- **Replacements.**
+**Decision**: 2.5.0 removes no REST field. The clarification answers Q2 (2026-10-01) and Q1 (2026-10-02) are
+superseded: removing fields conflicted with Constitution IV/V and VII.
 
-  | Field | Becomes |
-  |---|---|
-  | `contract` (assignments, contract lines) | `ContractSerializer(nested=True)` |
-  | `parent` (contracts) | `ContractSerializer(nested=True, required=False, allow_null=True)` |
-  | `invoice` (invoice lines) | `InvoiceSerializer(nested=True)` |
-  | `accounting_dimensions` | `SerializedPKRelatedField(serializer=AccountingDimensionSerializer, nested=True, ...)` |
-  | invoice `contracts` | `SerializedPKRelatedField(serializer=ContractSerializer, nested=True, ...)` |
-  | `replaces` | `ContractLineSerializer(nested=True, read_only=True)` |
-
-  The serializers are reordered so that each one is defined before it is used. `ContractSerializer.parent` refers to
-  its own class, which needs a small `get_fields()` hook or a lazy field. The plan accepts either.
-- **`brief_fields`, declared on every serializer** (see [contracts/rest-api.md](contracts/rest-api.md)):
-  - contract: `id, url, display, name, status`;
-  - invoice: `id, url, display, number`;
-  - accounting dimension: `id, url, display, name, value`;
-  - invoice line: `id, url, display, invoice, amount, currency`. Today's set lists `name`, which does not exist on
-    invoice lines.
-  - The other brief sets are kept.
+- **Switched now, with identical output:**
+  - `NestedInvoiceSerializer` → `InvoiceSerializer(nested=True, fields=('id', 'url', 'display', 'number'))`. An explicit
+    `fields=` keeps today's four fields without shrinking the invoice `brief=true` set.
+  - `NestedAccountingDimensionSerializer` → `SerializedPKRelatedField(serializer=AccountingDimensionSerializer,
+    nested=True, ...)`. The brief set is the same five fields.
+  - `NestedContractLineSerializer` → `ContractLineSerializer(nested=True, read_only=True)`. `replaces` is new in 2.5.0,
+    so it is free to change.
+- **Kept**: `NestedContractSerializer`, for assignment `contract`, line `contract` and contract `parent`.
+  `ContractSerializer(nested=True, fields=<the same 24 names>)` would not be identical, because `ContractSerializer`
+  declares `contract_type` as a nested object while the nested serializer returns its id. The class gets a docstring
+  "Deprecated: replaced by the brief contract (`ContractSerializer(nested=True)`) in the release that removes the
+  fields listed in docs/api.md", and its deprecated fields get help texts.
+- **Kept**: invoice `contracts` stays `SerializedPKRelatedField(serializer=ContractSerializer)` (full contracts).
+- **`brief_fields`, declared on all nine serializers** (see [contracts/rest-api.md](contracts/rest-api.md)):
+  - existing sets are kept;
+  - the invoice line drops its invalid `name` (ignored today) and gains `id` and `currency`;
+  - the contract line gains `start_date` and `end_date`;
+  - the contract type gains `slug`, and the service provider gains `description` (US5).
+- **Deprecations** (FR-012a): the per-field list of contracts/rest-api.md goes under "Deprecations" in the changelog
+  entry and into `docs/api.md`. The shrink is a later specified feature, which the maintainer named 2.6.0. Constitution
+  VII requires a major version for removals, so that feature must ship as 3.0.0 or amend VII first. This is recorded
+  in the spec assumptions.
 
 **Rationale**:
-- `BaseModelSerializer.__init__(nested=True)` uses `Meta.brief_fields` and accepts a PK or a dict of attributes on
-  write (`get_related_object_by_attrs`, restricted to what the user may view). This is the same behaviour as
-  `WritableNestedSerializer` (FR-011).
-- The OpenAPI generator (`core/api/schema.py`) names nested components `Brief<Name>`.
-- The constitution exception is recorded in the plan's Complexity Tracking.
+- `BaseModelSerializer(nested=True)` accepts a PK or an attributes dict on write, restricted to what the user may view,
+  as `WritableNestedSerializer` does (FR-011).
+- `fields=` overrides `brief_fields` for one usage, so exact output is kept where the brief set differs.
+- The OpenAPI generator names nested components `Brief<Name>`. The three renamed components keep their properties.
 
-**Alternatives considered**: additive brief sets with a later shrink (rejected in Q2); shrinking only the 2.5.0-new
-serializers.
+**Alternatives considered**:
+- Shrinking in 2.5.0: blocked by `/speckit-analyze` (C1, C2).
+- `ContractSerializer(nested=True, fields=...)` for contracts: changes the type of `contract_type`.
+- A `NestedContractCompatSerializer` subclass that overrides `contract_type`: it is the same hand-written serializer
+  under another name, so it gains nothing.
 
 ## D8. GraphQL API
 
@@ -250,8 +257,20 @@ configuration.
        characters (D10), and print a report of slugs made unique and descriptions moved;
     3. alter `slug` to unique and not null, and `description` to `CharField(200)`.
 
-    The reverse migration is a no-op `RunPython` plus the schema reversal. Running it again changes nothing: slugs
-    exist, and no description is over 200 characters.
+    Running it again changes nothing: slugs exist, and no description is over 200 characters.
+
+    The reverse is lossless for the moved descriptions (spec US5-7). Django reverses the operations in reverse order,
+    so `description` is back to `TextField` before the reverse `RunPython`
+    (`restore_descriptions(apps, schema_editor)`) runs. For each type whose `comments` is longer than 200 characters
+    and gives back its `description` through `shorten_description(comments)`, the reverse sets
+    `description = comments`. Only then are `comments`, `owner` and `slug` dropped. Comments typed by users after the
+    upgrade are lost on reverse, like any column a reverse migration drops; the migration docstring says so.
+    Migrating forward again shortens and moves the text again.
+
+    The data functions are thin wrappers around pure helpers in `text.py` (`plan_contract_type_changes(rows, taken)`
+    returns the slug and description changes plus the report lines). The helpers are tested directly, and the
+    migration is tested end to end with `MigrationExecutor` (migrate to 0050, create rows with the historical model,
+    migrate to 0051, back to 0050, then forward again).
   - `0052_serviceprovider_primary`: add `description` and `owner`.
 - **Query counts**: the owner columns are not default columns. The new `owner` select may add a join to the contract
   type and service provider lists. Baselines are re-recorded only if they change, with that reason (Constitution II).
@@ -288,7 +307,7 @@ is none), right-strips, and appends `…`. The migration:
 lists follow [contracts/rest-api.md](contracts/rest-api.md).
 
 Adapted existing tests (SC-006):
-- `test_issue_307` (Amend button rule and `NestedContract` schema name);
+- `test_issue_307` (Amend button rule; the `NestedContract` schema name is kept, so only the button rule changes);
 - `test_amendments` (REST permission);
 - `test_locking` (locked table class);
 - `test_deprecated` (badges become panels).
@@ -299,8 +318,9 @@ Adapted existing tests (SC-006):
 
 **Decision**: a #309 entry in the unreleased 2.5.0 section of `CHANGELOG.md`, with "Behaviour changes":
 - the amend action replaces add + change;
-- the nested REST objects are reduced, with every removed field listed per field, invoice `contracts` included;
-- `brief=true` sets;
+- the nested invoice, accounting dimension and contract line serializers move to NetBox's brief mechanism with
+  identical output, and their OpenAPI components are renamed `Brief*`;
+- `brief=true` additions and the removal of the invalid invoice line `name` declaration;
 - contract type slug, comments and owner;
 - service provider description and owner;
 - the GraphQL API and its computed-value and `supported_models` limits.
@@ -314,4 +334,8 @@ Adapted existing tests (SC-006):
 architecture notes are updated for layouts, `panels.py`, the GraphQL package and the amend permission. The translations
 are refreshed and translated into French.
 
-**Rationale**: Constitution VII. Two migrations in the same unreleased minor version.
+A "Deprecations" list in the same entry gives the per-field list of contracts/rest-api.md (nested contract,
+invoice `contracts`, contract and invoice `brief=true`) to be removed by a later specified release.
+
+**Rationale**: Constitution VII. 2.5.0 removes no field, so a minor version fits. Its migrations ship in the same
+unreleased minor version.

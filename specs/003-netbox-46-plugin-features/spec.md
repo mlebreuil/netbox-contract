@@ -14,7 +14,7 @@ This feature ships in 2.5.0, which is not released yet (the latest release is 2.
 
 - detail pages built from NetBox's standard panels;
 - an "amend" permission action;
-- a smaller nested representation of related objects in the REST API;
+- standard nested representations of related objects in the REST API, with the fields of the nested contract that a later release will remove announced as deprecated;
 - a GraphQL API;
 - a slug, comments and owner on contract types, and a description and owner on service providers.
 
@@ -25,15 +25,16 @@ The user stories are ordered by user value, which is also the suggested build or
 ### Session 2026-10-01
 
 - Q: Amending is new in 2.5.0, which is not released. How should the new "amend" permission action be introduced? → A: Amending requires only the new "amend" action on the contract line, from 2.5.0 on. The issue proposed a one-release period in which add + change would also be accepted, but that period is not needed because no released version had Amend. A migration declares the permission. The changelog and `docs/` describe it.
-- Q: The nested contract (the `contract` of assignments and contract lines, and a contract's `parent`) has been a public REST representation since 2.4. How far should the API change go in this release? → A: Shrink it now, in 2.5.0. Nested related objects use each model's brief representation. The removed fields are listed under "Behaviour changes" in the changelog. This removes REST fields without first deprecating them for a release. That conflicts with Constitution IV and V, and the maintainer accepts it. The plan MUST record it in Complexity Tracking.
+- Q: The nested contract (the `contract` of assignments and contract lines, and a contract's `parent`) has been a public REST representation since 2.4. How far should the API change go in this release? → A: Shrink it now, in 2.5.0. Nested related objects use each model's brief representation. The removed fields are listed under "Behaviour changes" in the changelog. This removes REST fields without first deprecating them for a release. That conflicts with Constitution IV and V, and the maintainer accepts it. The plan MUST record it in Complexity Tracking. *(Superseded on 2026-10-02 by the analysis remediation below: additive in 2.5.0, shrink in a later release.)*
 - Q: Which optional items of the issue are in scope? → A: Both. A GraphQL API for all nine object types (the API tests then use NetBox's complete API test case), and the NetBox base classes for contract types (organizational) and service providers (primary).
 
 ### Session 2026-10-02
 
-- Q: Should an invoice's `contracts` in the REST API also shrink to the brief contract form, or keep returning full contracts? → A: Shrink them to the brief contract (id, url, display, name, status), like every other nested contract. The fields removed from invoice contracts are listed under "Behaviour changes", and a full contract is still available from `contracts/{id}/`.
+- Q: Should an invoice's `contracts` in the REST API also shrink to the brief contract form, or keep returning full contracts? → A: Shrink them to the brief contract (id, url, display, name, status), like every other nested contract. The fields removed from invoice contracts are listed under "Behaviour changes", and a full contract is still available from `contracts/{id}/`. *(Superseded on 2026-10-02 by the analysis remediation below: invoice contracts are unchanged in 2.5.0 and their shrink is deprecated.)*
 - Q: Should the related-object tables on detail pages become the list page's tables (columns chosen by each user), or keep the fixed tables each page shows today? → A: Use the list page's configurable tables, filtered to the object, everywhere. The contract line actions are decided per line: Amend when that line can be amended and the user may amend it, and no Delete when the line is locked. This replaces the separate table for the lines of invoiced contracts. Only the deprecated invoice template lines keep a fixed table.
 - Q: What should the upgrade do with a contract type description longer than 200 characters, NetBox's standard description length? → A: Keep the first 200 characters as the description, cut at a word boundary and ending with "…". Put the full original text at the top of the new comments field, and report each type changed. A description of 200 characters or fewer is unchanged.
 - Q: Should the GraphQL API include the computed amounts (a contract's total, yearly and yearly billable values; a line's total and yearly values), or only stored fields? → A: Stored fields and relations only. The computed values stay in the REST API, and the GraphQL documentation says so.
+- Q: `/speckit-analyze` found that removing nested and brief REST fields in 2.5.0 conflicts with Constitution IV/V (deprecate for one released version first) and VII (removals need a major version). How should this be resolved? → A: The additive option. In 2.5.0 the REST output keeps every field clients get today: the nested contract (assignments, contract lines, `parent`), the full contracts of invoices, and the `brief=true` sets. Brief sets only gain fields. The hand-written nested serializers whose output can be reproduced exactly switch to NetBox's brief mechanism now. The nested contract keeps its own serializer, marked deprecated, because the brief mechanism would turn its `contract_type` from an id into an object. The fields that will be removed are announced as deprecated in the changelog and `docs/api.md`. The shrink itself is a later specified release, which the maintainer named 2.6.0.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -79,22 +80,23 @@ A user opening a contract, invoice, contract line, invoice line, unit, service p
 
 ---
 
-### User Story 3 - Smaller nested objects in the REST API (Priority: P2)
+### User Story 3 - Standard nested objects in the REST API, with the shrink announced (Priority: P2)
 
-An integration reading contract assignments or contract lines gets each related contract as a short reference (id, address, display name, name and status), as NetBox core does for related objects. Today it gets almost the whole contract, including the deprecated `mrc`, `yrc` and `nrc`. Responses are smaller and no longer expose deprecated amounts in every nested contract. Writing a related object (by id or by attributes) works as before.
+An integration reading contract lines, invoice lines or invoices gets nested related objects in NetBox's standard brief form, with the same fields as today. An integration that reads nested contracts (in assignments, contract lines and a contract's `parent`) or the contracts of an invoice gets exactly the same output as before. The changelog and the API documentation list the fields of those nested contracts that a later release will remove. They include the deprecated `mrc`, `yrc` and `nrc`, so integrators can switch to reading the contract endpoint first. Writing a related object (by id or by attributes) works as before.
 
-**Why this priority**: it aligns the API with core and stops spreading deprecated fields. It is a breaking change for clients that read the removed nested fields, which the changelog announces.
+**Why this priority**: it removes hand-written serializers that drift from core, fixes the invoice line brief set, and gives integrators at least one release of notice before the nested contract shrinks (Constitution IV/V).
 
-**Independent Test**: read a contract assignment, a contract line, a contract with a parent, an invoice and an invoice line through the REST API, and compare their nested objects with the brief representation of the related model.
+**Independent Test**: read a contract assignment, a contract line, a contract with a parent, an invoice and an invoice line through the REST API. Compare their nested objects with the 2.4 output (unchanged or only extended), and check the deprecation notice in the changelog and docs.
 
 **Acceptance Scenarios**:
 
-1. **Given** a contract assignment, **When** it is read through the REST API, **Then** its `contract` holds only the brief contract fields (id, url, display, name, status).
-2. **Given** a contract line and a contract with a parent, **When** they are read, **Then** `contract` and `parent` hold the brief contract fields. The line's `replaces` holds the brief contract line fields, and the line's `accounting_dimensions` the brief accounting dimension fields.
-3. **Given** an invoice and an invoice line, **When** they are read, **Then** the invoice's `contracts` hold brief contracts, and the line's `invoice` holds the brief invoice fields (id, url, display, number).
+1. **Given** a contract assignment, a contract line and a contract with a parent, **When** they are read through the REST API, **Then** their nested `contract` / `parent` hold exactly the 24 fields they hold today, with the same types (`contract_type` an id).
+2. **Given** an invoice, **When** it is read, **Then** its `contracts` hold the same full contracts as today.
+3. **Given** an invoice line and a contract line, **When** they are read, **Then** the line's `invoice` holds `id, url, display, number` and the `accounting_dimensions` hold `id, url, display, name, value`, as today. The contract line's `replaces` holds the brief contract line.
 4. **Given** a request that sets a related object by id or by a dictionary of attributes (for example `"contract": 12` or `"contract": {"name": "C-1"}`), **When** it is sent, **Then** it is accepted as before.
-5. **Given** a list request with `brief=true` on any endpoint, **When** it is sent, **Then** each object holds exactly that model's brief fields, and every brief field exists on the model.
-6. **Given** the OpenAPI schema, **When** it is generated, **Then** nested objects are documented as the brief representation of their model, and `external_party_object` and `content_object` remain documented as objects.
+5. **Given** a list request with `brief=true` on any endpoint, **When** it is sent, **Then** each object holds every field it held before, plus the documented additions, and every declared brief field exists on the model.
+6. **Given** the OpenAPI schema, **When** it is generated, **Then** the nested invoice, accounting dimension and contract line are the `Brief*` components of their models. The nested contract is still documented with the 24 fields, with its deprecated fields marked in their help text. `external_party_object` and `content_object` remain documented as objects.
+7. **Given** `CHANGELOG.md` and `docs/api.md`, **When** they are read, **Then** they list, per field, the nested contract fields, invoice `contracts` content and `brief=true` fields that a later release will remove, and what to read instead.
 
 ---
 
@@ -146,7 +148,7 @@ An administrator manages contract types like other NetBox categories (with a slu
 - The contract line actions are decided per line, not per page, so a table mixing locked and unlocked lines (for example the contract line list across contracts) offers Delete only on the unlocked ones.
 - A user who hid columns on a list page sees the same choice in that list's table on detail pages. Columns that identify the object of the page (for example the contract on a contract's lines) are left out there.
 - The plugin's other templates are kept as templates: the invoice edit page with its live preview of generated lines, the amend screen and the contract line edit page.
-- `brief=true` on invoice lines returns a valid representation. Today it lists a `name` field, which must exist or be removed.
+- `brief=true` on invoice lines declares a `name` field that does not exist (and is silently ignored). The declaration is removed, so the output does not change because of it.
 - A nested write that gives a dictionary which matches no object, or several objects, is refused with a validation error, as before.
 - A GraphQL query that asks for a computed value (for example `yearly_contract_value`) is refused as an unknown field, because computed values are not part of the GraphQL types.
 - A contract type description longer than 200 characters with no space in its first 200 characters is cut at 199 characters followed by "…". Running the migration again does not move the text into the comments a second time.
@@ -175,10 +177,11 @@ An administrator manages contract types like other NetBox categories (with a slu
 
 **REST API**
 
-- **FR-009**: Every nested related object in the REST API (contract, parent, invoice, invoice contracts, contract line `replaces`, accounting dimensions, unit, contract type) MUST use the brief representation of its model. The plugin's hand-written nested serializers MUST be removed.
-- **FR-010**: Every model's brief representation MUST be declared explicitly and contain only existing fields. The brief contract MUST be id, url, display, name and status. The brief invoice MUST be id, url, display and number. The brief accounting dimension MUST be id, url, display, name and value.
+- **FR-009**: The nested invoice (invoice lines), nested accounting dimensions (contract lines, invoice lines) and nested contract line `replaces` MUST use the brief mechanism of their model's serializer, and their hand-written nested serializers MUST be removed. Their output MUST be identical to today's, except `replaces`, which is new in 2.5.0. The nested contract (assignments, contract lines, `parent`) and the contracts of an invoice MUST keep today's output, and the nested contract serializer MUST be marked deprecated in the code.
+- **FR-010**: Every model's brief representation MUST be declared explicitly and contain only existing fields. Compared with 2.4, a brief set MAY gain fields and MUST NOT lose any. The invalid `name` of the invoice line brief set MUST be removed from the declaration.
 - **FR-011**: Writing a related object by id or by a dictionary of attributes MUST keep working on every writable related field.
-- **FR-012**: The OpenAPI schema MUST describe nested objects as the brief representation of their model. It MUST keep describing `external_party_object` and `content_object` as objects.
+- **FR-012**: The OpenAPI schema MUST describe the switched nested objects as the `Brief*` components of their models, keep the nested contract's 24 fields, and keep describing `external_party_object` and `content_object` as objects.
+- **FR-012a**: The fields that the later shrink will remove MUST be announced, per field, under "Deprecations" in the #309 changelog entry and in `docs/api.md`: the 19 nested contract fields other than id, url, display, name and status, the full contracts of invoices (to become brief contracts), and the `brief=true` fields of contracts and invoices outside their future brief sets.
 
 **GraphQL**
 
@@ -199,7 +202,7 @@ An administrator manages contract types like other NetBox categories (with a slu
 - **FR-020**: Every acceptance scenario above MUST be covered by an automated test that fails before the change where the behaviour changes. The REST API tests MUST also cover GraphQL through NetBox's complete API test case (Constitution II).
 - **FR-021**: `CHANGELOG.md` MUST have a #309 entry under 2.5.0, with a "Behaviour changes" list covering:
   - the amend permission action (which replaces add + change);
-  - the smaller nested objects in the REST API, with every removed field, including the full contracts that invoices returned until now;
+  - the nested serializers moved to NetBox's brief mechanism with identical output, and the renamed OpenAPI components (`BriefInvoice`, `BriefAccountingDimension`, `BriefContractLine`);
   - the contract type slug, comments and owner, and the service provider description and owner;
   - the new GraphQL API.
 
@@ -219,10 +222,10 @@ An administrator manages contract types like other NetBox categories (with a slu
 
 - **SC-001**: An administrator can grant amending alone. A user with view + amend and no other contract line permission can amend, and a user with add + change but without amend cannot (0 of the add + change-only users can amend).
 - **SC-002**: 9 out of 9 detail pages show the same attributes, tables, buttons and messages as before the change. No detail page template holds attribute or table markup any more: seven are removed and two keep only their breadcrumbs. The edit and amend screens are unchanged.
-- **SC-003**: A nested contract in a contract assignment or contract line response holds 5 fields instead of 24.
+- **SC-003**: 0 fields are removed from any REST response compared with 2.4, 3 of the 4 hand-written nested serializers are gone, and 100% of the fields planned for removal are listed in the changelog and docs.
 - **SC-004**: 9 out of 9 object types can be queried through GraphQL (today 0 out of 9), with permissions applied.
 - **SC-005**: After the upgrade, 100% of existing contract types have a unique slug, and 0 characters of existing contract type descriptions are lost.
-- **SC-006**: The existing test suite passes, apart from tests that check the changed behaviour (amend permission, nested REST output). Those tests are adapted, and each adaptation is listed in the tasks. Query-count baselines change only with a stated reason.
+- **SC-006**: The existing test suite passes, apart from tests that check the changed behaviour (amend permission, OpenAPI component names, table classes of the contract page, deprecated badges that become panels). Those tests are adapted, and each adaptation is listed in the tasks. Query-count baselines change only with a stated reason.
 
 ## Assumptions
 
@@ -230,4 +233,5 @@ An administrator manages contract types like other NetBox categories (with a slu
 - The owner field is NetBox's owner (users and groups), which comes with the base classes. It is not a new plugin concept.
 - Units and accounting dimensions keep their current base class. The issue does not ask for a change, and neither has a natural slug.
 - The exact panel arrangement of each detail page (which column, panel titles) is decided in the plan. Users must still see the same information.
+- The later release that shrinks the nested contract is a separate specified feature. The maintainer named it 2.6.0, but Constitution VII asks for a major version for removals, so that feature must either ship as 3.0.0 or amend VII first.
 - Translations are refreshed with `makemessages` and the new French entries are translated, as for #308.
