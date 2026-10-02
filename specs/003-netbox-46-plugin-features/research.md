@@ -190,7 +190,10 @@ superseded: removing fields conflicted with Constitution IV/V and VII.
 - `BaseModelSerializer(nested=True)` accepts a PK or an attributes dict on write, restricted to what the user may view,
   as `WritableNestedSerializer` does (FR-011).
 - `fields=` overrides `brief_fields` for one usage, so exact output is kept where the brief set differs.
-- The OpenAPI generator names nested components `Brief<Name>`. The three renamed components keep their properties.
+- The OpenAPI generator names nested components `Brief<Name>`. `BriefInvoice` and `BriefContractLine` keep the
+  properties of the components they replace. The accounting dimension lists are documented with the `AccountingDimension`
+  component, because core's `SerializedPKRelatedField` schema extension resolves the serializer class (implementation
+  note, T044).
 
 **Alternatives considered**:
 - Shrinking in 2.5.0: blocked by `/speckit-analyze` (C1, C2).

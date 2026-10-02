@@ -23,8 +23,21 @@ from ..models import (
 from ..services import invoicing
 from ..validators import check_invoice_contracts
 
+NESTED_CONTRACT_DEPRECATED_HELP = (
+    'Deprecated: will be removed from the nested contract (which will keep id, url, display, name and status); '
+    'read contracts/{id}/ instead.'
+)
+
 
 class NestedContractSerializer(WritableNestedSerializer):
+    """
+    The contract nested in contract assignments, contract lines and a contract's parent.
+
+    Deprecated: replaced by the brief contract (`ContractSerializer(nested=True)`) in the release that removes the
+    fields listed in docs/api.md. It is kept unchanged in 2.5.0 because the brief contract would return
+    `contract_type` as an object instead of an id (#309, research D7).
+    """
+
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_contract-api:contract-detail'
     )
@@ -61,6 +74,18 @@ class NestedContractSerializer(WritableNestedSerializer):
             'comments',
             'documents',
         )
+        deprecated = (
+            'contract_type', 'external_party_object_type', 'external_party_object_id', 'external_party_object',
+            'external_reference', 'internal_party', 'tenant', 'start_date', 'end_date', 'initial_term',
+            'renewal_term', 'notice_period', 'currency', 'mrc', 'yrc', 'nrc', 'invoice_frequency', 'comments',
+            'documents',
+        )
+
+    def get_fields(self):
+        fields = super().get_fields()
+        for name in self.Meta.deprecated:
+            fields[name].help_text = NESTED_CONTRACT_DEPRECATED_HELP
+        return fields
 
     @extend_schema_field(OpenApiTypes.OBJECT)
     def get_external_party_object(self, instance):
@@ -71,28 +96,6 @@ class NestedContractSerializer(WritableNestedSerializer):
         return serializer(
             instance.external_party_object, nested=True, context=context
         ).data
-
-
-class NestedInvoiceSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_contract-api:invoice-detail'
-    )
-
-    class Meta:
-        model = Invoice
-        fields = ('id', 'url', 'display', 'number')
-        brief_fields = ('id', 'url', 'display', 'number')
-
-
-class NestedAccountingDimensionSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_contract-api:accountingdimension-detail'
-    )
-
-    class Meta:
-        model = AccountingDimension
-        fields = ('id', 'url', 'display', 'name', 'value')
-        brief_fields = ('id', 'url', 'display', 'name', 'value')
 
 
 class ContractTypeSerializer(NetBoxModelSerializer):
@@ -281,6 +284,9 @@ class InvoiceSerializer(NetBoxModelSerializer):
         )
 
     def validate(self, data):
+        if self.nested:
+            # A related invoice (for example of an invoice line) is only looked up, not validated
+            return data
         is_new = self.instance is None
         previous_contract_ids = [] if is_new else list(self.instance.contracts.values_list('pk', flat=True))
         previous_currency = None if is_new else Invoice.objects.get(pk=self.instance.pk).currency
@@ -417,12 +423,27 @@ class UnitSerializer(NetBoxModelSerializer):
         brief_fields = ('id', 'url', 'display', 'name', 'description', 'billing_method', 'months')
 
 
-class NestedContractLineSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:contractline-detail')
+class AccountingDimensionSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='plugins-api:netbox_contract-api:accountingdimension-detail'
+    )
 
     class Meta:
-        model = ContractLine
-        fields = ('id', 'url', 'display', 'description', 'quantity', 'unit_price', 'start_date', 'end_date')
+        model = AccountingDimension
+        fields = (
+            'id',
+            'url',
+            'display',
+            'name',
+            'value',
+            'status',
+            'comments',
+            'tags',
+            'custom_fields',
+            'created',
+            'last_updated',
+        )
+        brief_fields = ('id', 'name', 'value', 'url', 'display')
 
 
 class ContractLineAmendmentSerializer(serializers.Serializer):
@@ -446,7 +467,8 @@ class ContractLineSerializer(NetBoxModelSerializer):
     )
     accounting_dimensions = SerializedPKRelatedField(
         queryset=AccountingDimension.objects.all(),
-        serializer=NestedAccountingDimensionSerializer,
+        serializer=AccountingDimensionSerializer,
+        nested=True,
         required=False,
         many=True,
     )
@@ -455,7 +477,6 @@ class ContractLineSerializer(NetBoxModelSerializer):
         help_text='Null when not available (recurring line without end date on an open-ended contract)',
     )
     yearly_value = serializers.DecimalField(max_digits=14, decimal_places=2, read_only=True)
-    replaces = NestedContractLineSerializer(read_only=True, help_text='The line replaced by an amendment')
 
     class Meta:
         model = ContractLine
@@ -483,7 +504,7 @@ class ContractLineSerializer(NetBoxModelSerializer):
             'last_updated',
         )
         brief_fields = ('id', 'url', 'display', 'contract', 'description', 'quantity', 'unit', 'unit_price',
-                        'currency')
+                        'currency', 'start_date', 'end_date')
 
     def validate(self, data):
         data = super().validate(data)
@@ -493,11 +514,17 @@ class ContractLineSerializer(NetBoxModelSerializer):
         return data
 
 
+# A line refers to the line it replaces: the field is attached once the class exists
+ContractLineSerializer._declared_fields['replaces'] = ContractLineSerializer(
+    nested=True, read_only=True, help_text='The line replaced by an amendment'
+)
+
+
 class InvoiceLineSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_contract-api:invoiceline-detail'
     )
-    invoice = NestedInvoiceSerializer(many=False, required=False)
+    invoice = InvoiceSerializer(nested=True, fields=('id', 'url', 'display', 'number'), required=False)
     contract_line = ContractLineSerializer(nested=True, required=False, allow_null=True)
     unit = UnitSerializer(
         nested=True, required=False, allow_null=True,
@@ -514,7 +541,8 @@ class InvoiceLineSerializer(NetBoxModelSerializer):
     )
     accounting_dimensions = SerializedPKRelatedField(
         queryset=AccountingDimension.objects.all(),
-        serializer=NestedAccountingDimensionSerializer,
+        serializer=AccountingDimensionSerializer,
+        nested=True,
         required=False,
         many=True,
     )
@@ -539,14 +567,7 @@ class InvoiceLineSerializer(NetBoxModelSerializer):
             'created',
             'last_updated',
         )
-        brief_fields = (
-            'invoice',
-            'accounting_dimensions',
-            'amount',
-            'url',
-            'display',
-            'name',
-        )
+        brief_fields = ('id', 'url', 'display', 'invoice', 'accounting_dimensions', 'amount', 'currency')
 
     def validate(self, data):
         data = super().validate(data)
@@ -558,26 +579,3 @@ class InvoiceLineSerializer(NetBoxModelSerializer):
                 raise serializers.ValidationError('duplicate accounting dimension')
             dimensions_names.append(dimension.name)
         return data
-
-
-class AccountingDimensionSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_contract-api:accountingdimension-detail'
-    )
-
-    class Meta:
-        model = AccountingDimension
-        fields = (
-            'id',
-            'url',
-            'display',
-            'name',
-            'value',
-            'status',
-            'comments',
-            'tags',
-            'custom_fields',
-            'created',
-            'last_updated',
-        )
-        brief_fields = ('id', 'name', 'value', 'url', 'display')

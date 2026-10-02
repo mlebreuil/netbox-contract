@@ -184,38 +184,38 @@ gone, and the changelog and docs list every field to be removed later.
 
 ### Tests for User Story 3 (write first)
 
-- [ ] T035 [P] [US3] `netbox_contract/tests/test_nested_api.py::NestedSnapshotTestCase` (guard, written before any serializer change). Record, as literal expected values in the test, the keys and value types of:
+- [X] T035 [P] [US3] `netbox_contract/tests/test_nested_api.py::NestedSnapshotTestCase` (guard, written before any serializer change). Record, as literal expected values in the test, the keys and value types of:
   - assignment `contract`, contract line `contract` and contract `parent` (24 keys, `contract_type` an integer) (US3-1);
   - invoice `contracts` items (full contract) (US3-2);
   - invoice line `invoice` (`id, url, display, number`) and `accounting_dimensions` items (`id, url, display, name, value`) (US3-3).
 
   Passes before and after.
-- [ ] T036 [P] [US3] Same module, `ReplacesTestCase`: the contract line `replaces` holds exactly the brief contract line set of contracts/rest-api.md. Fails today, because the hand-written set lacks `contract`, `unit` and `currency` (US3-3)
-- [ ] T037 [P] [US3] Same module, `NestedWriteTestCase` (guard):
+- [X] T036 [P] [US3] Same module, `ReplacesTestCase`: the contract line `replaces` holds exactly the brief contract line set of contracts/rest-api.md. Fails today, because the hand-written set lacks `contract`, `unit` and `currency` (US3-3)
+- [X] T037 [P] [US3] Same module, `NestedWriteTestCase` (guard):
   - create/update an assignment and a contract line with `"contract": <id>` and with `"contract": {"name": "C-1"}`, and an invoice line with `"invoice": <id>` (US3-4);
   - a dict matching nothing, or two contracts → 400 (edge case);
-  - `parent` set to `null`.
-- [ ] T038 [P] [US3] Same module, `BriefTestCase`. For each of the nine endpoints, `?brief=true` returns exactly the "Brief fields in 2.5.0" set of contracts/rest-api.md. That is a superset of today's output, and every declared brief field is a serializer field (US3-5). The invoice line set (`id`, `currency` added) and the contract line set (dates added) fail today. The contract type and service provider additions are asserted in T056/T057 (US5)
-- [ ] T039 [P] [US3] Same module, `SchemaTestCase` (OpenAPI generator, as `test_issue_307` does). Assert:
+  - `parent` set to `null`. Deviation: the `parent` set to `null` check was dropped. Today's nested contract rejects `null` (no `allow_null`), and the additive plan keeps it unchanged. Test bugs fixed before the guard passed: route names, and an invoice line amount above its invoice amount.
+- [X] T038 [P] [US3] Same module, `BriefTestCase`. For each of the nine endpoints, `?brief=true` returns exactly the "Brief fields in 2.5.0" set of contracts/rest-api.md. That is a superset of today's output, and every declared brief field is a serializer field (US3-5). The invoice line set (`id`, `currency` added) and the contract line set (dates added) fail today. The contract type and service provider additions are asserted in T056/T057 (US5)
+- [X] T039 [P] [US3] Same module, `SchemaTestCase` (OpenAPI generator, as `test_issue_307` does). Assert:
   - `BriefInvoice`, `BriefAccountingDimension` and `BriefContractLine` exist with the properties listed above, and `NestedInvoice`, `NestedAccountingDimension` and `NestedContractLine` do not;
   - `NestedContract` keeps its 24 properties, with "Deprecated" in the help text of the fields to be removed;
   - `external_party_object` and `content_object` are `object` (US3-6).
-- [ ] T040 [P] [US3] Same module, `DeprecationNoticeTestCase`. Read `CHANGELOG.md` and `docs/api.md` from the repository root, and assert that every field of the "Deprecations announced in 2.5.0" table of contracts/rest-api.md is named in both, under the #309 entry's "Deprecations" list and the docs section (US3-7, FR-012a)
-- [ ] T041 [US3] Run the module. T035 and T037 must pass (guards); T036, T038, T039 and T040 must fail for the expected reasons
+- [X] T040 [P] [US3] Same module, `DeprecationNoticeTestCase`. Read `CHANGELOG.md` and `docs/api.md` from the repository root, and assert that every field of the "Deprecations announced in 2.5.0" table of contracts/rest-api.md is named in both, under the #309 entry's "Deprecations" list and the docs section (US3-7, FR-012a)
+- [X] T041 [US3] Run the module. T035 and T037 must pass (guards); T036, T038, T039 and T040 must fail for the expected reasons Result: the guards pass; brief sets, replaces, schema and deprecation notices fail as expected.
 
 ### Implementation for User Story 3
 
-- [ ] T042 [US3] In `netbox_contract/api/serializers.py`:
+- [X] T042 [US3] In `netbox_contract/api/serializers.py`:
   - remove `NestedInvoiceSerializer`, `NestedAccountingDimensionSerializer` and `NestedContractLineSerializer`;
   - use `InvoiceSerializer(nested=True, fields=('id', 'url', 'display', 'number'), required=False)` for invoice line `invoice`, `SerializedPKRelatedField(serializer=AccountingDimensionSerializer, nested=True, ...)` for both `accounting_dimensions`, and `ContractLineSerializer(nested=True, read_only=True, ...)` for `replaces`;
   - order the classes so dependencies come first (`replaces` refers to its own class, so attach it after the class body);
   - keep `NestedContractSerializer`, with the docstring of research D7 and "Deprecated: will be removed from the nested contract, read contracts/{id}/" help texts on the 19 fields;
-  - keep invoice `contracts` unchanged.
-- [ ] T043 [US3] Set `brief_fields` on all nine serializers to the "Brief fields in 2.5.0" column of contracts/rest-api.md. Contract type `slug` and service provider `description` are added by US5 (T063)
-- [ ] T044 [US3] Adapt the `brief_fields` lists in `netbox_contract/tests/test_api.py`. Run `test_nested_api` (except T040), `test_api`, `test_issue_307`, `test_prefill`, `test_posted` and `ruff check`. Query counts must not change; if they do, find out why before re-recording
-- [ ] T045 [US3] Add to the #309 entry of `CHANGELOG.md`:
+  - keep invoice `contracts` unchanged. `InvoiceSerializer.validate()` now returns at once when the serializer is nested: as the related invoice of an invoice line it received the Invoice object. `replaces` is attached after the class body through `_declared_fields`.
+- [X] T043 [US3] Set `brief_fields` on all nine serializers to the "Brief fields in 2.5.0" column of contracts/rest-api.md. Contract type `slug` and service provider `description` are added by US5 (T063)
+- [X] T044 [US3] Adapt the `brief_fields` lists in `netbox_contract/tests/test_api.py`. Run `test_nested_api` (except T040), `test_api`, `test_issue_307`, `test_prefill`, `test_posted` and `ruff check`. Query counts must not change; if they do, find out why before re-recording Full suite: 743 tests OK, query counts unchanged. The OpenAPI schema documents the accounting dimension lists with the `AccountingDimension` component: NetBox's extension for `SerializedPKRelatedField` resolves the serializer class (core convention), so there is no `BriefAccountingDimension` component. The responses are unchanged.
+- [X] T045 [US3] Add to the #309 entry of `CHANGELOG.md`:
   - "Behaviour changes": the renamed OpenAPI components, the brief additions, and the invalid invoice line `name` declaration removed;
-  - "Deprecations": every field of the contracts/rest-api.md deprecation table, per location, with "read `contracts/{id}/` instead", to be removed by a later release.
+  - "Deprecations": every field of the contracts/rest-api.md deprecation table, per location, with "read `contracts/{id}/` instead", to be removed by a later release. `docs/api.md` also corrected: the amend action no longer "requires the add and change permissions" (missed in T018).
 
   In `docs/api.md`, add "Nested objects and `brief=true`" (2.5.0 sets) and "Deprecated nested fields" (same table). T040 then passes
 

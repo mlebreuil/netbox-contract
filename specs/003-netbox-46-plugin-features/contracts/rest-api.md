@@ -30,8 +30,10 @@ and `tests/test_api.py` assert exactly these sets.
 
 Writes by id or by attributes dict are unchanged on every writable field.
 
-OpenAPI: `NestedInvoice`, `NestedAccountingDimension` and `NestedContractLine` become `BriefInvoice`,
-`BriefAccountingDimension` and `BriefContractLine`, with the same properties. This is a component rename, so clients
+OpenAPI: `NestedInvoice` and `NestedContractLine` become `BriefInvoice` and `BriefContractLine`, with the same
+properties. `NestedAccountingDimension` disappears: the lists of accounting dimensions refer to the `AccountingDimension`
+component, because NetBox's schema extension for `SerializedPKRelatedField` resolves the serializer class. This is the
+core convention, and the response keeps the five brief fields (implementation note, T044). This is a component rename, so clients
 generated from the schema regenerate. `NestedContract` stays. `Contract.external_party_object` and
 `ContractAssignment.content_object` stay `object`.
 

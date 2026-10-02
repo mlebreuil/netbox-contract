@@ -10,7 +10,7 @@ Every list endpoint accepts the standard NetBox filters (`id`, `q`, `tag`, `crea
 
 - `units/`: `name`, `description`, `billing_method` (`one_time`, `recurring`, `usage`), `months` (required for `recurring`, empty otherwise). Deleting a unit used by contract lines returns 409.
 - `contract-lines/`: `contract` (id), `description`, `quantity`, `unit_price`, `unit` (id), `currency` (defaults to the contract's), `start_date` and `end_date` (default to the contract's), `accounting_dimensions` (list of ids), and the read-only `total_value`, `yearly_value` and `invoiced_at_conversion`. Filters: `contract_id`, `unit_id`, `unit`, `currency`, `billing_method`, `accounting_dimensions`, `invoice_id`, `q`. Creating or deleting a line of a contract that has invoices, or changing its contract terms, returns 400; its `accounting_dimensions`, `comments` and `tags` can still be changed. The read-only `replaces` field shows the line a line replaces after an amendment.
-- `POST contract-lines/{id}/amend/` with `effective_date`, `reason` and a new `unit_price` and/or `quantity`: ends the line the day before `effective_date` and returns the new line (201). Requires the add and change contract line permissions; errors (date before the end of the last invoiced period, one-time line, missing reason) return 400.
+- `POST contract-lines/{id}/amend/` with `effective_date`, `reason` and a new `unit_price` and/or `quantity`: ends the line the day before `effective_date` and returns the new line (201). Requires the view and **amend** actions on that line (object permissions, constraints included); a write-enabled token is needed. A line outside the view constraints returns 404, a user without the amend action 403. Errors (date before the end of the last invoiced period, one-time line, missing reason) return 400.
 
 ## Contracts
 
@@ -29,3 +29,28 @@ Every list endpoint accepts the standard NetBox filters (`id`, `q`, `tag`, `crea
 - `contract_line` (id, optional), `unit` (id) and `unit_price` (default to those of the contract line), `quantity`.
 - Lines of a Posted invoice cannot be created or deleted, and their unit, unit price, quantity, amount, currency and contract line cannot change (400).
 - `amount` is always quantity x unit price and ignored if sent; `unit_price` is required, except that an `amount` given alone when a line is created is taken as its unit price with quantity 1 (compatibility). `quantity` defaults to 1.
+
+## Nested objects and `brief=true`
+
+Related objects are nested in the responses:
+
+- `invoice` of an invoice line: `id`, `url`, `display`, `number`.
+- `accounting_dimensions` of contract lines and invoice lines: `id`, `url`, `display`, `name`, `value`.
+- `replaces` of a contract line: the brief contract line (`id`, `url`, `display`, `contract`, `description`, `quantity`, `unit`, `unit_price`, `currency`, `start_date`, `end_date`).
+- `contract` of contract assignments and contract lines, and `parent` of contracts: the nested contract, with the fields listed in the next section plus `id`, `url`, `display`, `name` and `status`. `contract_type` is the id of the contract type.
+- `contracts` of an invoice: the full contracts.
+
+A related object can be written by id, or by a dictionary of attributes that identifies exactly one object (for example `"contract": {"name": "C-1"}`).
+
+`?brief=true` on a list returns the brief representation of each object, for example `id`, `url`, `display`, `invoice`, `accounting_dimensions`, `amount` and `currency` for invoice lines.
+
+## Deprecated nested fields
+
+A later release will reduce the nested contract and the brief contract to `id`, `url`, `display`, `name` and `status`, the brief invoice to `id`, `url`, `display` and `number`, and the contracts of an invoice to brief contracts. To prepare, read the fields you need from `contracts/{id}/` (or `invoices/{id}/`) instead of the nested objects. The fields that will be removed are:
+
+| Where | Fields that will be removed |
+|---|---|
+| Nested contract (`contract` of assignments and contract lines, `parent` of contracts) | `contract_type`, `external_party_object_type`, `external_party_object_id`, `external_party_object`, `external_reference`, `internal_party`, `tenant`, `start_date`, `end_date`, `initial_term`, `renewal_term`, `notice_period`, `currency`, `mrc`, `yrc`, `nrc`, `invoice_frequency`, `comments`, `documents` |
+| `contracts` of an invoice | the fields above, plus `billable`, `total_contract_value`, `yearly_contract_value`, `yearly_billable_value`, `parent`, `tags`, `custom_fields`, `created`, `last_updated` |
+| `contracts/?brief=true` | `contract_type`, `external_party_object_type`, `external_party_object_id`, `external_party_object`, `external_reference`, `internal_party`, `tenant`, `start_date`, `end_date`, `initial_term`, `renewal_term`, `currency`, `mrc`, `yrc`, `nrc`, `invoice_frequency`, `billable`, `comments`, `parent` |
+| `invoices/?brief=true` | `date`, `template`, `contracts`, `period_start`, `period_end`, `currency`, `amount`, `comments` |

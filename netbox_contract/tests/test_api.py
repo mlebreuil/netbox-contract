@@ -76,7 +76,10 @@ class ContractLineAPITestCase(
     APIViewTestCases.DeleteObjectViewTestCase,
 ):
     model = ContractLine
-    brief_fields = ['contract', 'currency', 'description', 'display', 'id', 'quantity', 'unit', 'unit_price', 'url']
+    brief_fields = [
+        'contract', 'currency', 'description', 'display', 'end_date', 'id', 'quantity', 'start_date', 'unit',
+        'unit_price', 'url',
+    ]
     bulk_update_data = {'comments': 'Updated'}
 
     @classmethod
