@@ -437,8 +437,11 @@ class ContractTypeTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTes
     def setUpTestData(cls):
         # Create test contract types
         contract_types = ContractType.objects.bulk_create([
-            ContractType(name='Contract Type 1', description='Description for type 1', color=ColorChoices.COLOR_BLUE),
-            ContractType(name='Contract Type 2', description='Description for type 2', color=ColorChoices.COLOR_RED),
+            # bulk_create does not call save(), which derives the slug (#309)
+            ContractType(name='Contract Type 1', slug='contract-type-1', description='Description for type 1',
+                         color=ColorChoices.COLOR_BLUE),
+            ContractType(name='Contract Type 2', slug='contract-type-2', description='Description for type 2',
+                         color=ColorChoices.COLOR_RED),
         ])
 
         for contract_type in contract_types:

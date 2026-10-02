@@ -271,6 +271,7 @@ class ContractTypePanel(SettingsAttributesPanel):
     title = _('Contract type')
 
     name = attrs.TextAttr('name', label=_('Name'))
+    slug = attrs.TextAttr('slug', label=_('Slug'))
     description = attrs.TextAttr('description', label=_('Description'))
     color = attrs.ColorAttr('color')
 
@@ -280,6 +281,7 @@ class ServiceProviderPanel(SettingsAttributesPanel):
 
     name = attrs.TextAttr('name', label=_('Name'))
     slug = attrs.TextAttr('slug', label=_('Slug'))
+    description = attrs.TextAttr('description', label=_('Description'))
     portal_url = LinkAttr('portal_url', label=_('Portal URL'))
 
 

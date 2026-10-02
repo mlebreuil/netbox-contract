@@ -267,7 +267,7 @@ DRAFT = InvoiceStatusChoices.STATUS_DRAFT
 
 class ContractTypeAPIViewTestCase(APITestCase, APIViewTestCases.APIViewTestCase):
     model = ContractType
-    brief_fields = ['description', 'display', 'id', 'name', 'url']
+    brief_fields = ['description', 'display', 'id', 'name', 'slug', 'url']
     create_data = [
         {'name': 'Type 4', 'description': 'Fourth', 'color': ColorChoices.COLOR_GREEN},
         {'name': 'Type 5', 'color': ColorChoices.COLOR_RED},
@@ -284,7 +284,7 @@ class ContractTypeAPIViewTestCase(APITestCase, APIViewTestCases.APIViewTestCase)
 
 class ServiceProviderAPIViewTestCase(APITestCase, APIViewTestCases.APIViewTestCase):
     model = ServiceProvider
-    brief_fields = ['display', 'id', 'name', 'slug', 'url']
+    brief_fields = ['description', 'display', 'id', 'name', 'slug', 'url']
     create_data = [
         {'name': 'Provider 4', 'slug': 'provider-4'},
         {'name': 'Provider 5', 'slug': 'provider-5', 'portal_url': 'https://five.example'},

@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from netbox.tables import NetBoxTable, columns
+from netbox.tables import NetBoxTable, OrganizationalModelTable, PrimaryModelTable, columns
 from tenancy.tables import ContactsColumnMixin
 
 from .models import (
@@ -34,14 +34,16 @@ class DeprecatedColumnsMixin:
         super().__init__(*args, **kwargs)
 
 
-class ContractTypeListTable(NetBoxTable):
+class ContractTypeListTable(OrganizationalModelTable):
     name = tables.Column(linkify=True)
     color = columns.ColorColumn()
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
 
-    class Meta(NetBoxTable.Meta):
+    class Meta(OrganizationalModelTable.Meta):
         model = ContractType
-        fields = ('pk', 'id', 'name', 'description', 'color', 'actions')
+        fields = (
+            'pk', 'id', 'name', 'slug', 'description', 'color', 'owner_group', 'owner', 'comments', 'actions',
+        )
         default_columns = ('name', 'description', 'color')
 
 
@@ -203,13 +205,16 @@ class InvoiceListTable(NetBoxTable):
         )
 
 
-class ServiceProviderListTable(NetBoxTable):
+class ServiceProviderListTable(PrimaryModelTable):
     name = tables.Column(linkify=True)
     tags = columns.TagColumn(url_name='plugins:netbox_contract:serviceprovider_list')
 
-    class Meta(NetBoxTable.Meta):
+    class Meta(PrimaryModelTable.Meta):
         model = ServiceProvider
-        fields = ('pk', 'name', 'slug', 'portal_url')
+        fields = (
+            'pk', 'id', 'name', 'slug', 'description', 'portal_url', 'owner_group', 'owner', 'comments', 'tags',
+            'actions',
+        )
         default_columns = ('name', 'portal_url')
 
 

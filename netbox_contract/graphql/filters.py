@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Annotated
 
 import strawberry
 import strawberry_django
-from netbox.graphql.filters import NetBoxModelFilter
+from netbox.graphql.filters import NetBoxModelFilter, OrganizationalModelFilter, PrimaryModelFilter
 from strawberry.scalars import ID
 from strawberry_django import BaseFilterLookup, DateFilterLookup, FilterLookup, StrFilterLookup
 from tenancy.graphql.filter_mixins import ContactFilterMixin, TenancyFilterMixin
@@ -33,14 +33,12 @@ LAZY_LOOKUPS = 'netbox.graphql.filter_lookups'
 
 
 @strawberry_django.filter_type(models.ContractType, lookups=True)
-class ContractTypeFilter(NetBoxModelFilter):
-    name: StrFilterLookup | None = strawberry_django.filter_field()
-    description: StrFilterLookup | None = strawberry_django.filter_field()
+class ContractTypeFilter(OrganizationalModelFilter):
     color: StrFilterLookup | None = strawberry_django.filter_field()
 
 
 @strawberry_django.filter_type(models.ServiceProvider, lookups=True)
-class ServiceProviderFilter(ContactFilterMixin, NetBoxModelFilter):
+class ServiceProviderFilter(ContactFilterMixin, PrimaryModelFilter):
     name: StrFilterLookup | None = strawberry_django.filter_field()
     slug: StrFilterLookup | None = strawberry_django.filter_field()
     portal_url: StrFilterLookup | None = strawberry_django.filter_field()

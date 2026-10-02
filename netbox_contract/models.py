@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
 from netbox.choices import ColorChoices
-from netbox.models import NetBoxModel
+from netbox.models import NetBoxModel, OrganizationalModel, PrimaryModel
 from netbox.models.features import ContactsMixin
 from utilities.choices import ChoiceSet
 from utilities.exceptions import AbortRequest
@@ -20,6 +20,7 @@ from utilities.querysets import RestrictedQuerySet
 from virtualization.choices import VirtualMachineStatusChoices
 
 from . import calculations
+from .text import unique_slug
 
 LOCKED_CONTRACT_MESSAGE = _(
     'This contract already has invoices: its lines cannot be added, changed or deleted. '
@@ -145,9 +146,13 @@ class BillingMethodChoices(ChoiceSet):
 CURRENCY_DEFAULT = CurrencyChoices.CHOICES[0][0]
 
 
-class ContractType(NetBoxModel):
-    name = models.CharField(max_length=100, unique=True, verbose_name=_('name'))
-    description = models.TextField(blank=True, verbose_name=_('description'))
+class ContractType(OrganizationalModel):
+    """
+    A category of contracts: name, slug, description, comments and owner of NetBox's organizational models (#309).
+    The slug may be left empty when a type is created (form, import, REST API): it is then derived from the name.
+    """
+
+    slug = models.SlugField(max_length=100, unique=True, blank=True, verbose_name=_('slug'))
     color = ColorField(default=ColorChoices.COLOR_GREY, verbose_name=_('color'))
 
     class Meta:
@@ -163,6 +168,21 @@ class ContractType(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:contracttype', args=[self.pk])
+
+    def apply_slug_default(self):
+        """Derive a unique slug from the name when none is given (FR-018)."""
+        if not self.slug and self.name:
+            taken = set(ContractType.objects.exclude(pk=self.pk).values_list('slug', flat=True))
+            self.slug = unique_slug(self.name, taken)
+
+    def clean(self):
+        # Applied in clean() (validated before uniqueness checks) and in save() (REST creates validate a copy)
+        self.apply_slug_default()
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        self.apply_slug_default()
+        super().save(*args, **kwargs)
 
 
 class AccountingDimension(NetBoxModel):
@@ -200,11 +220,12 @@ class AccountingDimension(NetBoxModel):
         verbose_name_plural = _('accounting dimensions')
 
 
-class ServiceProvider(ContactsMixin, NetBoxModel):
+class ServiceProvider(ContactsMixin, PrimaryModel):
+    """An external party of contracts; description, comments and owner come from NetBox's primary models (#309)."""
+
     name = models.CharField(max_length=100, verbose_name=_('name'))
     slug = models.SlugField(max_length=100, unique=True, verbose_name=_('slug'))
     portal_url = models.URLField(blank=True, verbose_name=_('portal URL'))
-    comments = models.TextField(blank=True, verbose_name=_('comments'))
 
     class Meta:
         ordering = ('name',)

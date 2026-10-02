@@ -269,7 +269,7 @@ GraphQL.
 
 ### Tests for User Story 5 (write first, must fail)
 
-- [ ] T054 [P] [US5] `netbox_contract/tests/test_base_classes.py::TextHelpersTestCase` for `netbox_contract/text.py`:
+- [X] T054 [P] [US5] `netbox_contract/tests/test_base_classes.py::TextHelpersTestCase` for `netbox_contract/text.py`:
   - `unique_slug('Support & Licences', set())` == `'support-licences'`;
   - a collision gives `-2`, then `-3`;
   - `unique_slug('&&&', set())` == `'contract-type'` (edge case);
@@ -278,49 +278,49 @@ GraphQL.
     - "Maintenance" → slug `maintenance`; two names with the same slug get unique slugs, and both appear in the report (US5-1, US5-2);
     - a 350-character description gets the shortened text, its full text becomes the comments, and the report names the type (US5-3);
     - rows that already have a slug and a short description produce no change and no report line (US5-7, idempotence).
-- [ ] T055 [P] [US5] Same module, `MigrationTestCase(TransactionTestCase)`, with `django.db.migrations.executor.MigrationExecutor` and historical models (not the current model, whose unique `slug` forbids several empty values):
+- [X] T055 [P] [US5] Same module, `MigrationTestCase(TransactionTestCase)`, with `django.db.migrations.executor.MigrationExecutor` and historical models (not the current model, whose unique `slug` forbids several empty values):
   1. migrate `netbox_contract` to `0050`, then create three contract types with the historical model: "Maintenance", two names giving the same slug, and one with a 350-character description;
   2. migrate to `0051`: slugs filled and unique, the description shortened, and the full text in `comments` (US5-1, US5-2, US5-3);
   3. migrate back to `0050`: the 350-character description is restored exactly (US5-7, lossless reverse);
-  4. migrate forward again: the same result as step 2, with no duplicated text in `comments` (US5-7).
+  4. migrate forward again: the same result as step 2, with no duplicated text in `comments` (US5-7). Deviation: the migration test is a plain `TestCase`. PostgreSQL runs the schema changes inside the test transaction, and NetBox's database cannot be flushed by a `TransactionTestCase`: the first attempt left three contract types in the kept test database, and they were removed by hand. Rows are inserted with `bulk_create()`, because a historical model's `post_save` reaches NetBox's search cache, which expects the current fields.
 
   Restore the latest migration state in `tearDown`.
-- [ ] T056 [P] [US5] Same module, `ContractTypeTestCase`:
+- [X] T056 [P] [US5] Same module, `ContractTypeTestCase`:
   - REST create with only `name` → 201 with a derived slug, and with an explicit slug it is kept (US5-4);
   - form and CSV import without slug succeed;
   - `description` over 200 → 400 / form error;
   - `comments` and `owner` are editable, bulk-editable, importable (`owner` column), filterable (`?owner_id=`) and shown on the page (US5-6).
-- [ ] T057 [P] [US5] Same module, `ServiceProviderTestCase`:
+- [X] T057 [P] [US5] Same module, `ServiceProviderTestCase`:
   - description and owner are editable through form, bulk edit, import, REST and filters, and shown on the page;
   - the existing name, slug, portal URL, comments and contacts are unchanged after the change (US5-5, US5-6);
   - no owner defined anywhere → empty owner, forms valid (edge case).
-- [ ] T058 [US5] Run the module; confirm the expected failures (`ImportError` on `text`, missing fields)
+- [X] T058 [US5] Run the module; confirm the expected failures (`ImportError` on `text`, missing fields) Result: every test failed for the expected reasons (no `text` module, no slug, owner or description fields, description length not checked).
 
 ### Implementation for User Story 5
 
-- [ ] T059 [US5] Create `netbox_contract/text.py` with `unique_slug(name, taken)`, `shorten_description(text, limit=200)` and `plan_contract_type_changes(rows, taken)` (returns the per-row slug, description and comments changes plus the report lines), as in research D9 and D10. They are pure functions with no Django model import
-- [ ] T060 [US5] In `netbox_contract/models.py`:
+- [X] T059 [US5] Create `netbox_contract/text.py` with `unique_slug(name, taken)`, `shorten_description(text, limit=200)` and `plan_contract_type_changes(rows, taken)` (returns the per-row slug, description and comments changes plus the report lines), as in research D9 and D10. They are pure functions with no Django model import Also `restored_description(description, comments)` for the reverse migration.
+- [X] T060 [US5] In `netbox_contract/models.py`:
   - `ContractType(OrganizationalModel)` keeps `color`. Redeclare `slug = models.SlugField(max_length=100, unique=True, blank=True, verbose_name=_('slug'))`, and drop the local `name`/`description` (inherited: `name` "CharField(100, unique)", `description` "CharField(200, blank)"). `clean()` and `save()` set an empty slug with `unique_slug(self.name, <slugs of other types>)`.
   - `ServiceProvider(ContactsMixin, PrimaryModel)` keeps `name`, `slug` and `portal_url`, and inherits `description` "CharField(200, blank)" and `owner` (`comments` is now inherited).
-- [ ] T061 [US5] Create `netbox_contract/migrations/0051_contracttype_organizational.py`. Generate it with `makemigrations`, then edit it into:
+- [X] T061 [US5] Create `netbox_contract/migrations/0051_contracttype_organizational.py`. Generate it with `makemigrations`, then edit it into:
   1. add `slug` null;
   2. add `comments` and `owner`;
   3. `RunPython(fill_slugs_and_shorten_descriptions, restore_descriptions)`. The forward function applies `plan_contract_type_changes` and prints the report. The reverse puts the full text from `comments` back into `description` wherever `shorten_description(comments) == description` (`description` is already a `TextField` again at that point of the reverse);
   4. alter `slug` to unique not null;
-  5. alter `description` to `CharField(200)`.
+  5. alter `description` to `CharField(200)`. Written by hand (`makemigrations` needs `DEVELOPER = True`). The dependency is `users.0015_owner`, the migration that creates `Owner` (present in 4.6.0). The slug is added without an index (`db_index=False`) and made unique afterwards, because adding both made PostgreSQL create the `_like` index twice. Applied to the dev database: two contract types, slugs `maintenance` and `telecom`, nothing to report.
 
   Add a docstring saying that the reverse restores moved descriptions, and drops comments typed after the upgrade with their column. Then create `netbox_contract/migrations/0052_serviceprovider_primary.py` (add `description` and `owner`). Run `makemigrations --check`
-- [ ] T062 [US5] Switch the stack to the core bases:
+- [X] T062 [US5] Switch the stack to the core bases:
   - `netbox_contract/forms.py`: `OrganizationalModelForm` (slug `SlugField(required=False)`), `OrganizationalModelBulkEditForm`, `OrganizationalModelImportForm` (slug optional), `OrganizationalModelFilterSetForm`, and the `PrimaryModel*` equivalents for service providers, with `owner` and `description` placed in their fieldsets;
   - `netbox_contract/filtersets.py`: `OrganizationalModelFilterSet` and `PrimaryModelFilterSet`, with the `slug` and `description` filters;
   - `netbox_contract/tables.py`: `OrganizationalModelTable` and `PrimaryModelTable`, with `owner` not in `default_columns`;
-  - `netbox_contract/search.py`: contract type `description` and `slug`.
-- [ ] T063 [US5] In `netbox_contract/api/serializers.py`:
+  - `netbox_contract/search.py`: contract type `description` and `slug`. The owner fields are not listed in the form fieldsets: NetBox's form and bulk-edit templates render them after the sections, like comments.
+- [X] T063 [US5] In `netbox_contract/api/serializers.py`:
   - `ContractTypeSerializer(OrganizationalModelSerializer)` with `slug`, `comments` and `owner` in `fields`, `extra_kwargs={'slug': {'required': False}}`, and `brief_fields` with `slug`;
   - `ServiceProviderSerializer(PrimaryModelSerializer)` with `description` and `owner`, and `brief_fields` with `description` (completes T043).
-- [ ] T064 [US5] If US4 is done, switch `ContractTypeType` to `OrganizationalObjectType` and `ServiceProviderType` to `PrimaryObjectType` in `netbox_contract/graphql/types.py`, and the filters to `OrganizationalModelFilter` and `PrimaryModelFilter` in `graphql/filters.py`. If US2 is done, add slug, owner and description to `ContractTypePanel` and `ServiceProviderPanel` in `netbox_contract/panels.py`
-- [ ] T065 [US5] Run `test_base_classes`, `test_api`, `test_views`, `test_graphql` (if present), `test_conventions` and `ruff check`. Re-record the `contracttype:*` and `serviceprovider:*` query counts only if they change (reason: "owner relation of the core base classes, #309 D9")
-- [ ] T066 [US5] Add the US5 bullets to `CHANGELOG.md` #309 "Behaviour changes":
+- [X] T064 [US5] If US4 is done, switch `ContractTypeType` to `OrganizationalObjectType` and `ServiceProviderType` to `PrimaryObjectType` in `netbox_contract/graphql/types.py`, and the filters to `OrganizationalModelFilter` and `PrimaryModelFilter` in `graphql/filters.py`. If US2 is done, add slug, owner and description to `ContractTypePanel` and `ServiceProviderPanel` in `netbox_contract/panels.py` The owner is shown by NetBox in the page header of any object that has one; no panel attribute is needed.
+- [X] T065 [US5] Run `test_base_classes`, `test_api`, `test_views`, `test_graphql` (if present), `test_conventions` and `ruff check`. Re-record the `contracttype:*` and `serviceprovider:*` query counts only if they change (reason: "owner relation of the core base classes, #309 D9") Adapted: `test_views.ContractTypeTestCase` (its `bulk_create()` fixture gives slugs, since `bulk_create()` does not call `save()`), `test_conventions` (comments are nullable in bulk edit), and the brief sets in `test_api` and `test_nested_api`. Full suite: 930 tests OK, query counts unchanged.
+- [X] T066 [US5] Add the US5 bullets to `CHANGELOG.md` #309 "Behaviour changes":
   - slug derived on upgrade, with the report;
   - long descriptions shortened and moved to comments;
   - description limited to 200 characters;

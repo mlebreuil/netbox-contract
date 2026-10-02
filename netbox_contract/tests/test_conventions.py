@@ -333,7 +333,8 @@ class FormSectionsTestCase(TestCase):
                 self.assertIsInstance(widget, django_forms.TextInput)
                 self.assertNotIsInstance(widget, MarkdownWidget)
                 self.assertFalse(field.required)
-        self.assertEqual(tuple(forms.ContractTypeBulkEditForm.nullable_fields), ('description',))
+        # comments: added by #309 (organizational model)
+        self.assertEqual(tuple(forms.ContractTypeBulkEditForm.nullable_fields), ('description', 'comments'))
 
 
 class EditViewTestCase(TestCase):

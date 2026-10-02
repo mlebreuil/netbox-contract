@@ -7,7 +7,7 @@ from circuits.models import Circuit, Provider, VirtualCircuit
 from dcim.models import Device, Rack, Site
 from extras.graphql.mixins import ContactsMixin
 from netbox.graphql.optimization import build_gfk_prefetch
-from netbox.graphql.types import NetBoxObjectType
+from netbox.graphql.types import NetBoxObjectType, OrganizationalObjectType, PrimaryObjectType
 from virtualization.models import Cluster, VirtualMachine
 
 from .. import models
@@ -45,13 +45,13 @@ ASSIGNABLE_MODELS = [Circuit, VirtualCircuit, Site, Device, Rack, VirtualMachine
 
 
 @strawberry_django.type(models.ContractType, fields='__all__', filters=ContractTypeFilter, pagination=True)
-class ContractTypeType(NetBoxObjectType):
+class ContractTypeType(OrganizationalObjectType):
     color: str
     contracts: list[Annotated['ContractType', strawberry.lazy(LAZY)]]
 
 
 @strawberry_django.type(models.ServiceProvider, fields='__all__', filters=ServiceProviderFilter, pagination=True)
-class ServiceProviderType(ContactsMixin, NetBoxObjectType):
+class ServiceProviderType(ContactsMixin, PrimaryObjectType):
     pass
 
 

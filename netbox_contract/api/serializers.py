@@ -2,7 +2,12 @@ from django.contrib.contenttypes.models import ContentType
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 from netbox.api.fields import ContentTypeField, SerializedPKRelatedField
-from netbox.api.serializers import NetBoxModelSerializer, WritableNestedSerializer
+from netbox.api.serializers import (
+    NetBoxModelSerializer,
+    OrganizationalModelSerializer,
+    PrimaryModelSerializer,
+    WritableNestedSerializer,
+)
 from rest_framework import serializers
 from tenancy.api.serializers_.tenants import TenantSerializer
 from utilities.api import get_serializer_for_model
@@ -98,7 +103,7 @@ class NestedContractSerializer(WritableNestedSerializer):
         ).data
 
 
-class ContractTypeSerializer(NetBoxModelSerializer):
+class ContractTypeSerializer(OrganizationalModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='plugins-api:netbox_contract-api:contracttype-detail')
 
     class Meta:
@@ -108,14 +113,19 @@ class ContractTypeSerializer(NetBoxModelSerializer):
             'url',
             'display',
             'name',
+            'slug',
             'description',
             'color',
+            'owner',
+            'comments',
             'tags',
             'custom_fields',
             'created',
             'last_updated',
         )
-        brief_fields = ('id', 'name', 'description', 'url', 'display')
+        # The slug is derived from the name when it is not given (FR-018: no new required input)
+        extra_kwargs = {'slug': {'required': False}}
+        brief_fields = ('id', 'url', 'display', 'name', 'slug', 'description')
 
 
 class ContractValueField(serializers.DecimalField):
@@ -346,7 +356,7 @@ class InvoiceSerializer(NetBoxModelSerializer):
         return instance
 
 
-class ServiceProviderSerializer(NetBoxModelSerializer):
+class ServiceProviderSerializer(PrimaryModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='plugins-api:netbox_contract-api:serviceprovider-detail'
     )
@@ -359,14 +369,16 @@ class ServiceProviderSerializer(NetBoxModelSerializer):
             'display',
             'name',
             'slug',
+            'description',
             'portal_url',
+            'owner',
             'comments',
             'tags',
             'custom_fields',
             'created',
             'last_updated',
         )
-        brief_fields = ('id', 'url', 'display', 'name', 'slug')
+        brief_fields = ('id', 'url', 'display', 'name', 'slug', 'description')
 
 
 class ContractAssignmentSerializer(NetBoxModelSerializer):

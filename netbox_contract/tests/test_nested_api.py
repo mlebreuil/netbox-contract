@@ -50,7 +50,7 @@ BRIEF_CONTRACT_LINE = {
     'end_date',
 }
 
-# "Brief fields in 2.5.0" of contracts/rest-api.md (contract type slug and provider description come with US5)
+# "Brief fields in 2.5.0" of contracts/rest-api.md
 BRIEF_FIELDS = {
     'contracts': {
         'id', 'url', 'display', 'name', 'contract_type', 'external_party_object_type', 'external_party_object_id',
@@ -66,8 +66,8 @@ BRIEF_FIELDS = {
     'contract-lines': BRIEF_CONTRACT_LINE,
     'accountingdimension': NESTED_DIMENSION,
     'units': {'id', 'url', 'display', 'name', 'description', 'billing_method', 'months'},
-    'contracttype': {'id', 'url', 'display', 'name', 'description'},
-    'serviceproviders': {'id', 'url', 'display', 'name', 'slug'},
+    'contracttype': {'id', 'url', 'display', 'name', 'slug', 'description'},
+    'serviceproviders': {'id', 'url', 'display', 'name', 'slug', 'description'},
     'contractassignment': {'id', 'url', 'display', 'content_object', 'contract', 'tags', 'custom_fields'},
 }
 

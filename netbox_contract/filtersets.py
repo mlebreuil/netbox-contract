@@ -2,7 +2,7 @@ import django_filters
 from circuits.models import Provider
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
-from netbox.filtersets import NetBoxModelFilterSet
+from netbox.filtersets import NetBoxModelFilterSet, OrganizationalModelFilterSet, PrimaryModelFilterSet
 from tenancy.filtersets import ContactModelFilterSet, TenancyFilterSet
 from utilities.filtersets import register_filterset
 
@@ -125,23 +125,23 @@ class InvoiceFilterSet(NetBoxModelFilterSet):
 
 
 @register_filterset
-class ServiceProviderFilterSet(ContactModelFilterSet, NetBoxModelFilterSet):
+class ServiceProviderFilterSet(ContactModelFilterSet, PrimaryModelFilterSet):
     class Meta:
         model = ServiceProvider
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'slug', 'description', 'portal_url')
 
     def search(self, queryset, name, value):
-        return queryset.filter(name__icontains=value)
+        return queryset.filter(Q(name__icontains=value) | Q(description__icontains=value))
 
 
 @register_filterset
-class ContractTypeFilterSet(NetBoxModelFilterSet):
+class ContractTypeFilterSet(OrganizationalModelFilterSet):
     class Meta:
         model = ContractType
-        fields = ('name', 'description', 'color')
+        fields = ('id', 'name', 'slug', 'description', 'color')
 
     def search(self, queryset, name, value):
-        return queryset.filter(name__icontains=value)
+        return queryset.filter(Q(name__icontains=value) | Q(slug__icontains=value))
 
 
 @register_filterset
