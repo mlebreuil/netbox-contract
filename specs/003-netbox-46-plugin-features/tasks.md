@@ -334,13 +334,13 @@ GraphQL.
 
 ## Phase 8: Polish & Cross-Cutting Concerns
 
-- [ ] T067 Refresh translations: `makemessages -l en -l fr` from `netbox_contract/` (NetBox `manage.py`, test configuration). Translate the new and fuzzy French entries in `netbox_contract/locale/fr/LC_MESSAGES/django.po`, then `msgfmt` both catalogs. Check that msgids moved from the deleted templates keep their translations
-- [ ] T068 [P] Update `CLAUDE.md`:
+- [X] T067 Refresh translations: `makemessages -l en -l fr` from `netbox_contract/` (NetBox `manage.py`, test configuration). Translate the new and fuzzy French entries in `netbox_contract/locale/fr/LC_MESSAGES/django.po`, then `msgfmt` both catalogs. Check that msgids moved from the deleted templates keep their translations Seven entries were reviewed and corrected (six fuzzy guesses and the new "Ownership"); the only remaining fuzzy flag is the catalog header, as before. Both catalogs were compiled with `msgfmt -c`.
+- [X] T068 [P] Update `CLAUDE.md`:
   - Architecture: detail pages via `layout` + `panels.py`; per-line contract line actions and `with_lock_state()`; amend permission action and `object_actions.py`; nested `brief_fields`; `graphql/` package;
   - Tests: the API tests now use `APIViewTestCase`; remove "the plugin has no GraphQL".
-- [ ] T069 [P] Review `README.md`: requirements unchanged (NetBox 4.6.0). Mention GraphQL only if the README lists features
-- [ ] T070 Run the full quickstart: `ruff check`, `makemigrations --check`, `migrate`, the whole `netbox_contract.tests` suite (including `test_prefill`, `test_invoice_preview` and `test_amendments` for FR-008), then the manual dev-server checks 1-6 of [quickstart.md](quickstart.md)
-- [ ] T071 Keep `spec.md`, `research.md` and this file in step with what was implemented (CLAUDE.md workflow rule). Mark tasks `[X]` and record any deviation in research.md
+- [X] T069 [P] Review `README.md`: requirements unchanged (NetBox 4.6.0). Mention GraphQL only if the README lists features No change: requirements are unchanged (NetBox 4.6.0), and the README lists no API features.
+- [X] T070 Run the full quickstart: `ruff check`, `makemigrations --check`, `migrate`, the whole `netbox_contract.tests` suite (including `test_prefill`, `test_invoice_preview` and `test_amendments` for FR-008), then the manual dev-server checks 1-6 of [quickstart.md](quickstart.md) Result: ruff clean, no pending migration, 930 tests OK. Manual checks 1-6 were run on the dev database inside a rolled-back transaction: amend action offered; view + amend user sees Amend on the line page and in the table, and no Delete on the locked line; contract page panels including another plugin's left-area content; nested contract with 24 keys and `contract_type` an integer; GraphQL example query; contract type slugs, and API creation with a name only (201, slug derived).
+- [X] T071 Keep `spec.md`, `research.md` and this file in step with what was implemented (CLAUDE.md workflow rule). Mark tasks `[X]` and record any deviation in research.md spec.md, research.md, data-model.md, contracts/ and this file were updated during implementation; every deviation is recorded in the task notes above.
 
 ---
 

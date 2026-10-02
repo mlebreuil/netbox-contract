@@ -46,17 +46,31 @@ suite on a pinned NetBox tag (currently `v4.6.10`) for Python 3.12-3.14.
 ## Architecture
 
 **Standard NetBox plugin stack per model**: `models.py`, `forms.py` (edit, filter, CSV import, bulk edit),
-`filtersets.py`, `tables.py`, `views.py`, `urls.py`, `api/` (serializers, viewsets, router), `search.py`,
-`navigation.py`, templates under `templates/netbox_contract/` (never at the root of `templates/`). Every model is a
-`NetBoxModel` with the full stack. Every view is registered with `register_model_view` (list, add, import, bulk
-edit/delete with `detail=False`); `urls.py` only includes `get_model_urls` per model plus the non-model
-`invoice_lines_preview`, so NetBox adds changelog and journal and other code can attach tabs and actions (e.g.
-`contractline_amend`). Route names are pinned by `tests/test_conventions.py`. Filtersets are registered with
-`@register_filterset` (lookup modifiers on filter forms). Model, bulk-edit and filter forms declare `fieldsets`: a
-field left out of every section is not rendered, and `prune_fieldsets` removes fields deleted (deprecated) or hidden
-by the settings.
+`filtersets.py`, `tables.py`, `views.py`, `urls.py`, `api/` (serializers, viewsets, router), `graphql/` (filters,
+types, schema; registered by `PluginConfig.graphql_schema`), `search.py`, `navigation.py`, templates under
+`templates/netbox_contract/` (never at the root of `templates/`). Every model is a `NetBoxModel` with the full
+stack; `ContractType` is an `OrganizationalModel` (its slug is derived from the name when empty, `text.unique_slug`)
+and `ServiceProvider` a `PrimaryModel`, with the matching core form, filterset, table, serializer and GraphQL bases.
+Every view is registered with `register_model_view` (list, add, import, bulk edit/delete with `detail=False`);
+`urls.py` only includes `get_model_urls` per model plus the non-model `invoice_lines_preview`, so NetBox adds
+changelog and journal and other code can attach tabs and actions (e.g. `contractline_amend`). Route names are pinned
+by `tests/test_conventions.py`. Filtersets are registered with `@register_filterset` (lookup modifiers on filter
+forms). Model, bulk-edit and filter forms declare `fieldsets`: a field left out of every section is not rendered,
+and `prune_fieldsets` removes fields deleted (deprecated) or hidden by the settings.
 - New-object pre-fill (invoice, invoice line) uses `form_with_defaults` in `views.py` and then core
   `ObjectEditView.get()`, so quick add and HTMX partials work; values in the page address win over the pre-fill.
+- Detail pages are declared with `layout = SimpleLayout(...)` on the `ObjectView`s; the plugin's panels are in
+  `panels.py` (`SettingsAttributesPanel` applies `hidden_contract_fields` / `hidden_invoice_fields` at render time,
+  deprecated panels follow `show_deprecated_fields`, messages are `TemplatePanel` fragments under
+  `templates/netbox_contract/panels/`). Related tables are `ObjectsTablePanel`s that load the list views over HTMX
+  (tests read them with `tests.helpers.contract_page_with_lines` or the panel's `hx-get` URL). Only the contract,
+  contract line, invoice and invoice line pages keep a template, for their breadcrumbs.
+- Amending a contract line needs the `amend` permission action (`ContractLine.Meta.permissions`,
+  `netbox_contract.amend_contractline`), checked per line: `object_actions.AmendContractLine` (page),
+  `tables.ContractLineActionsColumn` (tables; also hides Delete on locked lines), `can_amend` template filter (edit
+  page), `ContractLineAmendView` and the REST `amend` action, which overrides NetBox's POST → "add" mapping
+  (`get_permissions()`). The contract line list reads lock and successor state from
+  `ContractLine.objects.with_lock_state()` instead of querying per row.
 
 **Where business rules live** (so that the UI, bulk edit, CSV import and REST API enforce them alike):
 - Single-record rules are in model `clean()` — NetBox forms, bulk edit, import forms and `ValidatedModelSerializer`
@@ -92,7 +106,14 @@ by the settings.
   (`ContractLine.replaces`); yearly values skip replaced lines.
 - Contract values (total, yearly, yearly billable) come from `models.contract_values(contracts)`, which computes a
   whole list in a fixed number of queries; list views/API pass the result in context instead of calling the
-  properties per row. The contract list's yearly value is a SQL annotation (`yearly_value_annotation`).
+  properties per row. The contract list's yearly value is a SQL annotation (`yearly_value_annotation`). They are
+  not in GraphQL (stored fields only).
+
+**REST representations**: related objects use `Serializer(nested=True)` and each serializer declares
+`Meta.brief_fields`. A serializer's `validate()` must return at once when `self.nested` (it then receives the related
+object, not data). `NestedContractSerializer` is kept, deprecated, until a later release shrinks the nested contract to
+its brief form; the fields to be removed are listed in `docs/api.md` and the changelog (#309, research D7). Brief sets
+may gain fields but never lose one without that deprecation path.
 
 **Locks**: a contract with any invoice freezes the contract terms of its lines (dimensions, comments and tags stay
 editable); a Posted invoice (not a template) freezes its amount, currency, period, contracts and the amount fields
@@ -112,9 +133,12 @@ in NetBox core, so script logic lives in importable modules).
 
 ## Tests
 
-- `tests/test_views.py` uses NetBox's `ViewTestCases.PrimaryObjectViewTestCase` per model; API tests compose
-  `APIViewTestCases` Get/List/Create/Update/Delete mixins (the plugin has no GraphQL, so do not use
-  `APIViewTestCase`). `tests/custom.py` overrides the URL helpers for the plugin namespaces.
+- `tests/test_views.py` uses NetBox's `ViewTestCases.PrimaryObjectViewTestCase` per model; `tests/test_api.py` uses
+  `APIViewTestCases.APIViewTestCase` (REST and GraphQL) per model. `tests/custom.py` overrides the URL helpers for the
+  plugin namespaces.
+- Migration tests run in a plain `TestCase` with `MigrationExecutor` (PostgreSQL rolls the schema back with the test
+  transaction); a `TransactionTestCase` cannot flush NetBox's database. Create rows with the historical model through
+  `bulk_create()` (no `post_save`, which NetBox's search cache handles with the current fields).
 - `tests/helpers.py` has factories (`make_contract`, `make_line`, `make_invoice`, units `monthly()`, `yearly()`,
   `one_time()`, `usage()`). `make_invoice` defaults to a Posted invoice, which is locked — pass
   `status=InvoiceStatusChoices.STATUS_DRAFT` when a test adds or edits its lines.
