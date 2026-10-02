@@ -218,7 +218,7 @@ An administrator manages contract types like other NetBox categories (with a slu
 ### Measurable Outcomes
 
 - **SC-001**: An administrator can grant amending alone. A user with view + amend and no other contract line permission can amend, and a user with add + change but without amend cannot (0 of the add + change-only users can amend).
-- **SC-002**: 9 out of 9 detail pages show the same attributes, tables, buttons and messages as before the change. The plugin's hand-written detail templates are removed, except the three edit and amend screens.
+- **SC-002**: 9 out of 9 detail pages show the same attributes, tables, buttons and messages as before the change. No detail page template holds attribute or table markup any more: seven are removed and two keep only their breadcrumbs. The edit and amend screens are unchanged.
 - **SC-003**: A nested contract in a contract assignment or contract line response holds 5 fields instead of 24.
 - **SC-004**: 9 out of 9 object types can be queried through GraphQL (today 0 out of 9), with permissions applied.
 - **SC-005**: After the upgrade, 100% of existing contract types have a unique slug, and 0 characters of existing contract type descriptions are lost.
