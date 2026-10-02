@@ -57,6 +57,6 @@ Re-run safety (Constitution IV):
 
 | Name | Where | Meaning |
 |---|---|---|
-| `is_locked_line` | annotation on the contract line list and viewset querysets | An invoice line references the line, or its contract has an invoice. This is the `lock_message()` rule. |
+| `is_locked_line` | annotation on the contract line list view queryset (`with_lock_state()`) | An invoice line references the line, or its contract has an invoice. This is the `lock_message()` rule. |
 | `has_successor` | same | Another line replaces it. `can_be_amended` is false. |
 | `invoice_id` | new `ContractFilterSet` filter | Contracts of an invoice (reverse `invoices` relation). Used by the invoice page table. |

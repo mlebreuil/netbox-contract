@@ -133,7 +133,10 @@ class InvoiceLinePrefillTestCase(TestCase):
 
 
 class AmendButtonPermissionTestCase(TestCase):
-    """The Amend button needs the change and add permissions on contract lines, as the amend view does."""
+    """
+    The Amend button is shown only to users allowed to amend, as the amend view requires. #307 required add + change;
+    #309 replaced them with the amend action (tests/test_amend_permission.py covers the full rule).
+    """
 
     def setUp(self):
         super().setUp()
@@ -159,7 +162,10 @@ class AmendButtonPermissionTestCase(TestCase):
                 self.assertNotContains(self.client.get(url), self.amend_url)
 
     def test_shown_with_the_change_and_add_permissions(self):
+        """Since #309: shown with the amend action, which add + change no longer replace."""
         self.add_permissions('netbox_contract.add_contractline')
+        self.assertEqual(self.client.get(self.amend_url).status_code, 403)
+        self.add_permissions('netbox_contract.amend_contractline')
         self.assertEqual(self.client.get(self.amend_url).status_code, 200)
         for page, url in self.pages().items():
             with self.subTest(page=page):

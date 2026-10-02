@@ -1,5 +1,6 @@
 {% extends 'generic/object_edit.html' %}
 {% load i18n %}
+{% load contract_tags %}
 
 {% block pre_form_fields %}
   {% if lock_message %}
@@ -11,7 +12,7 @@
           {% trans "To change its price or quantity from a date, amend it." %}
         {% endif %}
       </div>
-      {% if object.can_be_amended and perms.netbox_contract.change_contractline and perms.netbox_contract.add_contractline %}
+      {% if object|can_amend:request.user %}
         <a href="{% url 'plugins:netbox_contract:contractline_amend' pk=object.pk %}" class="btn btn-primary ms-3 text-nowrap">
           <i class="mdi mdi-cash-sync" aria-hidden="true"></i> {% trans "Amend" %}
         </a>

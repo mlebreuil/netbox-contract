@@ -34,6 +34,7 @@ from .models import (
     contract_values,
     yearly_value_annotation,
 )
+from .object_actions import AmendContractLine
 from .services import amendments, invoicing
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
@@ -344,11 +345,14 @@ class ContractView(generic.ObjectView):
         hidden_fields = plugin_settings.get('hidden_contract_fields')
 
         lines_locked = instance.invoices.exists()
-        table_class = tables.ContractLineLockedContractTable if lines_locked else tables.ContractLineContractTable
-        lines_table = table_class(
-            instance.lines.select_related('unit').prefetch_related('accounting_dimensions', 'tags', 'replaced_by')
+        # Until the page layout lists them from the contract line list view (US2), the same table is used here
+        lines_table = tables.ContractLineListTable(
+            ContractLine.objects.with_lock_state().filter(contract=instance).select_related('unit').prefetch_related(
+                'accounting_dimensions', 'tags'
+            )
         )
         lines_table.configure(request)
+        lines_table.columns.hide('contract')
 
         return {
             'hidden_fields': hidden_fields,
@@ -806,6 +810,7 @@ class UnitBulkDeleteView(generic.BulkDeleteView):
 @register_model_view(ContractLine)
 class ContractLineView(generic.ObjectView):
     queryset = ContractLine.objects.select_related('contract', 'unit')
+    actions = (CloneObject, EditObject, DeleteObject, AmendContractLine)
 
     def get_extra_context(self, request, instance):
         return {'lock_message': instance.lock_message()}
@@ -818,12 +823,18 @@ class ContractLineAmendView(BaseObjectView):
     queryset = ContractLine.objects.select_related('contract', 'unit')
     template_name = 'netbox_contract/contractline_amend.html'
 
+    additional_permissions = ['netbox_contract.view_contractline']
+
     def get_required_permission(self):
-        return 'netbox_contract.change_contractline'
+        # The "amend" action of object permissions (research D6); the queryset is restricted to it
+        return 'netbox_contract.amend_contractline'
 
     def has_permission(self):
-        # The amendment also creates a contract line, as the REST action requires
-        return super().has_permission() and self.request.user.has_perm('netbox_contract.add_contractline')
+        if not super().has_permission():
+            return False
+        # Only lines the user may both view and amend, object constraints included
+        self.queryset = self.queryset.restrict(self.request.user, 'view')
+        return True
 
     def render_form(self, request, line, form):
         return render(request, self.template_name, {
@@ -855,7 +866,9 @@ class ContractLineAmendView(BaseObjectView):
 
 @register_model_view(ContractLine, 'list', path='', detail=False)
 class ContractLineListView(generic.ObjectListView):
-    queryset = ContractLine.objects.select_related('contract', 'unit').prefetch_related('accounting_dimensions')
+    queryset = ContractLine.objects.with_lock_state().select_related('contract', 'unit').prefetch_related(
+        'accounting_dimensions'
+    )
     table = tables.ContractLineListTable
     filterset = filtersets.ContractLineFilterSet
     filterset_form = forms.ContractLineFilterForm

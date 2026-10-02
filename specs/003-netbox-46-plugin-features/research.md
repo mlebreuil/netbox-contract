@@ -98,14 +98,14 @@ Contract line tables get `ContractLineActionsColumn(ActionsColumn)`. Its `render
 `ContractLineListTable` is the only contract line table.
 
 The column must not cost queries per row. `ContractLine.lock_message()` runs up to three queries and `can_be_amended`
-runs one (`replaced_by.exists()`). The contract line list view (and its REST viewset) therefore annotates its
-queryset once with:
+runs one (`replaced_by.exists()`). The contract line list view therefore annotates its queryset once (`ContractLine.objects.with_lock_state()`) with:
 - `is_locked_line = Exists(invoice line referencing it) | Exists(invoice of its contract)`;
 - `has_successor = Exists(line replacing it)`.
 
 The column reads these annotations when present and falls back to the model methods otherwise. The query-count
 baseline of the contract line list must stay the same or change only by the constant cost of the annotations, with
-that reason stated.
+that reason stated. The REST viewset is not annotated, because no REST output reads the lock state (implementation
+note, T005). The baseline did not change.
 
 **Rationale**:
 - `ObjectsTablePanel.should_render()` hides the panel without view permission, which matches today's

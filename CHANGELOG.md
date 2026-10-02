@@ -38,6 +38,12 @@
   * The contract type description is a plain text field in the filter, bulk edit and import forms, and can be cleared in bulk.
   * Invoice line tables (list, invoice page) show the linked **ID** by default, so a line can be opened; no other column linked to it. Users who saved their own column choice add it from "Configure Table".
   * The translations are refreshed and the new texts of 2.5.0 are translated into French.
+
+* [#309](https://github.com/mlebreuil/netbox-contract/issues/309) Adopt the NetBox 4.6 plugin features.
+  * Amending a contract line has its own permission: the **amend** action of contract lines in NetBox object permissions (migration 0050). It can be limited with constraints. The **Amend** button is shown on the line page, in contract line tables and on the edit page only for lines the user may amend.
+  * Contract line tables decide their actions line by line: a locked line (on an invoiced contract, or referenced by an invoice line) offers no Delete, and an amendable line offers Amend.
+  * Behaviour changes:
+    * Amending requires the amend action. The add and change contract line permissions (required since #307) are no longer enough; administrators grant the new action to the users who amend lines. This applies to the screen and to the REST action `POST contract-lines/{id}/amend/`.
   * For plugin developers: the template shown at the bottom of assigned objects moved to `netbox_contract/inc/contract_assignments_bottom.html`, and the unused `contract_list_bottom.html` was removed.
 
 #### Behaviour changes

@@ -5,6 +5,8 @@ from decimal import Decimal
 
 from circuits.models import Provider
 from django.contrib.contenttypes.models import ContentType
+from users.models import ObjectPermission
+from utilities.permissions import resolve_permission_type
 
 from netbox_contract.models import (
     BillingMethodChoices,
@@ -101,4 +103,23 @@ def make_invoice_line(invoice, amount=None, contract_line=None, quantity=None, *
         **kwargs,
     )
     line.save()
+    return line
+
+
+def add_constrained_permission(user, name, constraints):
+    """Give the user a permission (<app>.<action>_<model>) limited by object constraints, as an ObjectPermission."""
+    object_type, action = resolve_permission_type(name)
+    permission = ObjectPermission.objects.create(
+        name=f'{name} {constraints}'[:100], actions=[action], constraints=constraints
+    )
+    permission.users.add(user)
+    permission.object_types.add(object_type)
+    return permission
+
+
+def invoiced_recurring_line(name='Invoiced contract'):
+    """A monthly line on a contract with a Posted invoice: locked, and amendable."""
+    contract = make_contract(name=name)
+    line = make_line(contract, monthly(), 100, description='Monthly fee')
+    make_invoice(contract, number=f'{name} JAN', amount=100)
     return line

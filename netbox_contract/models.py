@@ -16,6 +16,7 @@ from netbox.models.features import ContactsMixin
 from utilities.choices import ChoiceSet
 from utilities.exceptions import AbortRequest
 from utilities.fields import ColorField
+from utilities.querysets import RestrictedQuerySet
 from virtualization.choices import VirtualMachineStatusChoices
 
 from . import calculations
@@ -748,6 +749,21 @@ class Unit(NetBoxModel):
         )
 
 
+class ContractLineQuerySet(RestrictedQuerySet):
+
+    def with_lock_state(self):
+        """
+        Annotate each line with what lock_message() and replaced_by tell one line at a time, so that tables can decide
+        their actions per line without a query per row: is_locked_line (an invoice line references it, or its contract
+        has an invoice) and has_successor (another line replaces it).
+        """
+        return self.annotate(
+            is_locked_line=models.Exists(InvoiceLine.objects.filter(contract_line=models.OuterRef('pk')))
+            | models.Exists(Invoice.objects.filter(contracts=models.OuterRef('contract'))),
+            has_successor=models.Exists(ContractLine.objects.filter(replaces=models.OuterRef('pk'))),
+        )
+
+
 class ContractLine(NetBoxModel):
     contract = models.ForeignKey(
         to='Contract',
@@ -799,12 +815,17 @@ class ContractLine(NetBoxModel):
                     'invoice: the line is considered fully invoiced.'),
     )
 
+    objects = ContractLineQuerySet.as_manager()
+
     clone_fields = ('contract', 'unit', 'currency', 'start_date', 'end_date')
 
     class Meta:
         ordering = ('contract', 'start_date', 'description')
         verbose_name = _('contract line')
         verbose_name_plural = _('contract lines')
+        permissions = [
+            ('amend', 'Amend the price or quantity of an invoiced contract line'),
+        ]
 
     def __str__(self):
         return self.description
@@ -843,8 +864,14 @@ class ContractLine(NetBoxModel):
         return (
             bool(self.pk)
             and self.unit.billing_method != BillingMethodChoices.ONE_TIME
-            and not self.replaced_by.exists()
+            and not self.has_replacement()
         )
+
+    def has_replacement(self):
+        """Whether another line replaces this one; read from the with_lock_state() annotation when present."""
+        if hasattr(self, 'has_successor'):
+            return self.has_successor
+        return self.replaced_by.exists()
 
     def apply_contract_defaults(self):
         """Take the dates and the currency of the contract when they are not set (FR-002)."""

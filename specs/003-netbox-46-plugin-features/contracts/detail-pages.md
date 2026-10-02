@@ -69,6 +69,7 @@ comments.
 
 | Line | Edit | Amend | Delete |
 |---|---|---|---|
-| Unlocked | yes (change) | no | yes (delete) |
+| Unlocked, amendable (recurring or usage-based, not replaced), user may amend it | yes (change) | yes | yes (delete) |
+| Unlocked, not amendable | yes (change) | no | yes (delete) |
 | Locked, amendable, user may amend it | yes (change) | yes | no |
 | Locked, not amendable (one-time, replaced) | yes (change) | no | no |

@@ -53,7 +53,7 @@ An administrator wants to let a finance user change the price or quantity of inv
 3. **Given** the same user, **When** they call the REST amend action on that line, **Then** the amendment is made (201).
 4. **Given** a user with add and change on contract lines but without amend, **When** they open an invoiced recurring line, **Then** no Amend button is shown (page, tables, edit page), the amend screen answers "forbidden", and the REST amend action answers 403.
 5. **Given** an amend permission constrained to the lines of one contract, **When** the user opens a line of another contract, **Then** no Amend button is shown, and the amend screen and REST action are refused for that line.
-6. **Given** a line that cannot be amended (one-time unit, not invoiced, already replaced), **When** a user allowed to amend opens it, **Then** no Amend button is shown, as before.
+6. **Given** a line that cannot be amended (one-time unit, or already replaced), **When** a user allowed to amend opens it, **Then** no Amend button is shown, as before. A recurring or usage-based line that is not invoiced yet can be amended, as before (implementation note: the first version of this scenario wrongly listed "not invoiced").
 7. **Given** a superuser, **When** they open an amendable line, **Then** the Amend button is shown.
 
 ---

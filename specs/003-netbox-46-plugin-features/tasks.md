@@ -31,9 +31,9 @@ Commands (from `CLAUDE.md`):
 
 **Purpose**: baseline and shared test scaffolding
 
-- [ ] T001 Run the whole suite (`netbox_contract.tests`), `ruff check` and `makemigrations netbox_contract --check --dry-run` on the branch before any change, and note the result (all green expected) in the commit message of T002
-- [ ] T002 Add to `netbox_contract/tests/helpers.py`:
-  - `make_user_with_permissions(*perms, constraints=None)`, which creates a user and one `ObjectPermission` per `(model, actions)` pair, with optional constraints;
+- [X] T001 Run the whole suite (`netbox_contract.tests`), `ruff check` and `makemigrations netbox_contract --check --dry-run` on the branch before any change, and note the result (all green expected) in the commit message of T002. Result: 683 tests OK, ruff clean, no pending migration
+- [X] T002 Add to `netbox_contract/tests/helpers.py`:
+  - `add_constrained_permission(user, name, constraints)`, which gives a user one `ObjectPermission` limited by constraints. For unconstrained permissions, NetBox's `TestCase.add_permissions()` already exists;
   - `invoiced_recurring_line()`, which returns a monthly line on a contract that has a Posted invoice.
 
   Both are used by US1-US4.
@@ -45,9 +45,9 @@ Commands (from `CLAUDE.md`):
 **Purpose**: the contract line lock and successor annotations that US1 (Amend in tables) and US2 (per-line actions)
 both read (research D4).
 
-- [ ] T003 Write `netbox_contract/tests/test_amend_permission.py::LineAnnotationsTestCase` first. `ContractLine.objects.with_lock_state()` sets `is_locked_line` (true when an invoice line references the line, or when its contract has an invoice) and `has_successor` (true when another line `replaces` it). Each value must equal `bool(line.lock_message())` and `line.replaced_by.exists()`, on four lines: unlocked, locked by contract invoice, referenced by an invoice line, and replaced
-- [ ] T004 Implement `with_lock_state()` as a queryset method (`ContractLineQuerySet.as_manager()` on `ContractLine.objects`, keeping `RestrictedQuerySet` as base) in `netbox_contract/models.py`. Use two `Exists(...)` annotations, and make `can_be_amended` read `has_successor` when the annotation is present
-- [ ] T005 Use `with_lock_state()` in `ContractLineListView.queryset` (`netbox_contract/views.py`) and `ContractLineViewSet.queryset` (`netbox_contract/api/views.py`). Run `test_views`/`test_api`. If the `contractline:*` query counts change, re-record them with the reason "lock-state annotations for per-line actions (#309 D4)"
+- [X] T003 Write `netbox_contract/tests/test_amend_permission.py::LineAnnotationsTestCase` first. `ContractLine.objects.with_lock_state()` sets `is_locked_line` (true when an invoice line references the line, or when its contract has an invoice) and `has_successor` (true when another line `replaces` it). Each value must equal `bool(line.lock_message())` and `line.replaced_by.exists()`, on four lines: unlocked, locked by contract invoice, referenced by an invoice line, and replaced
+- [X] T004 Implement `with_lock_state()` as a queryset method (`ContractLineQuerySet.as_manager()` on `ContractLine.objects`, keeping `RestrictedQuerySet` as base) in `netbox_contract/models.py`. Use two `Exists(...)` annotations, and make `can_be_amended` read `has_successor` when the annotation is present
+- [X] T005 Use `with_lock_state()` in `ContractLineListView.queryset` (`netbox_contract/views.py`). Run `test_views`/`test_api`: query counts are unchanged, since the annotations are part of the list query. Deviation: `ContractLineViewSet` is not annotated, because no REST output reads the lock state, and the annotations would only add two subqueries to every API list (research D4 updated)
 
 **Checkpoint**: annotations available; no visible change yet.
 
@@ -63,10 +63,10 @@ add + change but not amend cannot.
 
 ### Tests for User Story 1 (write first, must fail)
 
-- [ ] T006 [US1] `netbox_contract/tests/test_amend_permission.py::PermissionRegistrationTestCase`:
+- [X] T006 [US1] `netbox_contract/tests/test_amend_permission.py::PermissionRegistrationTestCase`:
   - `'amend'` is in `registry['model_actions']['netbox_contract.contractline']`, with the help text "Amend the price or quantity of an invoiced contract line";
   - the ObjectPermission add form lists it for the contract line object type (US1-1).
-- [ ] T007 [US1] Same module, `AmendUITestCase`, with `invoiced_recurring_line()`:
+- [X] T007 [US1] Same module, `AmendUITestCase`, with `invoiced_recurring_line()`:
   - view + amend user: Amend button on the line page, GET/POST `contractline_amend` succeed, a successor exists (US1-2);
   - add + change + view user: no button on the line page, in the contract's lines table response or on the edit page, and `contractline_amend` answers 403 (US1-4);
   - amend constrained to `{"contract": <other>}`: no button and 403/404 for this line (US1-5);
@@ -74,37 +74,37 @@ add + change but not amend cannot.
   - superuser sees it (US1-7);
   - amend without view: refused (edge case);
   - a contract line list with an amendable and a non-amendable line shows the button only on the first (edge case).
-- [ ] T008 [US1] Same module, `AmendAPITestCase`: `POST contract-lines/{id}/amend/`:
+- [X] T008 [US1] Same module, `AmendAPITestCase`: `POST contract-lines/{id}/amend/`:
   - view + amend with a write token → 201 (US1-3);
   - add + change + view without amend → 403 (US1-4);
   - amend outside the view constraints → 404;
   - read-only token → 403 (contracts/rest-api.md table).
-- [ ] T009 [US1] Run the module; confirm every new test fails for the expected reason (no `amend` action, add + change still accepted)
+- [X] T009 [US1] Run the module; confirm every new test fails for the expected reason (no `amend` action, add + change still accepted) Result: 17 failures and 1 error, all for the expected reasons (no `amend` action, add + change still accepted).
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Add `permissions = [('amend', 'Amend the price or quantity of an invoiced contract line')]` to `ContractLine.Meta` in `netbox_contract/models.py`, and create `netbox_contract/migrations/0050_contractline_amend_permission.py` (`AlterModelOptions`) with `makemigrations` (DEVELOPER on)
-- [ ] T011 [US1] In `netbox_contract/views.py`:
+- [X] T010 [US1] Add `permissions = [('amend', 'Amend the price or quantity of an invoiced contract line')]` to `ContractLine.Meta` in `netbox_contract/models.py`, and create `netbox_contract/migrations/0050_contractline_amend_permission.py` (`AlterModelOptions`) with `makemigrations` (DEVELOPER on) Written by hand (`makemigrations` needs `DEVELOPER = True`); `makemigrations --check` is clean.
+- [X] T011 [US1] In `netbox_contract/views.py`:
   - `ContractLineAmendView.get_required_permission()` returns `'netbox_contract.amend_contractline'`;
   - `has_permission()` requires that, plus `netbox_contract.view_contractline`;
   - the object comes from `ContractLine.objects.restrict(user, 'view').restrict(user, 'amend')`;
   - the add + change check is removed.
-- [ ] T012 [US1] In `netbox_contract/api/views.py`, give `ContractLineViewSet`:
+- [X] T012 [US1] In `netbox_contract/api/views.py`, give `ContractLineViewSet`:
   - `get_permissions()`, which returns `[AmendPermission()]` for `self.action == 'amend'`. `AmendPermission` is authenticated, and a token must be write-enabled. Define it in the same file.
   - an `amend()` handler that rebuilds the queryset with `models.ContractLine.objects.restrict(user, 'view').restrict(user, 'amend')` (404 when absent), raises `PermissionDenied` when `not user.has_perm('netbox_contract.amend_contractline')`, and drops the `add_contractline` check.
-- [ ] T013 [P] [US1] Create `netbox_contract/object_actions.py` with `AmendContractLine(ObjectAction)`:
+- [X] T013 [P] [US1] Create `netbox_contract/object_actions.py` with `AmendContractLine(ObjectAction)`:
   - `name='amend'`, `label=_('Amend')`, `template_name='netbox_contract/buttons/amend.html'`, `permissions_required = {'amend'}` (the button declares its permission, as the constitution requires);
   - `render()` also returns `''` unless `obj.can_be_amended` and `context['request'].user.has_perm('netbox_contract.amend_contractline', obj)`.
 
   Also create the template `netbox_contract/templates/netbox_contract/buttons/amend.html` (the `mdi-cash-sync` primary button).
-- [ ] T014 [P] [US1] Create `netbox_contract/templatetags/__init__.py` and `netbox_contract/templatetags/contract_tags.py` with the `can_amend` filter (`line|can_amend:user`, same rule as T013). Use it in `netbox_contract/templates/netbox_contract/contractline_edit.html` in place of `perms.netbox_contract.change_contractline and perms.netbox_contract.add_contractline`
-- [ ] T015 [US1] In `netbox_contract/views.py`, set `ContractLineView.actions = (CloneObject, EditObject, DeleteObject, AmendContractLine)`, and remove the `extra_controls` block from `netbox_contract/templates/netbox_contract/contractline.html`
-- [ ] T016 [US1] In `netbox_contract/tables.py`:
+- [X] T014 [P] [US1] Create `netbox_contract/templatetags/__init__.py` and `netbox_contract/templatetags/contract_tags.py` with the `can_amend` filter (`line|can_amend:user`, same rule as T013). Use it in `netbox_contract/templates/netbox_contract/contractline_edit.html` in place of `perms.netbox_contract.change_contractline and perms.netbox_contract.add_contractline`
+- [X] T015 [US1] In `netbox_contract/views.py`, set `ContractLineView.actions = (CloneObject, EditObject, DeleteObject, AmendContractLine)`, and remove the `extra_controls` block from `netbox_contract/templates/netbox_contract/contractline.html`
+- [X] T016 [US1] In `netbox_contract/tables.py`:
   - add `ContractLineActionsColumn(columns.ActionsColumn)`. Its `render()` drops `delete` when the record is locked (`is_locked_line` annotation, else `bool(record.lock_message())`), and prepends the Amend button when `record.can_be_amended` and `user.has_perm('netbox_contract.amend_contractline', record)`;
   - use it as `ContractLineListTable.actions`;
-  - remove `AMEND_BUTTON`, `ContractLineContractTable` and `ContractLineLockedContractTable`, and switch `ContractView` to `ContractLineListTable` until US2 replaces the table.
-- [ ] T017 [US1] Adapt `netbox_contract/tests/test_issue_307.py` (Amend button rule: add + change → amend) and `netbox_contract/tests/test_amendments.py` (REST permission fixtures use amend). Run `test_amend_permission`, `test_amendments`, `test_issue_307`, `test_locking` (adapt its locked-table class assertions to the per-line column), `test_views`, and `ruff check`
-- [ ] T018 [US1] Update `docs/contract_lines.md` ("Amending ...": the **amend** action of object permissions replaces add + change, and is checked per line). Add the US1 bullets to the #309 entry in `CHANGELOG.md` (create the entry under 2.5.0) and to "Behaviour changes"
+  - remove `AMEND_BUTTON`, `ContractLineContractTable` and `ContractLineLockedContractTable`, and switch `ContractView` to `ContractLineListTable` until US2 replaces the table. The interim contract page table is `ContractLineListTable` on `with_lock_state()` with the `contract` column hidden, until US2.
+- [X] T017 [US1] Adapt `netbox_contract/tests/test_issue_307.py` (Amend button rule: add + change → amend) and `netbox_contract/tests/test_amendments.py` (REST permission fixtures use amend). Run `test_amend_permission`, `test_amendments`, `test_issue_307`, `test_locking` (adapt its locked-table class assertions to the per-line column), `test_views`, and `ruff check` Also adapted: `test_review_fixes.AmendPermissionTestCase`, which encoded the add + change rule. `test_locking` needed no change. US1-6 was corrected: a recurring line that is not invoiced yet can be amended, as before (spec and detail-pages matrix updated). Full suite: 700 tests OK.
+- [X] T018 [US1] Update `docs/contract_lines.md` ("Amending ...": the **amend** action of object permissions replaces add + change, and is checked per line). Add the US1 bullets to the #309 entry in `CHANGELOG.md` (create the entry under 2.5.0) and to "Behaviour changes"
 
 **Checkpoint**: US1 complete and shippable alone.
 
