@@ -123,3 +123,19 @@ def invoiced_recurring_line(name='Invoiced contract'):
     line = make_line(contract, monthly(), 100, description='Monthly fee')
     make_invoice(contract, number=f'{name} JAN', amount=100)
     return line
+
+
+def contract_page_with_lines(client, contract):
+    """
+    The contract page as a browser shows it: since #309 its contract lines table is loaded through HTMX from the
+    contract line list, so the content of that table is appended to the page.
+    """
+    from django.urls import reverse
+
+    page = client.get(contract.get_absolute_url())
+    assert page.status_code == 200, page.status_code
+    lines = client.get(
+        f"{reverse('plugins:netbox_contract:contractline_list')}?embedded=True&contract_id={contract.pk}"
+        '&exclude_columns=contract'
+    )
+    return page.content.decode() + (lines.content.decode() if lines.status_code == 200 else '')

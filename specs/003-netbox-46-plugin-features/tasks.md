@@ -120,10 +120,10 @@ same settings and permissions.
 
 ### Tests for User Story 2 (write first, must fail)
 
-- [ ] T019 [US2] `netbox_contract/tests/test_detail_layouts.py::LayoutTestCase`:
+- [X] T019 [US2] `netbox_contract/tests/test_detail_layouts.py::LayoutTestCase`:
   - each of the nine detail views has a `layout` that is a `SimpleLayout`. Fails today.
   - each page renders with status 200, as a superuser, for one object per model (guard part).
-- [ ] T020 [P] [US2] Same module, `ContractPageTestCase`:
+- [X] T020 [P] [US2] Same module, `ContractPageTestCase`:
   - every attribute of contracts/detail-pages.md with its value and links (US2-1);
   - `hidden_contract_fields=['tenant','notice_period']` hides them (US2-2, `mock.patch.dict`);
   - deprecated costs and the template panel only with `show_deprecated_fields`, and the template is not queried when it is off (`assertNumQueries` difference or query log) (US2-3);
@@ -131,35 +131,35 @@ same settings and permissions.
   - locked message and no add-line button on an invoiced contract; button with `?contract=<pk>` otherwise (US2-5);
   - four `ObjectsTablePanel`s whose `hx-get` URLs carry `contract_id`, `contract`, `parent` and `contracts` + `template=False`, each with the `exclude_columns` of research D4 (`contract`, `contract`, `parent`, `contracts`) (edge case "column choices"), the invoice add button with `?contracts=<pk>`, and no table panel for a user without view on invoices (US2-6);
   - a contract whose external party was deleted, or with no contract type, renders a placeholder (edge case).
-- [ ] T021 [P] [US2] Same module, `OtherPagesTestCase`:
+- [X] T021 [P] [US2] Same module, `OtherPagesTestCase`:
   - invoice: attributes, `hidden_invoice_fields`, posted message, deprecated template panel, contracts table via `invoice_id`, lines table via `invoice` with `exclude_columns=invoice`, add-line button absent when posted;
   - contract line: lock message, replaces/replaced-by links, invoiced-at-conversion checkmark;
   - invoice line, unit (lines table via `unit_id`), accounting dimension, contract type, service provider (contracts via `service_provider_id`), contract assignment: the attributes of contracts/detail-pages.md (US2-7);
   - a contract line page opened by a user without view on its contract still renders (edge case).
-- [ ] T022 [P] [US2] Same module, `TableActionsTestCase`: GET the contract line list filtered by `contract_id` (the URL the panel loads) for an invoiced contract with an amendable recurring line and a one-time line, as a user with change + delete + amend. The recurring line offers Edit + Amend, the one-time line Edit only, and neither offers Delete. For a contract without invoices, lines offer Edit + Delete (US2-8). A list mixing locked and unlocked lines offers Delete only on the unlocked ones (edge case)
-- [ ] T023 [P] [US2] Same module, `PluginContentTestCase`: register a test `PluginTemplateExtension` for `netbox_contract.contract` with `left_page`, `right_page` and `full_width_page` (in `netbox_contract/tests/plugin_content.py`, registered in `setUpClass` and removed in `tearDownClass`). Its three markers appear on the contract page (US2-9)
-- [ ] T024 [US2] Same module, `ContractFilterTestCase`: `contracts/?invoice_id=<pk>` (UI list and REST) returns exactly the invoice's contracts (research D5)
-- [ ] T025 [US2] Run the module; confirm the failures are the expected ones (no `layout`, no `invoice_id` filter, no left/full-width plugin content)
+- [X] T022 [P] [US2] Same module, `TableActionsTestCase`: GET the contract line list filtered by `contract_id` (the URL the panel loads) for an invoiced contract with an amendable recurring line and a one-time line, as a user with change + delete + amend. The recurring line offers Edit + Amend, the one-time line Edit only, and neither offers Delete. For a contract without invoices, lines offer Edit + Delete (US2-8). A list mixing locked and unlocked lines offers Delete only on the unlocked ones (edge case)
+- [X] T023 [P] [US2] Same module, `PluginContentTestCase`: register a test `PluginTemplateExtension` for `netbox_contract.contract` with `left_page`, `right_page` and `full_width_page` (in `netbox_contract/tests/plugin_content.py`, registered in `setUpClass` and removed in `tearDownClass`). Its three markers appear on the contract page (US2-9)
+- [X] T024 [US2] Same module, `ContractFilterTestCase`: `contracts/?invoice_id=<pk>` (UI list and REST) returns exactly the invoice's contracts (research D5)
+- [X] T025 [US2] Run the module; confirm the failures are the expected ones (no `layout`, no `invoice_id` filter, no left/full-width plugin content) Result: 16 failures and 4 errors, for the expected reasons (no `layout`, no `invoice_id` filter, no left/full-width plugin content, `hidden_invoice_fields` ignored). Two test assertions were then corrected: the navigation menu has its own add-line link, and the Parent column links the parent contract.
 
 ### Implementation for User Story 2
 
-- [ ] T026 [US2] Add `invoice_id = django_filters.ModelMultipleChoiceFilter(field_name='invoices', queryset=Invoice.objects.all(), label=_('Invoice (ID)'))` to `ContractFilterSet` in `netbox_contract/filtersets.py`
-- [ ] T027 [US2] Create `netbox_contract/panels.py`:
+- [X] T026 [US2] Add `invoice_id = django_filters.ModelMultipleChoiceFilter(field_name='invoices', queryset=Invoice.objects.all(), label=_('Invoice (ID)'))` to `ContractFilterSet` in `netbox_contract/filtersets.py`
+- [X] T027 [US2] Create `netbox_contract/panels.py`:
   - `SettingsAttributesPanel(ObjectAttributesPanel)` with `hidden_setting`, which excludes the listed names at render time from `settings.PLUGINS_CONFIG['netbox_contract']`;
   - `DeprecatedPanel` mixin with `should_render` on `show_deprecated_fields`;
   - `AddContractLine(AddObject)`, which renders `''` when the contract has invoices.
-- [ ] T028 [P] [US2] Create the fragments under `netbox_contract/templates/netbox_contract/panels/`: `contract_values.html`, `lines_locked.html`, `line_lock.html`, `invoice_posted.html` and `invoice_template.html`. Move the texts unchanged from the old templates, so the translation msgids are kept
-- [ ] T029 [US2] In `netbox_contract/panels.py`, declare the attribute panels of contracts/detail-pages.md for the nine models:
+- [X] T028 [P] [US2] Create the fragments under `netbox_contract/templates/netbox_contract/panels/`: `contract_values.html`, `lines_locked.html`, `line_lock.html`, `invoice_posted.html` and `invoice_template.html`. Move the texts unchanged from the old templates, so the translation msgids are kept
+- [X] T029 [US2] In `netbox_contract/panels.py`, declare the attribute panels of contracts/detail-pages.md for the nine models:
   - `ContractPanel` (with `GenericForeignKeyAttr('external_party_object', linkify=True)`, and `TemplatedAttr` for terms with units and for documents);
   - `DeprecatedCostsPanel`, `InvoicePanel`, `DeprecatedTemplatePanel`, `ContractLinePanel`, `InvoiceLinePanel`, `UnitPanel`, `AccountingDimensionPanel`, `ContractTypePanel`, `ServiceProviderPanel`, `ContractAssignmentPanel`;
   - the `TemplatePanel`s of T028.
-- [ ] T030 [US2] In `netbox_contract/views.py`, set `layout = SimpleLayout(...)` on `ContractView`, `InvoiceView`, `ContractLineView`, `InvoiceLineView`, `UnitView`, `AccountingDimensionView`, `ContractTypeView`, `ServiceProviderView` and `ContractAssignmentView`, as in contracts/detail-pages.md:
+- [X] T030 [US2] In `netbox_contract/views.py`, set `layout = SimpleLayout(...)` on `ContractView`, `InvoiceView`, `ContractLineView`, `InvoiceLineView`, `UnitView`, `AccountingDimensionView`, `ContractTypeView`, `ServiceProviderView` and `ContractAssignmentView`, as in contracts/detail-pages.md:
   - use `ObjectsTablePanel` with the filters and `exclude_columns` of research D4;
   - remove the tables from `get_extra_context`. `ContractView` keeps `contract_values`, `lines_locked` and the deprecated template table only when `show_deprecated_fields` is on. `ContractLineView` keeps `lock_message`. `InvoiceView` keeps nothing extra.
-- [ ] T031 [US2] Reduce `netbox_contract/templates/netbox_contract/contract.html` and `contractline.html` to `{% extends 'generic/object.html' %}` plus their `breadcrumbs` block. Delete `invoice.html`, `invoiceline.html`, `unit.html`, `serviceprovider.html`, `contracttype.html`, `accountingdimension.html` and `contractassignment.html`, and set `template_name = 'generic/object.html'` on those seven views
-- [ ] T032 [US2] Remove from `netbox_contract/tables.py` the tables only used by deleted page code (`ContractProviderBottomTable`, `ContractListBottomTable`, `ContractAssignmentContractTable` if unused elsewhere: check with `grep`)
-- [ ] T033 [US2] Adapt `netbox_contract/tests/test_deprecated.py`: deprecated badges per row become the "Deprecated costs" and deprecated template panels. Run `test_detail_layouts`, `test_deprecated`, `test_views`, `test_conventions`, `test_locking`, and, for FR-008 (edit, preview and amend screens unchanged), `test_prefill`, `test_invoice_preview` and `test_amendments`, then `ruff check`. Re-record query counts only if a list view changed, with the reason
-- [ ] T034 [US2] Add the US2 bullets to `CHANGELOG.md` #309:
+- [X] T031 [US2] Reduce `netbox_contract/templates/netbox_contract/contract.html` and `contractline.html` to `{% extends 'generic/object.html' %}` plus their `breadcrumbs` block. Delete `invoice.html`, `invoiceline.html`, `unit.html`, `serviceprovider.html`, `contracttype.html`, `accountingdimension.html` and `contractassignment.html`, and set `template_name = 'generic/object.html'` on those seven views Deviation: `invoice.html` and `invoiceline.html` also keep their breadcrumbs, so four templates are reduced and five deleted. The invoice line breadcrumb used an undefined `invoice` variable and now uses `object.invoice`.
+- [X] T032 [US2] Remove from `netbox_contract/tables.py` the tables only used by deleted page code (`ContractProviderBottomTable`, `ContractListBottomTable`, `ContractAssignmentContractTable` if unused elsewhere: check with `grep`)
+- [X] T033 [US2] Adapt `netbox_contract/tests/test_deprecated.py`: deprecated badges per row become the "Deprecated costs" and deprecated template panels. Run `test_detail_layouts`, `test_deprecated`, `test_views`, `test_conventions`, `test_locking`, and, for FR-008 (edit, preview and amend screens unchanged), `test_prefill`, `test_invoice_preview` and `test_amendments`, then `ruff check`. Re-record query counts only if a list view changed, with the reason `test_deprecated` needed no change. Adapted because the lines table is now loaded through HTMX (new helper `contract_page_with_lines`): `test_amendments` (2 tests), `test_locking`, `test_contract_lines`, `test_issue_307` and `test_conventions` (the template is no longer put in the context when hidden). Full suite: 729 tests OK, query counts unchanged.
+- [X] T034 [US2] Add the US2 bullets to `CHANGELOG.md` #309:
   - standard NetBox panels;
   - configurable related tables (#294);
   - per-line actions, with no Delete on locked lines;

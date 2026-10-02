@@ -164,8 +164,8 @@ netbox_contract/
 ├── migrations/0051_contracttype_organizational.py
 ├── migrations/0052_serviceprovider_primary.py
 ├── templates/netbox_contract/
-│   ├── contract.html, contractline.html          # reduced to breadcrumbs
-│   ├── {invoice,invoiceline,unit,serviceprovider,contracttype,accountingdimension,contractassignment}.html  # deleted
+│   ├── {contract,contractline,invoice,invoiceline}.html          # reduced to breadcrumbs
+│   ├── {unit,serviceprovider,contracttype,accountingdimension,contractassignment}.html  # deleted
 │   ├── contractline_edit.html                    # amend link uses can_amend
 │   └── panels/{contract_values,lines_locked,line_lock,invoice_posted,invoice_template,amend_button}.html   # NEW fragments
 ├── locale/{en,fr}/LC_MESSAGES/django.{po,mo}

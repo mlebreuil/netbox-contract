@@ -25,6 +25,7 @@ from netbox_contract.models import (
 )
 from netbox_contract.tests.custom import APITestCase
 from netbox_contract.tests.helpers import (
+    contract_page_with_lines,
     make_contract,
     make_invoice,
     make_invoice_line,
@@ -223,8 +224,7 @@ class LockViewsTestCase(NetBoxTestCase):
         self.assertEqual(ContractLine.objects.count(), 1)
 
     def test_contract_page_hides_line_buttons_and_shows_notice(self):
-        response = self.client.get(reverse('plugins:netbox_contract:contract', args=[self.contract.pk]))
-        content = response.content.decode()
+        content = contract_page_with_lines(self.client, self.contract)
         self.assertIn(NEW_CONTRACT_MESSAGE, content)
         self.assertNotIn(f"{reverse('plugins:netbox_contract:contractline_add')}?contract={self.contract.pk}", content)
         self.assertIn(reverse('plugins:netbox_contract:contractline_edit', args=[self.line.pk]), content)

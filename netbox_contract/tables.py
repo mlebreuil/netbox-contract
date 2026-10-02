@@ -119,31 +119,6 @@ class ContractAssignmentObjectTable(DeprecatedColumnsMixin, NetBoxTable):
         )
 
 
-class ContractAssignmentContractTable(NetBoxTable):
-    content_type = columns.ContentTypeColumn(verbose_name='Object Type')
-    content_object = tables.Column(linkify=True, verbose_name='Object', orderable=False)
-    content_object__status = columns.ChoiceFieldColumn(
-        verbose_name=('Status'),
-    )
-    actions = columns.ActionsColumn(actions=('edit', 'delete'))
-
-    class Meta(NetBoxTable.Meta):
-        model = ContractAssignment
-        fields = (
-            'pk',
-            'content_type',
-            'content_object',
-            'content_object__status',
-            'actions',
-        )
-        default_columns = (
-            'pk',
-            'content_type',
-            'content_object',
-            'content_object__status',
-        )
-
-
 class ContractListTable(DeprecatedColumnsMixin, ContactsColumnMixin, NetBoxTable):
     deprecated_columns = ('mrc', 'yrc', 'nrc')
     name = tables.Column(linkify=True)
@@ -190,68 +165,6 @@ class ContractListTable(DeprecatedColumnsMixin, ContactsColumnMixin, NetBoxTable
             'actions',
         )
         default_columns = ('name', 'status', 'contract_type', 'parent', 'billable', 'yearly_value')
-
-
-class ContractListBottomTable(DeprecatedColumnsMixin, NetBoxTable):
-    deprecated_columns = ('mrc',)
-    name = tables.Column(linkify=True)
-    external_party_object = tables.Column(linkify=True)
-    status = columns.ChoiceFieldColumn(
-        verbose_name=('Status'),
-    )
-
-    class Meta(NetBoxTable.Meta):
-        model = Contract
-        fields = (
-            'pk',
-            'id',
-            'name',
-            'external_party_object_type',
-            'external_party_object',
-            'external_reference',
-            'internal_party',
-            'status',
-            'mrc',
-            'comments',
-            'actions',
-        )
-        default_columns = (
-            'name',
-            'external_party_object_type',
-            'external_party_object',
-            'status',
-        )
-
-
-class ContractProviderBottomTable(DeprecatedColumnsMixin, NetBoxTable):
-    deprecated_columns = ('mrc',)
-    name = tables.Column(linkify=True)
-    external_party_object = tables.Column(linkify=True)
-    status = columns.ChoiceFieldColumn(
-        verbose_name=('Status'),
-    )
-
-    class Meta(NetBoxTable.Meta):
-        model = Contract
-        fields = (
-            'pk',
-            'id',
-            'name',
-            'start_date',
-            'end_date',
-            'external_reference',
-            'status',
-            'mrc',
-            'comments',
-            'actions',
-        )
-        default_columns = (
-            'name',
-            'status',
-            'external_reference',
-            'start_date',
-            'end_date',
-        )
 
 
 class InvoiceListTable(NetBoxTable):

@@ -8,9 +8,10 @@ answered the scope, amend, nested-API, table, description and GraphQL questions 
 
 **Decision**: every detail view declares `layout = layout.SimpleLayout(left_panels=..., right_panels=...,
 bottom_panels=...)`, built from `netbox.ui.panels`, `netbox.ui.attrs` and `netbox.ui.actions`. Panel classes specific
-to the plugin live in a new module `netbox_contract/panels.py`. The nine page templates are deleted, with two
-exceptions. `contract.html` and `contractline.html` are reduced to their `breadcrumbs` block, which links to the
-external party and the contract. The other seven views set `template_name = 'generic/object.html'`.
+to the plugin live in a new module `netbox_contract/panels.py`. The nine page templates are deleted, with four
+exceptions. `contract.html`, `contractline.html`, `invoice.html` and `invoiceline.html` are reduced to their
+`breadcrumbs` block (external party, contract, contracts of the invoice, invoice). The other five views set
+`template_name = 'generic/object.html'`.
 
 **Rationale**:
 - `generic/object.html` renders `{% for row in layout %}` when the view passes `layout` (`ObjectView.get()`).

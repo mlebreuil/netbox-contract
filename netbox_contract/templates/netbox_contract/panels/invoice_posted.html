@@ -1,0 +1,6 @@
+{% load i18n %}
+{% if object.is_locked %}
+  <div class="alert alert-info" role="alert">
+    {% trans "This invoice is posted: its amounts and its lines are locked, apart from their accounting dimensions, comments and tags. Set it back to draft to change them." %}
+  </div>
+{% endif %}

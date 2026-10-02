@@ -437,7 +437,7 @@ class ContractTemplateSectionTestCase(TestCase):
 
     def test_section_follows_the_setting(self):
         hidden, hidden_queries = self.get_page(False)
-        self.assertIsNone(hidden.context['invoice_template'])
+        self.assertNotIn('invoice_template', hidden.context)  # not looked up (#309: no longer in the context)
         self.assertNotContains(hidden, 'TEMPLATE-NUMBER-1')
         shown, shown_queries = self.get_page(True)
         self.assertEqual(shown.context['invoice_template'].number, 'TEMPLATE-NUMBER-1')

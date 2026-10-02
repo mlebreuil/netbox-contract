@@ -42,8 +42,12 @@
 * [#309](https://github.com/mlebreuil/netbox-contract/issues/309) Adopt the NetBox 4.6 plugin features.
   * Amending a contract line has its own permission: the **amend** action of contract lines in NetBox object permissions (migration 0050). It can be limited with constraints. The **Amend** button is shown on the line page, in contract line tables and on the edit page only for lines the user may amend.
   * Contract line tables decide their actions line by line: a locked line (on an invoiced contract, or referenced by an invoice line) offers no Delete, and an amendable line offers Amend.
+  * The detail pages of the nine object types are built from NetBox's standard panels. The related tables of a page (the lines, assignments, child contracts and invoices of a contract, the lines and contracts of an invoice, the lines of a unit, the contracts of a service provider) are the tables of the corresponding lists, filtered to the object, so their columns can be chosen with **Configure Table** on the list ([#294](https://github.com/mlebreuil/netbox-contract/issues/294)). Other plugins can add content to the left, right and full-width areas of every plugin page.
+  * New contract list filter `invoice_id` (UI and REST): the contracts of an invoice.
   * Behaviour changes:
     * Amending requires the amend action. The add and change contract line permissions (required since #307) are no longer enough; administrators grant the new action to the users who amend lines. This applies to the screen and to the REST action `POST contract-lines/{id}/amend/`.
+    * The related tables of detail pages show the default columns of their lists (for example the contract lines of a contract show the contract line list columns, without the contract). Users who want other columns choose them on the list with **Configure Table**.
+    * On the contract page, the deprecated costs (`mrc`, `yrc`, `nrc`, shown with `show_deprecated_fields`) are grouped in a **Deprecated costs** panel. The invoice page applies the `hidden_invoice_fields` setting, which it ignored until now.
   * For plugin developers: the template shown at the bottom of assigned objects moved to `netbox_contract/inc/contract_assignments_bottom.html`, and the unused `contract_list_bottom.html` was removed.
 
 #### Behaviour changes

@@ -1,0 +1,6 @@
+{% load i18n %}
+{% if lines_locked %}
+  <div class="alert alert-info" role="alert">
+    {% trans "This contract has invoices, so its lines can no longer be added, deleted or have their terms changed: a new contract must be created. Their accounting dimensions, comments and tags can still be edited, and the price or quantity of a recurring or usage-based line can be changed from a date with its Amend button." %}
+  </div>
+{% endif %}

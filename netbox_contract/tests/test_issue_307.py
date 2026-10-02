@@ -16,7 +16,7 @@ from netbox_contract.models import (
     ServiceProvider,
 )
 from netbox_contract.tests.custom import APITestCase
-from netbox_contract.tests.helpers import make_contract, make_invoice, make_line, monthly
+from netbox_contract.tests.helpers import contract_page_with_lines, make_contract, make_invoice, make_line, monthly
 
 
 class ContractsTabPermissionTestCase(TestCase):
@@ -149,17 +149,20 @@ class AmendButtonPermissionTestCase(TestCase):
         )
 
     def pages(self):
+        # Since #309 the contract page loads its lines table through HTMX: the table is read with the page
         return {
-            'line': self.line.get_absolute_url(),
-            'line edit': reverse('plugins:netbox_contract:contractline_edit', args=[self.line.pk]),
-            'contract': self.contract.get_absolute_url(),
+            'line': self.client.get(self.line.get_absolute_url()).content.decode(),
+            'line edit': self.client.get(
+                reverse('plugins:netbox_contract:contractline_edit', args=[self.line.pk])
+            ).content.decode(),
+            'contract': contract_page_with_lines(self.client, self.contract),
         }
 
     def test_hidden_without_the_add_permission(self):
         self.assertEqual(self.client.get(self.amend_url).status_code, 403)
-        for page, url in self.pages().items():
+        for page, content in self.pages().items():
             with self.subTest(page=page):
-                self.assertNotContains(self.client.get(url), self.amend_url)
+                self.assertNotIn(self.amend_url, content)
 
     def test_shown_with_the_change_and_add_permissions(self):
         """Since #309: shown with the amend action, which add + change no longer replace."""
@@ -167,6 +170,6 @@ class AmendButtonPermissionTestCase(TestCase):
         self.assertEqual(self.client.get(self.amend_url).status_code, 403)
         self.add_permissions('netbox_contract.amend_contractline')
         self.assertEqual(self.client.get(self.amend_url).status_code, 200)
-        for page, url in self.pages().items():
+        for page, content in self.pages().items():
             with self.subTest(page=page):
-                self.assertContains(self.client.get(url), self.amend_url)
+                self.assertIn(self.amend_url, content)

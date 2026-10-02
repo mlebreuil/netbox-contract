@@ -9,7 +9,15 @@ from django.urls import reverse
 from utilities.testing import TestCase as NetBoxTestCase
 
 from netbox_contract.models import AccountingDimension, BillingMethodChoices, ContractLine, Unit
-from netbox_contract.tests.helpers import make_contract, make_line, monthly, one_time, usage, yearly
+from netbox_contract.tests.helpers import (
+    contract_page_with_lines,
+    make_contract,
+    make_line,
+    monthly,
+    one_time,
+    usage,
+    yearly,
+)
 
 
 def new_line(contract, unit, unit_price=100, **kwargs):
@@ -214,9 +222,7 @@ class ContractLineDimensionsTestCase(NetBoxTestCase):
         line.accounting_dimensions.set(dimensions)
         self.assertEqual(line.accounting_dimensions.count(), 2)
 
-        response = self.client.get(reverse('plugins:netbox_contract:contract', args=[contract.pk]))
-        self.assertEqual(response.status_code, 200)
-        content = response.content.decode()
+        content = contract_page_with_lines(self.client, contract)
         self.assertIn('Hosting', content)
         self.assertIn('account:A100', content)
         self.assertIn('department:IT', content)

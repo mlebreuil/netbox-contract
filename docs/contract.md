@@ -21,9 +21,13 @@ The contract page shows values computed from the contract lines:
 - Yearly value: the twelve-month value of its recurring lines.
 - Yearly billable value: the yearly value of the lines invoiced under this contract, which are its own lines and those of its non-billable descendants (stopping at any billable child). It is zero for a non-billable contract.
 
+## Contract page
+
+The contract page is built from NetBox's standard panels, like core object pages. Below the contract details and values, it lists the contract's **lines**, **assignments**, **child contracts** (when there are any) and **invoices**. These tables are the tables of the corresponding lists, filtered to the contract: use **Configure Table** on a list (for example the contract line list) to choose the columns shown, and the same choice applies on the contract page. In a contract line table, a locked line offers no Delete button, and a line that can be amended offers **Amend**.
+
 ## Deprecated fields
 
-The monthly, yearly and non-recurring cost fields (`mrc`, `yrc`, `nrc`) are replaced by contract lines. The upgrade to version 2.5.0 converts them into contract lines. They are kept, marked as deprecated, and hidden by default in the contract form, detail page and tables; set the plugin setting `show_deprecated_fields` to `True` to show them. They stay available in the bulk import and in the REST API.
+The monthly, yearly and non-recurring cost fields (`mrc`, `yrc`, `nrc`) are replaced by contract lines. The upgrade to version 2.5.0 converts them into contract lines. They are kept, marked as deprecated, and hidden by default in the contract form, detail page and tables; set the plugin setting `show_deprecated_fields` to `True` to show them (on the contract page, in a **Deprecated costs** panel). They stay available in the bulk import and in the REST API.
 
 ## Linked objects:  
 

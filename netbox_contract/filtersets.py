@@ -49,6 +49,9 @@ class ContractFilterSet(ContactModelFilterSet, NetBoxModelFilterSet, TenancyFilt
         method='filter_by_circuit_provider',
         label='Circuit provider'
     )
+    invoice_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='invoices', queryset=Invoice.objects.all(), label='Invoice (ID)'
+    )
 
     class Meta:
         model = Contract
