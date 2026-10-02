@@ -30,6 +30,26 @@ Every list endpoint accepts the standard NetBox filters (`id`, `q`, `tag`, `crea
 - Lines of a Posted invoice cannot be created or deleted, and their unit, unit price, quantity, amount, currency and contract line cannot change (400).
 - `amount` is always quantity x unit price and ignored if sent; `unit_price` is required, except that an `amount` given alone when a line is created is taken as its unit price with quantity 1 (compatibility). `quantity` defaults to 1.
 
+## GraphQL
+
+The plugin's objects are in NetBox's GraphQL API (`/graphql/`), with two queries per object type: `contract` / `contract_list`, `contract_line` / `contract_line_list`, `contract_type` / `contract_type_list`, `contract_assignment` / `contract_assignment_list`, `invoice` / `invoice_list`, `invoice_line` / `invoice_line_list`, `unit` / `unit_list`, `accounting_dimension` / `accounting_dimension_list` and `service_provider` / `service_provider_list`. Results follow the user's view permissions, constraints included.
+
+```graphql
+{
+  contract_list(filters: {status: {exact: STATUS_ACTIVE}, currency: {exact: "usd"}}) {
+    name
+    contract_type { name }
+    external_party_object { __typename ... on ServiceProviderType { name } ... on ProviderType { name } }
+    lines { description quantity unit_price unit { name } }
+    invoices { number status }
+  }
+}
+```
+
+- Every stored field and relation is available. `mrc`, `yrc`, `nrc` (contracts) and `template` (invoices) are marked deprecated.
+- The computed values (`total_contract_value`, `yearly_contract_value` and `yearly_billable_value` of contracts, `total_value` and `yearly_value` of contract lines) are not in GraphQL: read them from the REST API.
+- `external_party_object` of a contract is a service provider or a circuit provider. `content_object` of a contract assignment covers the models of the default `supported_models` setting (circuits, virtual circuits, sites, devices, racks, virtual machines, clusters); for an object of another model it is `null`, and `content_type` and `object_id` identify it.
+
 ## Nested objects and `brief=true`
 
 Related objects are nested in the responses:

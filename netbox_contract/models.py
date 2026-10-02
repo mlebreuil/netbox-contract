@@ -1011,8 +1011,12 @@ class InvoiceLine(NetBoxModel):
     POSTED_LOCKED_FIELDS = ('invoice', 'contract_line', 'unit', 'unit_price', 'quantity', 'amount', 'currency')
 
     def __str__(self):
-        number = self.invoice.number if self.invoice_id else ''
-        return f'{number} line {self.pk}' if self.pk else f'{number} new line'
+        try:
+            number = self.invoice.number if self.invoice_id else ''
+        except InvoiceLine.invoice.RelatedObjectDoesNotExist:
+            # The invoice was left out of a permission-restricted query (GraphQL): name the line without it
+            number = ''
+        return f'{number} line {self.pk}'.strip() if self.pk else f'{number} new line'.strip()
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:invoiceline', args=[self.pk])

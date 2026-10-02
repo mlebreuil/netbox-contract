@@ -232,8 +232,8 @@ deprecated fields marked (research D8, [contracts/graphql.md](contracts/graphql.
 
 ### Tests for User Story 4 (write first, must fail)
 
-- [ ] T046 [US4] In `netbox_contract/tests/test_api.py`, switch the nine API test cases to `APIViewTestCases.APIViewTestCase`. Add `create_data`, `bulk_update_data` and `brief_fields` where missing (`ContractAPITestCase` and the custom `APITestCase` classes become full cases), and set `graphql_base_name` only where the default (verbose name with underscores) differs from contracts/graphql.md. The GraphQL part fails today (`GraphQLTypeNotFound`)
-- [ ] T047 [P] [US4] `netbox_contract/tests/test_graphql.py`:
+- [X] T046 [US4] In `netbox_contract/tests/test_api.py`, switch the nine API test cases to `APIViewTestCases.APIViewTestCase`. Add `create_data`, `bulk_update_data` and `brief_fields` where missing (`ContractAPITestCase` and the custom `APITestCase` classes become full cases), and set `graphql_base_name` only where the default (verbose name with underscores) differs from contracts/graphql.md. The GraphQL part fails today (`GraphQLTypeNotFound`) Seven complete test cases were added (`*APIViewTestCase`), and Unit and ContractLine moved to `APIViewTestCase`. Query-count baselines were recorded for the seven new `*:api_list_objects`, with the reason "new complete API test cases (#309 T046)"; existing baselines are unchanged. Bug found and fixed: `ContractLineSerializer.validate()` ran on the nested contract line of an invoice line, so creating an invoice line with `contract_line` through the REST API failed (500). It now returns at once when nested, like `InvoiceSerializer` (T042). Observation, not changed: `invoice:api_list_objects` costs 33 queries, because invoices embed full contracts.
+- [X] T047 [P] [US4] `netbox_contract/tests/test_graphql.py`:
   - `contract_list(filters: {status: ...})` returns the matching contracts with `contract_type`, `lines`, `invoices`, `assignments`, `parent` and `childs` (US4-1);
   - a user without view on invoices gets `[]`, and a constrained permission limits results (US4-3);
   - `external_party_object` on a service provider contract and on a circuit provider contract, and `content_object` of a device assignment, resolve with their type (US4-4);
@@ -241,18 +241,18 @@ deprecated fields marked (research D8, [contracts/graphql.md](contracts/graphql.
   - the schema marks `mrc`, `yrc`, `nrc` and `template` deprecated (US4-5);
   - querying `yearly_contract_value` returns a GraphQL error (edge case);
   - `contract_list { external_party_object { ... } }` and `contract_assignment_list { content_object { ... } }` run in the same number of queries for 2 and for 10 objects (`CaptureQueriesContext`; plan performance goal for generic relations).
-- [ ] T048 [US4] Run both modules; confirm the expected failures
+- [X] T048 [US4] Run both modules; confirm the expected failures Result: 7 errors (no schema).
 
 ### Implementation for User Story 4
 
-- [ ] T049 [P] [US4] Create `netbox_contract/graphql/__init__.py` and `netbox_contract/graphql/filters.py`. Add one `@strawberry_django.filter_type(models.<Model>, lookups=True)` class per model, based on `NetBoxModelFilter` (contract type and service provider are switched to the organizational and primary bases in T064), covering the stored fields with core lookups (`StrFilterLookup`, `ComparisonFilterLookup`, `DateFilterLookup`, choice enums)
-- [ ] T050 [US4] Create `netbox_contract/graphql/types.py` with `ContractType`, `ContractLineType`, `ContractTypeType`, `ContractAssignmentType`, `InvoiceType`, `InvoiceLineType`, `UnitType`, `AccountingDimensionType` and `ServiceProviderType`:
+- [X] T049 [P] [US4] Create `netbox_contract/graphql/__init__.py` and `netbox_contract/graphql/filters.py`. Add one `@strawberry_django.filter_type(models.<Model>, lookups=True)` class per model, based on `NetBoxModelFilter` (contract type and service provider are switched to the organizational and primary bases in T064), covering the stored fields with core lookups (`StrFilterLookup`, `ComparisonFilterLookup`, `DateFilterLookup`, choice enums)
+- [X] T050 [US4] Create `netbox_contract/graphql/types.py` with `ContractType`, `ContractLineType`, `ContractTypeType`, `ContractAssignmentType`, `InvoiceType`, `InvoiceLineType`, `UnitType`, `AccountingDimensionType` and `ServiceProviderType`:
   - `@strawberry_django.type(models.<Model>, fields='__all__', filters=..., pagination=True)`, on `NetBoxObjectType`;
   - `deprecation_reason` on `mrc`, `yrc`, `nrc` and `template`;
-  - unions `ContractExternalPartyType` and `ContractAssignmentObjectType`, resolved with `build_gfk_prefetch` (research D8).
-- [ ] T051 [US4] Create `netbox_contract/graphql/schema.py` with `NetBoxContractQuery` (single and `_list` field per model, named as in contracts/graphql.md) and `schema = [NetBoxContractQuery]`. Check that NetBox loads it (`/graphql/` introspection lists `contract_list`)
-- [ ] T052 [US4] Run `test_graphql`, `test_api` and `ruff check`. Re-record query counts only if the API list tests change, with the reason
-- [ ] T053 [US4] Add the US4 bullets to `CHANGELOG.md` #309 (GraphQL API; stored fields only; union limits for `supported_models`). In `docs/api.md`, add a "GraphQL" section with example queries, the absence of computed values (use REST), and the assignment union limit
+  - unions `ContractExternalPartyType` and `ContractAssignmentObjectType`, resolved with `build_gfk_prefetch` (research D8). Implementation notes: `ContractTypeType.color` is declared as `str` (core convention for color fields). Relations that the user's view permissions may hide are nullable (`contract`, `unit`, `invoice`). The reverse relation from accounting dimensions to invoice lines is `invoice_lines` (model `invoiceline_set`). `InvoiceLine.__str__` no longer fails when the invoice was left out of a restricted query.
+- [X] T051 [US4] Create `netbox_contract/graphql/schema.py` with `NetBoxContractQuery` (single and `_list` field per model, named as in contracts/graphql.md) and `schema = [NetBoxContractQuery]`. Check that NetBox loads it (`/graphql/` introspection lists `contract_list`) `PluginConfig.graphql_schema = 'graphql.schema.schema'`: NetBox's default `graphql.schema` expects a `schema` attribute on the `graphql` module, not a submodule.
+- [X] T052 [US4] Run `test_graphql`, `test_api` and `ruff check`. Re-record query counts only if the API list tests change, with the reason Full suite: 919 tests OK. The query count for the generic relations is constant (one query per related model).
+- [X] T053 [US4] Add the US4 bullets to `CHANGELOG.md` #309 (GraphQL API; stored fields only; union limits for `supported_models`). In `docs/api.md`, add a "GraphQL" section with example queries, the absence of computed values (use REST), and the assignment union limit
 
 **Checkpoint**: US4 shippable. If US5 is not done, contract type and service provider types are plain `NetBoxObjectType` until T064.
 

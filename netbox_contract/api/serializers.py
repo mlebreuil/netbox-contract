@@ -507,6 +507,9 @@ class ContractLineSerializer(NetBoxModelSerializer):
                         'currency', 'start_date', 'end_date')
 
     def validate(self, data):
+        if self.nested:
+            # A related contract line (for example of an invoice line) is only looked up, not validated
+            return data
         data = super().validate(data)
         names = [dimension.name for dimension in data.get('accounting_dimensions') or ()]
         if len(names) != len(set(names)):

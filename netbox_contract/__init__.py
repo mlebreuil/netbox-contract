@@ -9,6 +9,7 @@ class ContractsConfig(PluginConfig):
     author = 'Marc Lebreuil'
     author_email = 'marc@famillelebreuil.net'
     base_url = 'contracts'
+    graphql_schema = 'graphql.schema.schema'
     min_version = '4.6.0'
     required_settings = []
     default_settings = {

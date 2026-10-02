@@ -23,6 +23,7 @@ them (core test case convention).
 - **Relations, both directions:**
   - contract ↔ contract type, parent/`childs`, `lines`, `invoices`, `assignments`, tenant;
   - line ↔ unit, `accounting_dimensions`, `replaces`/`replaced_by`, `invoicelines`;
+  - accounting dimension ↔ `contract_lines`, `invoice_lines`;
   - invoice ↔ `contracts`, `invoicelines`.
 - **Deprecated, marked with `deprecation_reason`:** `Contract.mrc`, `yrc`, `nrc`; `Invoice.template`.
 - **Not exposed:** `total_contract_value`, `yearly_contract_value`, `yearly_billable_value`, `total_value`,
@@ -46,6 +47,8 @@ The tags, custom field and change logging filters come from `NetBoxModelFilter`.
 organizational and primary bases.
 
 ## Permissions
+
+Relations to objects the user may not view are `null` (they are nullable in the schema).
 
 Results are restricted to `restrict(user, 'view')`, including object-level constraints (`BaseObjectType`). A user
 without view permission gets an empty list, or `null` for a single object, as for core objects.

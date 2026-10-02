@@ -1,24 +1,37 @@
-"""REST API of the contract lines feature (contracts/rest-api.md)."""
+"""REST and GraphQL API of the nine models: NetBox's complete API test case (#309 T046) and model rules."""
 
 from datetime import date
 from decimal import Decimal
 
+from circuits.models import Provider
+from dcim.models import Site
+from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
+from netbox.choices import ColorChoices
 from rest_framework import status
 from utilities.testing import APIViewTestCases
 
-from netbox_contract.models import AccountingDimension, BillingMethodChoices, Contract, ContractLine, Unit
+from netbox_contract.models import (
+    AccountingDimension,
+    BillingMethodChoices,
+    Contract,
+    ContractAssignment,
+    ContractLine,
+    ContractType,
+    Invoice,
+    InvoiceLine,
+    InvoiceStatusChoices,
+    ServiceProvider,
+    StatusChoices,
+    Unit,
+)
 from netbox_contract.tests.custom import APITestCase
 from netbox_contract.tests.helpers import make_contract, make_invoice, make_line, monthly, one_time
 
 
 class UnitAPITestCase(
     APITestCase,
-    APIViewTestCases.GetObjectViewTestCase,
-    APIViewTestCases.ListObjectsViewTestCase,
-    APIViewTestCases.CreateObjectViewTestCase,
-    APIViewTestCases.UpdateObjectViewTestCase,
-    APIViewTestCases.DeleteObjectViewTestCase,
+    APIViewTestCases.APIViewTestCase,
 ):
     model = Unit
     brief_fields = ['billing_method', 'description', 'display', 'id', 'months', 'name', 'url']
@@ -69,11 +82,7 @@ class UnitAPITestCase(
 
 class ContractLineAPITestCase(
     APITestCase,
-    APIViewTestCases.GetObjectViewTestCase,
-    APIViewTestCases.ListObjectsViewTestCase,
-    APIViewTestCases.CreateObjectViewTestCase,
-    APIViewTestCases.UpdateObjectViewTestCase,
-    APIViewTestCases.DeleteObjectViewTestCase,
+    APIViewTestCases.APIViewTestCase,
 ):
     model = ContractLine
     brief_fields = [
@@ -247,3 +256,163 @@ class ContractAPITestCase(APITestCase):
         )
         self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)
         self.assertIn('billable', response.data)
+
+
+#
+# Complete API test cases (REST and GraphQL) of the other models (#309 T046)
+#
+
+DRAFT = InvoiceStatusChoices.STATUS_DRAFT
+
+
+class ContractTypeAPIViewTestCase(APITestCase, APIViewTestCases.APIViewTestCase):
+    model = ContractType
+    brief_fields = ['description', 'display', 'id', 'name', 'url']
+    create_data = [
+        {'name': 'Type 4', 'description': 'Fourth', 'color': ColorChoices.COLOR_GREEN},
+        {'name': 'Type 5', 'color': ColorChoices.COLOR_RED},
+        {'name': 'Type 6'},
+    ]
+    bulk_update_data = {'description': 'Updated'}
+
+    @classmethod
+    def setUpTestData(cls):
+        ContractType.objects.create(name='Type 1', description='First', color=ColorChoices.COLOR_BLUE)
+        ContractType.objects.create(name='Type 2', description='Second', color=ColorChoices.COLOR_RED)
+        ContractType.objects.create(name='Type 3', description='Third', color=ColorChoices.COLOR_GREEN)
+
+
+class ServiceProviderAPIViewTestCase(APITestCase, APIViewTestCases.APIViewTestCase):
+    model = ServiceProvider
+    brief_fields = ['display', 'id', 'name', 'slug', 'url']
+    create_data = [
+        {'name': 'Provider 4', 'slug': 'provider-4'},
+        {'name': 'Provider 5', 'slug': 'provider-5', 'portal_url': 'https://five.example'},
+        {'name': 'Provider 6', 'slug': 'provider-6', 'comments': 'Sixth'},
+    ]
+    bulk_update_data = {'comments': 'Updated'}
+
+    @classmethod
+    def setUpTestData(cls):
+        ServiceProvider.objects.create(name='Provider 1', slug='provider-1', portal_url='https://one.example')
+        ServiceProvider.objects.create(name='Provider 2', slug='provider-2')
+        ServiceProvider.objects.create(name='Provider 3', slug='provider-3', comments='Third')
+
+
+class AccountingDimensionAPIViewTestCase(APITestCase, APIViewTestCases.APIViewTestCase):
+    model = AccountingDimension
+    brief_fields = ['display', 'id', 'name', 'url', 'value']
+    create_data = [
+        {'name': 'account', 'value': 'A4', 'status': StatusChoices.STATUS_ACTIVE},
+        {'name': 'account', 'value': 'A5'},
+        {'name': 'department', 'value': 'D1', 'comments': 'Department'},
+    ]
+    bulk_update_data = {'comments': 'Updated'}
+
+    @classmethod
+    def setUpTestData(cls):
+        AccountingDimension.objects.create(name='account', value='A1')
+        AccountingDimension.objects.create(name='account', value='A2', comments='Second')
+        AccountingDimension.objects.create(name='cost center', value='CC1')
+
+
+class ContractAPIViewTestCase(APITestCase, APIViewTestCases.APIViewTestCase):
+    model = Contract
+    # Written as "app_label.model", stored as a content type
+    validation_excluded_fields = ['external_party_object_type']
+    brief_fields = [
+        'billable', 'comments', 'contract_type', 'currency', 'display', 'end_date', 'external_party_object',
+        'external_party_object_id', 'external_party_object_type', 'external_reference', 'id', 'initial_term',
+        'internal_party', 'invoice_frequency', 'mrc', 'name', 'nrc', 'parent', 'renewal_term', 'start_date',
+        'status', 'tenant', 'url', 'yrc',
+    ]
+    bulk_update_data = {'comments': 'Updated'}
+
+    @classmethod
+    def setUpTestData(cls):
+        provider = Provider.objects.create(name='Provider A', slug='provider-a')
+        contract_type = ContractType.objects.create(name='Maintenance')
+        make_contract(name='Contract 1', contract_type=contract_type, external_reference='EXT-1')
+        make_contract(name='Contract 2', external_reference='EXT-2')
+        make_contract(name='Contract 3', end_date=date(2026, 6, 30))
+        common = {
+            'external_party_object_type': 'circuits.provider',
+            'external_party_object_id': provider.pk,
+            'internal_party': 'default',
+            'status': StatusChoices.STATUS_ACTIVE,
+            'currency': 'usd',
+            'invoice_frequency': 1,
+            'start_date': date(2025, 1, 1),
+            'end_date': date(2025, 12, 31),
+        }
+        cls.create_data = [
+            dict(common, name='Contract 4', contract_type=contract_type.pk),
+            dict(common, name='Contract 5', external_reference='EXT-5'),
+            dict(common, name='Contract 6', billable=False),
+        ]
+
+
+class InvoiceAPIViewTestCase(APITestCase, APIViewTestCases.APIViewTestCase):
+    model = Invoice
+    brief_fields = [
+        'amount', 'comments', 'contracts', 'currency', 'date', 'display', 'id', 'number', 'period_end',
+        'period_start', 'template', 'url',
+    ]
+    bulk_update_data = {'comments': 'Updated'}
+
+    @classmethod
+    def setUpTestData(cls):
+        contract = make_contract(name='Invoiced contract')
+        for month in (1, 2, 3):
+            make_invoice(contract, number=f'INV-{month}', amount=100, status=DRAFT, date=date(2025, month, 25),
+                         period_start=date(2025, month, 1), period_end=date(2025, month, 28))
+        # Contracts without lines: a new invoice generates no line
+        cls.create_data = [
+            {
+                'number': f'INV-{month}', 'contracts': [make_contract(name=f'New contract {month}').pk],
+                'date': date(2025, month, 25), 'period_start': date(2025, month, 1),
+                'period_end': date(2025, month, 28), 'currency': 'usd', 'amount': Decimal('0.00'),
+            }
+            for month in (4, 5, 6)
+        ]
+
+
+class InvoiceLineAPIViewTestCase(APITestCase, APIViewTestCases.APIViewTestCase):
+    model = InvoiceLine
+    brief_fields = ['accounting_dimensions', 'amount', 'currency', 'display', 'id', 'invoice', 'url']
+    bulk_update_data = {'comments': 'Updated'}
+
+    @classmethod
+    def setUpTestData(cls):
+        contract = make_contract(name='Invoiced contract')
+        line = make_line(contract, monthly(), 10)
+        invoice = make_invoice(contract, number='INV-1', amount=1000, status=DRAFT)
+        for quantity in (1, 2, 3):
+            InvoiceLine.objects.create(invoice=invoice, contract_line=line, quantity=quantity, unit_price=10,
+                                       currency='usd')
+        dimension = AccountingDimension.objects.create(name='account', value='A1')
+        cls.create_data = [
+            {'invoice': invoice.pk, 'contract_line': line.pk, 'quantity': 4},
+            {'invoice': invoice.pk, 'amount': 15, 'currency': 'usd'},
+            {'invoice': invoice.pk, 'unit_price': 7, 'quantity': 2, 'currency': 'usd',
+             'accounting_dimensions': [dimension.pk]},
+        ]
+
+
+class ContractAssignmentAPIViewTestCase(APITestCase, APIViewTestCases.APIViewTestCase):
+    model = ContractAssignment
+    brief_fields = ['content_object', 'contract', 'custom_fields', 'display', 'id', 'tags', 'url']
+    # Written as "app_label.model", stored as a content type
+    validation_excluded_fields = ['content_type']
+
+    @classmethod
+    def setUpTestData(cls):
+        contract = make_contract(name='Assigned contract')
+        site_type = ContentType.objects.get_for_model(Site)
+        sites = [Site.objects.create(name=f'Site {i}', slug=f'site-{i}') for i in range(1, 7)]
+        for site in sites[:3]:
+            ContractAssignment.objects.create(content_type=site_type, object_id=site.pk, contract=contract)
+        cls.create_data = [
+            {'content_type': 'dcim.site', 'object_id': site.pk, 'contract': contract.pk} for site in sites[3:]
+        ]
+        cls.bulk_update_data = {'contract': make_contract(name='Other contract').pk}
