@@ -4,7 +4,9 @@ from netbox.api.viewsets import NetBoxModelViewSet
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
+from users.models import Token
 
 from .. import filtersets, models
 from ..services import amendments
@@ -88,6 +90,19 @@ class UnitViewSet(NetBoxModelViewSet):
     filterset_class = filtersets.UnitFilterSet
 
 
+class AmendPermission(BasePermission):
+    """
+    Gate of the amend action: an authenticated user, with a write-enabled token when a token is used. The object
+    permissions (view and amend on the line) are checked by the action itself, because NetBox maps every POST to the
+    "add" permission (research D6).
+    """
+
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        return not isinstance(request.auth, Token) or request.auth.write_enabled
+
+
 class ContractLineViewSet(NetBoxModelViewSet):
     queryset = models.ContractLine.objects.select_related('contract', 'unit', 'replaces').prefetch_related(
         'accounting_dimensions', 'tags'
@@ -95,13 +110,20 @@ class ContractLineViewSet(NetBoxModelViewSet):
     serializer_class = ContractLineSerializer
     filterset_class = filtersets.ContractLineFilterSet
 
+    def get_permissions(self):
+        if self.action == 'amend':
+            return [AmendPermission()]
+        return super().get_permissions()
+
     @extend_schema(request=ContractLineAmendmentSerializer, responses={201: ContractLineSerializer})
     @action(detail=True, methods=['post'])
     def amend(self, request, pk=None):
         """End this line and create the line that replaces it with a new unit price or quantity (FR-030)."""
-        if not request.user.has_perm('netbox_contract.add_contractline'):
+        if not request.user.has_perm('netbox_contract.amend_contractline'):
             raise PermissionDenied()
-        line = get_object_or_404(models.ContractLine.objects.restrict(request.user, 'change'), pk=pk)
+        # Amending is an "amend" operation, not the "add" BaseViewSet restricts POST requests to
+        lines = models.ContractLine.objects.restrict(request.user, 'view').restrict(request.user, 'amend')
+        line = get_object_or_404(lines, pk=pk)
         data = ContractLineAmendmentSerializer(data=request.data)
         data.is_valid(raise_exception=True)
         try:

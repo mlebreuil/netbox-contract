@@ -13,6 +13,13 @@
 
 What a contract bills for is described by its [contract lines](contract_lines.md).
 
+## Contract types and service providers
+
+- **Contract types** are NetBox organizational objects: name, slug, description (up to 200 characters), color, comments and owner. The slug can be left empty in the form, the import and the REST API: it is then derived from the name (`support-licences` for "Support & Licences", with `-2`, `-3`, ... when it is taken).
+- **Service providers** are NetBox primary objects: name, slug, description, portal URL, comments, contacts and owner.
+- The owner of both is NetBox's owner (*Admin → Owners*), shown at the top of their pages, and editable in bulk, importable (`owner` column) and filterable like on core objects.
+- Upgrade to 2.5.0: each existing contract type gets a slug derived from its name. A description longer than 200 characters is shortened at a word boundary (ending with "…") and its full text is kept at the top of the type's comments; the migration prints each contract type it changed this way, and each slug it had to make unique.
+
 ## Values
 
 The contract page shows values computed from the contract lines:
@@ -21,9 +28,13 @@ The contract page shows values computed from the contract lines:
 - Yearly value: the twelve-month value of its recurring lines.
 - Yearly billable value: the yearly value of the lines invoiced under this contract, which are its own lines and those of its non-billable descendants (stopping at any billable child). It is zero for a non-billable contract.
 
+## Contract page
+
+The contract page is built from NetBox's standard panels, like core object pages. Below the contract details and values, it lists the contract's **lines**, **assignments**, **child contracts** (when there are any) and **invoices**. These tables are the tables of the corresponding lists, filtered to the contract: use **Configure Table** on a list (for example the contract line list) to choose the columns shown, and the same choice applies on the contract page. In a contract line table, a locked line offers no Delete button, and a line that can be amended offers **Amend**.
+
 ## Deprecated fields
 
-The monthly, yearly and non-recurring cost fields (`mrc`, `yrc`, `nrc`) are replaced by contract lines. The upgrade to version 2.5.0 converts them into contract lines. They are kept, marked as deprecated, and hidden by default in the contract form, detail page and tables; set the plugin setting `show_deprecated_fields` to `True` to show them. They stay available in the bulk import and in the REST API.
+The monthly, yearly and non-recurring cost fields (`mrc`, `yrc`, `nrc`) are replaced by contract lines. The upgrade to version 2.5.0 converts them into contract lines. They are kept, marked as deprecated, and hidden by default in the contract form, detail page and tables; set the plugin setting `show_deprecated_fields` to `True` to show them (on the contract page, in a **Deprecated costs** panel). They stay available in the bulk import and in the REST API.
 
 ## Linked objects:  
 

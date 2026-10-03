@@ -1,0 +1,7 @@
+{% load i18n %}
+{% if object.template %}
+  <div class="alert alert-warning" role="alert">
+    <span class="badge text-bg-warning">{% trans "deprecated" %}</span>
+    {% trans "Invoice templates are deprecated and kept for reference only: invoice lines are now generated from the contract lines." %}
+  </div>
+{% endif %}

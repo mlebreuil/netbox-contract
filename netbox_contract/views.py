@@ -1,6 +1,7 @@
 import logging
 from datetime import date, timedelta
 from decimal import Decimal, InvalidOperation
+from types import SimpleNamespace
 
 from dateutil.relativedelta import relativedelta
 from django import forms as django_forms
@@ -13,13 +14,16 @@ from django.db.models import Case, F, When
 from django.db.models.functions import Round
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
+from extras.ui.panels import CustomFieldsPanel, TagsPanel
 from netbox.object_actions import *
+from netbox.ui import actions, layout
+from netbox.ui.panels import CommentsPanel, ObjectsTablePanel
 from netbox.views import generic
 from netbox.views.generic.base import BaseObjectView
 from utilities.querydict import normalize_querydict
 from utilities.views import ViewTab, get_action_url, register_model_view
 
-from . import calculations, filtersets, forms, tables
+from . import calculations, filtersets, forms, panels, tables
 from .constants import ASSIGNEMENT_TYPES
 from .models import (
     AccountingDimension,
@@ -34,6 +38,7 @@ from .models import (
     contract_values,
     yearly_value_annotation,
 )
+from .object_actions import AmendContractLine
 from .services import amendments, invoicing
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
@@ -47,6 +52,11 @@ logger = logging.getLogger('netbox.plugins.netbox_contract')
 @register_model_view(ContractType)
 class ContractTypeView(generic.ObjectView):
     queryset = ContractType.objects.all()
+    template_name = 'generic/object.html'
+    layout = layout.SimpleLayout(
+        left_panels=[panels.ContractTypePanel(), CustomFieldsPanel()],
+        right_panels=[TagsPanel(), CommentsPanel()],
+    )
 
 
 @register_model_view(ContractType, 'list', path='', detail=False)
@@ -96,19 +106,18 @@ class ContractTypeBulkDeleteView(generic.BulkDeleteView):
 @register_model_view(ServiceProvider)
 class ServiceProviderView(generic.ObjectView):
     queryset = ServiceProvider.objects.all()
-
-    def get_extra_context(self, request, instance):
-        provider_type = ContentType.objects.get_for_model(ServiceProvider)
-        contracts = Contract.objects.filter(
-            external_party_object_type__pk=provider_type.id,
-            external_party_object_id=instance.id
-        )
-
-        contracts_table = tables.ContractProviderBottomTable(contracts)
-        contracts_table.configure(request)
-        return {
-            'contracts_table': contracts_table,
-        }
+    template_name = 'generic/object.html'
+    layout = layout.SimpleLayout(
+        left_panels=[panels.ServiceProviderPanel(), CustomFieldsPanel()],
+        right_panels=[TagsPanel(), CommentsPanel()],
+        bottom_panels=[
+            ObjectsTablePanel(
+                model='netbox_contract.contract',
+                title=_('Contracts'),
+                filters={'service_provider_id': lambda ctx: ctx['object'].pk},
+            ),
+        ],
+    )
 
 
 @register_model_view(ServiceProvider, 'list', path='', detail=False)
@@ -159,6 +168,11 @@ class ServiceProviderBulkDeleteView(generic.BulkDeleteView):
 @register_model_view(ContractAssignment)
 class ContractAssignmentView(generic.ObjectView):
     queryset = ContractAssignment.objects.all()
+    template_name = 'generic/object.html'
+    layout = layout.SimpleLayout(
+        left_panels=[panels.ContractAssignmentPanel(), CustomFieldsPanel()],
+        right_panels=[TagsPanel()],
+    )
 
 
 @register_model_view(ContractAssignment, 'list', path='', detail=False)
@@ -310,58 +324,75 @@ class ContractView(generic.ObjectView):
             precision=2,
         )
     )
+    layout = layout.SimpleLayout(
+        left_panels=[panels.ContractPanel(), panels.DeprecatedCostsPanel(), CustomFieldsPanel()],
+        right_panels=[
+            panels.ContractValuesPanel(),
+            TagsPanel(),
+            CommentsPanel(),
+            panels.MessagePanel('netbox_contract/panels/contract_invoice_template.html'),
+        ],
+        bottom_panels=[
+            panels.MessagePanel('netbox_contract/panels/lines_locked.html'),
+            ObjectsTablePanel(
+                model='netbox_contract.contractline',
+                title=_('Contract lines'),
+                filters={'contract_id': lambda ctx: ctx['object'].pk},
+                exclude_columns=['contract'],
+                actions=[
+                    panels.AddContractLine(
+                        'netbox_contract.contractline', label=_('Add a contract line'),
+                        url_params={'contract': lambda ctx: ctx['object'].pk},
+                    ),
+                ],
+            ),
+            ObjectsTablePanel(
+                model='netbox_contract.contractassignment',
+                title=_('Assignments'),
+                filters={'contract': lambda ctx: ctx['object'].pk},
+                exclude_columns=['contract'],
+            ),
+            panels.ChildContractsPanel(
+                model='netbox_contract.contract',
+                title=_('Child contracts'),
+                filters={'parent': lambda ctx: ctx['object'].pk},
+                exclude_columns=['parent'],
+            ),
+            ObjectsTablePanel(
+                model='netbox_contract.invoice',
+                title=_('Invoices'),
+                filters={'contracts': lambda ctx: ctx['object'].pk, 'template': 'False'},
+                exclude_columns=['contracts'],
+                actions=[
+                    actions.AddObject(
+                        'netbox_contract.invoice', label=_('Add an invoice'),
+                        url_params={'contracts': lambda ctx: ctx['object'].pk},
+                    ),
+                ],
+            ),
+        ],
+    )
 
     def get_extra_context(self, request, instance):
-        invoices_table = tables.InvoiceListTable(
-            instance.invoices.exclude(template=True)
-        )
-        invoices_table.columns.hide('contracts')
-        invoices_table.configure(request)
-        assignments_table = tables.ContractAssignmentContractTable(
-            instance.assignments.all()
-        )
+        values = contract_values([instance])[instance.pk]
+        context = {
+            # Computed once for the page in a fixed number of queries (FR-006), read by ContractValuesPanel
+            'values': SimpleNamespace(
+                billable=instance.billable, get_currency_display=instance.get_currency_display, **values
+            ),
+            'lines_locked': instance.invoices.exists(),
+        }
         # Invoice templates are deprecated: looked up only when deprecated fields are shown
-        invoice_template = None
         if plugin_settings.get('show_deprecated_fields'):
             invoice_template = instance.invoices.filter(template=True).first()
-        if invoice_template:
-            invoicelines_table = tables.InvoiceLineListTable(
-                invoice_template.invoicelines.all()
-            )
-            invoicelines_table.columns.hide('invoice')
-            invoicelines_table.columns.hide('currency')
-            invoicelines_table.configure(request)
-            invoicelines_table.columns.hide('actions')
-        else:
-            invoicelines_table = None
-        assignments_table.configure(request)
-        if instance.childs.all():
-            childs_table = tables.ContractListBottomTable(instance.childs.all())
-            childs_table.configure(request)
-        else:
-            childs_table = None
-
-        hidden_fields = plugin_settings.get('hidden_contract_fields')
-
-        lines_locked = instance.invoices.exists()
-        table_class = tables.ContractLineLockedContractTable if lines_locked else tables.ContractLineContractTable
-        lines_table = table_class(
-            instance.lines.select_related('unit').prefetch_related('accounting_dimensions', 'tags', 'replaced_by')
-        )
-        lines_table.configure(request)
-
-        return {
-            'hidden_fields': hidden_fields,
-            'contract_values': contract_values([instance])[instance.pk],
-            'show_deprecated_fields': plugin_settings.get('show_deprecated_fields'),
-            'lines_table': lines_table,
-            'lines_locked': lines_locked,
-            'invoices_table': invoices_table,
-            'invoice_template': invoice_template,
-            'invoicelines_table': invoicelines_table,
-            'assignments_table': assignments_table,
-            'childs_table': childs_table,
-        }
+            if invoice_template:
+                invoicelines_table = tables.InvoiceLineListTable(invoice_template.invoicelines.all())
+                invoicelines_table.columns.hide('invoice')
+                invoicelines_table.columns.hide('currency')
+                invoicelines_table.configure(request)
+                invoicelines_table.columns.hide('actions')
+                context.update(invoice_template=invoice_template, invoicelines_table=invoicelines_table)
+        return context
 
 
 @register_model_view(Contract, 'list', path='', detail=False)
@@ -441,22 +472,34 @@ class ContractBulkDeleteView(generic.BulkDeleteView):
 @register_model_view(Invoice)
 class InvoiceView(generic.ObjectView):
     queryset = Invoice.objects.all()
-
-    def get_extra_context(self, request, instance):
-        contracts_table = tables.ContractListTable(instance.contracts.annotate(yearly_value=yearly_value_annotation()))
-        contracts_table.configure(request)
-        invoicelines_table = tables.InvoiceLineListTable(
-            instance.invoicelines.select_related('contract_line', 'unit').prefetch_related('accounting_dimensions')
-        )
-        invoicelines_table.columns.hide('invoice')
-        invoicelines_table.configure(request)
-        hidden_fields = plugin_settings.get('hidden_invoice_fields')
-
-        return {
-            'hidden_fields': hidden_fields,
-            'contracts_table': contracts_table,
-            'invoicelines_table': invoicelines_table,
-        }
+    layout = layout.SimpleLayout(
+        left_panels=[
+            panels.MessagePanel('netbox_contract/panels/invoice_template_notice.html'),
+            panels.InvoicePanel(),
+            CustomFieldsPanel(),
+        ],
+        right_panels=[TagsPanel(), CommentsPanel()],
+        bottom_panels=[
+            panels.MessagePanel('netbox_contract/panels/invoice_posted.html'),
+            ObjectsTablePanel(
+                model='netbox_contract.invoiceline',
+                title=_('Invoice lines'),
+                filters={'invoice': lambda ctx: ctx['object'].pk},
+                exclude_columns=['invoice'],
+                actions=[
+                    panels.AddInvoiceLine(
+                        'netbox_contract.invoiceline', label=_('Add a line'),
+                        url_params={'invoice': lambda ctx: ctx['object'].pk},
+                    ),
+                ],
+            ),
+            ObjectsTablePanel(
+                model='netbox_contract.contract',
+                title=_('Contracts'),
+                filters={'invoice_id': lambda ctx: ctx['object'].pk},
+            ),
+        ],
+    )
 
 
 @register_model_view(Invoice, 'list', path='', detail=False)
@@ -678,7 +721,11 @@ class InvoiceBulkDeleteView(generic.BulkDeleteView):
 
 @register_model_view(InvoiceLine)
 class InvoiceLineView(generic.ObjectView):
-    queryset = InvoiceLine.objects.all()
+    queryset = InvoiceLine.objects.select_related('invoice', 'contract_line__contract', 'unit')
+    layout = layout.SimpleLayout(
+        left_panels=[panels.InvoiceLinePanel(), CustomFieldsPanel()],
+        right_panels=[TagsPanel(), CommentsPanel()],
+    )
 
 
 @register_model_view(InvoiceLine, 'list', path='', detail=False)
@@ -749,13 +796,19 @@ class InvoiceLineBulkDeleteView(generic.BulkDeleteView):
 @register_model_view(Unit)
 class UnitView(generic.ObjectView):
     queryset = Unit.objects.all()
-
-    def get_extra_context(self, request, instance):
-        lines_table = tables.ContractLineListTable(
-            instance.contract_lines.select_related('contract', 'unit').prefetch_related('accounting_dimensions')
-        )
-        lines_table.configure(request)
-        return {'lines_table': lines_table}
+    template_name = 'generic/object.html'
+    layout = layout.SimpleLayout(
+        left_panels=[panels.UnitPanel(), CustomFieldsPanel()],
+        right_panels=[TagsPanel(), CommentsPanel()],
+        bottom_panels=[
+            ObjectsTablePanel(
+                model='netbox_contract.contractline',
+                title=_('Contract lines'),
+                filters={'unit_id': lambda ctx: ctx['object'].pk},
+                exclude_columns=['unit'],
+            ),
+        ],
+    )
 
 
 @register_model_view(Unit, 'list', path='', detail=False)
@@ -805,7 +858,16 @@ class UnitBulkDeleteView(generic.BulkDeleteView):
 
 @register_model_view(ContractLine)
 class ContractLineView(generic.ObjectView):
-    queryset = ContractLine.objects.select_related('contract', 'unit')
+    queryset = ContractLine.objects.select_related('contract', 'unit', 'replaces')
+    actions = (CloneObject, EditObject, DeleteObject, AmendContractLine)
+    layout = layout.SimpleLayout(
+        left_panels=[
+            panels.MessagePanel('netbox_contract/panels/line_lock.html'),
+            panels.ContractLinePanel(),
+            CustomFieldsPanel(),
+        ],
+        right_panels=[TagsPanel(), CommentsPanel()],
+    )
 
     def get_extra_context(self, request, instance):
         return {'lock_message': instance.lock_message()}
@@ -818,12 +880,18 @@ class ContractLineAmendView(BaseObjectView):
     queryset = ContractLine.objects.select_related('contract', 'unit')
     template_name = 'netbox_contract/contractline_amend.html'
 
+    additional_permissions = ['netbox_contract.view_contractline']
+
     def get_required_permission(self):
-        return 'netbox_contract.change_contractline'
+        # The "amend" action of object permissions (research D6); the queryset is restricted to it
+        return 'netbox_contract.amend_contractline'
 
     def has_permission(self):
-        # The amendment also creates a contract line, as the REST action requires
-        return super().has_permission() and self.request.user.has_perm('netbox_contract.add_contractline')
+        if not super().has_permission():
+            return False
+        # Only lines the user may both view and amend, object constraints included
+        self.queryset = self.queryset.restrict(self.request.user, 'view')
+        return True
 
     def render_form(self, request, line, form):
         return render(request, self.template_name, {
@@ -855,7 +923,9 @@ class ContractLineAmendView(BaseObjectView):
 
 @register_model_view(ContractLine, 'list', path='', detail=False)
 class ContractLineListView(generic.ObjectListView):
-    queryset = ContractLine.objects.select_related('contract', 'unit').prefetch_related('accounting_dimensions')
+    queryset = ContractLine.objects.with_lock_state().select_related('contract', 'unit').prefetch_related(
+        'accounting_dimensions'
+    )
     table = tables.ContractLineListTable
     filterset = filtersets.ContractLineFilterSet
     filterset_form = forms.ContractLineFilterForm
@@ -907,6 +977,11 @@ class ContractLineBulkDeleteView(generic.BulkDeleteView):
 @register_model_view(AccountingDimension)
 class AccountingDimensionView(generic.ObjectView):
     queryset = AccountingDimension.objects.all()
+    template_name = 'generic/object.html'
+    layout = layout.SimpleLayout(
+        left_panels=[panels.AccountingDimensionPanel(), CustomFieldsPanel()],
+        right_panels=[TagsPanel(), CommentsPanel()],
+    )
 
 
 @register_model_view(AccountingDimension, 'list', path='', detail=False)

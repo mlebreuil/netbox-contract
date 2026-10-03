@@ -11,6 +11,14 @@ from netbox.forms import (
     NetBoxModelFilterSetForm,
     NetBoxModelForm,
     NetBoxModelImportForm,
+    OrganizationalModelBulkEditForm,
+    OrganizationalModelFilterSetForm,
+    OrganizationalModelForm,
+    OrganizationalModelImportForm,
+    PrimaryModelBulkEditForm,
+    PrimaryModelFilterSetForm,
+    PrimaryModelForm,
+    PrimaryModelImportForm,
 )
 from tenancy.forms import ContactModelFilterForm, TenancyFilterForm
 from tenancy.models import Tenant
@@ -413,37 +421,35 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
 # ContractType
 
 
-class ContractTypeForm(NetBoxModelForm):
+class ContractTypeForm(OrganizationalModelForm):
+    # Derived from the name when left empty (FR-018)
+    slug = SlugField(label=_('Slug'), required=False)
     color = ColorField(label=_('Color'))
 
     fieldsets = (
-        FieldSet('name', 'description', 'color', 'tags', name=_('Contract type')),
+        FieldSet('name', 'slug', 'description', 'color', 'tags', name=_('Contract type')),
     )
 
     class Meta:
         model = ContractType
-        fields = (
-            'name',
-            'description',
-            'color',
-            'tags',
-        )
+        fields = ('name', 'slug', 'description', 'color', 'owner', 'comments', 'tags')
 
 
-class ContractTypeCSVForm(NetBoxModelImportForm):
+class ContractTypeCSVForm(OrganizationalModelImportForm):
     name = forms.CharField(max_length=100, label=_('Name'))
-    description = forms.CharField(required=False, label=_('Description'))
+    slug = SlugField(label=_('Slug'), required=False)
+    description = forms.CharField(max_length=200, required=False, label=_('Description'))
     color = ColorField(label=_('Color'))
 
     class Meta:
         model = ContractType
-        fields = ['name', 'description', 'color']
+        fields = ['name', 'slug', 'description', 'color', 'owner', 'comments']
 
 
-class ContractTypeBulkEditForm(NetBoxModelBulkEditForm):
-    description = forms.CharField(required=False, label=_('Description'))
-    nullable_fields = ('description',)
+class ContractTypeBulkEditForm(OrganizationalModelBulkEditForm):
+    description = forms.CharField(max_length=200, required=False, label=_('Description'))
     color = ColorField(label=_('Color'), required=False,)
+    nullable_fields = ('description', 'comments')
     fieldsets = (
         FieldSet('description', 'color', name=_('Contract type')),
     )
@@ -451,13 +457,15 @@ class ContractTypeBulkEditForm(NetBoxModelBulkEditForm):
     model = ContractType
 
 
-class ContractTypeFilterForm(NetBoxModelFilterSetForm):
+class ContractTypeFilterForm(OrganizationalModelFilterSetForm):
     model = ContractType
     fieldsets = (
         FieldSet('q', 'filter_id'),
-        FieldSet('name', 'description', name=_('Attributes')),
+        FieldSet('name', 'slug', 'description', name=_('Attributes')),
+        FieldSet('owner_group_id', 'owner_id', name=_('Ownership')),
     )
     name = forms.CharField(required=False, label=_('Name'))
+    slug = forms.CharField(required=False, label=_('Slug'))
     description = forms.CharField(required=False, label=_('Description'))
 
 # Invoice
@@ -741,45 +749,45 @@ class InvoiceBulkEditForm(NetBoxModelBulkEditForm):
 # service Provider forms
 
 
-class ServiceProviderForm(NetBoxModelForm):
+class ServiceProviderForm(PrimaryModelForm):
     slug = SlugField(label=_('Slug'))
-    comments = CommentField(label=_('Comments'))
 
     fieldsets = (
-        FieldSet('name', 'slug', 'portal_url', 'tags', name=_('Service provider')),
+        FieldSet('name', 'slug', 'description', 'portal_url', 'tags', name=_('Service provider')),
     )
 
     class Meta:
         model = ServiceProvider
-        fields = ('name', 'slug', 'portal_url', 'comments', 'tags')
+        fields = ('name', 'slug', 'description', 'portal_url', 'owner', 'comments', 'tags')
 
 
-class ServiceProviderFilterForm(ContactModelFilterForm, NetBoxModelFilterSetForm):
+class ServiceProviderFilterForm(ContactModelFilterForm, PrimaryModelFilterSetForm):
     model = ServiceProvider
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('name', name=_('Attributes')),
+        FieldSet('name', 'description', name=_('Attributes')),
+        FieldSet('owner_group_id', 'owner_id', name=_('Ownership')),
         FieldSet('contact', 'contact_role', 'contact_group', name=_('Contacts')),
     )
     name = forms.CharField(required=False, label=_('Name'))
+    description = forms.CharField(required=False, label=_('Description'))
     tag = TagFilterField(model)
 
 
-class ServiceProviderCSVForm(NetBoxModelImportForm):
+class ServiceProviderCSVForm(PrimaryModelImportForm):
     slug = SlugField(label=_('Slug'))
-    comments = CommentField(label=_('Comments'))
 
     class Meta:
         model = ServiceProvider
-        fields = ['name', 'slug', 'portal_url', 'comments', 'tags']
+        fields = ['name', 'slug', 'description', 'portal_url', 'owner', 'comments', 'tags']
 
 
-class ServiceProviderBulkEditForm(NetBoxModelBulkEditForm):
+class ServiceProviderBulkEditForm(PrimaryModelBulkEditForm):
     name = forms.CharField(max_length=100, required=False, label=_('Name'))
-    comments = CommentField(label=_('Comments'))
-    nullable_fields = ('comments',)
+    description = forms.CharField(max_length=200, required=False, label=_('Description'))
+    nullable_fields = ('description', 'comments')
     fieldsets = (
-        FieldSet('name', name=_('Service provider')),
+        FieldSet('name', 'description', name=_('Service provider')),
     )
 
     model = ServiceProvider

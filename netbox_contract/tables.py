@@ -1,6 +1,10 @@
 import django_tables2 as tables
 from django.conf import settings
-from netbox.tables import NetBoxTable, columns
+from django.urls import reverse
+from django.utils.html import format_html
+from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
+from netbox.tables import NetBoxTable, OrganizationalModelTable, PrimaryModelTable, columns
 from tenancy.tables import ContactsColumnMixin
 
 from .models import (
@@ -14,6 +18,7 @@ from .models import (
     ServiceProvider,
     Unit,
 )
+from .object_actions import can_amend
 
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 
@@ -29,14 +34,16 @@ class DeprecatedColumnsMixin:
         super().__init__(*args, **kwargs)
 
 
-class ContractTypeListTable(NetBoxTable):
+class ContractTypeListTable(OrganizationalModelTable):
     name = tables.Column(linkify=True)
     color = columns.ColorColumn()
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
 
-    class Meta(NetBoxTable.Meta):
+    class Meta(OrganizationalModelTable.Meta):
         model = ContractType
-        fields = ('pk', 'id', 'name', 'description', 'color', 'actions')
+        fields = (
+            'pk', 'id', 'name', 'slug', 'description', 'color', 'owner_group', 'owner', 'comments', 'actions',
+        )
         default_columns = ('name', 'description', 'color')
 
 
@@ -114,31 +121,6 @@ class ContractAssignmentObjectTable(DeprecatedColumnsMixin, NetBoxTable):
         )
 
 
-class ContractAssignmentContractTable(NetBoxTable):
-    content_type = columns.ContentTypeColumn(verbose_name='Object Type')
-    content_object = tables.Column(linkify=True, verbose_name='Object', orderable=False)
-    content_object__status = columns.ChoiceFieldColumn(
-        verbose_name=('Status'),
-    )
-    actions = columns.ActionsColumn(actions=('edit', 'delete'))
-
-    class Meta(NetBoxTable.Meta):
-        model = ContractAssignment
-        fields = (
-            'pk',
-            'content_type',
-            'content_object',
-            'content_object__status',
-            'actions',
-        )
-        default_columns = (
-            'pk',
-            'content_type',
-            'content_object',
-            'content_object__status',
-        )
-
-
 class ContractListTable(DeprecatedColumnsMixin, ContactsColumnMixin, NetBoxTable):
     deprecated_columns = ('mrc', 'yrc', 'nrc')
     name = tables.Column(linkify=True)
@@ -187,68 +169,6 @@ class ContractListTable(DeprecatedColumnsMixin, ContactsColumnMixin, NetBoxTable
         default_columns = ('name', 'status', 'contract_type', 'parent', 'billable', 'yearly_value')
 
 
-class ContractListBottomTable(DeprecatedColumnsMixin, NetBoxTable):
-    deprecated_columns = ('mrc',)
-    name = tables.Column(linkify=True)
-    external_party_object = tables.Column(linkify=True)
-    status = columns.ChoiceFieldColumn(
-        verbose_name=('Status'),
-    )
-
-    class Meta(NetBoxTable.Meta):
-        model = Contract
-        fields = (
-            'pk',
-            'id',
-            'name',
-            'external_party_object_type',
-            'external_party_object',
-            'external_reference',
-            'internal_party',
-            'status',
-            'mrc',
-            'comments',
-            'actions',
-        )
-        default_columns = (
-            'name',
-            'external_party_object_type',
-            'external_party_object',
-            'status',
-        )
-
-
-class ContractProviderBottomTable(DeprecatedColumnsMixin, NetBoxTable):
-    deprecated_columns = ('mrc',)
-    name = tables.Column(linkify=True)
-    external_party_object = tables.Column(linkify=True)
-    status = columns.ChoiceFieldColumn(
-        verbose_name=('Status'),
-    )
-
-    class Meta(NetBoxTable.Meta):
-        model = Contract
-        fields = (
-            'pk',
-            'id',
-            'name',
-            'start_date',
-            'end_date',
-            'external_reference',
-            'status',
-            'mrc',
-            'comments',
-            'actions',
-        )
-        default_columns = (
-            'name',
-            'status',
-            'external_reference',
-            'start_date',
-            'end_date',
-        )
-
-
 class InvoiceListTable(NetBoxTable):
     contracts = tables.ManyToManyColumn(linkify=True)
     number = tables.Column(linkify=True)
@@ -285,13 +205,16 @@ class InvoiceListTable(NetBoxTable):
         )
 
 
-class ServiceProviderListTable(NetBoxTable):
+class ServiceProviderListTable(PrimaryModelTable):
     name = tables.Column(linkify=True)
     tags = columns.TagColumn(url_name='plugins:netbox_contract:serviceprovider_list')
 
-    class Meta(NetBoxTable.Meta):
+    class Meta(PrimaryModelTable.Meta):
         model = ServiceProvider
-        fields = ('pk', 'name', 'slug', 'portal_url')
+        fields = (
+            'pk', 'id', 'name', 'slug', 'description', 'portal_url', 'owner_group', 'owner', 'comments', 'tags',
+            'actions',
+        )
         default_columns = ('name', 'portal_url')
 
 
@@ -367,6 +290,38 @@ class UnitListTable(NetBoxTable):
         default_columns = ('name', 'billing_method', 'months', 'description')
 
 
+AMEND_BUTTON = (
+    '<a href="{url}" class="btn btn-sm btn-primary" title="{title}">'
+    '<i class="mdi mdi-cash-sync" aria-hidden="true"></i> {label}</a> '
+)
+
+
+class ContractLineActionsColumn(columns.ActionsColumn):
+    """
+    Actions of a contract line, decided line by line (research D4): no Delete on a locked line, and an Amend button
+    when the line can be amended and the user may amend it. Reads the with_lock_state() annotations when present.
+    """
+
+    def render(self, record, table, **kwargs):
+        locked = record.is_locked_line if hasattr(record, 'is_locked_line') else bool(record.lock_message())
+        all_actions = self.actions
+        if locked:
+            self.actions = {name: item for name, item in all_actions.items() if name != 'delete'}
+        try:
+            html = super().render(record, table, **kwargs)
+        finally:
+            self.actions = all_actions
+
+        request = getattr(table, 'context', {}).get('request')
+        user = getattr(request, 'user', None)
+        if user is not None and record.pk and can_amend(record, user):
+            url = reverse('plugins:netbox_contract:contractline_amend', args=[record.pk])
+            html = format_html(
+                AMEND_BUTTON, url=url, title=_('Amend price or quantity'), label=_('Amend')
+            ) + html
+        return mark_safe(html)
+
+
 class ContractLineListTable(NetBoxTable):
     contract = tables.Column(linkify=True)
     description = tables.Column(linkify=True)
@@ -377,6 +332,7 @@ class ContractLineListTable(NetBoxTable):
     yearly_value = tables.Column(verbose_name='Yearly value', orderable=False)
     invoiced_at_conversion = columns.BooleanColumn(verbose_name='Invoiced at conversion')
     tags = columns.TagColumn(url_name='plugins:netbox_contract:contractline_list')
+    actions = ContractLineActionsColumn()
 
     class Meta(NetBoxTable.Meta):
         model = ContractLine
@@ -411,45 +367,3 @@ class ContractLineListTable(NetBoxTable):
             'end_date',
             'accounting_dimensions',
         )
-
-
-class ContractLineContractTable(ContractLineListTable):
-    """Contract lines shown on their contract page."""
-
-    class Meta(ContractLineListTable.Meta):
-        fields = tuple(field for field in ContractLineListTable.Meta.fields if field != 'contract')
-        default_columns = (
-            'description',
-            'quantity',
-            'unit',
-            'unit__billing_method',
-            'unit_price',
-            'start_date',
-            'end_date',
-            'accounting_dimensions',
-            'total_value',
-            'yearly_value',
-            'actions',
-        )
-
-
-AMEND_BUTTON = """
-{% if perms.netbox_contract.change_contractline and perms.netbox_contract.add_contractline and record.can_be_amended %}
-  <a href="{% url 'plugins:netbox_contract:contractline_amend' pk=record.pk %}"
-     class="btn btn-sm btn-primary" title="Amend price or quantity">
-    <i class="mdi mdi-cash-sync" aria-hidden="true"></i> Amend
-  </a>
-{% endif %}
-"""
-
-
-class ContractLineLockedContractTable(ContractLineContractTable):
-    """
-    Contract lines of an invoiced contract: only their internal fields can be edited, none can be deleted,
-    and their price or quantity can be amended from a date.
-    """
-
-    actions = columns.ActionsColumn(actions=('edit',), extra_buttons=AMEND_BUTTON)
-
-    class Meta(ContractLineContractTable.Meta):
-        pass

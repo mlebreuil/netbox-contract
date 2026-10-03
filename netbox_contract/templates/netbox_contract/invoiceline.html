@@ -1,77 +1,8 @@
 {% extends 'generic/object.html' %}
-{% load plugins %}
-{% load render_table from django_tables2 %}
-{% load i18n %}
+{% comment %}The page content is the layout declared on the view (netbox_contract/panels.py); only the breadcrumbs are specific.{% endcomment %}
 {% block breadcrumbs %}
   {{ block.super }}
   <li class="breadcrumb-item">
-    <a href="{% url 'plugins:netbox_contract:invoiceline_list' %}?invoice={{ invoice.pk }}">{{ invoice.number }}</a>
+    <a href="{% url 'plugins:netbox_contract:invoiceline_list' %}?invoice={{ object.invoice.pk }}">{{ object.invoice.number }}</a>
   </li>
 {% endblock %}
-{% block content %}
-  <div class="row mb-3">
-    <div class="col col-md-6">
-      <div class="card">
-        <h5 class="card-header">{% trans "Invoice lines" %}</h5>
-          <table class="table table-hover attr-table">
-            <tr>
-              <th scope="row">{% trans "Invoice" %}</th>
-              <td>
-                <a href="{{ object.invoice.get_absolute_url }}">{{ object.invoice.number }}</a>
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">{% trans "Contract line" %}</th>
-              <td>
-                {% if object.contract_line %}
-                  <a href="{{ object.contract_line.get_absolute_url }}">{{ object.contract_line }}</a>
-                  ({{ object.contract_line.contract }})
-                {% else %}
-                  {{ ''|placeholder }}
-                {% endif %}
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">{% trans "Quantity" %}</th>
-              <td>{{ object.quantity|placeholder }}</td>
-            </tr>
-            <tr>
-              <th scope="row">{% trans "Unit" %}</th>
-              <td>
-                {% if object.unit %}<a href="{{ object.unit.get_absolute_url }}">{{ object.unit }}</a>{% else %}{{ ''|placeholder }}{% endif %}
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">{% trans "Unit price" %}</th>
-              <td>{{ object.unit_price|placeholder }}</td>
-            </tr>
-            <tr>
-              <th scope="row">{% trans "Amount" %}</th>
-              <td>
-                {{ object.amount }}
-                {% if object.unit_price is not None %}<span class="text-muted">({% trans "calculated" %})</span>{% endif %}
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">{% trans "Currency" %}</th>
-              <td>{{ object.get_currency_display  }}</td>
-            </tr>
-            <tr>
-              <th scope="row">{% trans "Accounting dimensions" %}</th>
-              <td>
-                {% for dimension in object.accounting_dimensions.all %}
-                  <a href="{{ dimension.get_absolute_url }}">{{ dimension }}</a>{% if not forloop.last %}, {% endif %}
-                {% empty %}
-                  {{ ''|placeholder }}
-                {% endfor %}
-              </td>
-            </tr>
-          </table>
-      </div>
-      {% include 'inc/panels/custom_fields.html' %}
-      {% include 'inc/panels/tags.html' %}
-      {% include 'inc/panels/comments.html' %}
-    </div>
-  </div>
-{% plugin_right_page object %}
-{% endblock content %}

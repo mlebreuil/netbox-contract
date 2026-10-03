@@ -15,6 +15,7 @@ from netbox_contract.services import invoicing
 from netbox_contract.services.amendments import AmendmentError, amend_contract_line
 from netbox_contract.tests.custom import APITestCase
 from netbox_contract.tests.helpers import (
+    contract_page_with_lines,
     make_contract,
     make_invoice,
     make_invoice_line,
@@ -186,7 +187,7 @@ class AmendmentViewTestCase(NetBoxTestCase):
 
     def test_amend_button_on_the_contract_page(self):
         setup = make_line(self.contract, one_time(), 500, description='Setup')
-        content = self.client.get(self.contract.get_absolute_url()).content.decode()
+        content = contract_page_with_lines(self.client, self.contract)
         self.assertIn(self.url, content)
         self.assertNotIn(reverse('plugins:netbox_contract:contractline_amend', args=[setup.pk]), content)
         self.assertIn('Amend', content)
@@ -199,7 +200,7 @@ class AmendmentViewTestCase(NetBoxTestCase):
 
     def test_no_amend_button_once_replaced_or_before_invoicing(self):
         new = amend_contract_line(self.line, date(2025, 7, 1), 'Indexation', unit_price=Decimal(110))
-        content = self.client.get(self.contract.get_absolute_url()).content.decode()
+        content = contract_page_with_lines(self.client, self.contract)
         self.assertNotIn(self.url, content)
         self.assertIn(reverse('plugins:netbox_contract:contractline_amend', args=[new.pk]), content)
         other = make_contract(name='Not invoiced')
@@ -251,8 +252,7 @@ class AmendmentAPITestCase(APITestCase):
         self.url = reverse('plugins-api:netbox_contract-api:contractline-amend', args=[self.line.pk])
 
     def test_amend(self):
-        self.add_permissions('netbox_contract.change_contractline', 'netbox_contract.add_contractline',
-                             'netbox_contract.view_contractline')
+        self.add_permissions('netbox_contract.amend_contractline', 'netbox_contract.view_contractline')
         response = self.client.post(
             self.url, {'effective_date': '2025-07-01', 'quantity': 3, 'reason': 'More seats'}, format='json',
             **self.header,
@@ -268,8 +268,7 @@ class AmendmentAPITestCase(APITestCase):
         response = self.client.post(self.url, {'effective_date': '2025-07-01', 'quantity': 3, 'reason': 'x'},
                                     format='json', **self.header)
         self.assertHttpStatus(response, status.HTTP_403_FORBIDDEN)
-        self.add_permissions('netbox_contract.change_contractline', 'netbox_contract.add_contractline',
-                             'netbox_contract.view_contractline')
+        self.add_permissions('netbox_contract.amend_contractline', 'netbox_contract.view_contractline')
         response = self.client.post(self.url, {'effective_date': '2025-07-01', 'quantity': 3}, format='json',
                                     **self.header)
         self.assertHttpStatus(response, status.HTTP_400_BAD_REQUEST)

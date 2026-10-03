@@ -243,17 +243,20 @@ class DerivedAmountAPITestCase(APITestCase):
 
 
 class AmendPermissionTestCase(TestCase):
-    """T081: the amend screen needs the add and change contract line permissions."""
+    """T081, revised by #309: the amend screen needs the amend action (add + change no longer suffice)."""
 
     def test_change_only_is_refused(self):
         contract = make_contract()
         line = make_line(contract, monthly(), 100)
         url = reverse('plugins:netbox_contract:contractline_amend', args=[line.pk])
-        self.add_permissions('netbox_contract.change_contractline', 'netbox_contract.view_contractline')
+        self.add_permissions(
+            'netbox_contract.add_contractline', 'netbox_contract.change_contractline',
+            'netbox_contract.view_contractline',
+        )
         data = {'effective_date': '2025-07-01', 'unit_price': '110', 'reason': 'x'}
         self.assertEqual(self.client.post(url, data).status_code, 403)
         self.assertEqual(ContractLine.objects.count(), 1)
-        self.add_permissions('netbox_contract.add_contractline')
+        self.add_permissions('netbox_contract.amend_contractline')
         self.assertEqual(self.client.post(url, data).status_code, 302)
 
 

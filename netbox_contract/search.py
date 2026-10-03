@@ -16,6 +16,8 @@ class ServiceProviderIndex(SearchIndex):
     model = ServiceProvider
     fields = (
         ('name', 100),
+        ('slug', 110),
+        ('description', 500),
         ('comments', 5000),
     )
 
@@ -56,7 +58,9 @@ class ContractTypeIndex(SearchIndex):
     model = ContractType
     fields = (
         ('name', 20),
-        ('description', 20),
+        ('slug', 110),
+        ('description', 500),
+        ('comments', 5000),
     )
 
 

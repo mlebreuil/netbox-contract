@@ -48,7 +48,7 @@ When the price or the quantity of a recurring or usage-based line changes during
 - The date must be after the end of the last invoiced period of the line (draft and posted invoices count, canceled ones do not), so invoiced periods never change price.
 - The reason is required. It is recorded as the change-log message of both lines and added to the comments of the new line.
 - One-time lines cannot be amended.
-- Amending requires both the add and the change contract line permissions, because it changes one line and creates another. The **Amend** button is shown only to users who have both.
+- Amending requires the **amend** action of contract lines, which administrators tick in a NetBox object permission (*Admin → Object permissions*, object type *Netbox contract | contract line*), together with the view action. Like other actions, it can be limited with constraints, for example to the lines of some contracts. The add and change permissions are not needed and are not enough. The **Amend** button is shown only on lines the user may amend.
 - The yearly values of the contract count only the current line; the total contract value counts each line over its own dates. An invoice whose period spans the change gets both lines, each prorated to its days.
 - The same action is available in the REST API: `POST contract-lines/{id}/amend/`.
 
