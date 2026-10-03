@@ -279,9 +279,11 @@ class DeprecationNoticeTestCase(APITestCase):
         return match.group(1)
 
     def test_changelog(self):
+        # The changelog follows the NetBox release notes: the #309 item of the 2.5.0 "Deprecations" section
         changelog = repository_file('CHANGELOG.md').read_text()
-        entry = self.notice(changelog, r'\[#309\]', r'\n\* \[#|\n## ')
-        deprecations = self.notice(entry, r'Deprecations', r'\Z')
+        release = self.notice(changelog, r'\n### Version 2\.5\.0\n', r'\n### ')
+        section = self.notice(release, r'\n#### Deprecations\n', r'\n#### ')
+        deprecations = self.notice(section, r'\n\* \[#309\]', r'\n\* \[#|\Z')
         for field in DEPRECATED_NESTED_CONTRACT | DEPRECATED_INVOICE_CONTRACTS | DEPRECATED_BRIEF \
                 | DEPRECATED_INVOICE_BRIEF:
             with self.subTest(field=field):
