@@ -18,6 +18,8 @@ The upgrade to version 2.5.0 creates the units "One-time", "Monthly" and "Yearly
 
 ## Contract lines
 
+![Contract line](img/contract_line.png "contract line")
+
 - **Contract**: the contract the line belongs to.
 - **Description**.
 - **Quantity**: defaults to 1. Zero and negative values are accepted (for example a credit).

@@ -157,6 +157,11 @@ in NetBox core, so script logic lives in importable modules).
   with behaviour changes.
 - Every user-visible change updates `docs/` (mkdocs), `CHANGELOG.md` (see "Changelog" below) and, for settings or
   requirements, `README.md` (Constitution VII).
+- Screenshots in `docs/img/` are generated, never taken by hand: `utils/docs_screenshots/make_screenshots.sh
+  [name ...]` recreates a separate `netbox_docs` database, seeds it (`seed.py`), runs NetBox on port 8001 and captures
+  the regions listed in `SHOTS` of `capture.py` (see its README). When a change alters a page shown in the docs, rerun
+  it and look at the images before committing; a new screenshot is a `SHOTS` entry plus, if needed, seed data.
+  Don't name a file in that directory like a standard module (it is put on `PYTHONPATH`).
 - REST fields, endpoints, settings and import columns are public interfaces: deprecate before removing, never add a
   required input to an existing endpoint (Constitution V). Data migrations must be lossless and re-runnable
   (Constitution IV).
