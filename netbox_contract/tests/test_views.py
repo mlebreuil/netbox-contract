@@ -10,14 +10,17 @@ from utilities.testing import ViewTestCases
 
 from netbox_contract.models import (
     AccountingDimension,
+    BillingMethodChoices,
     Contract,
     ContractAssignment,
+    ContractLine,
     ContractType,
     Invoice,
     InvoiceLine,
+    InvoiceStatusChoices,
     ServiceProvider,
     StatusChoices,
-    InvoiceStatusChoices,
+    Unit,
 )
 from netbox_contract.tests.custom import ModelViewTestCase
 
@@ -96,20 +99,19 @@ class ContractTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCas
             'renewal_term': 12,
             'notice_period': 90,
             'currency': 'usd',
-            'yrc': Decimal(1000),
-            'nrc': Decimal(1000),
             'invoice_frequency': 1,
+            'billable': True,
         }
 
         cls.csv_data = (
             'name,contract_type,external_party_object_type,external_party_object_id,internal_party,'
-            'tenant,status,start_date,end_date,currency,mrc,nrc,invoice_frequency',
+            'tenant,status,start_date,end_date,currency,mrc,nrc,invoice_frequency,billable',
             'Contract 4,Contract Type A,netbox_contract.serviceprovider,Service Provider A,entity1,'
-            'Tenant 1,active,2025-01-01,2025-12-31,usd,100,1000,1',
+            'Tenant 1,active,2025-01-01,2025-12-31,usd,100,1000,1,true',
             'Contract 5,Contract Type A,netbox_contract.serviceprovider,Service Provider A,entity1,'
-            'Tenant 1,active,2025-01-01,2025-12-31,usd,100,1000,1',
+            'Tenant 1,active,2025-01-01,2025-12-31,usd,100,1000,1,true',
             'Contract 6,Contract Type A,netbox_contract.serviceprovider,Service Provider A,entity1,'
-            'Tenant 1,active,2025-01-01,2025-12-31,usd,100,1000,1'
+            'Tenant 1,active,2025-01-01,2025-12-31,usd,100,1000,1,false'
         )
 
         cls.csv_update_data = (
@@ -150,14 +152,14 @@ class InvoiceTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCase
         # Create test invoices
         invoices = Invoice.objects.bulk_create([
             Invoice(number='Invoice1', template=False, date=date(2025, 1, 25),
-                    status=InvoiceStatusChoices.STATUS_POSTED,
+                    status=InvoiceStatusChoices.STATUS_DRAFT,
                     period_start=date(2025, 1, 1), period_end=date(2025, 1, 31),
                     currency='usd', amount=Decimal(100)),
             Invoice(number='Invoice2', template=False, date=date(2025, 2, 25),
                     period_start=date(2025, 2, 1), period_end=date(2025, 2, 28),
                     currency='usd', amount=Decimal(100)),
             Invoice(number='Invoice3', template=False, date=date(2025, 3, 25),
-                    status=InvoiceStatusChoices.STATUS_POSTED,
+                    status=InvoiceStatusChoices.STATUS_DRAFT,
                     period_start=date(2025, 3, 1), period_end=date(2025, 3, 31),
                     currency='usd', amount=Decimal(100))
         ])
@@ -230,6 +232,9 @@ class InvoiceLineTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTest
 
         cls.form_data = {
             'invoice': invoices[1].pk,
+            'contract_line': None,
+            'unit_price': Decimal(50),
+            'quantity': Decimal(2),
             'currency': 'usd',
             'amount': Decimal(100),
         }
@@ -248,6 +253,105 @@ class InvoiceLineTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTest
 
         cls.bulk_edit_data = {
             'comments': 'New comment',
+        }
+
+
+class UnitTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCase):
+    model = Unit
+
+    @classmethod
+    def setUpTestData(cls):
+        units = (
+            Unit(name='Monthly', billing_method=BillingMethodChoices.RECURRING, months=1),
+            Unit(name='Yearly', billing_method=BillingMethodChoices.RECURRING, months=12),
+            Unit(name='Setup', billing_method=BillingMethodChoices.ONE_TIME),
+        )
+        for unit in units:
+            unit.save()
+
+        cls.form_data = {
+            'name': 'Quarterly',
+            'description': 'Three months',
+            'billing_method': BillingMethodChoices.RECURRING,
+            'months': 3,
+        }
+
+        cls.csv_data = (
+            'name,billing_method,months',
+            'Half-yearly,recurring,6',
+            'Gigabyte,usage,',
+            'Installation,one_time,',
+        )
+
+        cls.csv_update_data = (
+            'id,description',
+            f'{units[0].pk},Price per month',
+            f'{units[1].pk},Price per year',
+            f'{units[2].pk},Paid once',
+        )
+
+        cls.bulk_edit_data = {
+            'description': 'Updated description',
+        }
+
+
+class ContractLineTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCase):
+    model = ContractLine
+
+    @classmethod
+    def setUpTestData(cls):
+        Provider.objects.create(name='Provider A', slug='provider-a')
+        contract = Contract.objects.create(
+            name='Contract1',
+            external_party_object_type=ContentType.objects.get_for_model(Provider),
+            external_party_object_id=Provider.objects.get(slug='provider-a').id,
+            internal_party='default',
+            status=StatusChoices.STATUS_ACTIVE,
+            start_date=date(2025, 1, 1),
+            end_date=date(2025, 12, 31),
+            currency='usd',
+            invoice_frequency=1,
+        )
+        monthly = Unit.objects.create(name='Monthly', billing_method=BillingMethodChoices.RECURRING, months=1)
+        Unit.objects.create(name='Setup', billing_method=BillingMethodChoices.ONE_TIME)
+        dimension = AccountingDimension.objects.create(name='account', value='account1')
+
+        lines = (
+            ContractLine(contract=contract, description='Line 1', unit_price=Decimal(100), unit=monthly),
+            ContractLine(contract=contract, description='Line 2', unit_price=Decimal(200), unit=monthly),
+            ContractLine(contract=contract, description='Line 3', unit_price=Decimal(300), unit=monthly),
+        )
+        for line in lines:
+            line.save()
+
+        cls.form_data = {
+            'contract': contract.pk,
+            'description': 'Line X',
+            'quantity': Decimal(2),
+            'unit_price': Decimal(50),
+            'unit': monthly.pk,
+            'currency': 'usd',
+            'start_date': date(2025, 2, 1),
+            'end_date': date(2025, 11, 30),
+            'accounting_dimensions': [dimension.pk],
+        }
+
+        cls.csv_data = (
+            'contract,description,quantity,unit_price,unit,currency',
+            f'{contract.pk},Line 4,1,10,Monthly,usd',
+            f'{contract.pk},Line 5,2,20,Setup,usd',
+            f'{contract.pk},Line 6,3,30,Monthly,',
+        )
+
+        cls.csv_update_data = (
+            'id,description',
+            f'{lines[0].pk},Line A',
+            f'{lines[1].pk},Line B',
+            f'{lines[2].pk},Line C',
+        )
+
+        cls.bulk_edit_data = {
+            'description': 'Updated line',
         }
 
 
@@ -333,8 +437,11 @@ class ContractTypeTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTes
     def setUpTestData(cls):
         # Create test contract types
         contract_types = ContractType.objects.bulk_create([
-            ContractType(name='Contract Type 1', description='Description for type 1', color=ColorChoices.COLOR_BLUE),
-            ContractType(name='Contract Type 2', description='Description for type 2', color=ColorChoices.COLOR_RED),
+            # bulk_create does not call save(), which derives the slug (#309)
+            ContractType(name='Contract Type 1', slug='contract-type-1', description='Description for type 1',
+                         color=ColorChoices.COLOR_BLUE),
+            ContractType(name='Contract Type 2', slug='contract-type-2', description='Description for type 2',
+                         color=ColorChoices.COLOR_RED),
         ])
 
         for contract_type in contract_types:
@@ -470,7 +577,7 @@ class ContractAssignmentTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectV
         cls.csv_data = (
             'content_type,object_id,contract',
             f'circuits.circuit,{circuit3.pk},{contract2.pk}',
-            f'circuits.circuit,{device3.pk},{contract1.pk}',
+            f'dcim.device,{device3.pk},{contract1.pk}',
         )
 
         cls.csv_update_data = (

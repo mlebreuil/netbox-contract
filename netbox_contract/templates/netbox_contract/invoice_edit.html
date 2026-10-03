@@ -1,0 +1,8 @@
+{% extends 'generic/object_edit.html' %}
+
+{% block form %}
+  {{ block.super }}
+  {% if not object.pk and lines_preview %}
+    {% include 'netbox_contract/inc/invoice_lines_preview.html' %}
+  {% endif %}
+{% endblock form %}

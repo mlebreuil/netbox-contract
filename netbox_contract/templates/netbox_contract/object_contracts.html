@@ -1,0 +1,7 @@
+{% extends 'generic/object_children.html' %}
+{% load buttons %}
+
+{% block table_controls %}
+    {# Only the page header action button is needed (avoid duplicate table button) #}
+    {{ block.super }}
+{% endblock table_controls %}

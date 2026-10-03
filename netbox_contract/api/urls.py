@@ -12,5 +12,7 @@ router.register('serviceproviders', views.ServiceProviderViewSet)
 router.register('contractassignment', views.ContractAssignmentViewSet)
 router.register('invoiceline', views.InvoiceLineViewSet)
 router.register('accountingdimension', views.AccountingDimensionViewSet)
+router.register('units', views.UnitViewSet)
+router.register('contract-lines', views.ContractLineViewSet)
 
 urlpatterns = router.urls

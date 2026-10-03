@@ -1,26 +1,31 @@
 import django_filters
-from django.db.models import Q
-from django.contrib.contenttypes.models import ContentType
-from netbox.filtersets import NetBoxModelFilterSet
-from tenancy.filtersets import ContactModelFilterSet, TenancyFilterSet
 from circuits.models import Provider
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
+from netbox.filtersets import NetBoxModelFilterSet, OrganizationalModelFilterSet, PrimaryModelFilterSet
+from tenancy.filtersets import ContactModelFilterSet, TenancyFilterSet
+from utilities.filtersets import register_filterset
 
 from .models import (
     AccountingDimension,
     AccountingDimensionStatusChoices,
+    BillingMethodChoices,
     Contract,
     ContractAssignment,
+    ContractLine,
     ContractType,
     CurrencyChoices,
     InternalEntityChoices,
     Invoice,
     InvoiceLine,
+    InvoiceStatusChoices,
     ServiceProvider,
     StatusChoices,
-    InvoiceStatusChoices,
+    Unit,
 )
 
 
+@register_filterset
 class ContractFilterSet(ContactModelFilterSet, NetBoxModelFilterSet, TenancyFilterSet):
     status = django_filters.MultipleChoiceFilter(choices=StatusChoices, null_value=None)
     internal_party = django_filters.MultipleChoiceFilter(
@@ -44,6 +49,9 @@ class ContractFilterSet(ContactModelFilterSet, NetBoxModelFilterSet, TenancyFilt
         method='filter_by_circuit_provider',
         label='Circuit provider'
     )
+    invoice_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='invoices', queryset=Invoice.objects.all(), label='Invoice (ID)'
+    )
 
     class Meta:
         model = Contract
@@ -57,6 +65,7 @@ class ContractFilterSet(ContactModelFilterSet, NetBoxModelFilterSet, TenancyFilt
             'external_party_object_id',
             'external_reference',
             'parent',
+            'billable',
         )
 
     def search(self, queryset, name, value):
@@ -84,6 +93,7 @@ class ContractFilterSet(ContactModelFilterSet, NetBoxModelFilterSet, TenancyFilt
         )
 
 
+@register_filterset
 class InvoiceFilterSet(NetBoxModelFilterSet):
     status = django_filters.MultipleChoiceFilter(choices=InvoiceStatusChoices, null_value=None)
     currency = django_filters.MultipleChoiceFilter(
@@ -114,24 +124,27 @@ class InvoiceFilterSet(NetBoxModelFilterSet):
         )
 
 
-class ServiceProviderFilterSet(ContactModelFilterSet, NetBoxModelFilterSet):
+@register_filterset
+class ServiceProviderFilterSet(ContactModelFilterSet, PrimaryModelFilterSet):
     class Meta:
         model = ServiceProvider
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'slug', 'description', 'portal_url')
 
     def search(self, queryset, name, value):
-        return queryset.filter(name__icontains=value)
+        return queryset.filter(Q(name__icontains=value) | Q(description__icontains=value))
 
 
-class ContractTypeFilterSet(NetBoxModelFilterSet):
+@register_filterset
+class ContractTypeFilterSet(OrganizationalModelFilterSet):
     class Meta:
         model = ContractType
-        fields = ('name', 'description', 'color')
+        fields = ('id', 'name', 'slug', 'description', 'color')
 
     def search(self, queryset, name, value):
-        return queryset.filter(name__icontains=value)
+        return queryset.filter(Q(name__icontains=value) | Q(slug__icontains=value))
 
 
+@register_filterset
 class ContractAssignmentFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = ContractAssignment
@@ -141,6 +154,7 @@ class ContractAssignmentFilterSet(NetBoxModelFilterSet):
         return queryset.filter(Q(contract__name__icontains=value))
 
 
+@register_filterset
 class InvoiceLineFilterSet(NetBoxModelFilterSet):
     currency = django_filters.MultipleChoiceFilter(
         choices=CurrencyChoices, null_value=None
@@ -156,6 +170,7 @@ class InvoiceLineFilterSet(NetBoxModelFilterSet):
         )
 
 
+@register_filterset
 class AccountingDimensionFilterSet(NetBoxModelFilterSet):
     status = django_filters.MultipleChoiceFilter(
         choices=AccountingDimensionStatusChoices, null_value=None
@@ -167,3 +182,57 @@ class AccountingDimensionFilterSet(NetBoxModelFilterSet):
 
     def search(self, queryset, name, value):
         return queryset.filter(Q(comments__icontains=value) | Q(name__icontains=value))
+
+
+@register_filterset
+class UnitFilterSet(NetBoxModelFilterSet):
+    billing_method = django_filters.MultipleChoiceFilter(choices=BillingMethodChoices, null_value=None)
+
+    class Meta:
+        model = Unit
+        fields = ('id', 'name', 'description', 'months')
+
+    def search(self, queryset, name, value):
+        return queryset.filter(Q(name__icontains=value) | Q(description__icontains=value))
+
+
+@register_filterset
+class ContractLineFilterSet(NetBoxModelFilterSet):
+    contract_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='contract', queryset=Contract.objects.all(), label='Contract (ID)'
+    )
+    unit_id = django_filters.ModelMultipleChoiceFilter(
+        field_name='unit', queryset=Unit.objects.all(), label='Unit (ID)'
+    )
+    unit = django_filters.ModelMultipleChoiceFilter(
+        field_name='unit__name', to_field_name='name', queryset=Unit.objects.all(), label='Unit (name)'
+    )
+    billing_method = django_filters.MultipleChoiceFilter(
+        field_name='unit__billing_method', choices=BillingMethodChoices, label='Billing method'
+    )
+    currency = django_filters.MultipleChoiceFilter(choices=CurrencyChoices, null_value=None)
+    accounting_dimensions = django_filters.ModelMultipleChoiceFilter(
+        queryset=AccountingDimension.objects.all(), label='Accounting dimension (ID)'
+    )
+    invoice_id = django_filters.NumberFilter(
+        method='filter_by_invoice',
+        label='Invoice (ID): lines of its contract and of their non-billable descendants',
+    )
+
+    class Meta:
+        model = ContractLine
+        fields = ('id', 'description', 'quantity', 'unit_price', 'start_date', 'end_date', 'invoiced_at_conversion')
+
+    def search(self, queryset, name, value):
+        return queryset.filter(
+            Q(description__icontains=value) | Q(comments__icontains=value) | Q(contract__name__icontains=value)
+        )
+
+    def filter_by_invoice(self, queryset, name, value):
+        invoice = Invoice.objects.filter(pk=value).first()
+        if invoice is None:
+            return queryset.none()
+        contract_ids = {
+            contract.pk for invoice_contract in invoice.contracts.all() for contract in invoice_contract.billing_scope()
+        }
+        return queryset.filter(contract__in=contract_ids)

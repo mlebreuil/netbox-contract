@@ -1,0 +1,36 @@
+{% extends 'generic/_base.html' %}
+{% load form_helpers %}
+{% load i18n %}
+
+{% block title %}{% trans "Amend" %} {{ object }}{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col col-md-8 offset-md-2">
+      <div class="alert alert-info" role="alert">
+        {% blocktrans trimmed with price=object.unit_price quantity=object.quantity %}
+          This line ends the day before the new terms apply, and a new line with the new unit price or quantity
+          replaces it from that day. Current terms: quantity {{ quantity }} at {{ price }}.
+        {% endblocktrans %}
+        {% if last_invoiced_date %}
+          {% blocktrans trimmed with date=last_invoiced_date|date:"Y-m-d" %}
+            The last invoiced period ends on {{ date }}: the new terms must start after it.
+          {% endblocktrans %}
+        {% endif %}
+      </div>
+      <form method="post" class="form-object-edit">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+        {% endif %}
+        <div class="field-group my-4">
+          {% render_form form %}
+        </div>
+        <div class="text-end my-3">
+          <a href="{{ return_url }}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
+          <button type="submit" class="btn btn-primary">{% trans "Amend" %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock content %}

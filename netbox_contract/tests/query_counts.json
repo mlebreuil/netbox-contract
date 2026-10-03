@@ -1,0 +1,20 @@
+{
+  "accountingdimension:api_list_objects": 12,
+  "accountingdimension:list_objects_with_permission": 16,
+  "contract:api_list_objects": 17,
+  "contract:list_objects_with_permission": 18,
+  "contractassignment:api_list_objects": 18,
+  "contractassignment:list_objects_with_permission": 23,
+  "contractline:api_list_objects": 16,
+  "contractline:list_objects_with_permission": 18,
+  "contracttype:api_list_objects": 12,
+  "contracttype:list_objects_with_permission": 16,
+  "invoice:api_list_objects": 31,
+  "invoice:list_objects_with_permission": 18,
+  "invoiceline:api_list_objects": 20,
+  "invoiceline:list_objects_with_permission": 18,
+  "serviceprovider:api_list_objects": 12,
+  "serviceprovider:list_objects_with_permission": 17,
+  "unit:api_list_objects": 12,
+  "unit:list_objects_with_permission": 17
+}

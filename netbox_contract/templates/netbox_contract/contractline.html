@@ -1,0 +1,8 @@
+{% extends 'generic/object.html' %}
+{% comment %}The page content is the layout declared on the view (netbox_contract/panels.py); only the breadcrumbs are specific.{% endcomment %}
+{% block breadcrumbs %}
+  {{ block.super }}
+  <li class="breadcrumb-item">
+    <a href="{% url 'plugins:netbox_contract:contractline_list' %}?contract_id={{ object.contract.pk }}">{{ object.contract }}</a>
+  </li>
+{% endblock %}

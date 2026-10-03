@@ -1,0 +1,22 @@
+{% extends 'generic/object_edit.html' %}
+{% load i18n %}
+{% load contract_tags %}
+
+{% block pre_form_fields %}
+  {% if lock_message %}
+    <div class="alert alert-warning d-flex justify-content-between align-items-center" role="alert">
+      <div>
+        {{ lock_message }}
+        {% trans "Its contract terms are shown disabled; its accounting dimensions, comments and tags can still be edited." %}
+        {% if object.can_be_amended %}
+          {% trans "To change its price or quantity from a date, amend it." %}
+        {% endif %}
+      </div>
+      {% if object|can_amend:request.user %}
+        <a href="{% url 'plugins:netbox_contract:contractline_amend' pk=object.pk %}" class="btn btn-primary ms-3 text-nowrap">
+          <i class="mdi mdi-cash-sync" aria-hidden="true"></i> {% trans "Amend" %}
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock pre_form_fields %}

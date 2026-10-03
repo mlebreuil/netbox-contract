@@ -5,11 +5,12 @@ class ContractsConfig(PluginConfig):
     name = 'netbox_contract'
     verbose_name = 'Netbox contract'
     description = 'Contract management plugin for Netbox'
-    version = '2.4.4'
+    version = '2.5.0'
     author = 'Marc Lebreuil'
     author_email = 'marc@famillelebreuil.net'
     base_url = 'contracts'
-    min_version = '4.3.0'
+    graphql_schema = 'graphql.schema.schema'
+    min_version = '4.6.0'
     required_settings = []
     default_settings = {
         'top_level_menu': False,
@@ -27,7 +28,13 @@ class ContractsConfig(PluginConfig):
             'virtualization.virtualmachine',
             'virtualization.cluster',
         ],
+        'contract_assignments_display': 'both',  # options: 'tab', 'inline', 'both'
+        'show_deprecated_fields': False,
     }
+
+    def ready(self):
+        super().ready()
+        from . import signals  # noqa: F401
 
 
 config = ContractsConfig

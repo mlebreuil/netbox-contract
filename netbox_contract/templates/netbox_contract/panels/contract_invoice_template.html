@@ -1,0 +1,26 @@
+{% load i18n %}
+{% load render_table from django_tables2 %}
+{% if invoice_template %}
+  <div class="card">
+    <h2 class="card-header">
+      {% trans "Invoice templates (kept for reference)" %}
+      <span class="badge text-bg-warning">{% trans "deprecated" %}</span>
+    </h2>
+    <table class="table table-hover attr-table">
+      <tr>
+        <th scope="row">{% trans "Number" %}</th>
+        <td><a href="{{ invoice_template.get_absolute_url }}">{{ invoice_template.number }}</a></td>
+      </tr>
+      <tr>
+        <th scope="row">{% trans "Currency" %}</th>
+        <td>{{ invoice_template.get_currency_display }}</td>
+      </tr>
+      <tr>
+        <th scope="row">{% trans "Total amount" %}</th>
+        <td>{{ invoice_template.total_invoicelines_amount }}</td>
+      </tr>
+    </table>
+    <h2 class="card-header">{% trans "Invoice template lines" %}</h2>
+    {% render_table invoicelines_table %}
+  </div>
+{% endif %}

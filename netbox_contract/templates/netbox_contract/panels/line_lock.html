@@ -1,0 +1,9 @@
+{% load i18n %}
+{% if lock_message %}
+  <div class="alert alert-warning" role="alert">
+    {{ lock_message }} {% trans "Its accounting dimensions, comments and tags can still be edited." %}
+    {% if object.can_be_amended %}
+      {% trans "To change its price or quantity from a date, use Amend: the line then ends the day before and a new line with the new terms replaces it." %}
+    {% endif %}
+  </div>
+{% endif %}

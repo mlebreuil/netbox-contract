@@ -1,0 +1,2 @@
+{% load i18n %}
+{% for successor in value.all %}<a href="{{ successor.get_absolute_url }}">{{ successor }}</a> ({% trans "from" %} {{ successor.start_date }}){% if not forloop.last %}, {% endif %}{% empty %}{{ ''|placeholder }}{% endfor %}

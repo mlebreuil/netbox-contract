@@ -5,6 +5,10 @@ on:
   push:
     branches:
       - "!release"
+    paths-ignore:
+      - '.github/**'
+      - 'docs/**'
+      - '**.md'
 
 concurrency:
   group: ${{ github.workflow }}
@@ -70,6 +74,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: "netbox-community/netbox"
+          ref: v4.6.10
           path: netbox
       - name: Install netbox-contract
         working-directory: netbox-contract
