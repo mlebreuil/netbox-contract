@@ -5,8 +5,10 @@ contracts/rest-api.md). 2.5.0 removes no REST field; the fields a later release 
 
 import re
 from pathlib import Path
+from unittest import SkipTest
 
 from dcim.models import Site
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.urls import include, path, reverse
 from drf_spectacular.generators import SchemaGenerator
@@ -26,7 +28,19 @@ from netbox_contract.tests.custom import APITestCase
 from netbox_contract.tests.helpers import make_contract, make_invoice, make_invoice_line, make_line, monthly
 
 DRAFT = InvoiceStatusChoices.STATUS_DRAFT
-REPO = Path(__file__).resolve().parents[2]
+
+
+def repository_file(*parts):
+    """
+    A file of the plugin repository: next to the package in an editable install (development), or in the checkout
+    beside NetBox's when the package is installed in site-packages (CI runs from NetBox's directory).
+    """
+    for root in (Path(__file__).resolve().parents[2], Path.cwd().parent / 'netbox-contract', Path.cwd()):
+        candidate = root.joinpath(*parts)
+        if candidate.is_file():
+            return candidate
+    raise SkipTest(f'{"/".join(parts)} is not available next to this installation')
+
 
 # Today's nested contract (assignments, contract lines, contract parent): kept unchanged in 2.5.0 (FR-009)
 NESTED_CONTRACT = {
@@ -227,11 +241,17 @@ class SchemaTestCase(APITestCase):
     def test_brief_components(self):
         self.assertEqual(self.properties('BriefInvoice'), NESTED_INVOICE)
         self.assertEqual(self.properties('BriefContractLine'), BRIEF_CONTRACT_LINE)
-        # NetBox documents the items of SerializedPKRelatedField with the model's component (core convention);
-        # the response holds the brief accounting dimension (NestedSnapshotTestCase)
+        # The accounting dimension lists are SerializedPKRelatedField(nested=True): NetBox 4.6.10 (the CI pin)
+        # documents them with the brief component (netbox#22989); earlier 4.6 releases used the model's component.
+        # The response holds the brief accounting dimension either way (NestedSnapshotTestCase).
+        if tuple(int(part) for part in settings.RELEASE.version.split('.')[:3]) >= (4, 6, 10):
+            component = 'BriefAccountingDimension'
+            self.assertEqual(self.properties(component), NESTED_DIMENSION)
+        else:
+            component = 'AccountingDimension'
         for schema in ('ContractLine', 'InvoiceLine'):
             items = self.schemas[schema]['properties']['accounting_dimensions']['items']
-            self.assertEqual(items['$ref'], '#/components/schemas/AccountingDimension')
+            self.assertEqual(items['$ref'], f'#/components/schemas/{component}')
         for gone in ('NestedInvoice', 'NestedAccountingDimension', 'NestedContractLine'):
             self.assertNotIn(gone, self.schemas)
 
@@ -259,7 +279,7 @@ class DeprecationNoticeTestCase(APITestCase):
         return match.group(1)
 
     def test_changelog(self):
-        changelog = (REPO / 'CHANGELOG.md').read_text()
+        changelog = repository_file('CHANGELOG.md').read_text()
         entry = self.notice(changelog, r'\[#309\]', r'\n\* \[#|\n## ')
         deprecations = self.notice(entry, r'Deprecations', r'\Z')
         for field in DEPRECATED_NESTED_CONTRACT | DEPRECATED_INVOICE_CONTRACTS | DEPRECATED_BRIEF \
@@ -268,7 +288,7 @@ class DeprecationNoticeTestCase(APITestCase):
                 self.assertIn(f'`{field}`', deprecations)
 
     def test_api_docs(self):
-        docs = (REPO / 'docs' / 'api.md').read_text()
+        docs = repository_file('docs', 'api.md').read_text()
         section = self.notice(docs, r'## Deprecated nested fields', r'\n## |\Z')
         for field in DEPRECATED_NESTED_CONTRACT | DEPRECATED_INVOICE_CONTRACTS | DEPRECATED_BRIEF \
                 | DEPRECATED_INVOICE_BRIEF:

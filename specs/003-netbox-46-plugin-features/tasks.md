@@ -212,7 +212,7 @@ gone, and the changelog and docs list every field to be removed later.
   - keep `NestedContractSerializer`, with the docstring of research D7 and "Deprecated: will be removed from the nested contract, read contracts/{id}/" help texts on the 19 fields;
   - keep invoice `contracts` unchanged. `InvoiceSerializer.validate()` now returns at once when the serializer is nested: as the related invoice of an invoice line it received the Invoice object. `replaces` is attached after the class body through `_declared_fields`.
 - [X] T043 [US3] Set `brief_fields` on all nine serializers to the "Brief fields in 2.5.0" column of contracts/rest-api.md. Contract type `slug` and service provider `description` are added by US5 (T063)
-- [X] T044 [US3] Adapt the `brief_fields` lists in `netbox_contract/tests/test_api.py`. Run `test_nested_api` (except T040), `test_api`, `test_issue_307`, `test_prefill`, `test_posted` and `ruff check`. Query counts must not change; if they do, find out why before re-recording Full suite: 743 tests OK, query counts unchanged. The OpenAPI schema documents the accounting dimension lists with the `AccountingDimension` component: NetBox's extension for `SerializedPKRelatedField` resolves the serializer class (core convention), so there is no `BriefAccountingDimension` component. The responses are unchanged.
+- [X] T044 [US3] Adapt the `brief_fields` lists in `netbox_contract/tests/test_api.py`. Run `test_nested_api` (except T040), `test_api`, `test_issue_307`, `test_prefill`, `test_posted` and `ruff check`. Query counts must not change; if they do, find out why before re-recording Full suite: 743 tests OK, query counts unchanged. The OpenAPI component of the accounting dimension lists depends on the NetBox release: `BriefAccountingDimension` on the pinned 4.6.10 (netbox#22989), `AccountingDimension` before. The first CI run showed it, because the local NetBox (main after 4.6.8) predates the pin; `SchemaTestCase` now checks the component for the running release.
 - [X] T045 [US3] Add to the #309 entry of `CHANGELOG.md`:
   - "Behaviour changes": the renamed OpenAPI components, the brief additions, and the invalid invoice line `name` declaration removed;
   - "Deprecations": every field of the contracts/rest-api.md deprecation table, per location, with "read `contracts/{id}/` instead", to be removed by a later release. `docs/api.md` also corrected: the amend action no longer "requires the add and change permissions" (missed in T018).
@@ -379,3 +379,13 @@ docs and changelog.
 3. Add US4 (GraphQL) and US5 (base classes).
 4. Polish, then one pull request to `develop`: the feature ships whole in 2.5.0 (Constitution VII). The stories are
    commits, not separate releases.
+
+## Post-PR fixes (CI on NetBox v4.6.10)
+
+The first CI run of PR #312 failed four tests that passed locally. The local NetBox is `main` after 4.6.8, which
+predates the CI pin v4.6.10.
+
+- [X] T072 `test_nested_api.DeprecationNoticeTestCase` looked for `CHANGELOG.md` and `docs/api.md` next to the package. CI installs the plugin into site-packages and checks the repository out beside NetBox, so `repository_file()` also looks in `../netbox-contract` from NetBox's directory, and skips when neither exists.
+- [X] T073 `SchemaTestCase.test_brief_components`: on 4.6.10 the accounting dimension lists are `BriefAccountingDimension` (netbox#22989). The test checks the component for the running release, and the changelog, spec, contract and research wording are corrected.
+- [X] T074 `invoice:api_list_objects` baseline set to the CI value (31; 33 on the older local NetBox). Reason: baselines must match the pinned NetBox (Constitution II). The local environment should run NetBox v4.6.10 to reproduce CI.
+

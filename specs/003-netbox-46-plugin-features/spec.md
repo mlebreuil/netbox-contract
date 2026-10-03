@@ -95,7 +95,7 @@ An integration reading contract lines, invoice lines or invoices gets nested rel
 3. **Given** an invoice line and a contract line, **When** they are read, **Then** the line's `invoice` holds `id, url, display, number` and the `accounting_dimensions` hold `id, url, display, name, value`, as today. The contract line's `replaces` holds the brief contract line.
 4. **Given** a request that sets a related object by id or by a dictionary of attributes (for example `"contract": 12` or `"contract": {"name": "C-1"}`), **When** it is sent, **Then** it is accepted as before.
 5. **Given** a list request with `brief=true` on any endpoint, **When** it is sent, **Then** each object holds every field it held before, plus the documented additions, and every declared brief field exists on the model.
-6. **Given** the OpenAPI schema, **When** it is generated, **Then** the nested invoice and contract line are the `Brief*` components of their models, and the accounting dimension lists refer to the `AccountingDimension` component (NetBox's convention for such lists). The nested contract is still documented with the 24 fields, with its deprecated fields marked in their help text. `external_party_object` and `content_object` remain documented as objects.
+6. **Given** the OpenAPI schema on the pinned NetBox (4.6.10), **When** it is generated, **Then** the nested invoice, accounting dimension and contract line are the `Brief*` components of their models (earlier 4.6 releases document the accounting dimension lists with the `AccountingDimension` component). The nested contract is still documented with the 24 fields, with its deprecated fields marked in their help text. `external_party_object` and `content_object` remain documented as objects.
 7. **Given** `CHANGELOG.md` and `docs/api.md`, **When** they are read, **Then** they list, per field, the nested contract fields, invoice `contracts` content and `brief=true` fields that a later release will remove, and what to read instead.
 
 ---
@@ -180,7 +180,7 @@ An administrator manages contract types like other NetBox categories (with a slu
 - **FR-009**: The nested invoice (invoice lines), nested accounting dimensions (contract lines, invoice lines) and nested contract line `replaces` MUST use the brief mechanism of their model's serializer, and their hand-written nested serializers MUST be removed. Their output MUST be identical to today's, except `replaces`, which is new in 2.5.0. The nested contract (assignments, contract lines, `parent`) and the contracts of an invoice MUST keep today's output, and the nested contract serializer MUST be marked deprecated in the code.
 - **FR-010**: Every model's brief representation MUST be declared explicitly and contain only existing fields. Compared with 2.4, a brief set MAY gain fields and MUST NOT lose any. The invalid `name` of the invoice line brief set MUST be removed from the declaration.
 - **FR-011**: Writing a related object by id or by a dictionary of attributes MUST keep working on every writable related field.
-- **FR-012**: The OpenAPI schema MUST describe the switched nested invoice and contract line as the `Brief*` components of their models (the accounting dimension lists follow NetBox's convention for related-object lists and refer to the model's component), keep the nested contract's 24 fields, and keep describing `external_party_object` and `content_object` as objects.
+- **FR-012**: The OpenAPI schema MUST describe the switched nested objects as the `Brief*` components of their models on the pinned NetBox (4.6.10; earlier 4.6 releases document the accounting dimension lists with the model's component), keep the nested contract's 24 fields, and keep describing `external_party_object` and `content_object` as objects.
 - **FR-012a**: The fields that the later shrink will remove MUST be announced, per field, under "Deprecations" in the #309 changelog entry and in `docs/api.md`: the 19 nested contract fields other than id, url, display, name and status, the full contracts of invoices (to become brief contracts), and the `brief=true` fields of contracts and invoices outside their future brief sets.
 
 **GraphQL**
@@ -202,7 +202,7 @@ An administrator manages contract types like other NetBox categories (with a slu
 - **FR-020**: Every acceptance scenario above MUST be covered by an automated test that fails before the change where the behaviour changes. The REST API tests MUST also cover GraphQL through NetBox's complete API test case (Constitution II).
 - **FR-021**: `CHANGELOG.md` MUST have a #309 entry under 2.5.0, with a "Behaviour changes" list covering:
   - the amend permission action (which replaces add + change);
-  - the nested serializers moved to NetBox's brief mechanism with identical output, and the renamed OpenAPI components (`BriefInvoice`, `BriefContractLine`; accounting dimension lists refer to `AccountingDimension`);
+  - the nested serializers moved to NetBox's brief mechanism with identical output, and the renamed OpenAPI components (`BriefInvoice`, `BriefAccountingDimension`, `BriefContractLine`);
   - the contract type slug, comments and owner, and the service provider description and owner;
   - the new GraphQL API.
 
