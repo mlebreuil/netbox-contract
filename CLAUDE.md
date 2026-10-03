@@ -155,8 +155,38 @@ in NetBox core, so script logic lives in importable modules).
 - Features follow Spec Kit (`/speckit-*` skills in `.claude/skills/`, artifacts in `specs/<feature>/`: spec, plan,
   research decisions, data model, contracts, tasks). Keep the spec, `research.md` decisions and `tasks.md` in step
   with behaviour changes.
-- Every user-visible change updates `docs/` (mkdocs), `CHANGELOG.md` (with a "Behaviour changes" list for changes
-  that affect existing users or API clients) and, for settings or requirements, `README.md` (Constitution VII).
+- Every user-visible change updates `docs/` (mkdocs), `CHANGELOG.md` (see "Changelog" below) and, for settings or
+  requirements, `README.md` (Constitution VII).
 - REST fields, endpoints, settings and import columns are public interfaces: deprecate before removing, never add a
   required input to an existing endpoint (Constitution V). Data migrations must be lossless and re-runnable
   (Constitution IV).
+
+## Changelog
+
+`CHANGELOG.md` follows the NetBox release notes (e.g. `../netbox/docs/release-notes/version-4.6.md`, or
+https://netboxlabs.com/docs/netbox/release-notes/version-4.7). `docs/changelog.md` only includes it, so edit
+`CHANGELOG.md` alone. A release is organised **by kind of change, not by issue**: never add a per-issue entry with
+nested sub-lists, and never add a second "Behaviour changes" or "Deprecations" list inside an issue. When several
+issues ship in one release, each one adds its items to the release's shared sections. (Before this rule, 2.5.0 had
+a nested "Behaviour changes" list under #309 in addition to the release-wide one, which confused readers.)
+
+Under `### Version X.Y.Z` (keep the existing heading levels; older releases keep their old flat format), use only
+the sections that have content, in this order:
+
+1. `> [!WARNING]` callout for the NetBox minimum version or a mandatory upgrade step.
+2. `#### Breaking Changes`: anything that changes behaviour for existing users, administrators or API clients
+   (new validation, locks, changed defaults, removed scripts/templates, permission changes, data rewritten by a
+   migration, OpenAPI component renames). One sentence-style bullet per change ending with `([#N](link))`, saying
+   what to do about it.
+3. `#### New Features`: one `##### Title ([#N](link))` per major feature, with a short prose description
+   (including the upgrade/migration of its data).
+4. `#### Enhancements`, `#### Bug Fixes`, `#### Plugins` (APIs and templates for other plugins),
+   `#### Deprecations` (what is deprecated and what replaces it; REST fields to be removed are listed here),
+   `#### Other Changes` (CI, dependencies): bullets `* [#N](link) - Short description`, sorted by issue number,
+   no trailing period.
+5. `#### REST API Changes`: new endpoints (full `/api/plugins/contracts/...` paths), then one bullet per model
+   (`netbox_contract.Contract`) with nested bullets for added fields, filters, brief representation changes and
+   deprecations.
+
+Specs and `tasks.md` should say which section an item goes in (e.g. "add to 2.5.0 Breaking Changes"), not ask for
+a per-issue entry. The specs of 001-003 predate this rule and still mention per-issue "Behaviour changes" lists.
