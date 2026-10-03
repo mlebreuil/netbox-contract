@@ -25,7 +25,7 @@ Django [Coding style](https://docs.djangoproject.com/en/stable/internals/contrib
 
 ## linting
 
-The [ruff](https://docs.astral.sh/ruff/) linter is used to enforce code style. A [pre-commit hook](./getting-started.md#3-enable-pre-commit-hooks) which runs this automatically is included with NetBox. To invoke `ruff` manually, run:
+The [ruff](https://docs.astral.sh/ruff/) linter is used to enforce code style. The repository's [pre-commit](https://pre-commit.com/) configuration (`.pre-commit-config.yaml`) runs it on every commit once installed with `pip install pre-commit && pre-commit install`. To invoke `ruff` manually, run:
 
 ```
 python3 -m pip install ruff

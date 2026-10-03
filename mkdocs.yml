@@ -9,6 +9,7 @@ nav:
   - Invoice: invoice.md
   - Invoice line: invoice_line.md
   - Accounting dimensions: accounting_dimensions.md
+  - API: api.md
   - Contributing: contributing.md
   - Changelog: changelog.md
 theme:
@@ -45,7 +46,9 @@ markdown_extensions:
   - toc:
       baselevel: 2
       permalink: true
-      slugify: !!python/name:pymdownx.slugs.uslugify
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
   - meta
 plugins:
   - include-markdown
