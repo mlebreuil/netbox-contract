@@ -1,0 +1,886 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://github.com/mlebreuil/netbox-contract/api/">
+      
+      
+        <link rel="prev" href="../accounting_dimensions/">
+      
+      
+        <link rel="next" href="../contributing/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>API - Netbox-contract NetBox Plugin</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="preference" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#api" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Netbox-contract NetBox Plugin" class="md-header__button md-logo" aria-label="Netbox-contract NetBox Plugin" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Netbox-contract NetBox Plugin
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              API
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/mlebreuil/netbox-contract" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    netbox-contract
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Netbox-contract NetBox Plugin" class="md-nav__button md-logo" aria-label="Netbox-contract NetBox Plugin" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Netbox-contract NetBox Plugin
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/mlebreuil/netbox-contract" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    netbox-contract
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contract/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contract
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contract_lines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contract lines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../invoice/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Invoice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../invoice_line/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Invoice line
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../accounting_dimensions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accounting dimensions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#units-and-contract-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Units and contract lines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contracts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contracts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invoices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invoices
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invoice-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invoice lines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#graphql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GraphQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nested-objects-and-brieftrue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nested objects and brief=true
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deprecated-nested-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deprecated nested fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#units-and-contract-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Units and contract lines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contracts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contracts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invoices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invoices
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invoice-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invoice lines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#graphql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GraphQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nested-objects-and-brieftrue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nested objects and brief=true
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deprecated-nested-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deprecated nested fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>API</h1>
+
+<h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
+<p>The plugin API is under <code>/api/plugins/contracts/</code>.</p>
+<p>note: When creating invoices and invoice lines through the API, the corresponding contracts respectively accounting dimensions, must be referenced as a list of id.</p>
+<p>Every list endpoint accepts the standard NetBox filters (<code>id</code>, <code>q</code>, <code>tag</code>, <code>created</code>, <code>last_updated</code>, ...) and the filters of its model, for example <code>serviceproviders/?name=</code>, <code>contracttype/?name=</code>, <code>accountingdimension/?name=&amp;value=&amp;status=</code> and <code>contractassignment/?contract=</code>.</p>
+<h3 id="units-and-contract-lines">Units and contract lines<a class="headerlink" href="#units-and-contract-lines" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>units/</code>: <code>name</code>, <code>description</code>, <code>billing_method</code> (<code>one_time</code>, <code>recurring</code>, <code>usage</code>), <code>months</code> (required for <code>recurring</code>, empty otherwise). Deleting a unit used by contract lines returns 409.</li>
+<li><code>contract-lines/</code>: <code>contract</code> (id), <code>description</code>, <code>quantity</code>, <code>unit_price</code>, <code>unit</code> (id), <code>currency</code> (defaults to the contract's), <code>start_date</code> and <code>end_date</code> (default to the contract's), <code>accounting_dimensions</code> (list of ids), and the read-only <code>total_value</code>, <code>yearly_value</code> and <code>invoiced_at_conversion</code>. Filters: <code>contract_id</code>, <code>unit_id</code>, <code>unit</code>, <code>currency</code>, <code>billing_method</code>, <code>accounting_dimensions</code>, <code>invoice_id</code>, <code>q</code>. Creating or deleting a line of a contract that has invoices, or changing its contract terms, returns 400; its <code>accounting_dimensions</code>, <code>comments</code> and <code>tags</code> can still be changed. The read-only <code>replaces</code> field shows the line a line replaces after an amendment.</li>
+<li><code>POST contract-lines/{id}/amend/</code> with <code>effective_date</code>, <code>reason</code> and a new <code>unit_price</code> and/or <code>quantity</code>: ends the line the day before <code>effective_date</code> and returns the new line (201). Requires the view and <strong>amend</strong> actions on that line (object permissions, constraints included); a write-enabled token is needed. A line outside the view constraints returns 404, a user without the amend action 403. Errors (date before the end of the last invoiced period, one-time line, missing reason) return 400.</li>
+</ul>
+<h3 id="contracts">Contracts<a class="headerlink" href="#contracts" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>billable</code> (writable, default <code>true</code>) and the read-only values <code>total_contract_value</code> (null when not available), <code>yearly_contract_value</code> and <code>yearly_billable_value</code>. Filter: <code>billable</code>.</li>
+<li><code>mrc</code>, <code>yrc</code> and <code>nrc</code> are deprecated and kept for compatibility.</li>
+</ul>
+<h3 id="invoices">Invoices<a class="headerlink" href="#invoices" title="Permanent link">&para;</a></h3>
+<ul>
+<li>A new invoice is linked to at most one contract and has its currency. Its <code>status</code> defaults to <code>draft</code>.</li>
+<li>A Posted invoice cannot change its <code>amount</code>, <code>currency</code>, <code>period_start</code>, <code>period_end</code> or <code>contracts</code> (400); its <code>status</code> can change.</li>
+<li><code>POST invoices/</code> generates the invoice lines of a new invoice from the contract lines, in the same request. It returns 400 for a non-billable contract, or when <code>amount</code> is lower than the total of the lines to generate. Editing an invoice never generates lines.</li>
+<li><code>template</code> is deprecated: invoice templates are no longer copied.</li>
+</ul>
+<h3 id="invoice-lines">Invoice lines<a class="headerlink" href="#invoice-lines" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>contract_line</code> (id, optional), <code>unit</code> (id) and <code>unit_price</code> (default to those of the contract line), <code>quantity</code>.</li>
+<li>Lines of a Posted invoice cannot be created or deleted, and their unit, unit price, quantity, amount, currency and contract line cannot change (400).</li>
+<li><code>amount</code> is always quantity x unit price and ignored if sent; <code>unit_price</code> is required, except that an <code>amount</code> given alone when a line is created is taken as its unit price with quantity 1 (compatibility). <code>quantity</code> defaults to 1.</li>
+</ul>
+<h3 id="graphql">GraphQL<a class="headerlink" href="#graphql" title="Permanent link">&para;</a></h3>
+<p>The plugin's objects are in NetBox's GraphQL API (<code>/graphql/</code>), with two queries per object type: <code>contract</code> / <code>contract_list</code>, <code>contract_line</code> / <code>contract_line_list</code>, <code>contract_type</code> / <code>contract_type_list</code>, <code>contract_assignment</code> / <code>contract_assignment_list</code>, <code>invoice</code> / <code>invoice_list</code>, <code>invoice_line</code> / <code>invoice_line_list</code>, <code>unit</code> / <code>unit_list</code>, <code>accounting_dimension</code> / <code>accounting_dimension_list</code> and <code>service_provider</code> / <code>service_provider_list</code>. Results follow the user's view permissions, constraints included.</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="n">contract_list</span><span class="p">(</span><span class="n">filters</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="n">status</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="n">exact</span><span class="p">:</span><span class="w"> </span><span class="no">STATUS_ACTIVE</span><span class="p">},</span><span class="w"> </span><span class="n">currency</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="n">exact</span><span class="p">:</span><span class="w"> </span><span class="s">"usd"</span><span class="p">}})</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">name</span>
+<span class="w">    </span><span class="n">contract_type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="n">external_party_object</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">__typename</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="nc">ServiceProviderType</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="nc">ProviderType</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="n">lines</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">description</span><span class="w"> </span><span class="n">quantity</span><span class="w"> </span><span class="n">unit_price</span><span class="w"> </span><span class="n">unit</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="n">invoices</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">number</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<ul>
+<li>Every stored field and relation is available. <code>mrc</code>, <code>yrc</code>, <code>nrc</code> (contracts) and <code>template</code> (invoices) are marked deprecated.</li>
+<li>The computed values (<code>total_contract_value</code>, <code>yearly_contract_value</code> and <code>yearly_billable_value</code> of contracts, <code>total_value</code> and <code>yearly_value</code> of contract lines) are not in GraphQL: read them from the REST API.</li>
+<li><code>external_party_object</code> of a contract is a service provider or a circuit provider. <code>content_object</code> of a contract assignment covers the models of the default <code>supported_models</code> setting (circuits, virtual circuits, sites, devices, racks, virtual machines, clusters); for an object of another model it is <code>null</code>, and <code>content_type</code> and <code>object_id</code> identify it.</li>
+</ul>
+<h3 id="nested-objects-and-brieftrue">Nested objects and <code>brief=true</code><a class="headerlink" href="#nested-objects-and-brieftrue" title="Permanent link">&para;</a></h3>
+<p>Related objects are nested in the responses:</p>
+<ul>
+<li><code>invoice</code> of an invoice line: <code>id</code>, <code>url</code>, <code>display</code>, <code>number</code>.</li>
+<li><code>accounting_dimensions</code> of contract lines and invoice lines: <code>id</code>, <code>url</code>, <code>display</code>, <code>name</code>, <code>value</code>.</li>
+<li><code>replaces</code> of a contract line: the brief contract line (<code>id</code>, <code>url</code>, <code>display</code>, <code>contract</code>, <code>description</code>, <code>quantity</code>, <code>unit</code>, <code>unit_price</code>, <code>currency</code>, <code>start_date</code>, <code>end_date</code>).</li>
+<li><code>contract</code> of contract assignments and contract lines, and <code>parent</code> of contracts: the nested contract, with the fields listed in the next section plus <code>id</code>, <code>url</code>, <code>display</code>, <code>name</code> and <code>status</code>. <code>contract_type</code> is the id of the contract type.</li>
+<li><code>contracts</code> of an invoice: the full contracts.</li>
+</ul>
+<p>A related object can be written by id, or by a dictionary of attributes that identifies exactly one object (for example <code>"contract": {"name": "C-1"}</code>).</p>
+<p><code>?brief=true</code> on a list returns the brief representation of each object, for example <code>id</code>, <code>url</code>, <code>display</code>, <code>invoice</code>, <code>accounting_dimensions</code>, <code>amount</code> and <code>currency</code> for invoice lines.</p>
+<h3 id="deprecated-nested-fields">Deprecated nested fields<a class="headerlink" href="#deprecated-nested-fields" title="Permanent link">&para;</a></h3>
+<p>A later release will reduce the nested contract and the brief contract to <code>id</code>, <code>url</code>, <code>display</code>, <code>name</code> and <code>status</code>, the brief invoice to <code>id</code>, <code>url</code>, <code>display</code> and <code>number</code>, and the contracts of an invoice to brief contracts. To prepare, read the fields you need from <code>contracts/{id}/</code> (or <code>invoices/{id}/</code>) instead of the nested objects. The fields that will be removed are:</p>
+<table>
+<thead>
+<tr>
+<th>Where</th>
+<th>Fields that will be removed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nested contract (<code>contract</code> of assignments and contract lines, <code>parent</code> of contracts)</td>
+<td><code>contract_type</code>, <code>external_party_object_type</code>, <code>external_party_object_id</code>, <code>external_party_object</code>, <code>external_reference</code>, <code>internal_party</code>, <code>tenant</code>, <code>start_date</code>, <code>end_date</code>, <code>initial_term</code>, <code>renewal_term</code>, <code>notice_period</code>, <code>currency</code>, <code>mrc</code>, <code>yrc</code>, <code>nrc</code>, <code>invoice_frequency</code>, <code>comments</code>, <code>documents</code></td>
+</tr>
+<tr>
+<td><code>contracts</code> of an invoice</td>
+<td>the fields above, plus <code>billable</code>, <code>total_contract_value</code>, <code>yearly_contract_value</code>, <code>yearly_billable_value</code>, <code>parent</code>, <code>tags</code>, <code>custom_fields</code>, <code>created</code>, <code>last_updated</code></td>
+</tr>
+<tr>
+<td><code>contracts/?brief=true</code></td>
+<td><code>contract_type</code>, <code>external_party_object_type</code>, <code>external_party_object_id</code>, <code>external_party_object</code>, <code>external_reference</code>, <code>internal_party</code>, <code>tenant</code>, <code>start_date</code>, <code>end_date</code>, <code>initial_term</code>, <code>renewal_term</code>, <code>currency</code>, <code>mrc</code>, <code>yrc</code>, <code>nrc</code>, <code>invoice_frequency</code>, <code>billable</code>, <code>comments</code>, <code>parent</code></td>
+</tr>
+<tr>
+<td><code>invoices/?brief=true</code></td>
+<td><code>date</code>, <code>template</code>, <code>contracts</code>, <code>period_start</code>, <code>period_end</code>, <code>currency</code>, <code>amount</code>, <code>comments</code></td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.indexes", "navigation.instant", "navigation.tabs.sticky"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

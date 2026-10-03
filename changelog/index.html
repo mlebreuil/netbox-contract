@@ -1,0 +1,2243 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://github.com/mlebreuil/netbox-contract/changelog/">
+      
+      
+        <link rel="prev" href="../contributing/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Changelog - Netbox-contract NetBox Plugin</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="preference" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#changelog" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Netbox-contract NetBox Plugin" class="md-header__button md-logo" aria-label="Netbox-contract NetBox Plugin" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Netbox-contract NetBox Plugin
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Changelog
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/mlebreuil/netbox-contract" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    netbox-contract
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Netbox-contract NetBox Plugin" class="md-nav__button md-logo" aria-label="Netbox-contract NetBox Plugin" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Netbox-contract NetBox Plugin
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/mlebreuil/netbox-contract" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    netbox-contract
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contract/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contract
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contract_lines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contract lines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../invoice/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Invoice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../invoice_line/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Invoice line
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../accounting_dimensions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accounting dimensions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Changelog">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [Unreleased]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Version 2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-250" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.5.0
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Version 2.5.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breaking Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Features
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="New Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#contract-lines-and-units-278" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contract Lines and Units (#278)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invoices-generated-from-contract-lines-278" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invoices Generated from Contract Lines (#278)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contract-line-amendments-278-309" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contract Line Amendments (#278, #309)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#currency-consistency-and-posted-invoice-locking-278" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Currency Consistency and Posted Invoice Locking (#278)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#graphql-api-309" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GraphQL API (#309)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enhancements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugins
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deprecations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deprecations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rest-api-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        REST API Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-v247" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version v2.4.7
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-246" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.4.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-245" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.4.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-244" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.4.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-243" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.4.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-242" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.4.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-241" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.4.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-240" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.4.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-233" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.3.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-232" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.3.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-231" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.3.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-230" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.3.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2211" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.11
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2210" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.10
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-228" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.8
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-227" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.7
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-226" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-225" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-224" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-223" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-222" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-221" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-220" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-212" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.1.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-210" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.1.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2014" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.14
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2013" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.13
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2011" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.11
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2010" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.10
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-209" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.9
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-208" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.8
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-207" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.7
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-206" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-205" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-204" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-203" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-202" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-201" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-200" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changelog
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Changelog">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [Unreleased]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Version 2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-250" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.5.0
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Version 2.5.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breaking Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Features
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="New Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#contract-lines-and-units-278" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contract Lines and Units (#278)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invoices-generated-from-contract-lines-278" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invoices Generated from Contract Lines (#278)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contract-line-amendments-278-309" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contract Line Amendments (#278, #309)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#currency-consistency-and-posted-invoice-locking-278" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Currency Consistency and Posted Invoice Locking (#278)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#graphql-api-309" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GraphQL API (#309)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enhancements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bug-fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bug Fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugins
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deprecations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deprecations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rest-api-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        REST API Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-v247" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version v2.4.7
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-246" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.4.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-245" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.4.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-244" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.4.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-243" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.4.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-242" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.4.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-241" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.4.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-240" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.4.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-233" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.3.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-232" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.3.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-231" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.3.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-230" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.3.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2211" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.11
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2210" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.10
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-228" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.8
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-227" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.7
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-226" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-225" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-224" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-223" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-222" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-221" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-220" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.2.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-212" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.1.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-210" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.1.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2014" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.14
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2013" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.13
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2011" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.11
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2010" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.10
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-209" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.9
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-208" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.8
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-207" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.7
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-206" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-205" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-204" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-203" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-202" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-201" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-200" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version 2.0.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Changelog</h1>
+
+<h2 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h2>
+<h3 id="unreleased">[Unreleased]<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h3>
+<h3 id="version-2">Version 2<a class="headerlink" href="#version-2" title="Permanent link">&para;</a></h3>
+<h4 id="version-250">Version 2.5.0<a class="headerlink" href="#version-250" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>[!WARNING]
+This version requires NetBox 4.6.0 or later. Read the <strong>Breaking Changes</strong> below before upgrading: the upgrade converts the contract costs and invoice templates into contract lines, and changes how invoices are created and locked.</p>
+</blockquote>
+<h5 id="breaking-changes">Breaking Changes<a class="headerlink" href="#breaking-changes" title="Permanent link">&para;</a></h5>
+<ul>
+<li>A new invoice can no longer be linked to more than one contract. Existing invoices linked to several contracts stay as they are and can be edited, but no contract can be added to them. These rules also apply to bulk edits of invoices, whose Template field is offered only when <code>show_deprecated_fields</code> is <code>True</code>. (<a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a>)</li>
+<li>A new invoice must have the currency of its contract, and cannot be created for a non-billable contract. (<a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a>)</li>
+<li>Creating an invoice (web interface or <code>POST invoices/</code>) now generates its invoice lines from the contract lines, and is refused when the invoice amount is lower than their total. Invoice lines are not generated when an invoice is edited or imported. (<a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a>)</li>
+<li>The copy of invoice template lines onto a new invoice is removed. Invoice templates are no longer used to pre-fill invoices; the pre-fill uses the contract lines instead of <code>mrc</code> and <code>yrc</code>. (<a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a>)</li>
+<li>New invoices are Draft by default (previously Posted), in the web interface and the REST API; imports still set the status given in the file. (<a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a>)</li>
+<li>Posted invoices are locked: their amount, currency, period and contracts cannot change, lines cannot be added or deleted, and the unit, unit price, quantity and amount of their lines cannot change. Set an invoice back to Draft to correct it. (<a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a>)</li>
+<li>The amount of every invoice line is quantity x unit price and can no longer be typed, as in most ERPs; the unit price is required and the quantity defaults to 1. An import or API call that gives only an amount still works: the amount becomes the unit price with quantity 1. Migration 0049 gives existing lines a unit price without changing any amount. (<a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a>)</li>
+<li>Contract lines are locked once their contract has an invoice (any status) or once an invoice line references them: a new contract must be created. Their accounting dimensions, comments and tags remain editable, and their price or quantity can be amended from a date after the last invoiced period. The billing method and months of a unit used by such lines are locked too. (<a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a>)</li>
+<li>The billable flag of a contract cannot change once the contract, one of its parents or one of its children has invoices. The currency of a contract cannot change once it has invoices or invoice lines; without invoices, its contract lines follow the new currency. Changing the currency of a contract also changes its non-billable descendants of the same currency, unless one of them has invoices. (<a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a>)</li>
+<li>A contract whose lines (or those of its child contracts) are on posted invoices can no longer be deleted. (<a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a>)</li>
+<li>The contract cost fields, new invoice templates and the invoice template section of the contract page are hidden unless <code>show_deprecated_fields</code> is <code>True</code>; templates remain reachable from the invoice list. The mandatory and hidden field settings ignore a deprecated field that is not shown (with a warning in the log) instead of failing. (<a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a>)</li>
+<li>The custom scripts <code>create_invoice_template</code> and <code>create_invoice_lines</code> are removed: they read fields that no longer exist and are superseded by the conversion. (<a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a>)</li>
+<li>API clients that passed filters to <code>serviceproviders/</code>, <code>contracttype/</code>, <code>accountingdimension/</code> or <code>contractassignment/</code> now get the filtered list instead of every object. (<a href="https://github.com/mlebreuil/netbox-contract/issues/307">#307</a>)</li>
+<li>Amending a contract line requires the new <strong>amend</strong> permission action. The add and change contract line permissions (required since <a href="https://github.com/mlebreuil/netbox-contract/issues/307">#307</a>) are no longer enough; administrators grant the new action to the users who amend lines. This applies to the screen and to the REST action <code>POST contract-lines/{id}/amend/</code>. (<a href="https://github.com/mlebreuil/netbox-contract/issues/309">#309</a>)</li>
+<li>The related tables of detail pages show the default columns of their lists (for example the contract lines of a contract show the contract line list columns, without the contract). Users who want other columns choose them on the list with <strong>Configure Table</strong>. (<a href="https://github.com/mlebreuil/netbox-contract/issues/309">#309</a>)</li>
+<li>On the contract page, the deprecated costs (<code>mrc</code>, <code>yrc</code>, <code>nrc</code>, shown with <code>show_deprecated_fields</code>) are grouped in a <strong>Deprecated costs</strong> panel. The invoice page applies the <code>hidden_invoice_fields</code> setting, which it ignored until now. (<a href="https://github.com/mlebreuil/netbox-contract/issues/309">#309</a>)</li>
+<li>Contract type descriptions are limited to 200 characters, as on core objects: a longer description is refused (form, import, REST API). On upgrade, every contract type gets a slug derived from its name, made unique with <code>-2</code>, <code>-3</code>, ... when needed, and a longer description is shortened at a word boundary (ending with "…") with its full text moved to the new comments; the migration prints every slug it made unique and every description it moved. Migrating back restores the moved descriptions. (<a href="https://github.com/mlebreuil/netbox-contract/issues/309">#309</a>)</li>
+<li>Code that creates contract types with <code>bulk_create()</code> must give a slug, since <code>bulk_create()</code> does not call <code>save()</code>, which derives it. (<a href="https://github.com/mlebreuil/netbox-contract/issues/309">#309</a>)</li>
+<li>OpenAPI schema: the components <code>NestedInvoice</code>, <code>NestedAccountingDimension</code> and <code>NestedContractLine</code> are replaced by <code>BriefInvoice</code>, <code>BriefAccountingDimension</code> and <code>BriefContractLine</code>, with the same properties (on NetBox 4.6.10 or later; earlier 4.6 releases document the accounting dimension lists with the <code>AccountingDimension</code> component). Clients generated from the schema must be regenerated; the responses are unchanged. (<a href="https://github.com/mlebreuil/netbox-contract/issues/309">#309</a>)</li>
+</ul>
+<h5 id="new-features">New Features<a class="headerlink" href="#new-features" title="Permanent link">&para;</a></h5>
+<h6 id="contract-lines-and-units-278">Contract Lines and Units (<a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a>)<a class="headerlink" href="#contract-lines-and-units-278" title="Permanent link">&para;</a></h6>
+<p>Contract lines replace the contract costs (<code>mrc</code>, <code>yrc</code>, <code>nrc</code>) and the invoice templates. The new <strong>Unit</strong> model defines a billing method (one-time, recurring or usage-based) and the number of months one unit price covers; a <strong>Contract line</strong> has a description, quantity, unit price, unit, currency, start and end dates and accounting dimensions. Both have list, detail, edit, bulk import, bulk edit and bulk delete screens.</p>
+<p>Contracts get a <strong>billable</strong> flag and three computed values: total contract value, yearly value and yearly billable value (which includes the lines of non-billable descendants).</p>
+<p>On upgrade, a data migration converts the monthly, yearly and non-recurring costs and the invoice templates into contract lines (units "One-time", "Monthly", "Yearly") and prints a report. It can be run again with <code>python manage.py convert_contract_lines</code>. Every existing contract is billable. Invoices and invoice lines are not changed.</p>
+<h6 id="invoices-generated-from-contract-lines-278">Invoices Generated from Contract Lines (<a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a>)<a class="headerlink" href="#invoices-generated-from-contract-lines-278" title="Permanent link">&para;</a></h6>
+<p>The invoice add screen proposes the amount from the contract lines and previews the invoice lines that will be generated, with their amounts and total. Their quantities, unit prices and accounting dimensions can be changed, and lines without contract line added, before saving; the invoice and its lines are created in one step.</p>
+<p>Invoice lines reference their contract line and carry their own quantity, unit and unit price, taken from the contract line by default and editable as long as the invoice is not posted (for example a discount on one invoice). Their amount is calculated as quantity x unit price. Migration 0047 copies the unit and unit price of the contract line into existing lines without changing their amounts.</p>
+<h6 id="contract-line-amendments-278-309">Contract Line Amendments (<a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a>, <a href="https://github.com/mlebreuil/netbox-contract/issues/309">#309</a>)<a class="headerlink" href="#contract-line-amendments-278-309" title="Permanent link">&para;</a></h6>
+<p>The unit price or quantity of a recurring or usage-based line can be amended from a date (<strong>Amend</strong> button, or <code>POST contract-lines/{id}/amend/</code>): the line ends the day before and a new line replaces it, invoiced periods keep their price, and the required reason is recorded in the change log. Amending has its own <strong>amend</strong> permission action (migration 0050), which can be limited with constraints; the <strong>Amend</strong> button is shown on the line page, in contract line tables and on the edit page only for the lines the user may amend.</p>
+<h6 id="currency-consistency-and-posted-invoice-locking-278">Currency Consistency and Posted Invoice Locking (<a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a>)<a class="headerlink" href="#currency-consistency-and-posted-invoice-locking-278" title="Permanent link">&para;</a></h6>
+<p>Contract lines, invoices and invoice lines must have the currency of their contract or invoice, and a non-billable child contract has the currency of its parent. The new read-only custom script "Report currency mismatches" lists existing mismatches without changing them.</p>
+<p>Posted invoices are locked: their amounts, period and contracts, and the amounts of their lines, can no longer change, and lines can no longer be added or deleted. Accounting dimensions, comments and tags remain editable, and the status can change back to Draft.</p>
+<h6 id="graphql-api-309">GraphQL API (<a href="https://github.com/mlebreuil/netbox-contract/issues/309">#309</a>)<a class="headerlink" href="#graphql-api-309" title="Permanent link">&para;</a></h6>
+<p>Contracts, contract lines, contract types, contract assignments, invoices, invoice lines, units, accounting dimensions and service providers can be queried and filtered in NetBox's GraphQL API, with permissions applied. It has the stored fields and relations; the computed contract and line values stay in the REST API, and an assigned object is resolved for the models of the default <code>supported_models</code> setting (see the API documentation).</p>
+<h5 id="enhancements">Enhancements<a class="headerlink" href="#enhancements" title="Permanent link">&para;</a></h5>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a> - Invoice lines have a readable name (<code>&lt;invoice number&gt; line &lt;id&gt;</code>) in search results, the change log and reports</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/308">#308</a> - Add the <strong>Journal</strong> tab to invoice lines, accounting dimensions, contract types and contract assignments</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/308">#308</a> - Filter forms offer NetBox's lookup modifiers (contains, starts with, is not, is empty, ...)</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/308">#308</a> - Add, edit, bulk edit and filter forms group their fields into sections (for contracts: Contract, Parties, Dates and terms, Billing, Tenancy)</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/308">#308</a> - The invoice and invoice line add screens support NetBox's quick add and partial refresh; values given in the page address (for example <code>?date=</code> or <code>?period_start=</code>) are kept by the invoice pre-fill instead of being replaced</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/308">#308</a> - The contract type description is a plain text field in the filter, bulk edit and import forms, and can be cleared in bulk</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/308">#308</a> - Invoice line tables (list, invoice page) show the linked <strong>ID</strong> by default, so a line can be opened; users who saved their own column choice add it from <strong>Configure Table</strong></li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/308">#308</a> - Refresh the translations and translate the new texts of 2.5.0 into French</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/309">#309</a> - The detail pages of the nine object types are built from NetBox's standard panels; their related tables are the tables of the corresponding lists filtered to the object, so their columns can be chosen with <strong>Configure Table</strong> on the list (<a href="https://github.com/mlebreuil/netbox-contract/issues/294">#294</a>)</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/309">#309</a> - Contract line tables decide their actions line by line: a locked line offers no Delete, and an amendable line offers Amend</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/309">#309</a> - Add the contract list filter <code>invoice_id</code> (UI and REST API): the contracts of an invoice</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/309">#309</a> - Contract types become NetBox organizational objects, with a <strong>slug</strong>, <strong>comments</strong> and an <strong>owner</strong>; service providers become NetBox primary objects, with a <strong>description</strong> and an <strong>owner</strong> (migrations 0051 and 0052). Both can be filtered by owner, and the owner can be set in bulk and imported. A contract type's slug is derived from its name when it is not given</li>
+</ul>
+<h5 id="bug-fixes">Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permanent link">&para;</a></h5>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/307">#307</a> - The Contracts tab of assigned objects (sites, devices, circuits, ...) is shown to users with the view contract assignment permission; it was shown to superusers only, because it checked a permission of a non-existent <code>contracts</code> app</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/307">#307</a> - The REST endpoints <code>serviceproviders/</code>, <code>contracttype/</code>, <code>accountingdimension/</code> and <code>contractassignment/</code> ignored their filters (<code>name</code>, <code>q</code>, <code>tag</code>, <code>contract</code>, ...) and always returned the whole list</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/307">#307</a> - The OpenAPI schema documents <code>external_party_object</code> (contracts, and the contract nested in contract lines and assignments) and <code>content_object</code> (contract assignments) as objects instead of strings</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/307">#307</a> - The invoice line add form pre-fills the unit price and currency only from an invoice the user may view, and no longer fails with a server error when the <code>invoice</code> parameter is unknown or not a number</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/307">#307</a> - The <strong>Amend</strong> button of contract lines was shown to users with the change permission alone, who then got a "forbidden" page</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/308">#308</a> - Editing an existing invoice showed today's date in place of its date</li>
+</ul>
+<h5 id="plugins">Plugins<a class="headerlink" href="#plugins" title="Permanent link">&para;</a></h5>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/308">#308</a> - Every screen of the plugin is registered with <code>register_model_view</code>, so other plugins can add tabs and actions to any plugin object; page addresses do not change</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/309">#309</a> - Other plugins can add content to the left, right and full-width areas of every plugin page</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/309">#309</a> - The template shown at the bottom of assigned objects moved to <code>netbox_contract/inc/contract_assignments_bottom.html</code>, and the unused <code>contract_list_bottom.html</code> was removed</li>
+</ul>
+<h5 id="deprecations">Deprecations<a class="headerlink" href="#deprecations" title="Permanent link">&para;</a></h5>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a> - The contract fields <code>mrc</code>, <code>yrc</code> and <code>nrc</code> and the invoice templates are deprecated. They are kept (never deleted, shown with a "deprecated" badge) and hidden by default; the new plugin setting <code>show_deprecated_fields</code> (default <code>False</code>) shows them again. They remain in the bulk import and the REST API</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/309">#309</a> - REST API fields, to be removed by a later release (see the API documentation; read <code>contracts/{id}/</code> or <code>invoices/{id}/</code> instead):<ul>
+<li>Nested contract (<code>contract</code> of assignments and contract lines, <code>parent</code> of contracts): <code>contract_type</code>, <code>external_party_object_type</code>, <code>external_party_object_id</code>, <code>external_party_object</code>, <code>external_reference</code>, <code>internal_party</code>, <code>tenant</code>, <code>start_date</code>, <code>end_date</code>, <code>initial_term</code>, <code>renewal_term</code>, <code>notice_period</code>, <code>currency</code>, <code>mrc</code>, <code>yrc</code>, <code>nrc</code>, <code>invoice_frequency</code>, <code>comments</code>, <code>documents</code>; it will keep <code>id</code>, <code>url</code>, <code>display</code>, <code>name</code> and <code>status</code></li>
+<li><code>contracts</code> of an invoice become brief contracts: the fields above and <code>billable</code>, <code>total_contract_value</code>, <code>yearly_contract_value</code>, <code>yearly_billable_value</code>, <code>parent</code>, <code>tags</code>, <code>custom_fields</code>, <code>created</code>, <code>last_updated</code> will be removed</li>
+<li><code>contracts/?brief=true</code>: <code>contract_type</code>, <code>external_party_object_type</code>, <code>external_party_object_id</code>, <code>external_party_object</code>, <code>external_reference</code>, <code>internal_party</code>, <code>tenant</code>, <code>start_date</code>, <code>end_date</code>, <code>initial_term</code>, <code>renewal_term</code>, <code>currency</code>, <code>mrc</code>, <code>yrc</code>, <code>nrc</code>, <code>invoice_frequency</code>, <code>billable</code>, <code>comments</code>, <code>parent</code></li>
+<li><code>invoices/?brief=true</code>: <code>date</code>, <code>template</code>, <code>contracts</code>, <code>period_start</code>, <code>period_end</code>, <code>currency</code>, <code>amount</code>, <code>comments</code></li>
+</ul>
+</li>
+</ul>
+<h5 id="other-changes">Other Changes<a class="headerlink" href="#other-changes" title="Permanent link">&para;</a></h5>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/278">#278</a> - CI runs the tests against the NetBox v4.6.10 tag</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/307">#307</a> - The plugin no longer depends on <code>drf_yasg</code>, which NetBox does not use</li>
+</ul>
+<h5 id="rest-api-changes">REST API Changes<a class="headerlink" href="#rest-api-changes" title="Permanent link">&para;</a></h5>
+<ul>
+<li>Added the following endpoints:<ul>
+<li><code>GET/POST /api/plugins/contracts/units/</code></li>
+<li><code>GET/PUT/PATCH/DELETE /api/plugins/contracts/units/&lt;id&gt;/</code></li>
+<li><code>GET/POST /api/plugins/contracts/contract-lines/</code></li>
+<li><code>GET/PUT/PATCH/DELETE /api/plugins/contracts/contract-lines/&lt;id&gt;/</code></li>
+<li><code>POST /api/plugins/contracts/contract-lines/&lt;id&gt;/amend/</code></li>
+</ul>
+</li>
+<li><code>netbox_contract.Contract</code><ul>
+<li>Add the <code>billable</code> boolean field</li>
+<li>Add the read-only <code>total_contract_value</code>, <code>yearly_contract_value</code> and <code>yearly_billable_value</code> fields</li>
+<li>Add the <code>invoice_id</code> filter</li>
+<li><code>mrc</code>, <code>yrc</code> and <code>nrc</code> are deprecated</li>
+</ul>
+</li>
+<li><code>netbox_contract.ContractType</code><ul>
+<li>Add the <code>slug</code>, <code>comments</code> and <code>owner</code> fields</li>
+<li>The brief representation gains <code>slug</code> and <code>description</code></li>
+</ul>
+</li>
+<li><code>netbox_contract.ServiceProvider</code><ul>
+<li>Add the <code>description</code> and <code>owner</code> fields</li>
+<li>The brief representation gains <code>slug</code> and <code>description</code></li>
+</ul>
+</li>
+<li><code>netbox_contract.Invoice</code><ul>
+<li>New invoices default to the <code>draft</code> status</li>
+<li><code>template</code> is deprecated</li>
+<li>The nested invoice uses NetBox's brief representation (same fields)</li>
+</ul>
+</li>
+<li><code>netbox_contract.InvoiceLine</code><ul>
+<li>Add the <code>contract_line</code>, <code>quantity</code>, <code>unit</code> and <code>unit_price</code> fields; <code>amount</code> is calculated</li>
+<li>The brief representation gains <code>id</code> and <code>currency</code> and no longer declares the non-existent <code>name</code></li>
+</ul>
+</li>
+<li><code>netbox_contract.ContractLine</code><ul>
+<li>The brief representation (also used for the replaced line, <code>replaces</code>) includes <code>start_date</code> and <code>end_date</code></li>
+</ul>
+</li>
+<li><code>netbox_contract.AccountingDimension</code><ul>
+<li>The nested accounting dimensions use NetBox's brief representation (same fields)</li>
+</ul>
+</li>
+</ul>
+<h4 id="version-v247">Version v2.4.7<a class="headerlink" href="#version-v247" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/303">#303</a> Gracefully skip <code>supported_models</code> entries that don't resolve to a registered Django model instead of raising an unhandled <code>LookupError</code> during app startup (which previously crashed <em>every</em> management command, including <code>migrate</code>). This most commonly affects models created dynamically by other plugins (e.g. <code>netbox_custom_objects</code> custom object types), whose registration order relative to <code>netbox_contract</code> is not guaranteed. A clear error is now logged (<code>netbox.plugins.netbox_contract</code>) naming the offending entry, and the rest of the plugin continues to load normally.</li>
+</ul>
+<h4 id="version-246">Version 2.4.6<a class="headerlink" href="#version-246" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/300">#300</a> Expose missing model fields (slug, comments, color, notice_period, documents, status, tags, custom_fields) via API serializers.</li>
+</ul>
+<h4 id="version-245">Version 2.4.5<a class="headerlink" href="#version-245" title="Permanent link">&para;</a></h4>
+<ul>
+<li>
+<p><a href="https://github.com/mlebreuil/netbox-contract/issues/292">292</a> bug fix. Contract detail show internal party value instead of label.</p>
+</li>
+<li>
+<p><a href="https://github.com/mlebreuil/netbox-contract/issues/294">294</a> Add <code>contract_assignments_display</code> plugin setting (<code>tab</code>, <code>inline</code>, <code>both</code>) for contract assignment UI. The tab view allows customization of the contracts list table columns.</p>
+</li>
+</ul>
+<h4 id="version-244">Version 2.4.4<a class="headerlink" href="#version-244" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/288">288</a> Add the possibility to assign contract any object type. By default the following objects types: 'circuits.circuit', 'circuits.virtualcircuit', 'dcim.site', 'dcim.device', 'dcim.rack', 'virtualization.virtualmachine', 'virtualization.cluster', 'ipam.ipaddress', 'ipam.prefix'. This list can be overriden within the PLUGINS_CONFIG configuration parameter. Check the README file or <a href="https://mlebreuil.github.io/netbox-contract/">documentation</a> for more information.</li>
+</ul>
+<h4 id="version-243">Version 2.4.3<a class="headerlink" href="#version-243" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/282">282</a> Add the possibility to assign contract to clusters and racks.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/276">276</a> Add the possibility to update the provider in bulk for contracts.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/275">275</a> Add the possibility to filter contract by provider an service provider. Remove the default value for the currency and internal party fields in the contract search form.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/274">274</a> List contracts on providers and service providers pages</li>
+</ul>
+<h4 id="version-242">Version 2.4.2<a class="headerlink" href="#version-242" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/272">272</a> Add missing contract_type fields to the api.</li>
+</ul>
+<h4 id="version-241">Version 2.4.1<a class="headerlink" href="#version-241" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/257">257</a> Add the possibility to filter invoices by accounting dimensions.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/267">267</a> Add status field to invoices.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/263">263</a> Enable contract assignment to virtual circuits.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/258">258</a> Fix assignement of contacts to service providers.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/261">261</a> Fix spelling of word "party".</li>
+</ul>
+<h4 id="version-240">Version 2.4.0<a class="headerlink" href="#version-240" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>[!WARNING]
+This version requires Netbox 4.3.0 or later</p>
+</blockquote>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/pull/253">253</a> Implement Netbox 4.3 compatibility</li>
+</ul>
+<h4 id="version-233">Version 2.3.3<a class="headerlink" href="#version-233" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/pull/250">250</a> Add contacts to contract.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/pull/248">248</a> Add contact filtering on service provider.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/pull/245">245</a> Add contract-type model.</li>
+</ul>
+<h4 id="version-232">Version 2.3.2<a class="headerlink" href="#version-232" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/234">234</a> As part of the preparation of the <a href="https://github.com/netbox-community/netbox/wiki/Plugin-Certification-Program">plugin for certification</a>, this version includes standard Netbox unittest for model views. Correction to data import are also present as well.</li>
+</ul>
+<h4 id="version-231">Version 2.3.1<a class="headerlink" href="#version-231" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/219">219</a> Fix - netbox 4.2 non editable field for gfk</li>
+</ul>
+<h4 id="version-230">Version 2.3.0<a class="headerlink" href="#version-230" title="Permanent link">&para;</a></h4>
+<blockquote>
+<p>[!WARNING]
+Accounting dimension json field removed. It is deprecated since v2.2.0. Refer to the <a href="https://mlebreuil.github.io/netbox-contract/accounting_dimensions/">documentation</a></p>
+</blockquote>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/206">206</a> remove deprecated json accounting dimention field</li>
+<li>Add background color to status</li>
+<li>Script - fix check_contract_end with empty end date</li>
+<li>minor fix</li>
+</ul>
+<h4 id="version-2211">Version 2.2.11<a class="headerlink" href="#version-2211" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/202">202</a> Fix django.template.exceptions when trying to open device detail.</li>
+</ul>
+<h4 id="version-2210">Version 2.2.10<a class="headerlink" href="#version-2210" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/198">198</a> Add internationalization support and french translation.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/196">196</a> Add notice field to contract. Add an example custom script to report contract nearing cancelation notice.</li>
+<li>minor fix and cleanup</li>
+</ul>
+<h4 id="version-228">Version 2.2.8<a class="headerlink" href="#version-228" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/167">167</a> Add selector to object dynamic selection box.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/pull/193">193</a> Set the first currency in the choiceset as default currency.</li>
+</ul>
+<h4 id="version-227">Version 2.2.7<a class="headerlink" href="#version-227" title="Permanent link">&para;</a></h4>
+<ul>
+<li>fix migration dependency</li>
+</ul>
+<h4 id="version-226">Version 2.2.6<a class="headerlink" href="#version-226" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/186">186</a> Code compatibility fix for Netbox 4.1</li>
+</ul>
+<h4 id="version-225">Version 2.2.5<a class="headerlink" href="#version-225" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Generally improve filtering options</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/178">178</a> Add the possibility to filter on invoice number, and contract name through the API.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/176">176</a> Order accounting dimensions in tables alphabetically.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/171">171</a> It is now possible to define madatory accounting dimension by specifying their names in the 'mandatory_dimensions' list in the plugin settings. (see the "Customize the plugin" paragraph in the README.md file)</li>
+</ul>
+<h4 id="version-224">Version 2.2.4<a class="headerlink" href="#version-224" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/166">166</a> Review the Contract view to include invoice template details and lines.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/161">161</a> Change the invoice block title if the invoice is a template.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/160">160</a> Add more fields to the invoice and contract bulk edit forms.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/165">165</a> Fix Invoice and invoiceline creation through api. </li>
+</ul>
+<h4 id="version-223">Version 2.2.3<a class="headerlink" href="#version-223" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Fix accounting dimensions access through Dynamic Object Fields</li>
+<li>Fix invoice creation from contract. </li>
+<li>Add scripts to convert accounting dimensions in the json fields of contract and invoices to invoice template, invoicelines and dimensions objects.</li>
+</ul>
+<h4 id="version-222">Version 2.2.2<a class="headerlink" href="#version-222" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/154">154</a> Fix edit and delete bulk operations on dimensions and invoice lines.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/153">153</a> Enforce uniquness of accounting dimensions.</li>
+<li>Adds a status ( Active or Inactive ) to accounitng dimensions.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/151">151</a> Fix accounting line and dimensions search.</li>
+</ul>
+<h4 id="version-221">Version 2.2.1<a class="headerlink" href="#version-221" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/142">142</a> Gives the option to enter contract yearly recuring costs instead of only monthly recuring costs.
+Corresponding value is used to calculate the invoices amount without rounding approximations.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/148">148</a> Update tables format to match the new Netbox UI design.</li>
+</ul>
+<h4 id="version-220">Version 2.2.0<a class="headerlink" href="#version-220" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/140">140</a> Add the "Invoice line" and "Accounting dimension" models. In order to simplify invoices creation, it is possible to selsct one invoice as the template for each contract; Its accounting lines will automatically be copied to the new invoices for the contract. The amount of the first line will be updated so that the sum of the amount for each invoice line match the invoice amount.</li>
+</ul>
+<h4 id="version-212">Version 2.1.2<a class="headerlink" href="#version-212" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/135">127</a> Fix service provider creation issue</li>
+<li>Fix contract assignement issue</li>
+</ul>
+<h4 id="version-210">Version 2.1.0<a class="headerlink" href="#version-210" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Netbox v4 compatibility. Netbox4.0.2 become a minimum requirement </li>
+</ul>
+<h4 id="version-2014">Version 2.0.14<a class="headerlink" href="#version-2014" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/127">127</a> Fix contract filtering</li>
+<li>Fix contact assignement.</li>
+</ul>
+<h4 id="version-2013">Version 2.0.13<a class="headerlink" href="#version-2013" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/123">123</a> prepare plugin to <a href="https://docs.netbox.dev/en/feature/plugins/development/migration-v4/">Netbox 4.0 migration</a>.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/125">125</a> Cleanup direct reference to Circuits in the Contract model. Correct database inconsistencies related to the ContractAssignment object renaming.</li>
+</ul>
+<h4 id="version-2011">Version 2.0.11<a class="headerlink" href="#version-2011" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/115">115</a> API correction for contract external party</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/117">117</a> Tenant and accounting dimensions optional</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/119">119</a> Add a Yearly recuring cost, read only, calculated field for contract</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/105">15</a> Quick serach limited to active contracts</li>
+</ul>
+<h4 id="version-2010">Version 2.0.10<a class="headerlink" href="#version-2010" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/107">107</a> Add the contacts tab to the service provider detail view.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/111">111</a> Correct assignment spelling.</li>
+</ul>
+<h4 id="version-209">Version 2.0.9<a class="headerlink" href="#version-209" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/42">42</a> Allow the selection of either providers or Service providers as contract third party.</li>
+<li>Removed all reference to the direct assignement of circuits to contracts</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/88">88</a> Add a placeholder value to the accounting dimensions jsonfield. This placeholder vale con be configured as part of the PLUGINS_CONFIG parameter in the configuration.py file (see above)</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/89">89</a> add the posibility to link contracts to sites and virtual machines.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/99">99</a> list child contracts in on the parent view.</li>
+</ul>
+<h4 id="version-208">Version 2.0.8<a class="headerlink" href="#version-208" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/91">#91</a> Replace deprecated ( in netbox version 3.6) MultipleChoiceField.  </li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/48">48</a> Allow other plugin to inject visual in contract and invoice forms.  </li>
+<li>[89] (https://github.com/mlebreuil/netbox-contract/issues/89) Add contract assignement to virtual machines.</li>
+</ul>
+<h4 id="version-207">Version 2.0.7<a class="headerlink" href="#version-207" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/85">#85</a> Fix missing fields contract and invoice import and export forms.</li>
+</ul>
+<h4 id="version-206">Version 2.0.6<a class="headerlink" href="#version-206" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/80">#80</a> Fix missing fields in the API.</li>
+</ul>
+<h4 id="version-205">Version 2.0.5<a class="headerlink" href="#version-205" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/74">#75</a> Fix contract assignement for service providers.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/73">#73</a> Add comment field to contract import form</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/72">#72</a> Add fields to the contract assignement bottom tables</li>
+<li>Remove the 'add' actions from the contract assignment list view</li>
+</ul>
+<h4 id="version-204">Version 2.0.4<a class="headerlink" href="#version-204" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Add bulk update capability for contract assignement</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/63">#63</a> Correct an API issue on the invoice object.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/64">#64</a> Add hierarchy to contract; New parent field created.</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/65">#65</a> Add end date to contact import form.</li>
+<li>Removed the possibility of add or modify circuits to contracts. The field becomes read only and will be removed in next major release.</li>
+<li>Make accounting dimensions optional.</li>
+</ul>
+<h4 id="version-203">Version 2.0.3<a class="headerlink" href="#version-203" title="Permanent link">&para;</a></h4>
+<ul>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/60">#60</a> Update contract quick search to also filter on fields "External reference" and "Comments".</li>
+<li><a href="https://github.com/mlebreuil/netbox-contract/issues/49">#49</a> Manage permissions.</li>
+</ul>
+<h4 id="version-202">Version 2.0.2<a class="headerlink" href="#version-202" title="Permanent link">&para;</a></h4>
+<p>Add support for Netbox 3.5 which become the minimum version supported to accomodate the removal of NetBoxModelCSVForm class (replaced by NetBoxModelImportForm) .</p>
+<h4 id="version-201">Version 2.0.1<a class="headerlink" href="#version-201" title="Permanent link">&para;</a></h4>
+<p>Add support contract assignement panel to devices.</p>
+<h4 id="version-200">Version 2.0.0<a class="headerlink" href="#version-200" title="Permanent link">&para;</a></h4>
+<p>Add a new contract asignement model to allow the assignement of contract not only to Circuits. The support for the direct Contract to Circuit relation will be removed in version 2.1.0 . In Order to migrate existing relations contract_migration.py script is provided and can be run from the django shell.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.indexes", "navigation.instant", "navigation.tabs.sticky"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
