@@ -9,6 +9,7 @@ nav:
   - Invoice: invoice.md
   - Invoice line: invoice_line.md
   - Accounting dimensions: accounting_dimensions.md
+  - Permissions: permissions.md
   - API: api.md
   - Contributing: contributing.md
   - Changelog: changelog.md
