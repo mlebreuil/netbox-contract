@@ -2,10 +2,11 @@ import django_filters
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from circuits.models import Circuit, CircuitTermination
-from dcim.models import Device, Region, Site
+from dcim.models import Device, Rack, Region, Site
 from dcim.models import Manufacturer
 from netbox.filtersets import NetBoxModelFilterSet
 from utilities.filters import ContentTypeFilter
+from virtualization.models import Cluster, VirtualMachine
 from .models import (
     Contract,
     ContractAssignment,
@@ -158,10 +159,28 @@ class ContractAssignmentFilterSet(NetBoxModelFilterSet):
         ).values_list('pk', flat=True)
 
         #
-        # Devices located at matching sites
+        # Devices and racks located directly at matching sites
         #
         device_ids = Device.objects.filter(
             site_id__in=site_ids
+        ).values_list('pk', flat=True)
+
+        rack_ids = Rack.objects.filter(
+            site_id__in=site_ids
+        ).values_list('pk', flat=True)
+
+        #
+        # NetBox 4.x: Cluster has no direct 'site' field. It's scoped via a
+        # generic 'scope' (scope_type/scope_id), with '_region_id' cached
+        # directly on the model for querying regardless of whether the
+        # scope is a Region, Site Group, Site, or Location.
+        #
+        cluster_ids = Cluster.objects.filter(
+            _region_id__in=region_ids
+        ).values_list('pk', flat=True)
+
+        vm_ids = VirtualMachine.objects.filter(
+            Q(site_id__in=site_ids) | Q(cluster___region_id__in=region_ids)
         ).values_list('pk', flat=True)
 
         #
@@ -187,33 +206,29 @@ class ContractAssignmentFilterSet(NetBoxModelFilterSet):
         ).values_list('circuit_id', flat=True)
 
         #
-        # Content types used by ContractAssignment.object_type
-        #
-        device_content_type = ContentType.objects.get_for_model(
-            Device,
-            for_concrete_model=False,
-        )
-
-        circuit_content_type = ContentType.objects.get_for_model(
-            Circuit,
-            for_concrete_model=False,
-        )
-
-        #
         # object_id must always be evaluated together with object_type,
-        # because Device and Circuit primary keys can overlap.
+        # because primary keys can overlap across these models.
         #
-        return queryset.filter(
-            Q(
-                object_type_id=device_content_type.pk,
-                object_id__in=device_ids,
-            )
-            |
-            Q(
-                object_type_id=circuit_content_type.pk,
-                object_id__in=circuit_ids,
-            )
-        ).distinct()
+        # NOTE: VirtualCircuit assignments are not matched here, since a
+        # virtual circuit's region can only be derived by walking its
+        # interface terminations to a device/site, which this filter does
+        # not currently do.
+        #
+        content_type_matches = (
+            (Site, site_ids),
+            (Device, device_ids),
+            (Rack, rack_ids),
+            (Cluster, cluster_ids),
+            (VirtualMachine, vm_ids),
+            (Circuit, circuit_ids),
+        )
+
+        region_filter = Q()
+        for model, ids in content_type_matches:
+            content_type = ContentType.objects.get_for_model(model, for_concrete_model=False)
+            region_filter |= Q(object_type_id=content_type.pk, object_id__in=ids)
+
+        return queryset.filter(region_filter).distinct()
 
     def search(self, queryset, name, value):
         if not value.strip():
