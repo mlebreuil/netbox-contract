@@ -115,6 +115,12 @@ softwarelicense_buttons = [
         title=_('Add'),
         icon_class='mdi mdi-plus-thick',
         permissions=['netbox_contracts.add_softwarelicense'],
+    ),
+    PluginMenuButton(
+        link='plugins:netbox_contracts:softwarelicense_bulk_import',
+        title=_('Import'),
+        icon_class="mdi mdi-upload",
+        permissions=['netbox_contracts.add_softwarelicense'],
     )
 ]
 
@@ -124,6 +130,12 @@ licensetype_buttons = [
         title=_('Add'),
         icon_class='mdi mdi-plus-thick',
         permissions=['netbox_contracts.add_licensetype'],
+    ),
+    PluginMenuButton(
+        link='plugins:netbox_contracts:licensetype_bulk_import',
+        title=_('Import'),
+        icon_class="mdi mdi-upload",
+        permissions=['netbox_contracts.add_licensetype'],
     )
 ]
 
@@ -132,6 +144,12 @@ licenseassignment_buttons = [
         link='plugins:netbox_contracts:licenseassignment_add',
         title=_('Add'),
         icon_class='mdi mdi-plus-thick',
+        permissions=['netbox_contracts.add_licenseassignment'],
+    ),
+    PluginMenuButton(
+        link='plugins:netbox_contracts:licenseassignment_bulk_import',
+        title=_('Import'),
+        icon_class="mdi mdi-upload",
         permissions=['netbox_contracts.add_licenseassignment'],
     )
 ]

@@ -657,6 +657,13 @@ class LicenseTypeEditView(generic.ObjectEditView):
     form = forms.LicenseTypeForm
 
 
+@register_model_view(LicenseType, name='bulk_import')
+class LicenseTypeBulkImportView(generic.BulkImportView):
+    queryset = LicenseType.objects.all()
+    model_form = forms.LicenseTypeCSVForm
+    table = tables.LicenseTypeTable
+
+
 @register_model_view(LicenseType, name='delete')
 class LicenseTypeDeleteView(generic.ObjectDeleteView):
     queryset = LicenseType.objects.all()
@@ -678,6 +685,13 @@ class SoftwareLicenseListView(generic.ObjectListView):
 class SoftwareLicenseEditView(generic.ObjectEditView):
     queryset = SoftwareLicense.objects.all()
     form = forms.SoftwareLicenseForm
+
+
+@register_model_view(SoftwareLicense, name='bulk_import')
+class SoftwareLicenseBulkImportView(generic.BulkImportView):
+    queryset = SoftwareLicense.objects.all()
+    model_form = forms.SoftwareLicenseCSVForm
+    table = tables.SoftwareLicenseTable
 
 
 @register_model_view(SoftwareLicense, name='delete')
@@ -726,6 +740,13 @@ class LicenseAssignmentListView(generic.ObjectListView):
 class LicenseAssignmentEditView(generic.ObjectEditView):
     queryset = LicenseAssignment.objects.all()
     form = forms.LicenseAssignmentForm
+
+
+@register_model_view(LicenseAssignment, name='bulk_import')
+class LicenseAssignmentBulkImportView(generic.BulkImportView):
+    queryset = LicenseAssignment.objects.all()
+    model_form = forms.LicenseAssignmentCSVForm
+    table = tables.LicenseAssignmentTable
 
 
 @register_model_view(LicenseAssignment, name='delete')

@@ -256,6 +256,11 @@ urlpatterns = [
     # License types
     path('license-types/', views.LicenseTypeListView.as_view(), name='licensetype_list'),
     path('license-types/add/', views.LicenseTypeEditView.as_view(), name='licensetype_add'),
+    path(
+        'license-types/import/',
+        views.LicenseTypeBulkImportView.as_view(),
+        name='licensetype_bulk_import',
+    ),
     path('license-types/<int:pk>/', views.LicenseTypeView.as_view(), name='licensetype'),
     path('license-types/<int:pk>/edit/', views.LicenseTypeEditView.as_view(), name='licensetype_edit'),
     path('license-types/<int:pk>/delete/', views.LicenseTypeDeleteView.as_view(), name='licensetype_delete'),
@@ -268,6 +273,11 @@ urlpatterns = [
     # Software licenses
     path('software-licenses/', views.SoftwareLicenseListView.as_view(), name='softwarelicense_list'),
     path('software-licenses/add/', views.SoftwareLicenseEditView.as_view(), name='softwarelicense_add'),
+    path(
+        'software-licenses/import/',
+        views.SoftwareLicenseBulkImportView.as_view(),
+        name='softwarelicense_bulk_import',
+    ),
     path('software-licenses/<int:pk>/', views.SoftwareLicenseView.as_view(), name='softwarelicense'),
     path('software-licenses/<int:pk>/edit/', views.SoftwareLicenseEditView.as_view(), name='softwarelicense_edit'),
     path(
@@ -289,6 +299,11 @@ urlpatterns = [
     # License assignments
     path('license-assignments/', views.LicenseAssignmentListView.as_view(), name='licenseassignment_list'),
     path('license-assignments/add/', views.LicenseAssignmentEditView.as_view(), name='licenseassignment_add'),
+    path(
+        'license-assignments/import/',
+        views.LicenseAssignmentBulkImportView.as_view(),
+        name='licenseassignment_bulk_import',
+    ),
     path('license-assignments/<int:pk>/', views.LicenseAssignmentView.as_view(), name='licenseassignment'),
     path(
         'license-assignments/<int:pk>/edit/',

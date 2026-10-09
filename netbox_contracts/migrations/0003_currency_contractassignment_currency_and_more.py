@@ -6,6 +6,41 @@ import utilities.json
 from django.db import migrations, models
 
 
+def migrate_contract_currency_codes(apps, schema_editor):
+    """
+    Contract.currency used to be a plain CharField (e.g. 'usd'). Build a
+    Currency row for each distinct code found and point the new FK at it,
+    since the column can't be cast from text straight to a Currency ID.
+    """
+    Contract = apps.get_model('netbox_contracts', 'Contract')
+    Currency = apps.get_model('netbox_contracts', 'Currency')
+
+    currency_cache = {}
+
+    contracts = Contract.objects.exclude(
+        legacy_currency_code__isnull=True
+    ).exclude(legacy_currency_code='')
+
+    for contract in contracts:
+        code = contract.legacy_currency_code.strip().upper()
+        if not code:
+            continue
+
+        currency = currency_cache.get(code)
+        if currency is None:
+            currency, _ = Currency.objects.get_or_create(
+                currency_code=code,
+                defaults={
+                    'currency_name': code,
+                    'currency_number': '',
+                },
+            )
+            currency_cache[code] = currency
+
+        contract.currency = currency
+        contract.save(update_fields=['currency'])
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -38,9 +73,25 @@ class Migration(migrations.Migration):
             name='currency',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='contract_assignments', to='netbox_contracts.currency'),
         ),
-        migrations.AlterField(
+        # Contract.currency was previously a CharField (e.g. 'usd'); rename it
+        # out of the way, add the real FK column, backfill it from the old
+        # text values, then drop the legacy column.
+        migrations.RenameField(
+            model_name='contract',
+            old_name='currency',
+            new_name='legacy_currency_code',
+        ),
+        migrations.AddField(
             model_name='contract',
             name='currency',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='netbox_contracts.currency'),
+        ),
+        migrations.RunPython(
+            migrate_contract_currency_codes,
+            reverse_code=migrations.RunPython.noop,
+        ),
+        migrations.RemoveField(
+            model_name='contract',
+            name='legacy_currency_code',
         ),
     ]

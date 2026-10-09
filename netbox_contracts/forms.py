@@ -652,6 +652,16 @@ class LicenseTypeForm(NetBoxModelForm):
         fields = ('name', 'description', 'color', 'tags')
 
 
+class LicenseTypeCSVForm(NetBoxModelImportForm):
+    name = forms.CharField(max_length=100, label=_('Name'))
+    description = forms.CharField(max_length=200, required=False, label=_('Description'))
+    color = ColorField(label=_('Color'), required=False)
+
+    class Meta:
+        model = LicenseType
+        fields = ('name', 'description', 'color', 'tags')
+
+
 class SoftwareLicenseForm(NetBoxModelForm):
     manufacturer = DynamicModelChoiceField(
         queryset=Manufacturer.objects.all(),
@@ -666,6 +676,42 @@ class SoftwareLicenseForm(NetBoxModelForm):
     )
     license_type = DynamicModelChoiceField(
         queryset=LicenseType.objects.all(),
+        required=False,
+        label=_('License Type'),
+    )
+
+    class Meta:
+        model = SoftwareLicense
+        fields = (
+            'manufacturer',
+            'license_name',
+            'friendly_name',
+            'license_sku',
+            'per_license_cost',
+            'local_currency',
+            'license_type',
+            'tags',
+        )
+
+
+class SoftwareLicenseCSVForm(NetBoxModelImportForm):
+    manufacturer = CSVModelChoiceField(
+        queryset=Manufacturer.objects.all(),
+        to_field_name='name',
+        help_text='NetBox name of the manufacturer',
+        label=_('Manufacturer'),
+    )
+    local_currency = CSVModelChoiceField(
+        queryset=Currency.objects.all(),
+        to_field_name='currency_code',
+        help_text='Currency code (e.g. USD)',
+        required=False,
+        label=_('Local Currency'),
+    )
+    license_type = CSVModelChoiceField(
+        queryset=LicenseType.objects.all(),
+        to_field_name='name',
+        help_text='License type name',
         required=False,
         label=_('License Type'),
     )
@@ -735,3 +781,26 @@ class LicenseAssignmentForm(NetBoxModelForm):
             self.cleaned_data['object_id'] = selected_object.pk
 
         return self.cleaned_data
+
+
+class LicenseAssignmentCSVForm(NetBoxModelImportForm):
+    software_license = CSVModelChoiceField(
+        queryset=SoftwareLicense.objects.all(),
+        to_field_name='license_name',
+        help_text='Software license name',
+        label=_('Software License'),
+    )
+    object_type = CSVContentTypeField(
+        queryset=ObjectType.objects.public(),
+        help_text='Content Type in the form <app>.<model>',
+        label=_('Object type'),
+    )
+    object_id = forms.IntegerField(
+        required=True,
+        help_text='ID of the object to be assigned',
+        label=_('Object ID'),
+    )
+
+    class Meta:
+        model = LicenseAssignment
+        fields = ('software_license', 'object_type', 'object_id', 'tags')
