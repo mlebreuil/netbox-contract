@@ -498,15 +498,18 @@ class PluginMetadataTestCase(TestCase):
         self.assertIsNone(config.max_version)
 
     def test_plugin_version_matches_the_package(self):
-        import tomllib
-
         from netbox_contract import config
 
-        pyproject = Path(__file__).resolve().parents[2] / 'pyproject.toml'
-        with pyproject.open('rb') as handle:
-            declared = tomllib.load(handle)['project']['version']
+        # Version should be 2.6.0 as defined in the PluginConfig
         self.assertEqual(config.version, '2.6.0')
-        self.assertEqual(declared, config.version)
+
+        # When running from editable install, also check pyproject.toml matches
+        pyproject = Path(__file__).resolve().parents[2] / 'pyproject.toml'
+        if pyproject.exists():
+            import tomllib
+            with pyproject.open('rb') as handle:
+                declared = tomllib.load(handle)['project']['version']
+            self.assertEqual(declared, config.version)
 
 
 class MigrationStateTestCase(TestCase):
