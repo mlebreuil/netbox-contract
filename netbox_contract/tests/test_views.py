@@ -87,8 +87,8 @@ class ContractTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectViewTestCas
         cls.form_data = {
             'name': 'Contract X',
             'contract_type': ContractType.objects.get(name='Contract Type A').pk,
-            'external_party_object_type': ContentType.objects.get_for_model(Provider).pk,
-            'external_party_object': Provider.objects.get(slug='provider-a').id,
+            'external_party_object_content_type': ContentType.objects.get_for_model(Provider).pk,
+            'external_party_object_object_id': Provider.objects.get(slug='provider-a').id,
             'external_reference': 'External Reference 1',
             'internal_party': 'default',
             'tenant': Tenant.objects.get(name='Tenant 1').id,
@@ -569,8 +569,8 @@ class ContractAssignmentTestCase(ModelViewTestCase, ViewTestCases.PrimaryObjectV
             assignement.save()
 
         cls.form_data = {
-            'content_type': ContentType.objects.get_for_model(Device).pk,
-            'object_id': device2.pk,
+            'content_object_content_type': ContentType.objects.get_for_model(Device).pk,
+            'content_object_object_id': device2.pk,
             'contract': contract1.pk
         }
 

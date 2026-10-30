@@ -1,5 +1,11 @@
 <!--
 Sync Impact Report (temporary, remove before committing)
+- Version change: 1.0.0 -> 1.0.1 (PATCH: compatibility clarification, issue #318)
+- Reason: the minimum NetBox version moves from 4.6 to 4.7 (specs/008-netbox-47-baseline);
+  the sentence saying 4.7 compatibility was separate work is replaced by a version-neutral one.
+- Modified principles: none. Modified section: Compatibility and Technical Constraints.
+- Templates checked: plan-template.md, spec-template.md, tasks-template.md (no version text).
+--- earlier report, version 1.0.0 ---
 - Version change: template (unversioned) -> 1.0.0
 - Modified principles: none (first ratification; all placeholders replaced)
 - Added sections: Core Principles I-VII, Compatibility and Technical Constraints,
@@ -90,7 +96,8 @@ Rationale: administrators decide whether to upgrade from the changelog and the d
 
 ## Compatibility and Technical Constraints
 
-- Python 3.12 or newer; NetBox 4.6 or newer until a specification raises the minimum. The
+- Python 3.12 or newer; NetBox 4.7 or newer until a specification raises the minimum (raised from
+  4.6 by specs/008-netbox-47-baseline; NetBox 4.6 installations stay on plugin 2.5.x). The
   supported Python versions and the pinned NetBox tag are those in
   `.github/workflows/lint-tests.yaml`.
 - Currency amounts use `DecimalField` with the existing currency code fields; no currency or
@@ -100,8 +107,8 @@ Rationale: administrators decide whether to upgrade from the changelog and the d
 - NetBox core custom scripts are announced as deprecated; scripts shipped in `scripts/` MUST be
   limited to what cannot reasonably live in the plugin and MUST keep their logic in importable
   plugin modules so they can move to a replacement mechanism.
-- NetBox 4.7 compatibility is separate work and is not implied by any feature specification
-  that does not say so.
+- Compatibility with a NetBox release newer than the pinned one is separate work and is not
+  implied by any feature specification that does not say so.
 
 ## Development Workflow and Quality Gates
 
@@ -126,4 +133,4 @@ request by the maintainer. Compliance is reviewed in every pull request and in e
 Constitution Check; unresolved conflicts block the merge. Day-to-day guidance for contributors
 is in `CONTRIBUTING.md`.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-09-26
+**Version**: 1.0.1 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-10-30

@@ -1233,3 +1233,40 @@ msgstr ""
 #, python-brace-format
 msgid "Contract line amended from {date}."
 msgstr ""
+
+#: models.py
+msgid "Being prepared: amounts and lines can still change"
+msgstr ""
+
+#: models.py
+msgid "Final: amount, currency, period, contracts and the amounts of its lines are locked"
+msgstr ""
+
+#: models.py
+msgid "No longer valid; kept for the record"
+msgstr ""
+
+#: models.py
+msgid "In force"
+msgstr ""
+
+#: models.py
+msgid "Ended or withdrawn; kept for the record"
+msgstr ""
+
+#: models.py
+msgid "Billed once, from quantity and unit price"
+msgstr ""
+
+#: models.py
+msgid "Billed every period, prorated to the invoice period"
+msgstr ""
+
+#: models.py
+msgid "Billed from a quantity entered on each invoice"
+msgstr ""
+
+#: models.py
+msgid "%(contract)s is already assigned to %(object)s."
+msgstr ""
+

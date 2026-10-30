@@ -8,7 +8,7 @@
           {% trans "Contracts assignments" %}
           {% if perms.netbox_contract.add_contractassignment %}
           <div class="card-actions">
-            <a href="{% url 'plugins:netbox_contract:contractassignment_add' %}?content_type={{ object|content_type_id }}&object_id={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
+            <a href="{% url 'plugins:netbox_contract:contractassignment_add' %}?content_object_content_type={{ object|content_type_id }}&content_object_object_id={{ object.pk }}&return_url={{ object.get_absolute_url }}" class="btn btn-ghost-primary btn-sm">
                 <i class="mdi mdi-plus-thick" aria-hidden="true"></i>
                 {% trans "Add assignment" %}
             </a>

@@ -6,7 +6,7 @@ A contract is described line by line. Each contract line says what the contract 
 
 A unit defines the nature of a cost:
 
-- **Billing method**:
+- **Billing method** (each option shows a one-line description under its name):
     - *One-time*: invoiced once, for example a setup fee.
     - *Recurring*: invoiced for each period, for example a monthly subscription.
     - *Usage-based*: invoiced from the quantity used, entered on each invoice line (for example gigabytes of traffic).

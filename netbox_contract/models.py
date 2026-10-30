@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 from netbox.choices import ColorChoices
 from netbox.models import NetBoxModel, OrganizationalModel, PrimaryModel
 from netbox.models.features import ContactsMixin
-from utilities.choices import ChoiceSet
+from utilities.choices import Choice, ChoiceSet
 from utilities.exceptions import AbortRequest
 from utilities.fields import ColorField
 from utilities.querysets import RestrictedQuerySet
@@ -77,8 +77,8 @@ class StatusChoices(ChoiceSet):
     STATUS_CANCELED = 'canceled'
 
     CHOICES = [
-        (STATUS_ACTIVE, 'Active', 'green'),
-        (STATUS_CANCELED, 'Canceled', 'red'),
+        Choice(STATUS_ACTIVE, 'Active', 'green', description=_('In force')),
+        Choice(STATUS_CANCELED, 'Canceled', 'red', description=_('Ended or withdrawn; kept for the record')),
     ]
 
 
@@ -123,9 +123,15 @@ class InvoiceStatusChoices(ChoiceSet):
     STATUS_CANCELED = 'canceled'
 
     CHOICES = [
-        (STATUS_DRAFT, 'Draft', 'yellow'),
-        (STATUS_POSTED, 'Posted', 'green'),
-        (STATUS_CANCELED, 'Canceled', 'red'),
+        Choice(
+            STATUS_DRAFT, 'Draft', 'yellow',
+            description=_('Being prepared: amounts and lines can still change'),
+        ),
+        Choice(
+            STATUS_POSTED, 'Posted', 'green',
+            description=_('Final: amount, currency, period, contracts and the amounts of its lines are locked'),
+        ),
+        Choice(STATUS_CANCELED, 'Canceled', 'red', description=_('No longer valid; kept for the record')),
     ]
 
 
@@ -137,9 +143,12 @@ class BillingMethodChoices(ChoiceSet):
     USAGE = calculations.USAGE
 
     CHOICES = [
-        (ONE_TIME, 'One-time', 'blue'),
-        (RECURRING, 'Recurring', 'green'),
-        (USAGE, 'Usage-based', 'orange'),
+        Choice(ONE_TIME, 'One-time', 'blue', description=_('Billed once, from quantity and unit price')),
+        Choice(
+            RECURRING, 'Recurring', 'green',
+            description=_('Billed every period, prorated to the invoice period'),
+        ),
+        Choice(USAGE, 'Usage-based', 'orange', description=_('Billed from a quantity entered on each invoice')),
     ]
 
 
@@ -249,18 +258,41 @@ class ContractAssignment(NetBoxModel):
         related_name='assignments',
         verbose_name=_('contract'),
     )
-    clone_fields = ('content_type', 'object_id', 'contract')
+    clone_fields = ('content_object', 'contract')
 
     class Meta:
         ordering = ('contract',)
         indexes = [
             models.Index(fields=['content_type', 'object_id']),
         ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['contract', 'content_type', 'object_id'], name='netbox_contract_unique_assignment'
+            ),
+        ]
         verbose_name = _('contract assignment')
         verbose_name_plural = _('contract assignments')
 
     def get_absolute_url(self):
         return reverse('plugins:netbox_contract:contractassignment', args=[self.pk])
+
+    def clean(self):
+        super().clean()
+        if not (self.contract_id and self.content_type_id and self.object_id):
+            return
+        duplicates = ContractAssignment.objects.filter(
+            contract_id=self.contract_id, content_type_id=self.content_type_id, object_id=self.object_id
+        ).exclude(pk=self.pk)
+        if duplicates.exists():
+            raise ValidationError(
+                _('%(contract)s is already assigned to %(object)s.')
+                % {'contract': self.contract, 'object': self.content_object or f'#{self.object_id}'}
+            )
+
+    def validate_constraints(self, exclude=None):
+        # The only constraint is the unique pair: clean() reports it with the names of the contract and the object,
+        # which Django's generic constraint message would repeat without them.
+        pass
 
     def get_contract__status_color(self):
         return StatusChoices.colors.get(self.contract.status)

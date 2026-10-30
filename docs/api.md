@@ -2,6 +2,8 @@
 
 The plugin API is under `/api/plugins/contracts/`.
 
+note: Creating or updating a contract assignment for a contract and an object that already have one is refused (HTTP 400, "... is already assigned to ...").
+
 note: When creating invoices and invoice lines through the API, the corresponding contracts respectively accounting dimensions, must be referenced as a list of id.
 
 Every list endpoint accepts the standard NetBox filters (`id`, `q`, `tag`, `created`, `last_updated`, ...) and the filters of its model, for example `serviceproviders/?name=`, `contracttype/?name=`, `accountingdimension/?name=&value=&status=` and `contractassignment/?contract=`.
@@ -49,6 +51,28 @@ The plugin's objects are in NetBox's GraphQL API (`/graphql/`), with two queries
 - Every stored field and relation is available. `mrc`, `yrc`, `nrc` (contracts) and `template` (invoices) are marked deprecated.
 - The computed values (`total_contract_value`, `yearly_contract_value` and `yearly_billable_value` of contracts, `total_value` and `yearly_value` of contract lines) are not in GraphQL: read them from the REST API.
 - `external_party_object` of a contract is a service provider or a circuit provider. `content_object` of a contract assignment covers the models of the default `supported_models` setting (circuits, virtual circuits, sites, devices, racks, virtual machines, clusters); for an object of another model it is `null`, and `content_type` and `object_id` identify it.
+
+### Contracts from the core objects
+
+On the objects contracts can be assigned to (the models of the `supported_models` setting that NetBox has a GraphQL type for: by default circuits, virtual circuits, sites, devices, racks, virtual machines and clusters), the plugin adds a `contract_assignments` field and two filters, so a single query answers "which devices have no active contract":
+
+```graphql
+{
+  device_list(filters: {has_active_contract: false, site: {slug: {exact: "paris"}}}) {
+    name
+    contract_assignments {
+      contract { name status end_date external_party_object { __typename } }
+    }
+  }
+}
+```
+
+- `contract_assignments`: the assignments of the object, each with its contract. The list is empty when the object has none or when you may not view contracts.
+- `has_contracts: true | false`: objects with at least one, or with no, contract you may view.
+- `has_active_contract: true | false`: objects with at least one, or with no, contract you may view whose status is Active. Dates are ignored.
+- Only assignments and contracts you have the `view` permission on are counted and returned. A user without the contract permissions sees every object as having no contract.
+- The field and the filters are absent from the other types. A model listed in `supported_models` that NetBox has no GraphQL type for is left out.
+- When an object is deleted its contract assignments are deleted with it. Assignments left behind by earlier versions are removed with `manage.py cleanup_orphan_assignments` (see the README).
 
 ## Nested objects and `brief=true`
 
