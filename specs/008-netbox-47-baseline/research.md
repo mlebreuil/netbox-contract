@@ -10,7 +10,7 @@ All questions were settled by running the suite on NetBox v4.7.4 (Python 3.13, P
 
 ## D2 - Fix the REST tests by giving text values
 
-- **Decision**: in `create_data` and `update_data` of the contract, contract line and invoice API tests, give dates as ISO strings (`'2025-01-01'`) and decimals as strings (`'50.00'`).
+- **Decision**: in `create_data` and `update_data` of the contract, contract line and invoice API tests, give dates as ISO strings (`'2025-01-01'`). Decimal amounts are left as they are: the 4.7 helper compares them with the stored `Decimal`, and a text amount made the invoice tests fail (found during implementation).
 - **Rationale**: NetBox 4.7's `assertInstanceEqual(api=True)` turns the stored object into its JSON form (text for dates and decimals) and compares it with the test data as given; an API client sends text anyway, so the test becomes more faithful. 4.6.10 accepted the Python objects; the text form is expected to work there too but is not tested on 4.6.
 - **Alternatives**: exclude the fields from the comparison (rejected: loses the assertion on stored values); convert in a custom `assertInstanceEqual` override (rejected: more code than changing the data).
 
@@ -37,3 +37,10 @@ All questions were settled by running the suite on NetBox v4.7.4 (Python 3.13, P
 - **Decision**: change the compatibility section (Python 3.12 or newer; NetBox 4.7 or newer) through `/speckit-constitution` as a PATCH amendment (1.0.1) in the same change.
 - **Rationale**: the constitution says "NetBox 4.6 or newer until a specification raises the minimum" and "4.7 compatibility is separate work"; this specification is that raise, so the text must say so, through the amendment procedure it defines.
 - **Alternatives**: edit by hand (rejected: governance requires the skill).
+
+## D7 - Owner field migration (found during implementation)
+
+- **Finding**: `makemigrations --check --dry-run` on NetBox v4.7.4 proposes `AlterField` for `contracttype.owner` and `serviceprovider.owner`: 4.7's owner field has `related_name='+'`, the plugin's migrations 0051 and 0052 (written for 4.6) do not. The compatibility assessment had not run this check.
+- **Decision**: hand-written `0053_owner_related_name.py` with the two `AlterField` operations, depending on `netbox_contract.0052` and `users.0015_owner` only (the auto-generated dependency on `users.0016_default_ordering_indexes` would make the plugin fail on a 4.7.x that lacks it). A related-name change produces no SQL and no data change.
+- **Test**: `MigrationStateTestCase` in `test_conventions.py` asks Django's autodetector for pending changes of `netbox_contract`; it failed before the migration and passes after. It also guards later work (specification 004 adds migration 0054).
+- **Alternatives**: setting `related_name` differently on the plugin models (rejected: the field comes from NetBox's mixin).

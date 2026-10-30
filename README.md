@@ -24,8 +24,9 @@ Accounting dimensions can be linked with contract lines and invoice lines.
 |     4.4        |      2.4       |
 |     4.5        |      2.4       |
 |     4.6        |   2.4, 2.5     |
+|     4.7        |      2.6       |
 
-Version 2.5 requires NetBox 4.6 or later.
+Version 2.6 requires NetBox 4.7 or later. NetBox 4.6 installations stay on plugin 2.5.
 
 ## Installing
 

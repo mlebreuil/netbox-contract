@@ -73,7 +73,7 @@ netbox_contract/
 ├── forms.py                      # ContractAssignmentForm, ContractForm
 ├── views.py                      # ContractAssignmentEditView, ContractEditView, AddContractAssignment
 ├── models.py                     # ContractAssignment.clone_fields, clean(), UniqueConstraint
-├── migrations/0053_contractassignment_unique.py   # merge duplicates, add constraint
+├── migrations/0054_contractassignment_unique.py   # merge duplicates, add constraint
 ├── templates/netbox_contract/inc/contract_assignments_bottom.html   # Add link
 ├── locale/fr/LC_MESSAGES/django.po                                  # new labels
 └── tests/

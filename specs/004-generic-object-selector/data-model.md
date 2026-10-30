@@ -27,4 +27,4 @@ No new column. One constraint and one data migration are added to `ContractAssig
 |------|-------|--------|
 | Unique pair | `ContractAssignment.Meta.constraints` | `UniqueConstraint(fields=['contract', 'content_type', 'object_id'], name='netbox_contract_unique_assignment')` |
 | Application check | `ContractAssignment.clean()` | error "<contract> is already assigned to <object>." when another row has the same triple; ignores the row itself |
-| Migration `0053_contractassignment_unique` | before the constraint | merge duplicate groups: keep lowest id; move tags, journal entries, bookmarks, subscriptions, image attachments; fill empty custom fields; report groups and conflicting custom field values; delete the rest; no-op when no duplicate |
+| Migration `0054_contractassignment_unique` | before the constraint | merge duplicate groups: keep lowest id; move tags, journal entries, bookmarks, subscriptions, image attachments; fill empty custom fields; report groups and conflicting custom field values; delete the rest; no-op when no duplicate |

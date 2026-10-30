@@ -107,8 +107,8 @@ class ContractLineAPITestCase(
                 'unit_price': 50,
                 'unit': unit.pk,
                 'currency': 'usd',
-                'start_date': date(2025, 2, 1),
-                'end_date': date(2025, 11, 30),
+                'start_date': '2025-02-01',
+                'end_date': '2025-11-30',
                 'accounting_dimensions': [dimension.pk],
             },
             {
@@ -342,8 +342,8 @@ class ContractAPIViewTestCase(APITestCase, APIViewTestCases.APIViewTestCase):
             'status': StatusChoices.STATUS_ACTIVE,
             'currency': 'usd',
             'invoice_frequency': 1,
-            'start_date': date(2025, 1, 1),
-            'end_date': date(2025, 12, 31),
+            'start_date': '2025-01-01',
+            'end_date': '2025-12-31',
         }
         cls.create_data = [
             dict(common, name='Contract 4', contract_type=contract_type.pk),
@@ -370,8 +370,8 @@ class InvoiceAPIViewTestCase(APITestCase, APIViewTestCases.APIViewTestCase):
         cls.create_data = [
             {
                 'number': f'INV-{month}', 'contracts': [make_contract(name=f'New contract {month}').pk],
-                'date': date(2025, month, 25), 'period_start': date(2025, month, 1),
-                'period_end': date(2025, month, 28), 'currency': 'usd', 'amount': Decimal('0.00'),
+                'date': f'2025-{month:02d}-25', 'period_start': f'2025-{month:02d}-01',
+                'period_end': f'2025-{month:02d}-28', 'currency': 'usd', 'amount': Decimal('0.00'),
             }
             for month in (4, 5, 6)
         ]

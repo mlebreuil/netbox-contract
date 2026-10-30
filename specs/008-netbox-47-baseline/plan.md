@@ -6,7 +6,7 @@
 
 ## Summary
 
-Make the existing suite green on NetBox v4.7.4, pin CI to that tag, and declare 4.7.0 as the minimum version of plugin 2.6.0. No plugin code changes: the compatibility assessment ran the 1020 tests on v4.7.4 and found 18 failures that are all test artefacts (nine query-count baselines one lower, nine REST tests giving Python dates and decimals where NetBox 4.7's test helper compares text). The change is therefore test data, a recorded baseline, CI, metadata and documents. It is implemented first, so that plans 004 to 007 start from a green baseline.
+Make the existing suite green on NetBox v4.7.4, pin CI to that tag, and declare 4.7.0 as the minimum version of plugin 2.6.0. No plugin behaviour changes (one state-only migration, see research D7): the compatibility assessment ran the 1020 tests on v4.7.4 and found 18 failures that are all test artefacts (nine query-count baselines one lower, nine REST tests giving Python dates where NetBox 4.7's test helper compares text). The change is therefore test data, a recorded baseline, CI, metadata and documents. It is implemented first, so that plans 004 to 007 start from a green baseline.
 
 ## Technical Context
 
@@ -37,7 +37,7 @@ Make the existing suite green on NetBox v4.7.4, pin CI to that tag, and declare 
 | I. NetBox-native | Pass. `min_version` stays the single source of the minimum; no removed 4.7 API is used (checked in the compatibility assessment). |
 | II. Tested behaviour | Pass. No behaviour changes; the tests are corrected, not weakened: REST tests keep their assertions on stored values, and the baseline is re-recorded once with the reason stated. |
 | III. Lint-clean | Pass. Only test data and metadata change; `ruff check` is run before the commit. |
-| IV. Data safety | Pass. No migration, no data touched. |
+| IV. Data safety | Pass. One state-only migration (`0053_owner_related_name`, no SQL, no data touched), required by NetBox 4.7 so that `makemigrations --check` stays clean; guarded by a test. |
 | V. Backward-compatible interfaces | Pass with a stated exception: dropping NetBox 4.6 narrows the supported platform, not a plugin interface; recorded in the changelog warning (option A of the compatibility assessment). |
 | VI. Minimal dependencies | Pass. No dependency added. |
 | VII. Documented change | Pass. README, changelog, CLAUDE.md and the constitution's compatibility section are in scope (FR-006 to FR-008). |

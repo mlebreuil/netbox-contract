@@ -4,6 +4,16 @@
 
 ## Version 2
 
+### Version 2.6.0
+
+> [!WARNING]
+> This version requires NetBox 4.7.0 or later. NetBox 4.6 installations must stay on plugin version 2.5.x. The plugin refuses to load on an earlier NetBox.
+
+#### Other Changes
+
+* A state-only migration (0053) records the `related_name` that NetBox 4.7 gives to the owner field of contract types and service providers; it changes no data. ([#318](https://github.com/mlebreuil/netbox-contract/issues/318))
+* The minimum NetBox version is now 4.7.0 and the tests run in CI against NetBox v4.7.4 (previously 4.6.0 and v4.6.10). The query-count baseline of the list-view tests is recorded for NetBox 4.7, where each list view needs one query less, and the REST tests give dates as text as NetBox 4.7's test helper expects. ([#318](https://github.com/mlebreuil/netbox-contract/issues/318))
+
 ### Version 2.5.0
 
 > [!WARNING]

@@ -18,7 +18,7 @@
 
 ## Delivery Overview
 
-The plugin 2.5.0 declares NetBox 4.6.0 as its minimum and is tested against NetBox 4.6.10. The compatibility assessment of NetBox 4.7.4 found that the plugin runs unchanged on 4.7.4 and that all 18 failing tests fail because of the tests themselves: nine list-view query counts are one query lower on 4.7, and nine REST tests give dates and decimals as Python objects where NetBox 4.7's test helper compares text. This change makes the suite green on 4.7.4, pins CI to that release, and declares 4.7.0 as the minimum. It adds no feature and changes no behaviour, API, setting or data.
+The plugin 2.5.0 declares NetBox 4.6.0 as its minimum and is tested against NetBox 4.6.10. The compatibility assessment of NetBox 4.7.4 found that the plugin runs unchanged on 4.7.4 and that all 18 failing tests fail because of the tests themselves: nine list-view query counts are one query lower on 4.7, and nine REST tests give dates as Python objects where NetBox 4.7's test helper compares text. This change makes the suite green on 4.7.4, pins CI to that release, and declares 4.7.0 as the minimum. It adds no feature and changes no behaviour, API, setting or data. Running `makemigrations --check` on 4.7.4 found one more adjustment, missed by the compatibility assessment: NetBox 4.7 gives the `owner` field of its objects `related_name='+'`, so the plugin's two owner fields (contract types and service providers) need a state-only migration (no SQL, no data touched).
 
 It carries the shared prerequisite that specifications 004 to 007 each refer to.
 
@@ -34,10 +34,11 @@ A maintainer opens a pull request and CI runs the whole suite against the NetBox
 
 **Acceptance Scenarios**:
 
-1. **Given** NetBox v4.7.4 and the plugin, **When** the full suite runs, **Then** 1020 existing tests plus the metadata test of T006 run, none fail and no test is skipped that ran before (9 tests are skipped today for unrelated reasons).
+1. **Given** NetBox v4.7.4 and the plugin, **When** the full suite runs, **Then** 1020 existing tests plus the 2 metadata tests of T006 and the migration-state test of T016 run, none fail and no test is skipped that ran before (9 tests are skipped today for unrelated reasons).
 2. **Given** the CI configuration, **When** it is read, **Then** it checks out the NetBox tag `v4.7.4` and runs on Python 3.12, 3.13 and 3.14.
-3. **Given** the REST tests for contracts, contract lines and invoices, **When** they run, **Then** they send dates and amounts the way an API client does (as text) and still check the stored objects.
-4. **Given** the list-view tests, **When** the query counts of NetBox 4.7.4 differ by one from the recorded baseline, **Then** the baseline is updated once, with the reason recorded in the commit, and any later change of a count fails the test again.
+3. **Given** the REST tests for contracts, contract lines and invoices, **When** they run, **Then** they send dates the way an API client does (as text) and still check the stored objects.
+4. **Given** the plugin models and migrations, **When** the pending model changes are computed on NetBox 4.7.4, **Then** there are none.
+5. **Given** the list-view tests, **When** the query counts of NetBox 4.7.4 differ by one from the recorded baseline, **Then** the baseline is updated once, with the reason recorded in the commit, and any later change of a count fails the test again.
 
 ---
 
@@ -69,14 +70,15 @@ An administrator reading the README, the changelog or the plugin metadata sees t
 ### Functional Requirements
 
 - **FR-001**: The CI MUST run the suite against the NetBox tag `v4.7.4` on Python 3.12, 3.13 and 3.14, and the lint job MUST be unchanged.
-- **FR-002**: The REST create, bulk create and update tests for contracts, contract lines and invoices MUST give dates and decimal amounts as text and MUST still verify the stored values.
+- **FR-002**: The REST create, bulk create and update tests for contracts, contract lines and invoices MUST give dates as text (decimal amounts stay as they are, see `research.md` D1) and MUST still verify the stored values.
 - **FR-003**: The recorded list-view query counts MUST be updated to the NetBox 4.7.4 values, once, with the reason stated, using the project's re-record procedure (serial run, no parallel).
 - **FR-004**: The full suite MUST pass on NetBox v4.7.4: no failure, and no test newly skipped.
 - **FR-005**: The plugin's minimum NetBox version MUST be 4.7.0, with no maximum version.
 - **FR-006**: The plugin version MUST become 2.6.0 and the README compatibility table MUST list NetBox 4.7 with plugin 2.6, keeping 4.6 with 2.4 and 2.5.
 - **FR-007**: The changelog MUST open the 2.6.0 section with the NetBox 4.7.0 requirement warning, and list the CI pin under Other Changes, following the changelog rules of `CLAUDE.md`.
 - **FR-008**: `CLAUDE.md`, `CONTRIBUTING.md` and the constitution's compatibility section MUST name NetBox 4.7 as the minimum and `v4.7.4` as the pinned test release, the constitution through `/speckit-constitution`.
-- **FR-009**: The change MUST NOT alter plugin behaviour, models, migrations, REST or GraphQL output, settings or templates.
+- **FR-009**: The change MUST NOT alter plugin behaviour, REST or GraphQL output, settings or templates, and MUST NOT change any stored column or value; its only model-level change is the state-only migration of FR-010.
+- **FR-010**: On NetBox 4.7, `makemigrations --check` MUST report nothing pending for the plugin: a migration `0053_owner_related_name` MUST record `related_name='+'` on `ContractType.owner` and `ServiceProvider.owner`, depend only on `users.0015_owner` (not on a later `users` migration, so it works on every 4.7.x), produce no SQL, and a test MUST fail when the models and migrations differ.
 
 ### Key Entities
 

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `netbox-contract` is a NetBox plugin (Django app `netbox_contract`) managing contracts, contract lines, units,
 invoices, invoice lines, accounting dimensions, service providers and contract assignments to NetBox objects.
-Minimum NetBox 4.6 (`min_version` in `netbox_contract/__init__.py`), Python 3.12+. Project rules are in
+Minimum NetBox 4.7 (`min_version` in `netbox_contract/__init__.py`), Python 3.12+. Project rules are in
 `.specify/memory/constitution.md` (Principles I-VII); it overrides other practice documents when they conflict.
 
 ## Environment and commands
@@ -41,7 +41,7 @@ venv/bin/python netbox/manage.py convert_contract_lines
 ```
 
 CI (`.github/workflows/lint-tests.yaml`) links `testing/configuration.py` as NetBox's configuration and runs the
-suite on a pinned NetBox tag (currently `v4.6.10`) for Python 3.12-3.14.
+suite on a pinned NetBox tag (currently `v4.7.4`) for Python 3.12-3.14.
 
 ## Architecture
 

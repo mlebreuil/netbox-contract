@@ -2,7 +2,7 @@
 
 **Input**: `specs/004-generic-object-selector/` (plan.md, spec.md, research.md R1-R9, data-model.md, contracts/forms-and-urls.md, quickstart.md)
 
-**Migration**: US4 adds migration `0053` (the only one of 004 to 008).
+**Migration**: US4 adds migration `0054` (the only one of 004 to 008).
 
 **Tests**: required and written first (constitution II); each test task must be seen failing before its implementation task.
 
@@ -67,7 +67,7 @@
 
 ### Implementation
 - [ ] T019 [US4] `netbox_contract/models.py` `ContractAssignment`: add `clean()` raising the duplicate `ValidationError` (message of `contracts/forms-and-urls.md`; exclude `self.pk`; skip when contract or object missing) and `Meta.constraints = [UniqueConstraint(fields=['contract', 'content_type', 'object_id'], name='netbox_contract_unique_assignment')]` (R10).
-- [ ] T020 [US4] Create `netbox_contract/migrations/0053_contractassignment_unique.py`: `RunPython(merge_duplicates, noop)` then `AddConstraint`; put `merge_duplicates(apps, schema_editor)` in a module-level function so T017 can call it; declare the dependency on the `extras` migration that provides the models it touches (read how `0051`/`0052` declare dependencies and an earlier `RunPython` migration first). Rules and report format: `research.md` R10. Report to stdout and to the `netbox_contract` logger.
+- [ ] T020 [US4] Create `netbox_contract/migrations/0054_contractassignment_unique.py`: `RunPython(merge_duplicates, noop)` then `AddConstraint`; put `merge_duplicates(apps, schema_editor)` in a module-level function so T017 can call it; declare the dependency on the `extras` migration that provides the models it touches (read how `0051`/`0052` declare dependencies and an earlier `RunPython` migration first). Rules and report format: `research.md` R10. Report to stdout and to the `netbox_contract` logger.
 - [ ] T021 [US4] Run T016-T018; `makemigrations netbox_contract --check --dry-run` reports no change.
 - [ ] T022 [P] [US4] `docs/contract.md`: one paragraph on the duplicate rule and on the upgrade merge report; `docs/api.md`: the REST create and update of an assignment now answer 400 for a duplicate pair, with the message. `CHANGELOG.md`: Breaking Changes (duplicate assignments are refused by form, import and REST; existing duplicates are merged at upgrade; removed duplicates are not restored on downgrade).
 
