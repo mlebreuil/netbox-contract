@@ -87,13 +87,14 @@ PLUGINS_CONFIG = {
 ```
 
 * top_level_menu : If "Contracts" appears under the "Plugins" menu item or on its own
+* supported_models: The NetBox models a contract can be assigned to. Each model must be exposed in NetBox's REST API, because the assignment form searches its objects through it. A contract can be assigned to a given object only once.
 * contract_assignments_display:
   * `'tab'` - only the Contracts view tab is visible on the related object page.
   * `'inline'` - only the inline contract assignments table is shown in object detail; the Contracts tab is hidden.
   * `'both'` - both tab and inline table are shown (default behavior).
 * default_accounting_dimensions: The accounting dimensions which will appear in the field' background when empty. Note that accounting dimensions are now managed as individual objects. The use of this field is deprecated.  
 * mandatory_contract_fields, mandatory_invoice_fields: Fields which are not required by default and can be set as such. The list of fields is at the bottom of the contract import form.
-* hidden_contract_fields, hidden_invoice_fields: List of fields to be hidden. Fields should not be required to be hidden. A deprecated field that is not shown is ignored, with a warning in the log.
+* hidden_contract_fields, hidden_invoice_fields: List of fields to be hidden. Fields should not be required to be hidden. A deprecated field that is not shown is ignored, with a warning in the log. The legacy name `external_party_object_type` is an alias of `external_party_object`.
 * show_deprecated_fields: show the deprecated contract cost fields (monthly, yearly and non-recurring costs, replaced by contract lines) in the contract form, detail page and tables, and allow creating new invoice templates. Default: `False`.
 
 ### Customize the plugin fields choices
@@ -128,6 +129,17 @@ FIELD_CHOICES = {
 
 ```
 
+Status and billing method options show a description under their name. The built-in options come with one. An option you add or
+replace through `FIELD_CHOICES` can give its own with a dictionary entry; an option without a description is shown without one. Replacing all the options of a set, as in the example above, drops the built-in descriptions unless you give them again:
+
+```python
+FIELD_CHOICES = {
+    'netbox_contract.Invoice.status+': [
+        {'value': 'on_hold', 'label': 'On hold', 'color': 'orange', 'description': 'Waiting for the customer approval'},
+    ],
+}
+```
+
 ### Run database migrations
 
 ```bash
@@ -142,5 +154,16 @@ The migration to version 2.5 converts the monthly, yearly and non-recurring cost
 ```bash
 (venv) $ python3 manage.py convert_contract_lines
 ```
+
+### Upgrading to version 2.6: orphan assignments
+
+Before version 2.6, deleting a device, site or other object left its contract assignments behind. From 2.6 the assignments are deleted with their object. The ones already left behind are not touched by the upgrade. List them, then delete them once you have looked at the list:
+
+```bash
+(venv) $ python3 manage.py cleanup_orphan_assignments          # list only, nothing is changed
+(venv) $ python3 manage.py cleanup_orphan_assignments --apply  # delete the listed assignments
+```
+
+The report gives the number per object type and, for each assignment, its contract, the object type and the former identifier. Assignments whose object type is no longer installed are listed separately and are never deleted. Running the command again lists nothing once it is clean.
 
 The custom script "Report currency mismatches" (in `scripts/netbox-contract.py`) lists existing records whose currency does not match their contract or invoice, without changing them.

@@ -204,8 +204,8 @@ class InvoiceFormCurrencyTestCase(NetBoxTestCase):
         provider = make_provider()
         data = {
             'name': self.eur.name,
-            'external_party_object_type': ContentType.objects.get_for_model(Provider).pk,
-            'external_party_object': provider.pk,
+            'external_party_object_content_type': ContentType.objects.get_for_model(Provider).pk,
+            'external_party_object_object_id': provider.pk,
             'internal_party': 'default',
             'status': 'active',
             'currency': 'usd',

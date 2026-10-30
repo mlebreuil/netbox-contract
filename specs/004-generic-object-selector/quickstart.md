@@ -26,7 +26,7 @@ Expected: all pass; before the change the new module and the updated form-data t
 
 ## Checks
 
-- `makemigrations netbox_contract --check --dry-run`: no change (the new migration 0054 is part of the repository).
+- `makemigrations netbox_contract --check --dry-run`: no change (the new migrations 0054 and 0055 are part of the repository).
 - `ruff check`.
 - Search the plugin for the removed code: `grep -n "alter_object" netbox_contract/views.py` shows neither override.
 

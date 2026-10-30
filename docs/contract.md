@@ -4,7 +4,7 @@
 
 ![Contract](img/contract.png "contract")
 
-- External party type: either an Circuit provider or Contract Service provider.
+- External party: either a circuit provider or a contract service provider. Choose the type, then search the provider by typing part of its name; only the providers you may view are offered.
 - Invoice frequency : The number of month that each invoice covers. It is used to propose the period of a new invoice.
 - Parent: Contrats can be arranged in a parent / child hierarchie.
 - Billable: whether invoices are issued for this contract (default: yes). The lines of a non-billable contract are invoiced through its closest billable parent. The flag cannot change once the contract, one of its parents or one of its children has invoices, or once an invoice line references one of its lines.
@@ -41,5 +41,5 @@ The monthly, yearly and non-recurring cost fields (`mrc`, `yrc`, `nrc`) are repl
 ![Contract linked objects](img/contract_linked_objects.png "contract linked objects")
 
 - Contract lines: the lines of the contract, with a button to add a new one. The buttons are hidden once the contract has invoices.
-- Assignments: the assignement of contract to objects is managed from each object's detail view.
+- Assignments: the assignment of a contract to objects is managed from each object's detail view. In the assignment form, choose the object type, then search the object by typing part of its name (no object number to look up); only the objects you may view are offered, and the types offered are those of the `supported_models` setting. A contract can be assigned to an object only once: assigning it again is refused, in the form, in a CSV import and through the REST API.
 - Invoice templates (kept for reference): the deprecated invoice template of the contract, if any. Shown only when the plugin setting `show_deprecated_fields` is `True`; templates remain reachable from the invoice list.

@@ -52,8 +52,8 @@ class DeprecatedFieldsViewTestCase(TestCase):
         provider = make_provider()
         data = {
             'name': 'Renamed',
-            'external_party_object_type': ContentType.objects.get_for_model(Provider).pk,
-            'external_party_object': provider.pk,
+            'external_party_object_content_type': ContentType.objects.get_for_model(Provider).pk,
+            'external_party_object_object_id': provider.pk,
             'internal_party': 'default',
             'status': 'active',
             'currency': 'usd',
@@ -75,6 +75,22 @@ class DeprecatedFieldsViewTestCase(TestCase):
         ):
             response = self.get_contract_form()
         self.assertEqual(response.status_code, 200)
+
+    def test_legacy_external_party_setting_name_is_an_alias(self):
+        """The pre-2.6 name external_party_object_type acts on external_party_object, without a warning."""
+        settings_ = {
+            'mandatory_contract_fields': ['external_party_object_type'],
+            'hidden_contract_fields': ['external_party_object_type'],
+        }
+        with (
+            mock.patch.dict(PLUGIN_SETTINGS, settings_),
+            self.assertNoLogs('netbox.plugins.netbox_contract', 'WARNING'),
+        ):
+            response = self.get_contract_form()
+        self.assertEqual(response.status_code, 200)
+        field = response.context['form'].fields['external_party_object']
+        self.assertTrue(field.required)
+        self.assertFalse(field.widget.is_hidden)
 
     def test_contract_list_hides_deprecated_columns(self):
         url = reverse('plugins:netbox_contract:contract_list')

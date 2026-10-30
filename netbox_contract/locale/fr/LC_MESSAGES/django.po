@@ -1354,6 +1354,42 @@ msgstr "Choisir un contrat pour voir les lignes générées pour lui."
 msgid "Contract line amended from {date}."
 msgstr "Avenant sur la ligne de contrat à partir du {date}."
 
+#: models.py
+msgid "Being prepared: amounts and lines can still change"
+msgstr "En préparation : les montants et les lignes peuvent encore changer"
+
+#: models.py
+msgid "Final: amount, currency, period, contracts and the amounts of its lines are locked"
+msgstr "Définitive : le montant, la devise, la période, les contrats et les montants de ses lignes sont verrouillés"
+
+#: models.py
+msgid "No longer valid; kept for the record"
+msgstr "N'est plus valide ; conservée pour mémoire"
+
+#: models.py
+msgid "In force"
+msgstr "En vigueur"
+
+#: models.py
+msgid "Ended or withdrawn; kept for the record"
+msgstr "Terminé ou retiré ; conservé pour mémoire"
+
+#: models.py
+msgid "Billed once, from quantity and unit price"
+msgstr "Facturé une seule fois, à partir de la quantité et du prix unitaire"
+
+#: models.py
+msgid "Billed every period, prorated to the invoice period"
+msgstr "Facturé à chaque période, au prorata de la période de facturation"
+
+#: models.py
+msgid "Billed from a quantity entered on each invoice"
+msgstr "Facturé à partir d'une quantité saisie sur chaque facture"
+
+#: models.py
+msgid "%(contract)s is already assigned to %(object)s."
+msgstr "%(contract)s est déjà affecté à %(object)s."
+
 #~ msgid "childs"
 #~ msgstr "enfants"
 

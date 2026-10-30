@@ -37,7 +37,7 @@ A new contract opens with the type "service provider" selected. The old fields `
 |-------|--------|-------|
 | Add button on an object's Contracts tab (`AddContractAssignment`) | `?content_type=&object_id=&return_url=` | `?content_object_content_type=&content_object_object_id=&return_url=` |
 | Inline table on the object page (`inc/contract_assignments_bottom.html`) | old names | new names |
-| Add-another after saving (`get_extra_addanother_params`) | old names | new names |
+| Add-another after saving | old names (override of `get_extra_addanother_params`) | new names, carried by the clone fields; the override is removed |
 
 ## Duplicate assignments
 

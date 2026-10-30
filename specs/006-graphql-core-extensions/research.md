@@ -37,3 +37,8 @@ Source: NetBox 4.7.4 `netbox/plugins/__init__.py`, `netbox/graphql`, `docs/plugi
 - **Decision**: management command `cleanup_orphan_assignments` (next to `convert_contract_lines`), dry-run by default, `--apply` deletes in one transaction. Orphan test: for each content type present in the assignments, the model class resolves and `model.objects.filter(pk__in=ids)` misses the identifier. Assignments whose content type has no model class are listed under a separate "cannot judge" heading and never deleted. Output: totals per object type and one line per orphan (assignment id, contract, type, former identifier). Idempotent.
 - **Rationale**: constitution IV forbids silent deletion of user data and requires reporting judgement calls; an automatic data migration would delete without a chance to review. The command logic lives in a function (`find_orphan_assignments`) so tests and the command share it, as `conversion.py` does.
 - **Alternatives**: data migration (rejected, silent); doing nothing (rejected by the owner, 2026-10-29).
+
+## Implementation notes
+- R1: NetBox 4.7.4 reads `graphql_extensions.type_extensions` / `.filter_extensions` by default, so nothing is added to `PluginConfig`. Extensions are `@strawberry.type` classes with an unannotated `models` list; filter methods take `info: strawberry.Info` (annotated), `value`, `queryset` and `prefix`.
+- Visibility: an assignment is returned and counted only when the user may view it and may view its contract.
+- The quickstart manual steps were not run in a browser; the automated tests cover the delete check and the command.

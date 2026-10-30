@@ -22,8 +22,9 @@ from netbox.forms import (
 )
 from tenancy.forms import ContactModelFilterForm, TenancyFilterForm
 from tenancy.models import Tenant
-from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES, get_field_value
+from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES, GenericObjectFormMixin, add_blank_choice, get_field_value
 from utilities.forms.fields import (
+    ChoiceField,
     ColorField,
     CommentField,
     ContentTypeChoiceField,
@@ -33,6 +34,8 @@ from utilities.forms.fields import (
     CSVModelMultipleChoiceField,
     DynamicModelChoiceField,
     DynamicModelMultipleChoiceField,
+    GenericObjectChoiceField,
+    MultipleChoiceField,
     SlugField,
     TagFilterField,
 )
@@ -72,17 +75,23 @@ plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 logger = logging.getLogger('netbox.plugins.netbox_contract')
 
 
-def apply_field_settings(form, mandatory_setting, hidden_setting):
-    """Apply the mandatory and hidden field settings, ignoring (with a warning) fields the form does not have."""
-    for field in plugin_settings.get(mandatory_setting) or []:
+def apply_field_settings(form, mandatory_setting, hidden_setting, aliases=None):
+    """
+    Apply the mandatory and hidden field settings, ignoring (with a warning) fields the form does not have.
+    `aliases` maps a legacy setting name to the form field that replaced it.
+    """
+    aliases = aliases or {}
+    for name in plugin_settings.get(mandatory_setting) or []:
+        field = aliases.get(name, name)
         if field not in form.fields:
             logger.warning('%s: field "%s" is not in the form (deprecated or unknown), ignored', mandatory_setting,
-                           field)
+                           name)
             continue
         form.fields[field].required = True
-    for field in plugin_settings.get(hidden_setting) or []:
+    for name in plugin_settings.get(hidden_setting) or []:
+        field = aliases.get(name, name)
         if field not in form.fields:
-            logger.warning('%s: field "%s" is not in the form (deprecated or unknown), ignored', hidden_setting, field)
+            logger.warning('%s: field "%s" is not in the form (deprecated or unknown), ignored', hidden_setting, name)
             continue
         if not form.fields[field].required:
             form.fields[field].widget = forms.HiddenInput()
@@ -107,16 +116,15 @@ def prune_fieldsets(form):
 # Contract
 
 
-class ContractForm(NetBoxModelForm):
+class ContractForm(GenericObjectFormMixin, NetBoxModelForm):
     comments = CommentField(label=_('Comments'))
 
-    external_party_object_type = ContentTypeChoiceField(
-        queryset=ContentType.objects.all(),
-        limit_choices_to=SERVICE_PROVIDER_MODELS,
-        widget=HTMXSelect(),
-        label=_('External party object type'),
+    external_party_object = GenericObjectChoiceField(
+        content_type_queryset=ContentType.objects.filter(SERVICE_PROVIDER_MODELS),
+        required=True,
+        label=_('External party'),
     )
-    external_party_object = forms.ModelChoiceField(queryset=None, label=_('External party object'))
+    status = ChoiceField(choices=StatusChoices, required=True, label=_('Status'))
     internal_party = internal_party = forms.ChoiceField(
         choices=InternalEntityChoices,
         required=True,
@@ -138,7 +146,7 @@ class ContractForm(NetBoxModelForm):
             'name', 'contract_type', 'status', 'external_reference', 'parent', 'documents', 'tags',
             name=_('Contract'),
         ),
-        FieldSet('external_party_object_type', 'external_party_object', 'internal_party', name=_('Parties')),
+        FieldSet('external_party_object', 'internal_party', name=_('Parties')),
         FieldSet('start_date', 'end_date', 'initial_term', 'renewal_term', 'notice_period', name=_('Dates and terms')),
         FieldSet('currency', 'invoice_frequency', 'billable', name=_('Billing')),
         FieldSet('tenant', name=_('Tenancy')),
@@ -146,28 +154,16 @@ class ContractForm(NetBoxModelForm):
     )
 
     def __init__(self, *args, **kwargs):
-        initial = kwargs.get('initial', None)
+        # A new contract starts with the service provider type chosen, as the form always did
+        instance = kwargs.get('instance')
+        initial = dict(kwargs.get('initial') or {})
+        is_new = instance is None or instance.pk is None
+        if is_new and not args and not kwargs.get('data') and not any(
+            key.startswith('external_party_object') for key in initial
+        ):
+            initial['external_party_object_content_type'] = ContentType.objects.get_for_model(ServiceProvider).pk
+        kwargs['initial'] = initial
         super().__init__(*args, **kwargs)
-
-        # Initialize the external party object gfk
-        if initial and 'external_party_object_type' in initial:
-            external_party_object_type = ContentType.objects.get_for_id(initial['external_party_object_type'])
-            external_party_class = external_party_object_type.model_class()
-            self.fields['external_party_object'].queryset = external_party_class.objects.all()
-            if (
-                self.instance.external_party_object_type
-                and self.instance.external_party_object_type.id == external_party_object_type.id
-            ):
-                self.fields['external_party_object'].initial = self.instance.external_party_object
-            else:
-                self.fields['external_party_object'].initial = None
-        elif self.instance.external_party_object_type:
-            external_party_class = self.instance.external_party_object_type.model_class()
-            self.fields['external_party_object'].queryset = external_party_class.objects.all()
-            self.fields['external_party_object'].initial = self.instance.external_party_object
-        else:
-            self.fields['external_party_object'].queryset = ServiceProvider.objects.all()
-            self.fields['external_party_object'].initial = None
 
         # Deprecated cost fields are replaced by contract lines
         if plugin_settings.get('show_deprecated_fields'):
@@ -178,15 +174,16 @@ class ContractForm(NetBoxModelForm):
                 del self.fields[field]
 
         # Initialise fields settings
-        apply_field_settings(self, 'mandatory_contract_fields', 'hidden_contract_fields')
+        apply_field_settings(
+            self, 'mandatory_contract_fields', 'hidden_contract_fields',
+            aliases={'external_party_object_type': 'external_party_object'},
+        )
 
     class Meta:
         model = Contract
         fields = (
             'name',
             'contract_type',
-            'external_party_object_type',
-            'external_party_object',
             'external_reference',
             'internal_party',
             'tenant',
@@ -265,7 +262,7 @@ class ContractFilterForm(ContactModelFilterForm, TenancyFilterForm, NetBoxModelF
         label=_('Internal party')
     )
 
-    status = forms.ChoiceField(choices=StatusChoices, required=False, label=_('Status'))
+    status = ChoiceField(choices=StatusChoices, required=False, label=_('Status'))
 
     currency = forms.ChoiceField(
         choices=[('', '-----')] + list(CurrencyChoices),
@@ -476,6 +473,12 @@ class InvoiceForm(NetBoxModelForm):
         max_length=100,
         label=_('Number'),
     )
+    status = ChoiceField(
+        choices=InvoiceStatusChoices,
+        required=True,
+        label=_('Status'),
+        help_text=Invoice._meta.get_field('status').help_text,
+    )
     contracts = DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(),
         required=False,
@@ -624,7 +627,7 @@ class InvoiceFilterForm(NetBoxModelFilterSetForm):
         widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
         label=_('Template'),
     )
-    status = forms.ChoiceField(choices=InvoiceStatusChoices, required=False, label=_('Status'))
+    status = ChoiceField(choices=InvoiceStatusChoices, required=False, label=_('Status'))
     currency = forms.ChoiceField(choices=CurrencyChoices, required=False, label=_('Currency'))
     contracts = DynamicModelMultipleChoiceField(
         queryset=Contract.objects.all(),
@@ -796,12 +799,12 @@ class ServiceProviderBulkEditForm(PrimaryModelBulkEditForm):
 # ContractAssignment
 
 
-class ContractAssignmentForm(NetBoxModelForm):
+class ContractAssignmentForm(GenericObjectFormMixin, NetBoxModelForm):
 
-    content_type = ContentTypeChoiceField(
-        queryset=ContentType.objects.all(),
-        limit_choices_to=ASSIGNEMENT_MODELS,
-        label=_('object type'),
+    content_object = GenericObjectChoiceField(
+        content_type_queryset=ContentType.objects.filter(ASSIGNEMENT_MODELS),
+        required=True,
+        label=_('Object'),
     )
 
     contract = DynamicModelChoiceField(
@@ -810,16 +813,23 @@ class ContractAssignmentForm(NetBoxModelForm):
         label=_('Contract'))
 
     fieldsets = (
-        FieldSet('content_type', 'object_id', 'contract', 'tags', name=_('Assignment')),
+        FieldSet('content_object', 'contract', 'tags', name=_('Assignment')),
     )
+
+    def __init__(self, *args, **kwargs):
+        # Links written before the object selector pre-fill with content_type and object_id: still accepted
+        initial = dict(kwargs.get('initial') or {})
+        if not any(key in initial for key in ('content_object_content_type', 'content_object_object_id')):
+            if initial.get('content_type'):
+                initial['content_object_content_type'] = initial['content_type']
+            if initial.get('object_id'):
+                initial['content_object_object_id'] = initial['object_id']
+        kwargs['initial'] = initial
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = ContractAssignment
-        fields = ['content_type', 'object_id', 'contract', 'tags']
-        # widgets = {
-        #     'content_type': forms.HiddenInput(),
-        #     'object_id': forms.HiddenInput(),
-        # }
+        fields = ['contract', 'tags']
 
 
 class ContractAssignmentFilterForm(NetBoxModelFilterSetForm):
@@ -1058,6 +1068,9 @@ class InvoiceLineBulkEditForm(NetBoxModelBulkEditForm):
 
 class UnitForm(NetBoxModelForm):
     comments = CommentField(label=_('Comments'))
+    billing_method = ChoiceField(
+        choices=add_blank_choice(BillingMethodChoices), required=True, label=_('Billing method')
+    )
 
     fieldsets = (
         FieldSet('name', 'description', 'billing_method', 'months', 'tags', name=_('Unit')),
@@ -1075,7 +1088,7 @@ class UnitFilterForm(NetBoxModelFilterSetForm):
         FieldSet('name', 'billing_method', name=_('Attributes')),
     )
     name = forms.CharField(required=False, label=_('Name'))
-    billing_method = forms.MultipleChoiceField(
+    billing_method = MultipleChoiceField(
         choices=BillingMethodChoices, required=False, label=_('Billing method')
     )
     tag = TagFilterField(model)
@@ -1195,7 +1208,7 @@ class ContractLineFilterForm(NetBoxModelFilterSetForm):
     unit_id = DynamicModelMultipleChoiceField(
         queryset=Unit.objects.all(), required=False, selector=True, label=_('Unit')
     )
-    billing_method = forms.MultipleChoiceField(
+    billing_method = MultipleChoiceField(
         choices=BillingMethodChoices, required=False, label=_('Billing method')
     )
     currency = forms.MultipleChoiceField(choices=CurrencyChoices, required=False, label=_('Currency'))
