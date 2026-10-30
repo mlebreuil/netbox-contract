@@ -7,10 +7,14 @@ from unittest import mock
 
 from dcim.models import Site
 from django import forms as django_forms
+from django.apps import apps
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages import get_messages
 from django.db import connection
+from django.db.migrations.autodetector import MigrationAutodetector
+from django.db.migrations.loader import MigrationLoader
+from django.db.migrations.state import ProjectState
 from django.test.utils import CaptureQueriesContext
 from django.urls import resolve, reverse
 from extras.models import JournalEntry
@@ -482,3 +486,38 @@ class InvoiceLineTableTestCase(TestCase):
         self.add_permissions('netbox_contract.view_invoiceline')
         response = self.client.get(reverse('plugins:netbox_contract:invoiceline_list'))
         self.assertContains(response, f'href="{line.get_absolute_url()}"')
+
+
+class PluginMetadataTestCase(TestCase):
+    """The plugin declares NetBox 4.7.0 as its minimum and no maximum (specs/008-netbox-47-baseline)."""
+
+    def test_netbox_version_range(self):
+        from netbox_contract import config
+
+        self.assertEqual(config.min_version, '4.7.0')
+        self.assertIsNone(config.max_version)
+
+    def test_plugin_version_matches_the_package(self):
+        from netbox_contract import config
+
+        # Version should be 2.6.0 as defined in the PluginConfig
+        self.assertEqual(config.version, '2.6.0')
+
+        # When running from editable install, also check pyproject.toml matches
+        pyproject = Path(__file__).resolve().parents[2] / 'pyproject.toml'
+        if pyproject.exists():
+            import tomllib
+            with pyproject.open('rb') as handle:
+                declared = tomllib.load(handle)['project']['version']
+            self.assertEqual(declared, config.version)
+
+
+class MigrationStateTestCase(TestCase):
+    """The models match the migrations: `makemigrations --check` has nothing to add (constitution IV)."""
+
+    def test_no_pending_model_changes(self):
+        loader = MigrationLoader(None, ignore_no_migrations=True)
+        autodetector = MigrationAutodetector(loader.project_state(), ProjectState.from_apps(apps))
+        changes = autodetector.changes(graph=loader.graph, trim_to_apps={'netbox_contract'})
+        operations = [repr(op) for migration in changes.get('netbox_contract', []) for op in migration.operations]
+        self.assertEqual(operations, [])

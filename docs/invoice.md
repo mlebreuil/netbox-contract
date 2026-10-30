@@ -35,7 +35,7 @@ Lines are generated only when an invoice is created (through the web interface o
 ![Invoice](img/invoice.png "invoice")
 
 - Number: The invoice number. Should correspond to your accounting sysstem invoice number.
-- Status: Draft (default), Posted (locked, see above) or Canceled. Only Posted invoices count as invoiced when the remaining amount of one-time lines is computed.
+- Status: Draft (default), Posted (locked, see above) or Canceled. Each option shows a one-line description under its name. Only Posted invoices count as invoiced when the remaining amount of one-time lines is computed.
 - Date: the date of the invoice
 - Contracts: The contract linked to the invoice. Invoices linked to several contracts before version 2.5.0 stay as they are and can still be edited, but no contract can be added to them.
 - Period_start: The start of the contract periode covered by this invoice.

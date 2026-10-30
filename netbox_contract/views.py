@@ -12,11 +12,13 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import Case, F, When
 from django.db.models.functions import Round
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from extras.ui.panels import CustomFieldsPanel, TagsPanel
 from netbox.object_actions import *
 from netbox.ui import actions, layout
+from netbox.ui.breadcrumbs import Breadcrumb
 from netbox.ui.panels import CommentsPanel, ObjectsTablePanel
 from netbox.views import generic
 from netbox.views.generic.base import BaseObjectView
@@ -44,6 +46,23 @@ from .services import amendments, invoicing
 plugin_settings = settings.PLUGINS_CONFIG['netbox_contract']
 
 logger = logging.getLogger('netbox.plugins.netbox_contract')
+
+
+# Breadcrumbs (spec 005): one trail per detail page, declared in its layout and shown on its tabs as well
+
+
+def _list_url(url_name, parameter):
+    """A URL callable for a breadcrumb: the list `url_name` filtered on `parameter` = the pk of the crumb's object."""
+    return lambda obj: f"{reverse(f'plugins:netbox_contract:{url_name}')}?{parameter}={obj.pk}"
+
+
+def _external_party_url(party):
+    parameter = 'service_provider_id' if isinstance(party, ServiceProvider) else 'provider_id'
+    return f"{reverse('plugins:netbox_contract:contract_list')}?{parameter}={party.pk}"
+
+
+def _invoice_contracts(invoice):
+    return sorted(invoice.contracts.all(), key=lambda contract: contract.name)
 
 
 # ContractType views
@@ -189,23 +208,6 @@ class ContractAssignmentEditView(generic.ObjectEditView):
     queryset = ContractAssignment.objects.all()
     form = forms.ContractAssignmentForm
 
-    def alter_object(self, instance, request, args, kwargs):
-        if not instance.pk and kwargs:
-            # Assign the object based on URL kwargs
-            content_type = get_object_or_404(
-                ContentType, pk=request.GET.get('content_type')
-            )
-            instance.object = get_object_or_404(
-                content_type.model_class(), pk=request.GET.get('object_id')
-            )
-        return instance
-
-    def get_extra_addanother_params(self, request):
-        return {
-            'content_type': request.GET.get('content_type'),
-            'object_id': request.GET.get('object_id'),
-        }
-
 
 @register_model_view(ContractAssignment, 'delete')
 class ContractAssignmentDeleteView(generic.ObjectDeleteView):
@@ -245,8 +247,8 @@ class AddContractAssignment(AddObject):
             parent_ct = ContentType.objects.get_for_model(parent)
             base_url = get_action_url(ContractAssignment, action='add')
             return (
-                f"{base_url}?content_type={parent_ct.pk}"
-                f"&object_id={parent.pk}&return_url={parent.get_absolute_url()}"
+                f"{base_url}?content_object_content_type={parent_ct.pk}"
+                f"&content_object_object_id={parent.pk}&return_url={parent.get_absolute_url()}"
             )
 
         # fallback for a class value (if called as model class)
@@ -318,6 +320,7 @@ for model_string in ASSIGNEMENT_TYPES:
 
 @register_model_view(Contract)
 class ContractView(generic.ObjectView):
+    template_name = 'generic/object.html'
     queryset = Contract.objects.annotate(
         calculated_rc=Round(
             Case(When(yrc__gt=0, then=F('yrc') / 12), default=F('mrc') * 12),
@@ -325,6 +328,7 @@ class ContractView(generic.ObjectView):
         )
     )
     layout = layout.SimpleLayout(
+        breadcrumbs=[Breadcrumb('external_party_object', url=_external_party_url)],
         left_panels=[panels.ContractPanel(), panels.DeprecatedCostsPanel(), CustomFieldsPanel()],
         right_panels=[
             panels.ContractValuesPanel(),
@@ -409,35 +413,6 @@ class ContractEditView(generic.ObjectEditView):
     queryset = Contract.objects.all()
     form = forms.ContractForm
 
-    def alter_object(self, obj, request, url_args, url_kwargs):
-        """
-        When this method is called after a Post,
-        it is used here to set the external party object id for exiting objects,
-        In any case, this happens before the form is instanciated.
-
-        Args:
-            obj: The object being edited
-            request: The current request
-            url_args: URL path args
-            url_kwargs: URL path kwargs
-        """
-
-        if request.method == 'POST':
-            data = normalize_querydict(request.POST)
-            obj.external_party_object_id = data['external_party_object']
-            external_party_object_type_id = data['external_party_object_type']
-            obj.external_party_object_type = ContentType.objects.get(
-                id=external_party_object_type_id
-            )
-            external_party_object_type = obj.external_party_object_type
-            obj.external_party_object = (
-                external_party_object_type.get_object_for_this_type(
-                    id=obj.external_party_object_id
-                )
-            )
-
-        return obj
-
 
 @register_model_view(Contract, 'delete')
 class ContractDeleteView(generic.ObjectDeleteView):
@@ -471,8 +446,10 @@ class ContractBulkDeleteView(generic.BulkDeleteView):
 
 @register_model_view(Invoice)
 class InvoiceView(generic.ObjectView):
+    template_name = 'generic/object.html'
     queryset = Invoice.objects.all()
     layout = layout.SimpleLayout(
+        breadcrumbs=[Breadcrumb(_invoice_contracts, url=_list_url('invoice_list', 'contracts'))],
         left_panels=[
             panels.MessagePanel('netbox_contract/panels/invoice_template_notice.html'),
             panels.InvoicePanel(),
@@ -721,8 +698,12 @@ class InvoiceBulkDeleteView(generic.BulkDeleteView):
 
 @register_model_view(InvoiceLine)
 class InvoiceLineView(generic.ObjectView):
+    template_name = 'generic/object.html'
     queryset = InvoiceLine.objects.select_related('invoice', 'contract_line__contract', 'unit')
     layout = layout.SimpleLayout(
+        breadcrumbs=[
+            Breadcrumb('invoice', label=lambda invoice: invoice.number, url=_list_url('invoiceline_list', 'invoice')),
+        ],
         left_panels=[panels.InvoiceLinePanel(), CustomFieldsPanel()],
         right_panels=[TagsPanel(), CommentsPanel()],
     )
@@ -858,9 +839,11 @@ class UnitBulkDeleteView(generic.BulkDeleteView):
 
 @register_model_view(ContractLine)
 class ContractLineView(generic.ObjectView):
+    template_name = 'generic/object.html'
     queryset = ContractLine.objects.select_related('contract', 'unit', 'replaces')
     actions = (CloneObject, EditObject, DeleteObject, AmendContractLine)
     layout = layout.SimpleLayout(
+        breadcrumbs=[Breadcrumb('contract', url=_list_url('contractline_list', 'contract_id'))],
         left_panels=[
             panels.MessagePanel('netbox_contract/panels/line_lock.html'),
             panels.ContractLinePanel(),
