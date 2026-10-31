@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Work on GitHub issue #309 — Adopt NetBox 4.6 plugin features: declarative detail layouts, amend permission action, nested serializers." The issue was found while reviewing the plugin against NetBox 4.6.8. It also lists two optional items: a GraphQL API and the NetBox base classes for contract types and service providers. The maintainer put both in scope (Q3 below). The issue replaces the minimal Amend button fix of #307.
+**Input**: User description: "Work on GitHub issue #309 — Adopt NetBox 4.6 plugin features: declarative detail layouts, amend permission action, nested serializers." The issue was found while reviewing the plugin against NetBox 4.6.8. It also lists two optional items: a GraphQL API and the NetBox base classes for contract types and service providers. The maintainer put both in scope (003-Q3 below). The issue replaces the minimal Amend button fix of #307.
 
 ## Delivery Overview
 
@@ -162,52 +162,52 @@ An administrator manages contract types like other NetBox categories (with a slu
 
 **Amend permission**
 
-- **FR-001**: Contract lines MUST declare an "amend" permission action with a description. It MUST be selectable in NetBox object permissions and stored by a migration.
-- **FR-002**: The amend screen and the REST amend action MUST require the view and amend actions on the contract line being amended, object-level constraints included. They MUST NOT require or accept add + change instead.
-- **FR-003**: The Amend button MUST be offered on the contract line page actions, in the contract line tables, and in the locked-line message of the contract line edit page. It MUST be shown only when the line can be amended and the user may amend that line.
+- **003-FR-001**: Contract lines MUST declare an "amend" permission action with a description. It MUST be selectable in NetBox object permissions and stored by a migration.
+- **003-FR-002**: The amend screen and the REST amend action MUST require the view and amend actions on the contract line being amended, object-level constraints included. They MUST NOT require or accept add + change instead.
+- **003-FR-003**: The Amend button MUST be offered on the contract line page actions, in the contract line tables, and in the locked-line message of the contract line edit page. It MUST be shown only when the line can be amended and the user may amend that line.
 
 **Detail pages**
 
-- **FR-004**: The detail pages of all nine object types MUST be built from NetBox's declarative page layout. They MUST show every attribute, related object table, "Add" button and message they showed before, under the same conditions and permissions.
-- **FR-004a**: Related object tables on detail pages MUST be the list page's tables of the related type, filtered to the object, with the user's column choices. Only the deprecated invoice template lines MAY use a fixed table. Contract line table actions MUST be decided per line: Amend as in FR-003, and no Delete on a locked line. The separate table for the lines of invoiced contracts MUST be removed.
-- **FR-005**: Attributes hidden by `hidden_contract_fields` or `hidden_invoice_fields` MUST stay hidden. Deprecated fields and the invoice template section MUST be shown only when `show_deprecated_fields` is on, and the template MUST NOT be looked up otherwise.
-- **FR-006**: Contract values on the contract page MUST come from the shared contract value computation, in a fixed number of queries.
-- **FR-007**: Detail pages MUST offer the left, right and full-width plugin content areas.
-- **FR-008**: The invoice edit page (with its line preview), the amend screen and the contract line edit page MUST keep working as they do today. These pages are not detail pages.
+- **003-FR-004**: The detail pages of all nine object types MUST be built from NetBox's declarative page layout. They MUST show every attribute, related object table, "Add" button and message they showed before, under the same conditions and permissions.
+- **003-FR-004a**: Related object tables on detail pages MUST be the list page's tables of the related type, filtered to the object, with the user's column choices. Only the deprecated invoice template lines MAY use a fixed table. Contract line table actions MUST be decided per line: Amend as in 003-FR-003, and no Delete on a locked line. The separate table for the lines of invoiced contracts MUST be removed.
+- **003-FR-005**: Attributes hidden by `hidden_contract_fields` or `hidden_invoice_fields` MUST stay hidden. Deprecated fields and the invoice template section MUST be shown only when `show_deprecated_fields` is on, and the template MUST NOT be looked up otherwise.
+- **003-FR-006**: Contract values on the contract page MUST come from the shared contract value computation, in a fixed number of queries.
+- **003-FR-007**: Detail pages MUST offer the left, right and full-width plugin content areas.
+- **003-FR-008**: The invoice edit page (with its line preview), the amend screen and the contract line edit page MUST keep working as they do today. These pages are not detail pages.
 
 **REST API**
 
-- **FR-009**: The nested invoice (invoice lines), nested accounting dimensions (contract lines, invoice lines) and nested contract line `replaces` MUST use the brief mechanism of their model's serializer, and their hand-written nested serializers MUST be removed. Their output MUST be identical to today's, except `replaces`, which is new in 2.5.0. The nested contract (assignments, contract lines, `parent`) and the contracts of an invoice MUST keep today's output, and the nested contract serializer MUST be marked deprecated in the code.
-- **FR-010**: Every model's brief representation MUST be declared explicitly and contain only existing fields. Compared with 2.4, a brief set MAY gain fields and MUST NOT lose any. The invalid `name` of the invoice line brief set MUST be removed from the declaration.
-- **FR-011**: Writing a related object by id or by a dictionary of attributes MUST keep working on every writable related field.
-- **FR-012**: The OpenAPI schema MUST describe the switched nested objects as the `Brief*` components of their models on the pinned NetBox (4.6.10; earlier 4.6 releases document the accounting dimension lists with the model's component), keep the nested contract's 24 fields, and keep describing `external_party_object` and `content_object` as objects.
-- **FR-012a**: The fields that the later shrink will remove MUST be announced, per field, under "Deprecations" in the #309 changelog entry and in `docs/api.md`: the 19 nested contract fields other than id, url, display, name and status, the full contracts of invoices (to become brief contracts), and the `brief=true` fields of contracts and invoices outside their future brief sets.
+- **003-FR-009**: The nested invoice (invoice lines), nested accounting dimensions (contract lines, invoice lines) and nested contract line `replaces` MUST use the brief mechanism of their model's serializer, and their hand-written nested serializers MUST be removed. Their output MUST be identical to today's, except `replaces`, which is new in 2.5.0. The nested contract (assignments, contract lines, `parent`) and the contracts of an invoice MUST keep today's output, and the nested contract serializer MUST be marked deprecated in the code.
+- **003-FR-010**: Every model's brief representation MUST be declared explicitly and contain only existing fields. Compared with 2.4, a brief set MAY gain fields and MUST NOT lose any. The invalid `name` of the invoice line brief set MUST be removed from the declaration.
+- **003-FR-011**: Writing a related object by id or by a dictionary of attributes MUST keep working on every writable related field.
+- **003-FR-012**: The OpenAPI schema MUST describe the switched nested objects as the `Brief*` components of their models on the pinned NetBox (4.6.10; earlier 4.6 releases document the accounting dimension lists with the model's component), keep the nested contract's 24 fields, and keep describing `external_party_object` and `content_object` as objects.
+- **003-FR-012a**: The fields that the later shrink will remove MUST be announced, per field, under "Deprecations" in the #309 changelog entry and in `docs/api.md`: the 19 nested contract fields other than id, url, display, name and status, the full contracts of invoices (to become brief contracts), and the `brief=true` fields of contracts and invoices outside their future brief sets.
 
 **GraphQL**
 
-- **FR-013**: The plugin MUST expose its nine object types in NetBox's GraphQL API. It MUST provide a single-object query and a list query with filters, and each type's relations to plugin and NetBox objects.
-- **FR-014**: GraphQL results MUST respect view permissions and object permission constraints, as for core objects.
-- **FR-015**: Deprecated fields MUST be present in GraphQL and marked deprecated.
-- **FR-015a**: GraphQL types MUST expose stored fields and relations only. The computed values (contract total, yearly and yearly billable values; contract line total and yearly values) MUST NOT be exposed. `docs/` MUST say that they are available in the REST API.
+- **003-FR-013**: The plugin MUST expose its nine object types in NetBox's GraphQL API. It MUST provide a single-object query and a list query with filters, and each type's relations to plugin and NetBox objects.
+- **003-FR-014**: GraphQL results MUST respect view permissions and object permission constraints, as for core objects.
+- **003-FR-015**: Deprecated fields MUST be present in GraphQL and marked deprecated.
+- **003-FR-015a**: GraphQL types MUST expose stored fields and relations only. The computed values (contract total, yearly and yearly billable values; contract line total and yearly values) MUST NOT be exposed. `docs/` MUST say that they are available in the REST API.
 
 **Base classes**
 
-- **FR-016**: Contract types MUST become NetBox organizational objects, with a unique name, a unique slug, a description, comments and an owner. Service providers MUST become NetBox primary objects, which gives them a description and an owner. Their existing fields and relations are kept.
-- **FR-017**: The migration MUST give every existing contract type a unique slug derived from its name. A description longer than 200 characters MUST be shortened to at most 200 characters, cut at a word boundary and ending with "…", with the full original text placed at the top of the comments, so that no text is lost. It MUST report every slug it had to make unique and every description it had to move. It MUST be re-runnable without duplicating or losing data (Constitution IV).
-- **FR-018**: Creating a contract type through the REST API, the import or the form MUST NOT require a slug. When the slug is missing, it MUST be derived from the name (Constitution V: no new required input).
-- **FR-019**: The new fields (contract type slug and comments; service provider description; owner on both) MUST be available in the forms, bulk edit, import, filters, tables, REST API and GraphQL, as on core objects.
+- **003-FR-016**: Contract types MUST become NetBox organizational objects, with a unique name, a unique slug, a description, comments and an owner. Service providers MUST become NetBox primary objects, which gives them a description and an owner. Their existing fields and relations are kept.
+- **003-FR-017**: The migration MUST give every existing contract type a unique slug derived from its name. A description longer than 200 characters MUST be shortened to at most 200 characters, cut at a word boundary and ending with "…", with the full original text placed at the top of the comments, so that no text is lost. It MUST report every slug it had to make unique and every description it had to move. It MUST be re-runnable without duplicating or losing data (Constitution IV).
+- **003-FR-018**: Creating a contract type through the REST API, the import or the form MUST NOT require a slug. When the slug is missing, it MUST be derived from the name (Constitution V: no new required input).
+- **003-FR-019**: The new fields (contract type slug and comments; service provider description; owner on both) MUST be available in the forms, bulk edit, import, filters, tables, REST API and GraphQL, as on core objects.
 
 **Cross-cutting**
 
-- **FR-020**: Every acceptance scenario above MUST be covered by an automated test that fails before the change where the behaviour changes. The REST API tests MUST also cover GraphQL through NetBox's complete API test case (Constitution II).
-- **FR-021**: `CHANGELOG.md` MUST have a #309 entry under 2.5.0, with a "Behaviour changes" list covering:
+- **003-FR-020**: Every acceptance scenario above MUST be covered by an automated test that fails before the change where the behaviour changes. The REST API tests MUST also cover GraphQL through NetBox's complete API test case (Constitution II).
+- **003-FR-021**: `CHANGELOG.md` MUST have a #309 entry under 2.5.0, with a "Behaviour changes" list covering:
   - the amend permission action (which replaces add + change);
   - the nested serializers moved to NetBox's brief mechanism with identical output, and the renamed OpenAPI components (`BriefInvoice`, `BriefAccountingDimension`, `BriefContractLine`);
   - the contract type slug, comments and owner, and the service provider description and owner;
   - the new GraphQL API.
 
   `docs/` MUST document the amend action, the nested and brief representations, GraphQL and the new fields. `README.md` MUST be updated if requirements change (Constitution VII).
-- **FR-022**: No plugin setting or import column MAY be removed or renamed. Existing page addresses and route names MUST keep working.
+- **003-FR-022**: No plugin setting or import column MAY be removed or renamed. Existing page addresses and route names MUST keep working.
 
 ### Key Entities
 
@@ -220,12 +220,12 @@ An administrator manages contract types like other NetBox categories (with a slu
 
 ### Measurable Outcomes
 
-- **SC-001**: An administrator can grant amending alone. A user with view + amend and no other contract line permission can amend, and a user with add + change but without amend cannot (0 of the add + change-only users can amend).
-- **SC-002**: 9 out of 9 detail pages show the same attributes, tables, buttons and messages as before the change. No detail page template holds attribute or table markup any more: five are removed and four (contract, contract line, invoice, invoice line) keep only their breadcrumbs. The edit and amend screens are unchanged.
-- **SC-003**: 0 fields are removed from any REST response compared with 2.4, 3 of the 4 hand-written nested serializers are gone, and 100% of the fields planned for removal are listed in the changelog and docs.
-- **SC-004**: 9 out of 9 object types can be queried through GraphQL (today 0 out of 9), with permissions applied.
-- **SC-005**: After the upgrade, 100% of existing contract types have a unique slug, and 0 characters of existing contract type descriptions are lost.
-- **SC-006**: The existing test suite passes, apart from tests that check the changed behaviour (amend permission, OpenAPI component names, table classes of the contract page, deprecated badges that become panels). Those tests are adapted, and each adaptation is listed in the tasks. Query-count baselines change only with a stated reason.
+- **003-SC-001**: An administrator can grant amending alone. A user with view + amend and no other contract line permission can amend, and a user with add + change but without amend cannot (0 of the add + change-only users can amend).
+- **003-SC-002**: 9 out of 9 detail pages show the same attributes, tables, buttons and messages as before the change. No detail page template holds attribute or table markup any more: five are removed and four (contract, contract line, invoice, invoice line) keep only their breadcrumbs. The edit and amend screens are unchanged.
+- **003-SC-003**: 0 fields are removed from any REST response compared with 2.4, 3 of the 4 hand-written nested serializers are gone, and 100% of the fields planned for removal are listed in the changelog and docs.
+- **003-SC-004**: 9 out of 9 object types can be queried through GraphQL (today 0 out of 9), with permissions applied.
+- **003-SC-005**: After the upgrade, 100% of existing contract types have a unique slug, and 0 characters of existing contract type descriptions are lost.
+- **003-SC-006**: The existing test suite passes, apart from tests that check the changed behaviour (amend permission, OpenAPI component names, table classes of the contract page, deprecated badges that become panels). Those tests are adapted, and each adaptation is listed in the tasks. Query-count baselines change only with a stated reason.
 
 ## Assumptions
 

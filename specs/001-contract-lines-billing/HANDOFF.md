@@ -4,11 +4,11 @@ Written 2026-09-26 at the end of the specification phase, to start a fresh Claud
 
 ## Where things stand
 
-- Updated 2026-09-27: all tasks of `tasks.md` are done (T001-T073), including the adjustments after the upgrade test (T062-T068: invoice line name, editable dimensions of locked lines, amendment of a price or quantity, invoice line unit and unit price, Posted lock and Draft default, preview of the lines of a new invoice) and the convergence phase (T069-T073). SC-001 was removed from the spec by the maintainer.
+- Updated 2026-09-27: all tasks of `tasks.md` are done (001-T001 to 001-T073), including the adjustments after the upgrade test (001-T062 to 001-T068: invoice line name, editable dimensions of locked lines, amendment of a price or quantity, invoice line unit and unit price, Posted lock and Draft default, preview of the lines of a new invoice) and the convergence phase (001-T069 to 001-T073). 001-SC-001 was removed from the spec by the maintainer.
 - Everything is committed and pushed on branch `278-replace-invoice-templates-with-contract-lines`, apart from the changes of the last `/speckit-implement` run until they are committed.
 - Checks: `ruff check` clean, `makemigrations --check` reports nothing (migrations 0044-0048), the full suite passes on the local NetBox 4.6.8 and on a clone of the pinned `v4.6.10` tag.
 - Run the tests in the dev container with `NETBOX_CONFIGURATION=netbox.configuration_testing` (the default configuration has DEBUG on, which the debug toolbar refuses in tests).
-- Spec Kit artifacts: `spec.md` (FR-001-FR-032), `plan.md`, `research.md` (decisions D1-D12, I1-I13), `data-model.md`, `contracts/`, `quickstart.md`, `tasks.md`, `checklists/requirements.md`. Project rules: `.specify/memory/constitution.md` 1.0.0.
+- Spec Kit artifacts: `spec.md` (001-FR-001-FR-032), `plan.md`, `research.md` (decisions 001-D1 to 001-D12, 001-I1-I13), `data-model.md`, `contracts/`, `quickstart.md`, `tasks.md`, `checklists/requirements.md`. Project rules: `.specify/memory/constitution.md` 1.0.0.
 - The dev database `netbox` is migrated to 0048 and contains the `MIG-` test data; `netbox_premigration_testdata` (test data, before the upgrade) and `netbox_before_0044` (original data) are copies to reset from.
 
 ## Start here
@@ -16,7 +16,7 @@ Written 2026-09-26 at the end of the specification phase, to start a fresh Claud
 1. `git fetch origin` and check the branch is up to date with `origin/develop`.
 2. Make sure the dev container has NetBox 4.6 or newer (the plugin's new minimum) on Python 3.12 or newer, with PostgreSQL and Redis running, and this repository installed in editable mode. `testing/configuration.py` is the NetBox configuration used by CI.
 3. Run the existing suite once as the baseline: `python netbox/manage.py test netbox_contract.tests --keepdb`, and `ruff check`.
-4. Run `/speckit-implement` and follow `tasks.md` in order: Setup, Foundational, then US1 (MVP), US2 immediately after (the riskiest part), then US3, US4, US5, US6, Polish. Tests come first in each story and must fail before the code that fixes them. Run `ruff check` and the story's tests at the end of each story. Do not commit without asking; the pre-commit hook must not be bypassed.
+4. Run `/speckit-implement` and follow `tasks.md` in order: Setup, Foundational, then 001-US1 (MVP), 001-US2 immediately after (the riskiest part), then 001-US3, 001-US4, 001-US5, 001-US6, Polish. Tests come first in each story and must fail before the code that fixes them. Run `ruff check` and the story's tests at the end of each story. Do not commit without asking; the pre-commit hook must not be bypassed.
 
 ## Decisions taken with the maintainer (do not reopen without asking)
 

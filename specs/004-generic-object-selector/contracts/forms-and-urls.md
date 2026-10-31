@@ -1,5 +1,7 @@
 # Contract: forms and URLs
 
+> Delta of feature 004: what this feature adds or changes. The current state is in [specs/_global/contracts/ui.md](../../_global/contracts/ui.md), which this feature keeps up to date.
+
 Web-interface contract of this feature. REST, GraphQL, CSV import columns and filters are unchanged and are not repeated here.
 
 ## Contract assignment form

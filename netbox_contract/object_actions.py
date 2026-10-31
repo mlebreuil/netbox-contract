@@ -11,9 +11,9 @@ def can_amend(line, user):
 
 class AmendContractLine(ObjectAction):
     """
-    Amend the price or quantity of an invoiced contract line (research D6). NetBox drops the button for users without
-    any amend permission; render() also hides it for lines that cannot be amended or that the user's amend permission
-    constraints do not cover.
+    Amend the price or quantity of an invoiced contract line (research 003-D6). NetBox drops the button for users
+    without any amend permission; render() also hides it for lines that cannot be amended or that the user's amend
+    permission constraints do not cover.
     """
 
     name = 'amend'

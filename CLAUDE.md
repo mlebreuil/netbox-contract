@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 `netbox-contract` is a NetBox plugin (Django app `netbox_contract`) managing contracts, contract lines, units,
 invoices, invoice lines, accounting dimensions, service providers and contract assignments to NetBox objects.
 Minimum NetBox 4.7 (`min_version` in `netbox_contract/__init__.py`), Python 3.12+. Project rules are in
-`.specify/memory/constitution.md` (Principles I-VII); it overrides other practice documents when they conflict.
+`.specify/memory/constitution.md` (Principles I-VIII); it overrides other practice documents when they conflict.
 
 ## Environment and commands
 
@@ -112,7 +112,7 @@ and `prune_fieldsets` removes fields deleted (deprecated) or hidden by the setti
 **REST representations**: related objects use `Serializer(nested=True)` and each serializer declares
 `Meta.brief_fields`. A serializer's `validate()` must return at once when `self.nested` (it then receives the related
 object, not data). `NestedContractSerializer` is kept, deprecated, until a later release shrinks the nested contract to
-its brief form; the fields to be removed are listed in `docs/api.md` and the changelog (#309, research D7). Brief sets
+its brief form; the fields to be removed are listed in `docs/api.md` and the changelog (#309, research 003-D7). Brief sets
 may gain fields but never lose one without that deprecation path.
 
 **Locks**: a contract with any invoice freezes the contract terms of its lines (dimensions, comments and tags stay
@@ -155,6 +155,15 @@ in NetBox core, so script logic lives in importable modules).
 - Features follow Spec Kit (`/speckit-*` skills in `.claude/skills/`, artifacts in `specs/<feature>/`: spec, plan,
   research decisions, data model, contracts, tasks). Keep the spec, `research.md` decisions and `tasks.md` in step
   with behaviour changes.
+- **Identifiers are always qualified with the feature number**: `001-FR-029`, `003-US2`, `002-SC-005`, `004-T017`,
+  `003-D6` (research decision), `001-I14` (implementation decision), `002-Q1` (clarification). Never write a kind and
+  number without the feature number — in specs, code, tests, docs, commits or the changelog; numbers are never reused
+  or renumbered. In code, cite the requirement next to the rule it explains, e.g. `# a posted invoice is locked
+  (001-FR-031)`. `python utils/spec_ids.py check` enforces it (CI and pre-commit); `show <id>` prints a definition and
+  its citations, `next <NNN> <KIND>` gives the next free number. Details: `specs/_global/CONVENTIONS.md`.
+- **`specs/_global/` is the current state of the product** (data model, REST, GraphQL, UI, routes, operations, business
+  rules by domain, generated `registry.md`). Read it first to learn what exists; every feature updates it in the same
+  pull request, its own `data-model.md` and `contracts/` being deltas (Constitution VIII).
 - Every user-visible change updates `docs/` (mkdocs), `CHANGELOG.md` (see "Changelog" below) and, for settings or
   requirements, `README.md` (Constitution VII).
 - Screenshots in `docs/img/` are generated, never taken by hand: `utils/docs_screenshots/make_screenshots.sh

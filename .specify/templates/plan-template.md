@@ -42,6 +42,23 @@
 
 [Gates determined based on constitution file]
 
+## Global documents
+
+*Which documents of `specs/_global/` does this feature change? (see `specs/_global/CONVENTIONS.md`)*
+
+| Document | Changed? | What changes (cite the `NNN-FR-nn` / `NNN-D n` that justify it) |
+|---|---|---|
+| data-model.md | [yes / no] | [models, fields, constraints, locks, migrations] |
+| contracts/rest-api.md | [yes / no] | |
+| contracts/graphql.md | [yes / no] | |
+| contracts/ui.md | [yes / no] | |
+| contracts/routes.md | [yes / no] | |
+| contracts/operations.md | [yes / no] | |
+| behaviours.md | [yes / no] | [rules added, changed or retired] |
+
+The feature's own `data-model.md` and `contracts/` describe the delta only; `/speckit-tasks` adds a task to update
+each document marked "yes".
+
 ## Project Structure
 
 ### Documentation (this feature)

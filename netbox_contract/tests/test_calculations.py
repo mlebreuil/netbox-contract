@@ -196,7 +196,7 @@ class LineValuesTestCase(SimpleTestCase):
 
 
 class UsageAndInvoiceLineAmountTestCase(SimpleTestCase):
-    """SC-004 and spec user story 6, scenarios 5 and 7."""
+    """001-SC-004 and spec user story 6, scenarios 5 and 7."""
 
     def test_usage_amount(self):
         self.assertEqual(calc.usage_amount(Decimal(10), Decimal(20)), Decimal('200.00'))

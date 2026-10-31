@@ -1,4 +1,4 @@
-"""Spec user story 5: invoice pre-fill from the contract lines (FR-017..FR-020, FR-017a, SC-004)."""
+"""Spec user story 5: invoice pre-fill from the contract lines (001-FR-017..FR-020, 001-FR-017a, 001-SC-004)."""
 
 from datetime import date
 from decimal import Decimal
@@ -112,7 +112,7 @@ class PrefillTestCase(TestCase):
         self.assertEqual(initial['amount'], Decimal('610.00'))
 
     def test_non_billable_contract(self):
-        """FR-008 and spec user story 3, scenario 3."""
+        """001-FR-008 and spec user story 3, scenario 3."""
         parent = make_contract(name='Parent')
         contract = make_contract(name='Child', parent=parent, billable=False)
         make_line(contract, monthly(), 100)
@@ -189,7 +189,7 @@ class PrefillTestCase(TestCase):
         self.assertEqual(initial['amount'], Decimal('7.00'))
 
     def test_currency_and_editable_values(self):
-        """FR-020."""
+        """001-FR-020."""
         contract = make_contract(currency='chf')
         make_line(contract, monthly(), 100)
         response, initial = self.prefill(contract)

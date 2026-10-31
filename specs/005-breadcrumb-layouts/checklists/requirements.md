@@ -31,5 +31,5 @@
 
 ## Notes
 
-- Story 3 and FR-004 describe a maintainer outcome (templates removed); this is the stated purpose of the change, not a design choice.
+- Story 3 and 005-FR-004 describe a maintainer outcome (templates removed); this is the stated purpose of the change, not a design choice.
 - Whether an invoice's multi-contract order matches the page order is verified in the plan.

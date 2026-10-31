@@ -1,0 +1,28 @@
+name: Spec identifiers
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  spec-ids:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check identifiers (every identifier carries its feature number and resolves)
+        run: python utils/spec_ids.py check
+      - name: Check the generated registry is up to date
+        run: |
+          python utils/spec_ids.py registry
+          git diff --exit-code specs/_global/registry.md

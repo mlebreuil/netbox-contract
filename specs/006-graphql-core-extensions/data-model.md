@@ -1,5 +1,7 @@
 # Data Model: GraphQL core extensions
 
+> Delta of feature 006: what this feature adds or changes. The current state is in [specs/_global/data-model.md](../_global/data-model.md), which this feature keeps up to date.
+
 No table, column or migration change.
 
 ## Runtime relation added to core models

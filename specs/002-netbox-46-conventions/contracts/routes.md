@@ -1,8 +1,10 @@
 # Contract: plugin routes (unchanged)
 
-Public interface kept by FR-003. Every route name below, in the `plugins:netbox_contract:` namespace, MUST resolve
+> Delta of feature 002: what this feature adds or changes. The current state is in [specs/_global/contracts/routes.md](../../_global/contracts/routes.md), which this feature keeps up to date.
+
+Public interface kept by 002-FR-003. Every route name below, in the `plugins:netbox_contract:` namespace, MUST resolve
 to the same address and view after the change. The list was taken from `netbox_contract/urls.py` on `develop`
-(commit 29c3df7) and is the fixture of the route test (research D8).
+(commit 29c3df7) and is the fixture of the route test (research 002-D8).
 
 Routes added by this feature (not in the list, registered by NetBox for every model once the detail include exists):
 `<model>_journal` for all nine models; `invoiceline`, `accountingdimension`, `contracttype` and `contractassignment`

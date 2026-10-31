@@ -1,5 +1,5 @@
 """
-Invoice checks shared by the invoice form and the invoice API serializer (research D4).
+Invoice checks shared by the invoice form and the invoice API serializer (research 001-D4).
 
 The many-to-many relation between invoices and contracts is saved after the invoice itself,
 so these rules cannot live in Invoice.clean(). The functions take plain values and objects that
@@ -15,9 +15,9 @@ def currency_label(code):
 
 def check_invoice_contracts(is_new, contracts, currency, previous_contract_ids=(), previous_currency=None):
     """
-    - a new invoice is linked to at most one contract (FR-011);
+    - a new invoice is linked to at most one contract (001-FR-011);
     - an existing invoice cannot be linked to more contracts than it had (at least one);
-    - the invoice currency equals the currency of each of its contracts (FR-009), checked for a new invoice
+    - the invoice currency equals the currency of each of its contracts (001-FR-009), checked for a new invoice
       and whenever the currency or the contracts change, so that existing mismatches stay editable.
     """
     errors = []

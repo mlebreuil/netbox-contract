@@ -44,10 +44,10 @@ The model fields, REST, GraphQL, CSV import, bulk edit and filters do not change
 | I. NetBox-native | Pass, and improved: the forms use the platform's own control, as NetBox core forms do. Requires 4.7 (specification 008). |
 | II. Tested behaviour | Pass. Tests first: pre-filled link, permission limit, `supported_models` limit, edit, assignment clone, missing object, unchanged import/bulk edit/REST. Existing form-data tests change to the new parameter names, and must fail before the change. |
 | III. Lint-clean | Pass; `ruff check` before commit. |
-| IV. Data safety | **Attention, justified**: the uniqueness rule needs a migration that deletes redundant duplicate assignments. It is lossless (oldest kept; tags, journal entries, bookmarks, subscriptions and image attachments moved; empty custom fields filled; conflicting custom field values written to the report), reports every merge, and is re-runnable (R10). `makemigrations --check` stays clean after the migration is added. |
+| IV. Data safety | **Attention, justified**: the uniqueness rule needs a migration that deletes redundant duplicate assignments. It is lossless (oldest kept; tags, journal entries, bookmarks, subscriptions and image attachments moved; empty custom fields filled; conflicting custom field values written to the report), reports every merge, and is re-runnable (004-D10). `makemigrations --check` stays clean after the migration is added. |
 | V. Backward-compatible interfaces | Pass with one declared exception: REST and import now refuse a duplicate pair (a validation error on input that used to be accepted; no field or endpoint changes). Listed under Breaking Changes. REST, GraphQL, import columns, filters otherwise unchanged. The web form's POST field names change (not a public interface); old pre-fill URLs keep working. |
 | VI. Simplicity | Pass. Removes custom form and view code; no dependency. |
-| VII. Documented change | Pass. `docs/contract.md`, `CHANGELOG.md` (Enhancements, Breaking Changes for the duplicate rule), README unchanged unless the `supported_models` note is added (R7). |
+| VII. Documented change | Pass. `docs/contract.md`, `CHANGELOG.md` (Enhancements, Breaking Changes for the duplicate rule), README unchanged unless the `supported_models` note is added (004-D7). |
 
 Post-design re-check: unchanged. No Complexity Tracking entry.
 

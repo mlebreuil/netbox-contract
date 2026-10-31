@@ -1,5 +1,5 @@
 """
-Detection of records whose currency does not match the record they belong to (FR-012).
+Detection of records whose currency does not match the record they belong to (001-FR-012).
 
 Read-only: nothing is changed. Used by the "Report currency mismatches" custom script
 (scripts/netbox-contract.py) and by the tests; the logic is kept here so that it can move

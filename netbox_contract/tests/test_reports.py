@@ -1,4 +1,4 @@
-"""Currency mismatch report (FR-012, SC-003, user story 4 scenario 7)."""
+"""Currency mismatch report (001-FR-012, 001-SC-003, user story 4 scenario 7)."""
 
 from django.test import TestCase
 

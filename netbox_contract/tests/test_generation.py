@@ -1,4 +1,4 @@
-"""Spec user story 6: invoice lines generated at invoice creation (FR-021..FR-025, SC-006)."""
+"""Spec user story 6: invoice lines generated at invoice creation (001-FR-021..FR-025, 001-SC-006)."""
 
 from datetime import date
 from decimal import Decimal
@@ -350,7 +350,7 @@ class InvoiceLineRulesTestCase(TestCase):
         self.invoice = make_invoice(self.contract, amount=1000, status=DRAFT)
 
     def test_contract_line_of_an_unrelated_contract_refused(self):
-        """FR-021a."""
+        """001-FR-021a."""
         other = make_contract(name='Other')
         other_line = make_line(other, usage(), 20)
         invoice_line = InvoiceLine(invoice=self.invoice, contract_line=other_line, quantity=1, currency='usd')
@@ -471,7 +471,7 @@ class GenerationAPITestCase(HierarchyMixin, APITestCase):
 
 
 class InvoiceLineUnitPriceTestCase(TestCase):
-    """Invoice lines carry their own unit and unit price, fixed at creation (FR-024, decision I11)."""
+    """Invoice lines carry their own unit and unit price, fixed at creation (001-FR-024, decision 001-I11)."""
 
     def setUp(self):
         self.contract = make_contract()
@@ -558,7 +558,7 @@ class InvoiceLineUnitPriceTestCase(TestCase):
         self.assertEqual(
             (line.unit, line.unit_price, line.amount), (self.usage_line.unit, Decimal(20), Decimal('60.00'))
         )
-        # a manual line got its amount as unit price when it was created (decision I14)
+        # a manual line got its amount as unit price when it was created (decision 001-I14)
         self.assertEqual((manual.unit, manual.unit_price), (None, Decimal(5)))
 
 

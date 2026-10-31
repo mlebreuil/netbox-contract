@@ -84,14 +84,14 @@ A maintainer who changes the content of these pages finds the whole page, includ
 
 ### Functional Requirements
 
-- **FR-001**: The four pages MUST show the trails of User Story 1; the contract line, invoice and invoice line entries MUST link to the same filtered lists as before, and the contract entry MUST name the external party and link to the contracts of that external party.
-- **FR-002**: An invoice linked to several contracts MUST show one separate trail entry per contract, and an invoice without a contract MUST show no contract entry.
-- **FR-003**: The trails of the other plugin pages MUST NOT change.
-- **FR-004**: The four page templates that only add a trail MUST be removed, and the trails MUST be declared with the pages' layouts.
-- **FR-005**: The feature MUST NOT change data, permissions, REST, GraphQL or any other page content.
-- **FR-006**: The plugin's minimum NetBox version becomes 4.7.0. Provided by specification 008 (minimum NetBox 4.7.0, CI on v4.7.4, README table, changelog warning, version 2.6.0); this specification only relies on it and has no task of its own for it.
-- **FR-007**: The behaviour MUST be covered by tests that fail before the change, reading the trail of each of the four pages, the invoice with two contracts and the invoice without contract (constitution principle II).
-- **FR-008**: The trail entries MUST NOT depend on the user's permission on the related object, as today.
+- **005-FR-001**: The four pages MUST show the trails of User Story 1; the contract line, invoice and invoice line entries MUST link to the same filtered lists as before, and the contract entry MUST name the external party and link to the contracts of that external party.
+- **005-FR-002**: An invoice linked to several contracts MUST show one separate trail entry per contract, and an invoice without a contract MUST show no contract entry.
+- **005-FR-003**: The trails of the other plugin pages MUST NOT change.
+- **005-FR-004**: The four page templates that only add a trail MUST be removed, and the trails MUST be declared with the pages' layouts.
+- **005-FR-005**: The feature MUST NOT change data, permissions, REST, GraphQL or any other page content.
+- **005-FR-006**: The plugin's minimum NetBox version becomes 4.7.0. Provided by specification 008 (minimum NetBox 4.7.0, CI on v4.7.4, README table, changelog warning, version 2.6.0); this specification only relies on it and has no task of its own for it.
+- **005-FR-007**: The behaviour MUST be covered by tests that fail before the change, reading the trail of each of the four pages, the invoice with two contracts and the invoice without contract (constitution principle II).
+- **005-FR-008**: The trail entries MUST NOT depend on the user's permission on the related object, as today.
 
 ### Key Entities
 
@@ -101,10 +101,10 @@ A maintainer who changes the content of these pages finds the whole page, includ
 
 ### Measurable Outcomes
 
-- **SC-001**: 100% of the working trail links of the contract line, invoice and invoice line pages are present after the change with the same destination, and the contract page's trail entry shows the external party name instead of an empty link.
-- **SC-002**: On an invoice linked to two contracts, a user can open the list of invoices of either contract in one click, and each link is visually separate.
-- **SC-003**: The number of page templates kept only for a trail goes from four to zero.
-- **SC-004**: The existing tests that display these pages pass without change other than the new trail assertions.
+- **005-SC-001**: 100% of the working trail links of the contract line, invoice and invoice line pages are present after the change with the same destination, and the contract page's trail entry shows the external party name instead of an empty link.
+- **005-SC-002**: On an invoice linked to two contracts, a user can open the list of invoices of either contract in one click, and each link is visually separate.
+- **005-SC-003**: The number of page templates kept only for a trail goes from four to zero.
+- **005-SC-004**: The existing tests that display these pages pass without change other than the new trail assertions.
 
 ## Assumptions
 

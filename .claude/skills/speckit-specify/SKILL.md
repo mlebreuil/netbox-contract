@@ -10,6 +10,8 @@ user-invocable: true
 disable-model-invocation: false
 ---
 
+> **Project rule - identifiers** (`specs/_global/CONVENTIONS.md`): every identifier carries the number of its feature, `NNN-FR-001`, `NNN-SC-001`, `NNN-US1` (scenario `NNN-US1-2`), `NNN-T001`, `NNN-D1` (research decision), `NNN-I1` (implementation decision), `NNN-Q1` (clarification). Never write a bare `FR-001`, `T001`, `US1` or `D1`: where this skill shows one, write it with the `NNN-` of the feature at hand. Numbers are never reused or renumbered (a removed requirement becomes a `Retired: NNN-FR-009 (reason)` line). Next free number: `python utils/spec_ids.py next NNN FR`; validate: `python utils/spec_ids.py check`.
+
 
 ## User Input
 

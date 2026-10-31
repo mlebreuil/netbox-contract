@@ -74,7 +74,7 @@ class BreadcrumbTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         return trail(response)
 
-    # US1: contract
+    # 005-US1: contract
     def test_contract_trail_circuit_provider(self):
         entries = self.trail(self.contract)
         self.assertEqual(entries[0], ('Contracts', reverse(LIST + 'contract_list')))
@@ -90,7 +90,7 @@ class BreadcrumbTestCase(TestCase):
         entries = self.trail(self.orphan_contract)
         self.assertEqual(len(entries), 1)
 
-    # US1: contract line, invoice line
+    # 005-US1: contract line, invoice line
     def test_contract_line_trail(self):
         entries = self.trail(self.line)
         self.assertEqual(entries[0], ('Contract Lines', reverse(LIST + 'contractline_list')))
@@ -119,14 +119,14 @@ class BreadcrumbTestCase(TestCase):
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, expected)
 
-    # US1: tabs show the same trail
+    # 005-US1: tabs show the same trail
     def test_tab_pages_show_the_same_trail(self):
         for obj in (self.contract, self.line, self.invoice, self.invoice_line):
             with self.subTest(obj=str(obj)):
                 for tab in ('changelog/', 'journal/'):
                     self.assertEqual(self.trail(obj, tab), self.trail(obj))
 
-    # FR-008: shown whatever the permissions on the target
+    # 005-FR-008: shown whatever the permissions on the target
     def test_view_only_user_sees_entries(self):
         self.user.is_superuser = False
         self.user.save()
@@ -134,7 +134,7 @@ class BreadcrumbTestCase(TestCase):
         entries = self.trail(self.contract)
         self.assertEqual(entries[1][0], 'Provider A')
 
-    # US2
+    # 005-US2
     def test_invoice_trail_one_entry_per_contract(self):
         entries = self.trail(self.invoice)
         self.assertEqual(entries[0], ('Invoices', reverse(LIST + 'invoice_list')))
@@ -149,7 +149,7 @@ class BreadcrumbTestCase(TestCase):
     def test_invoice_without_contract_has_no_contract_entry(self):
         self.assertEqual(len(self.trail(self.empty_invoice)), 1)
 
-    # US3
+    # 005-US3
     def test_page_templates_are_removed(self):
         for name in ('contract.html', 'contractline.html', 'invoice.html', 'invoiceline.html'):
             self.assertFalse((TEMPLATES / name).exists(), name)

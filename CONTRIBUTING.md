@@ -146,3 +146,11 @@ Before you submit a pull request, check that it meets these guidelines:
 A reminder for the maintainers on how to deploy.
 Make sure all your changes are committed (including an entry in CHANGELOG.md) and that all tests pass.
 Then in the github project go to `Releases` and create a new release with a new tag.  This will automatically upload the release to pypi:
+
+## Specifications and identifiers
+
+Features are specified under `specs/NNN-name/` (Spec Kit). Requirements, user stories, success criteria,
+clarifications, tasks and decisions are always cited with the feature number (`001-FR-029`, `004-T017`,
+`003-D6`), in specifications, code comments, tests, documentation and the changelog. `specs/_global/` describes the
+product as it is now and is updated by every feature. Run `python utils/spec_ids.py check` before pushing (CI and the
+pre-commit hook run it); the rules are in `specs/_global/CONVENTIONS.md`.

@@ -1,5 +1,10 @@
 <!--
 Sync Impact Report (temporary, remove before committing)
+- Version change: 1.0.1 -> 1.1.0 (MINOR: new Principle VIII, qualified identifiers and the global specification view)
+- Reason: requirement, task and decision numbers restarted in every feature, so a citation in code could not be resolved, and each
+  feature had its own data model and contracts with no view of the whole. See specs/_global/CONVENTIONS.md.
+- Added: Principle VIII; Development Workflow bullets. Templates updated: spec, plan, tasks; skills speckit-*.
+--- earlier report, version 1.0.1 ---
 - Version change: 1.0.0 -> 1.0.1 (PATCH: compatibility clarification, issue #318)
 - Reason: the minimum NetBox version moves from 4.6 to 4.7 (specs/008-netbox-47-baseline);
   the sentence saying 4.7 compatibility was separate work is replaced by a version-neutral one.
@@ -94,6 +99,19 @@ one release MUST NOT be published in pieces.
 
 Rationale: administrators decide whether to upgrade from the changelog and the docs.
 
+### VIII. Traceable Specifications
+
+Every requirement, user story, success criterion, clarification, task and decision is identified by its
+feature number and kind (`001-FR-029`, `003-US2`, `004-T017`, `003-D6`, `001-I14`). An identifier without
+the feature number MUST NOT appear anywhere, and identifiers are never reused or renumbered. Code and tests cite
+the requirement they implement with its qualified identifier. `specs/_global/` is the current description of
+the product (data model, REST, GraphQL, UI, routes, operations, business rules); every feature MUST update it
+in the same pull request, its own `data-model.md` and `contracts/` being deltas. `python utils/spec_ids.py
+check` MUST pass; it runs in CI and in the pre-commit hook.
+
+Rationale: a reference is only useful if it points to exactly one thing, and a specification set is only
+useful if the whole can be read without replaying every feature.
+
 ## Compatibility and Technical Constraints
 
 - Python 3.12 or newer; NetBox 4.7 or newer until a specification raises the minimum (raised from
@@ -117,10 +135,12 @@ Rationale: administrators decide whether to upgrade from the changelog and the d
 - Features follow the Spec Kit sequence: assessment where the value is unclear, then specify,
   clarify, plan, tasks, analyze, implement. `/speckit-analyze` MUST report no CRITICAL finding
   before implementation starts.
-- A plan MUST include a Constitution Check against Principles I-VII; a violation MUST be listed
+- A plan MUST include a Constitution Check against Principles I-VIII; a violation MUST be listed
   in the plan's Complexity Tracking with the simpler alternative that was rejected.
+- A plan MUST list the documents of `specs/_global/` the feature changes, and the tasks MUST include
+  updating them (Principle VIII).
 - Merge gates: lint clean, tests pass on the pinned NetBox tag, no pending migration, docs and
-  changelog updated, and a review that verifies compliance with this constitution.
+  changelog updated, `specs/_global/` updated and the identifier check passing, and a review that verifies compliance with this constitution.
 - Commits go through the pre-commit hook; the hook MUST NOT be bypassed.
 
 ## Governance
@@ -133,4 +153,4 @@ request by the maintainer. Compliance is reviewed in every pull request and in e
 Constitution Check; unresolved conflicts block the merge. Day-to-day guidance for contributors
 is in `CONTRIBUTING.md`.
 
-**Version**: 1.0.1 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-10-30
+**Version**: 1.1.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-10-31

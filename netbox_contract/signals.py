@@ -23,7 +23,7 @@ def _deleted_directly(origin):
 
 @receiver(pre_delete, sender=ContractLine)
 def protect_invoiced_contract_line(sender, instance, origin=None, **kwargs):
-    """Refuse deleting a contract line once its contract is invoiced or an invoice line uses it (FR-029)."""
+    """Refuse deleting a contract line once its contract is invoiced or an invoice line uses it (001-FR-029)."""
     if not _deleted_directly(origin):
         return
     message = instance.lock_message()
@@ -33,7 +33,7 @@ def protect_invoiced_contract_line(sender, instance, origin=None, **kwargs):
 
 @receiver(pre_delete, sender=InvoiceLine)
 def protect_posted_invoice_line(sender, instance, origin=None, **kwargs):
-    """Refuse deleting a line of a posted invoice, unless the invoice itself is deleted (FR-031)."""
+    """Refuse deleting a line of a posted invoice, unless the invoice itself is deleted (001-FR-031)."""
     if isinstance(origin, QuerySet):
         direct = issubclass(origin.model, InvoiceLine)
     else:
@@ -44,7 +44,7 @@ def protect_posted_invoice_line(sender, instance, origin=None, **kwargs):
 
 @receiver(pre_delete, sender=Contract)
 def protect_contract_on_posted_invoices(sender, instance, origin=None, **kwargs):
-    """Refuse a queryset deletion of a contract whose lines are on posted invoices (FR-031)."""
+    """Refuse a queryset deletion of a contract whose lines are on posted invoices (001-FR-031)."""
     if isinstance(origin, QuerySet) and issubclass(origin.model, Contract):
         numbers = instance.posted_invoice_numbers()
         if numbers:

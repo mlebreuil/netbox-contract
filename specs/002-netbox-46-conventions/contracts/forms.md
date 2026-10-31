@@ -1,7 +1,9 @@
 # Contract: form sections and filter modifiers
 
-User-visible form layout introduced by FR-004, FR-006 to FR-008. The section-by-section grouping of every model is in
-[research.md, D3](../research.md#d3-form-sections-fieldsets-and-fields-hidden-by-settings).
+> Delta of feature 002: what this feature adds or changes. The current state is in [specs/_global/contracts/ui.md](../../_global/contracts/ui.md), which this feature keeps up to date.
+
+User-visible form layout introduced by 002-FR-004, 002-FR-006 to 002-FR-008. The section-by-section grouping of every model is in
+[research.md, 002-D3](../research.md#d3-form-sections-fieldsets-and-fields-hidden-by-settings).
 
 ## Invariants (tested)
 

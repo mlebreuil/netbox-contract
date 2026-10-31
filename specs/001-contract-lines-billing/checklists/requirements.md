@@ -32,6 +32,6 @@
 ## Notes
 
 - Validation iteration 1: all items pass after one fix (a partial-period scenario and its formula were made numeric).
-- Two clarifications were resolved with the maintainer before writing, instead of leaving markers: invoices linked to several contracts (new invoices link at most one contract; existing ones are left alone) and the definition of the computed contract values (see FR-006 and FR-011).
+- Two clarifications were resolved with the maintainer before writing, instead of leaving markers: invoices linked to several contracts (new invoices link at most one contract; existing ones are left alone) and the definition of the computed contract values (see 001-FR-006 and 001-FR-011).
 - Platform and process statements (minimum NetBox version 4.6, tests run in a CI pinned to 4.6) come from the maintainer's decisions and are kept as requirements; how they are implemented is left to planning.
 - The edge cases list is broad on purpose because the maintainer asked for tests covering every use case; each edge case should be turned into an acceptance scenario during `/speckit-clarify` or `/speckit-plan`.

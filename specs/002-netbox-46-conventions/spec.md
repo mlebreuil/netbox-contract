@@ -10,7 +10,7 @@
 
 ## Delivery Overview
 
-This is a conformance change delivered in one patch-level release (2.5.0, not yet released, as a #308 entry; see research D9; no migration, setting, field or endpoint is added). Users see four improvements: a Journal tab on every object, lookup modifiers on every filter form, edit, bulk-edit and filter forms grouped into sections, and quick-add and partial page refreshes working on the invoice and invoice line edit screens. Everything else (URLs, REST API, settings, import columns, stored data) stays the same. The user stories are ordered by user value, which is also the suggested build order.
+This is a conformance change delivered in one patch-level release (2.5.0, not yet released, as a #308 entry; see research 002-D9; no migration, setting, field or endpoint is added). Users see four improvements: a Journal tab on every object, lookup modifiers on every filter form, edit, bulk-edit and filter forms grouped into sections, and quick-add and partial page refreshes working on the invoice and invoice line edit screens. Everything else (URLs, REST API, settings, import columns, stored data) stays the same. The user stories are ordered by user value, which is also the suggested build order.
 
 ## Clarifications
 
@@ -124,21 +124,21 @@ A user viewing a contract with the deprecated fields setting off does not see th
 
 ### Functional Requirements
 
-- **FR-001**: The detail page of every plugin object type (contract, contract line, contract type, contract assignment, invoice, invoice line, unit, accounting dimension, service provider) MUST show the Journal and Changelog tabs.
-- **FR-002**: Every plugin object type MUST accept extra tabs and actions registered for it by NetBox's model view registration, as contracts, invoices, units, contract lines and service providers already do.
-- **FR-003**: Every existing plugin page address and route name MUST keep working and reach the same page. All pages of the nine object types (list, add, import, bulk edit, bulk delete, detail, edit, delete, changelog, journal and extra actions) MUST be registered through NetBox's model view registration, with the URL configuration reduced to one include per object type plus the plugin's non-model pages (for example the invoice lines preview); a test MUST resolve every route name that existed before the change.
-- **FR-004**: The filter forms of all plugin object lists MUST offer the lookup modifiers NetBox offers on core filter forms for the same kinds of fields.
-- **FR-005**: Filter addresses (query strings) valid before the change MUST return the same results after it.
-- **FR-006**: The add/edit, bulk-edit and filter forms of every plugin object type MUST group their fields into titled sections; filter forms MUST start with a section holding the search, saved filter and tag fields.
-- **FR-007**: No form field MAY be added, removed or renamed by the grouping; fields hidden by `hidden_contract_fields` or `show_deprecated_fields` MUST stay hidden under the same conditions.
-- **FR-008**: The contract type description MUST be a single-line text field in the filter, bulk-edit and import forms.
-- **FR-009**: The invoice and invoice line add/edit screens MUST answer quick-add and partial-refresh requests like other NetBox edit screens.
-- **FR-010**: The pre-fill of a new invoice from a contract and of a new invoice line from an invoice MUST propose the same values as before for the fields the page address leaves empty; a value given in the address MUST be kept. Values are only taken from a contract or invoice the user may view, and an existing invoice or invoice line opened for editing MUST NOT be pre-filled.
-- **FR-011**: The contract assignment template used on other NetBox objects' pages MUST live in the plugin's own template folder so that another plugin cannot replace it by accident. The unused `contract_list_bottom.html` template MUST be deleted, with its translation entries, and no plugin template MAY remain at the root of the template folder.
-- **FR-012**: The contract page MUST NOT look up or show the deprecated invoice template when `show_deprecated_fields` is off, and MUST show it as before when it is on.
-- **FR-013**: No REST field, endpoint, plugin setting, import column or stored data MAY change (Constitution IV and V).
-- **FR-014**: Every acceptance scenario above MUST be covered by an automated test that fails before the change where the behaviour changes (Constitution II).
-- **FR-015**: `CHANGELOG.md` MUST have a "Changed" entry for these changes, with a "Behaviour changes" note for the invoice template section hidden when deprecated fields are off, a mention of the removed unused `contract_list_bottom.html` template, and the invoice pre-fill keeping values given in the page address; `docs/` MUST be updated where form descriptions or screenshots change (Constitution VII).
+- **002-FR-001**: The detail page of every plugin object type (contract, contract line, contract type, contract assignment, invoice, invoice line, unit, accounting dimension, service provider) MUST show the Journal and Changelog tabs.
+- **002-FR-002**: Every plugin object type MUST accept extra tabs and actions registered for it by NetBox's model view registration, as contracts, invoices, units, contract lines and service providers already do.
+- **002-FR-003**: Every existing plugin page address and route name MUST keep working and reach the same page. All pages of the nine object types (list, add, import, bulk edit, bulk delete, detail, edit, delete, changelog, journal and extra actions) MUST be registered through NetBox's model view registration, with the URL configuration reduced to one include per object type plus the plugin's non-model pages (for example the invoice lines preview); a test MUST resolve every route name that existed before the change.
+- **002-FR-004**: The filter forms of all plugin object lists MUST offer the lookup modifiers NetBox offers on core filter forms for the same kinds of fields.
+- **002-FR-005**: Filter addresses (query strings) valid before the change MUST return the same results after it.
+- **002-FR-006**: The add/edit, bulk-edit and filter forms of every plugin object type MUST group their fields into titled sections; filter forms MUST start with a section holding the search, saved filter and tag fields.
+- **002-FR-007**: No form field MAY be added, removed or renamed by the grouping; fields hidden by `hidden_contract_fields` or `show_deprecated_fields` MUST stay hidden under the same conditions.
+- **002-FR-008**: The contract type description MUST be a single-line text field in the filter, bulk-edit and import forms.
+- **002-FR-009**: The invoice and invoice line add/edit screens MUST answer quick-add and partial-refresh requests like other NetBox edit screens.
+- **002-FR-010**: The pre-fill of a new invoice from a contract and of a new invoice line from an invoice MUST propose the same values as before for the fields the page address leaves empty; a value given in the address MUST be kept. Values are only taken from a contract or invoice the user may view, and an existing invoice or invoice line opened for editing MUST NOT be pre-filled.
+- **002-FR-011**: The contract assignment template used on other NetBox objects' pages MUST live in the plugin's own template folder so that another plugin cannot replace it by accident. The unused `contract_list_bottom.html` template MUST be deleted, with its translation entries, and no plugin template MAY remain at the root of the template folder.
+- **002-FR-012**: The contract page MUST NOT look up or show the deprecated invoice template when `show_deprecated_fields` is off, and MUST show it as before when it is on.
+- **002-FR-013**: No REST field, endpoint, plugin setting, import column or stored data MAY change (Constitution IV and V).
+- **002-FR-014**: Every acceptance scenario above MUST be covered by an automated test that fails before the change where the behaviour changes (Constitution II).
+- **002-FR-015**: `CHANGELOG.md` MUST have a "Changed" entry for these changes, with a "Behaviour changes" note for the invoice template section hidden when deprecated fields are off, a mention of the removed unused `contract_list_bottom.html` template, and the invoice pre-fill keeping values given in the page address; `docs/` MUST be updated where form descriptions or screenshots change (Constitution VII).
 
 ### Key Entities
 
@@ -148,12 +148,12 @@ No entity is added or changed. The change touches how the nine existing plugin o
 
 ### Measurable Outcomes
 
-- **SC-001**: 9 out of 9 plugin object types show a Journal tab on their detail page (today 5 out of 9).
-- **SC-002**: 9 out of 9 plugin filter forms offer lookup modifiers (today 0 out of 9).
-- **SC-003**: 100% of the plugin page addresses and route names used before the change still resolve to the same page.
-- **SC-004**: 100% of the plugin's add/edit, bulk-edit and filter forms show their fields in titled sections, with the same set of fields as before.
-- **SC-005**: The existing automated test suite passes unchanged apart from tests added for this feature and the #278 test of the invoice template panel, adapted to clarification Q1; query-count baselines change only with a stated reason.
-- **SC-006**: 2 out of 2 screens (invoice and invoice line add/edit) return the short quick-add form and the partial form when asked, as every core add/edit screen does (today 0 out of 2).
+- **002-SC-001**: 9 out of 9 plugin object types show a Journal tab on their detail page (today 5 out of 9).
+- **002-SC-002**: 9 out of 9 plugin filter forms offer lookup modifiers (today 0 out of 9).
+- **002-SC-003**: 100% of the plugin page addresses and route names used before the change still resolve to the same page.
+- **002-SC-004**: 100% of the plugin's add/edit, bulk-edit and filter forms show their fields in titled sections, with the same set of fields as before.
+- **002-SC-005**: The existing automated test suite passes unchanged apart from tests added for this feature and the #278 test of the invoice template panel, adapted to clarification 002-Q1; query-count baselines change only with a stated reason.
+- **002-SC-006**: 2 out of 2 screens (invoice and invoice line add/edit) return the short quick-add form and the partial form when asked, as every core add/edit screen does (today 0 out of 2).
 
 ## Assumptions
 
