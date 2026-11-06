@@ -13,4 +13,4 @@ repos:
       entry: python3 utils/spec_ids.py check
       language: system
       pass_filenames: false
-      files: '^(specs/|utils/spec_ids\.py|netbox_contract/|docs/|CHANGELOG\.md|CLAUDE\.md|CONTRIBUTING\.md|README\.md)'
+      files: '^(specs/|utils/spec_ids\.py|netbox_contract/|docs/|CHANGELOG\.md|AGENTS\.md|AI_POLICY\.md|CLAUDE\.md|CONTRIBUTING\.md|README\.md)'

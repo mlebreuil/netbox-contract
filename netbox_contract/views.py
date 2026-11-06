@@ -596,6 +596,13 @@ def form_with_defaults(form_class, defaults):
     """
     The form class with extra initial values that the initial values passed by the view (the page address) override.
     Used to pre-fill a new object and still let core ObjectEditView.get() handle quick add and HTMX requests.
+
+    Core get() builds the form itself (self.form(instance=obj, initial=<page address values>)) and offers no hook
+    for extra initial values. This returns a subclass whose __init__ merges `defaults` under the `initial` it is
+    given, so the page address wins, then calls the real __init__. Core instantiates it without knowing.
+    A view sets `self.form = form_with_defaults(self.form, defaults)` in get() for a new object only (no pk), then
+    calls super().get(). The assignment shadows the class attribute on this request's view instance only.
+    The values are initial data, not enforced: the user can change them and POST uses what was submitted.
     """
     class FormWithDefaults(form_class):
         def __init__(self, *args, initial=None, **kwargs):
