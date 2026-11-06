@@ -137,8 +137,10 @@ Before you submit a pull request, check that it meets these guidelines:
 
 1. The pull request should include tests.
 2. If the pull request adds functionality, the docs should be updated. 
-3. The pull request should work for Python 3.10 and 3.11. Check [Actions](https://github.com/mlebreuil/netbox-contract/actions)
+3. The pull request should work for every supported Python version (3.12, 3.13 and 3.14). Check [Actions](https://github.com/mlebreuil/netbox-contract/actions)
    and make sure that the tests pass for all supported Python versions.
+4. The pull request closes an issue: put `Closes: #N` in its description and base it on `develop`.
+5. The description is written in your own words (see the AI policy below).
 
 
 ## Deploying
@@ -154,3 +156,13 @@ clarifications, tasks and decisions are always cited with the feature number (`0
 `003-D6`), in specifications, code comments, tests, documentation and the changelog. `specs/_global/` describes the
 product as it is now and is updated by every feature. Run `python utils/spec_ids.py check` before pushing (CI and the
 pre-commit hook run it); the rules are in `specs/_global/CONVENTIONS.md`.
+
+## AI-assisted contributions
+
+AI tools are welcome, with two rules: do not let an LLM speak for you (issues, pull request descriptions and comments
+are in your own words), and do not let it think for you (only submit what you understand and can explain). The full
+text is the [AI contribution policy](https://github.com/mlebreuil/netbox-contract/blob/develop/AI_POLICY.md).
+AI agents working in the repository follow
+[`AGENTS.md`](https://github.com/mlebreuil/netbox-contract/blob/develop/AGENTS.md).
+The skills they use are described in
+[`.claude/skills/README.md`](https://github.com/mlebreuil/netbox-contract/blob/develop/.claude/skills/README.md).
