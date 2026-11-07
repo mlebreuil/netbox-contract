@@ -2,10 +2,6 @@
 
 ## [Unreleased]
 
-#### Other Changes
-
-* [#321](https://github.com/mlebreuil/netbox-contract/issues/321) - The plugin version is written once, in `netbox_contract/version.py`: `pyproject.toml` and the plugin configuration read it
-
 ## Version 2
 
 ### Version 2.6.0
