@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "netbox-contract"
-version = "2.6.0"
+dynamic = ["version"]
 authors = [
   { name="Marc Lebreuil", email="marc@famillelebreuil.net" },
 ]
@@ -42,3 +42,6 @@ packages = [
 package-data = { "netbox_contract" = ["**/*", "templates/**"] }
 exclude-package-data = { netbox_contract = ["tests/*"] }
 license-files = ["LICENSE"]
+
+[tool.setuptools.dynamic]
+version = {attr = "netbox_contract.version.__version__"}
