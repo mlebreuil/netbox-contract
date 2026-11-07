@@ -2,12 +2,12 @@
 # https://www.python.org/dev/peps/pep-0518/
 
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "netbox-contract"
-version = "2.6.0"
+dynamic = ["version"]
 authors = [
   { name="Marc Lebreuil", email="marc@famillelebreuil.net" },
 ]
@@ -15,6 +15,8 @@ authors = [
 description = "Contract management plugin for Netbox"
 readme = "README.md"
 requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE"]
 
 dependencies = [
     'python-dateutil',
@@ -23,7 +25,6 @@ dependencies = [
 
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 
@@ -35,10 +36,12 @@ test = ["coverage", "pytest", "pytest-cov"]
 "Homepage" = "https://github.com/mlebreuil/netbox-contract"
 "Bug Tracker" = "https://github.com/mlebreuil/netbox-contract/issues"
 
-[tool.setuptools]
-packages = [
-    "netbox_contract",
-]
-package-data = { "netbox_contract" = ["**/*", "templates/**"] }
-exclude-package-data = { netbox_contract = ["tests/*"] }
-license-files = ["LICENSE"]
+[tool.setuptools.packages.find]
+include = ["netbox_contract*"]
+exclude = ["netbox_contract.tests*"]
+
+[tool.setuptools.package-data]
+netbox_contract = ["templates/**/*.html", "locale/**/*.po", "locale/**/*.mo"]
+
+[tool.setuptools.dynamic]
+version = {attr = "netbox_contract.version.__version__"}
