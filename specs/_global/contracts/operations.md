@@ -19,7 +19,7 @@ accounting dimension; contract end check. `create_invoice_template` and `create_
 
 | Item | Value | Feature |
 |---|---|---|
-| Plugin version | 2.6.0 (`__init__.py`, `pyproject.toml`) | 008-FR-006 |
+| Plugin version | 2.6.0, written once in `netbox_contract/version.py`; `__init__.py` and `pyproject.toml` read it | 008-FR-006 |
 | `min_version` | 4.7.0, no `max_version` | 008-FR-005 |
 | README compatibility | NetBox 4.5: 2.4; 4.6: 2.4, 2.5; 4.7: 2.6 | 008-FR-006 |
 | Changelog | by kind of change; minimum-version warning first | 008-FR-007 |
