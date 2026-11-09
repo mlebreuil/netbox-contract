@@ -150,7 +150,7 @@ in NetBox core, so script logic lives in importable modules).
 
 ## Workflow
 
-- Branches: `develop` for development, `master` for releases; one branch per GitHub issue, created from `develop`.
+- Branches: `develop` for development, `main` for releases; one branch per GitHub issue, created from `develop`.
 - Features follow Spec Kit (`/speckit-*` skills in `.claude/skills/`, artifacts in `specs/<feature>/`: spec, plan,
   research decisions, data model, contracts, tasks). Keep the spec, `research.md` decisions and `tasks.md` in step
   with behaviour changes.
@@ -189,7 +189,7 @@ All contributions follow the project's [AI policy](AI_POLICY.md) (Constitution I
 ## Pull requests
 
 - One branch per GitHub issue, created from `develop` after a `git fetch`, named `<issue-number>-short-description`
-  (e.g. `318-assess-against-netbox-4-7-4`). `master` receives releases only.
+  (e.g. `318-assess-against-netbox-4-7-4`). `main` receives releases only.
 - Every pull request closes an issue: its description has a `Closes: #<number>` line, and it is based on `develop`
   (release pull requests excepted).
 - Before drafting a pull request, check that the issue is open and, for an outside contributor, assigned to them:

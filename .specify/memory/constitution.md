@@ -1,6 +1,11 @@
 <!--
 Sync Impact Report and amendment history (kept: each amendment adds its report above the previous ones)
---- latest report, version 1.2.0 ---
+--- latest report, version 1.2.1 ---
+- Version change: 1.2.0 -> 1.2.1 (PATCH: factual correction)
+- Reason: the stable branch is `main`; the repository has no `master` branch. Development Workflow now says `main`
+  receives releases only (also corrected in AGENTS.md, CONTRIBUTING.md and the release-plugin skill).
+- Modified principles: none. Templates checked: none contain the branch name.
+--- earlier report, version 1.2.0 ---
 - Version change: 1.1.0 -> 1.2.0 (MINOR: new Principle IX, human accountability for AI-assisted work)
 - Reason: adopt the AI contribution policy (AI_POLICY.md, from the NetBox project) and the pull request rules of
   NetBox's AGENTS.md. Agent instructions move to AGENTS.md; CLAUDE.md imports it.
@@ -153,7 +158,7 @@ who can answer for the change.
 
 ## Development Workflow and Quality Gates
 
-- One branch per GitHub issue, created from `develop`; `master` receives releases only.
+- One branch per GitHub issue, created from `develop`; `main` receives releases only.
   Local `develop` MUST be refreshed with `git fetch` before a branch is created or rebased.
 - Features follow the Spec Kit sequence: assessment where the value is unclear, then specify,
   clarify, plan, tasks, analyze, implement. `/speckit-analyze` MUST report no CRITICAL finding
@@ -181,4 +186,4 @@ Constitution Check; unresolved conflicts block the merge. Day-to-day guidance fo
 is in `CONTRIBUTING.md`, the AI contribution policy in `AI_POLICY.md`, and the instructions for AI agents in
 `AGENTS.md`.
 
-**Version**: 1.2.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-11-02
+**Version**: 1.2.1 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-11-09
