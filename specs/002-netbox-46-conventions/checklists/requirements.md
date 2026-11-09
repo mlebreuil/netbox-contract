@@ -35,7 +35,7 @@
   user-facing concepts (Journal tab, lookup modifiers, quick add, form sections) and the plugin settings
   `hidden_contract_fields` and `show_deprecated_fields`. These are user-visible behaviours and public settings,
   not implementation choices; code-level mechanisms (decorators, URL helpers, view methods) are left to the plan.
-- FR-014 and FR-015 restate Constitution II and VII as requirements because the issue's "Done when" lists them.
+- 002-FR-014 and 002-FR-015 restate Constitution II and VII as requirements because the issue's "Done when" lists them.
 - One judgement call is recorded in Assumptions rather than as a clarification: hiding the invoice template
   section on the contract page when `show_deprecated_fields` is off (a visible change for installations that
   still rely on it). It follows the existing deprecation rule and is flagged as a behaviour change;

@@ -16,22 +16,22 @@
 
 #### Enhancements
 
-* The contract and invoice status and the unit billing method options show a description under their name in the forms and filters, in English and French. Options added through `FIELD_CHOICES` can have one too. ([#318](https://github.com/mlebreuil/netbox-contract/issues/318))
-* GraphQL: the objects contracts can be assigned to have a `contract_assignments` field and the filters `has_contracts` and `has_active_contract`, restricted to what the user may view. ([#318](https://github.com/mlebreuil/netbox-contract/issues/318))
-* New command `manage.py cleanup_orphan_assignments` lists (default) and deletes (`--apply`) the assignments whose object no longer exists. ([#318](https://github.com/mlebreuil/netbox-contract/issues/318))
-* The contract assignment form and the external party of the contract form use NetBox's object selector: choose the object type, then search the object by name, instead of typing an object number or scrolling through every provider. The selector offers only the objects the user may view. Pre-filled links written with `content_type` and `object_id` keep working. ([#318](https://github.com/mlebreuil/netbox-contract/issues/318))
+* [#318](https://github.com/mlebreuil/netbox-contract/issues/318) - The contract and invoice status and the unit billing method options show a description under their name in the forms and filters, in English and French. Options added through `FIELD_CHOICES` can have one too
+* [#318](https://github.com/mlebreuil/netbox-contract/issues/318) - GraphQL: the objects contracts can be assigned to have a `contract_assignments` field and the filters `has_contracts` and `has_active_contract`, restricted to what the user may view
+* [#318](https://github.com/mlebreuil/netbox-contract/issues/318) - New command `manage.py cleanup_orphan_assignments` lists (default) and deletes (`--apply`) the assignments whose object no longer exists
+* [#318](https://github.com/mlebreuil/netbox-contract/issues/318) - The contract assignment form and the external party of the contract form use NetBox's object selector: choose the object type, then search the object by name, instead of typing an object number or scrolling through every provider. The selector offers only the objects the user may view. Pre-filled links written with `content_type` and `object_id` keep working
 
 #### Bug Fixes
 
-* The contract page breadcrumb named no external party and the link was empty. It now shows the external party and links to the contracts of that party. ([#318](https://github.com/mlebreuil/netbox-contract/issues/318))
-* The invoice page breadcrumb showed several contracts run together in one entry. It now shows one entry per contract, each linking to the invoices of that contract. ([#318](https://github.com/mlebreuil/netbox-contract/issues/318))
+* [#318](https://github.com/mlebreuil/netbox-contract/issues/318) - The contract page breadcrumb named no external party and the link was empty. It now shows the external party and links to the contracts of that party
+* [#318](https://github.com/mlebreuil/netbox-contract/issues/318) - The invoice page breadcrumb showed several contracts run together in one entry. It now shows one entry per contract, each linking to the invoices of that contract
 
 #### Other Changes
 
-* The breadcrumb trails of the contract, contract line, invoice and invoice line pages are declared in the page layouts, like the panels, so the tabs of these pages show the same trail. The four page templates (`contract.html`, `contractline.html`, `invoice.html`, `invoiceline.html`) are removed. ([#318](https://github.com/mlebreuil/netbox-contract/issues/318))
-* The legacy `external_party_object_type` name in `mandatory_contract_fields` and `hidden_contract_fields` is kept as an alias of `external_party_object`, without a warning. ([#318](https://github.com/mlebreuil/netbox-contract/issues/318))
-* A state-only migration (0053) records the `related_name` that NetBox 4.7 gives to the owner field of contract types and service providers; it changes no data. ([#318](https://github.com/mlebreuil/netbox-contract/issues/318))
-* The minimum NetBox version is now 4.7.0 and the tests run in CI against NetBox v4.7.4 (previously 4.6.0 and v4.6.10). The query-count baseline of the list-view tests is recorded for NetBox 4.7, where each list view needs one query less, and the REST tests give dates as text as NetBox 4.7's test helper expects. ([#318](https://github.com/mlebreuil/netbox-contract/issues/318))
+* [#318](https://github.com/mlebreuil/netbox-contract/issues/318) - The breadcrumb trails of the contract, contract line, invoice and invoice line pages are declared in the page layouts, like the panels, so the tabs of these pages show the same trail. The four page templates (`contract.html`, `contractline.html`, `invoice.html`, `invoiceline.html`) are removed
+* [#318](https://github.com/mlebreuil/netbox-contract/issues/318) - The legacy `external_party_object_type` name in `mandatory_contract_fields` and `hidden_contract_fields` is kept as an alias of `external_party_object`, without a warning
+* [#318](https://github.com/mlebreuil/netbox-contract/issues/318) - A state-only migration (0053) records the `related_name` that NetBox 4.7 gives to the owner field of contract types and service providers; it changes no data
+* [#318](https://github.com/mlebreuil/netbox-contract/issues/318) - The minimum NetBox version is now 4.7.0 and the tests run in CI against NetBox v4.7.4 (previously 4.6.0 and v4.6.10). The query-count baseline of the list-view tests is recorded for NetBox 4.7, where each list view needs one query less, and the REST tests give dates as text as NetBox 4.7's test helper expects
 
 ### Version 2.5.0
 

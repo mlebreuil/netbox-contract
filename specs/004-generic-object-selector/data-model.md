@@ -1,5 +1,7 @@
 # Data Model: generic-object selector
 
+> Delta of feature 004: what this feature adds or changes. The current state is in [specs/_global/data-model.md](../_global/data-model.md), which this feature keeps up to date.
+
 No new column. One constraint and one data migration are added to `ContractAssignment` (see Validation); the form-level mapping below is otherwise the only structure involved.
 
 ## Stored data (unchanged)

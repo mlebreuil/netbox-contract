@@ -1,6 +1,6 @@
 """
 Issue #309, user story 5: contract types and service providers on NetBox's organizational and primary base classes
-(spec 003, research D9 and D10, data-model.md).
+(spec 003, research 003-D9 and 003-D10, data-model.md).
 """
 
 from django.db import connection
@@ -21,7 +21,7 @@ AFTER = (APP, '0051_contracttype_organizational')
 
 
 class TextHelpersTestCase(DjangoTestCase):
-    """T054: the pure helpers of netbox_contract/text.py."""
+    """003-T054: the pure helpers of netbox_contract/text.py."""
 
     def test_unique_slug(self):
         from netbox_contract.text import unique_slug
@@ -59,7 +59,7 @@ class TextHelpersTestCase(DjangoTestCase):
         self.assertEqual(changes[3]['slug'], 'licences')
         self.assertTrue(changes[3]['description'].endswith('…'))
         self.assertEqual(changes[3]['comments'], LONG_TEXT)
-        self.assertNotIn(4, changes)  # US5-7: nothing to do twice
+        self.assertNotIn(4, changes)  # 003-US5-7: nothing to do twice
         self.assertEqual(len(report), 2)
         self.assertIn('Maintenance!', report[0])
         self.assertIn('maintenance-2', report[0])
@@ -69,7 +69,8 @@ class TextHelpersTestCase(DjangoTestCase):
 
 class MigrationTestCase(DjangoTestCase):
     """
-    T055: migration 0051 forward, back and forward again on historical models (US5-1, US5-2, US5-3, US5-7).
+    003-T055: migration 0051 forward, back and forward again on historical models (003-US5-1, 003-US5-2, 003-US5-3,
+    003-US5-7).
     PostgreSQL runs the schema changes inside the test transaction, so its rollback restores the schema. (A
     TransactionTestCase cannot flush NetBox's database, which has foreign keys between apps.)
     """
@@ -107,7 +108,7 @@ class MigrationTestCase(DjangoTestCase):
 
 
 class ContractTypeTestCase(APITestCase):
-    """T056: slug, description limit, comments and owner of contract types (US5-4, US5-6)."""
+    """003-T056: slug, description limit, comments and owner of contract types (003-US5-4, 003-US5-6)."""
 
     model = ContractType
 
@@ -146,7 +147,7 @@ class ContractTypeTestCase(APITestCase):
 
 
 class ContractTypeUITestCase(TestCase):
-    """T056: form, import, bulk edit and page."""
+    """003-T056: form, import, bulk edit and page."""
 
     def setUp(self):
         super().setUp()
@@ -183,7 +184,7 @@ class ContractTypeUITestCase(TestCase):
 
 
 class ServiceProviderTestCase(APITestCase):
-    """T057: description and owner of service providers (US5-5, US5-6)."""
+    """003-T057: description and owner of service providers (003-US5-5, 003-US5-6)."""
 
     model = ServiceProvider
 

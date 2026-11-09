@@ -111,24 +111,24 @@ A user, an import or an integration tries to assign a contract to an object that
 
 ### Functional Requirements
 
-- **FR-001**: The contract assignment form MUST let the user choose an object type and then search and pick an object of that type by name, without showing or requiring a numeric identifier.
-- **FR-002**: The object types offered MUST be exactly the types allowed by the `supported_models` setting that exist on the installation.
-- **FR-003**: The objects offered MUST be limited to those the current user may view.
-- **FR-004**: The **Add contract** link on an object's Contracts tab MUST open the form with that object chosen, and saving MUST return the user to that object's page.
-- **FR-005**: Editing an assignment MUST show its current type and object; changing the type MUST clear the object.
-- **FR-006**: Saving with only one of type and object MUST be refused with a message naming both.
-- **FR-007**: The contract form MUST let the user choose the external party type (service provider or circuit provider) and then search and pick one provider of that type; an external party remains required.
-- **FR-008**: Editing a contract MUST show the current external party type and provider.
-- **FR-009**: Except for the duplicate rule of FR-014 to FR-018, the saved data, CSV import and export, bulk edit, REST API, GraphQL and filters of assignments and contracts MUST NOT change.
-- **FR-010**: The two selectors MUST NOT change any stored value; the only migration of the feature is the one of FR-016 and FR-017.
-- **FR-011**: The plugin's minimum NetBox version becomes 4.7.0. Provided by specification 008 (minimum NetBox 4.7.0, CI on v4.7.4, README table, changelog warning, version 2.6.0); this specification only relies on it and has no task of its own for it.
-- **FR-012**: The behaviour MUST be covered by tests that fail before the change, including the pre-filled link, the permission limit, the `supported_models` limit, edit, clone of an assignment and the unchanged interfaces (constitution principle II).
-- **FR-013**: Both forms MUST remain usable through NetBox quick add and partial refreshes.
-- **FR-014**: A contract MUST NOT be assigned twice to the same object: saving an assignment whose contract and object (type and identifier) are those of another assignment MUST be refused with a message naming the contract and the object, in the web form, the CSV import and the REST API; editing an assignment without changing that pair MUST remain possible.
-- **FR-015**: The rule MUST also be enforced by the database, so that an insert that bypasses the application is rejected.
-- **FR-016**: Upgrading MUST merge the existing duplicates before the rule is applied, without losing information: keep the oldest assignment of each group; move to it the tags, journal entries, bookmarks, subscriptions and image attachments of the others (a bookmark or subscription the same user already has on the kept one is dropped as redundant); fill the custom fields that are empty on the kept one from the others; then delete the others. Nothing else is changed.
-- **FR-017**: The merge MUST print a report of every group merged (contract, object, kept and removed identifiers, what was moved) and, for every custom field with different non-empty values, the value kept and the value of the removed assignment, so that no value is lost silently; it MUST be safe to run again (second run: nothing to merge) and MUST do nothing when there are no duplicates beyond adding the rule.
-- **FR-018**: The behaviour MUST be covered by tests that fail before the change: refusal in the form, import and REST, edit without change, different pairs accepted, the migration merge (tags, report, re-run) and the database rule.
+- **004-FR-001**: The contract assignment form MUST let the user choose an object type and then search and pick an object of that type by name, without showing or requiring a numeric identifier.
+- **004-FR-002**: The object types offered MUST be exactly the types allowed by the `supported_models` setting that exist on the installation.
+- **004-FR-003**: The objects offered MUST be limited to those the current user may view.
+- **004-FR-004**: The **Add contract** link on an object's Contracts tab MUST open the form with that object chosen, and saving MUST return the user to that object's page.
+- **004-FR-005**: Editing an assignment MUST show its current type and object; changing the type MUST clear the object.
+- **004-FR-006**: Saving with only one of type and object MUST be refused with a message naming both.
+- **004-FR-007**: The contract form MUST let the user choose the external party type (service provider or circuit provider) and then search and pick one provider of that type; an external party remains required.
+- **004-FR-008**: Editing a contract MUST show the current external party type and provider.
+- **004-FR-009**: Except for the duplicate rule of 004-FR-014 to 004-FR-018, the saved data, CSV import and export, bulk edit, REST API, GraphQL and filters of assignments and contracts MUST NOT change.
+- **004-FR-010**: The two selectors MUST NOT change any stored value; the only migration of the feature is the one of 004-FR-016 and 004-FR-017.
+- **004-FR-011**: The plugin's minimum NetBox version becomes 4.7.0. Provided by specification 008 (minimum NetBox 4.7.0, CI on v4.7.4, README table, changelog warning, version 2.6.0); this specification only relies on it and has no task of its own for it.
+- **004-FR-012**: The behaviour MUST be covered by tests that fail before the change, including the pre-filled link, the permission limit, the `supported_models` limit, edit, clone of an assignment and the unchanged interfaces (constitution principle II).
+- **004-FR-013**: Both forms MUST remain usable through NetBox quick add and partial refreshes.
+- **004-FR-014**: A contract MUST NOT be assigned twice to the same object: saving an assignment whose contract and object (type and identifier) are those of another assignment MUST be refused with a message naming the contract and the object, in the web form, the CSV import and the REST API; editing an assignment without changing that pair MUST remain possible.
+- **004-FR-015**: The rule MUST also be enforced by the database, so that an insert that bypasses the application is rejected.
+- **004-FR-016**: Upgrading MUST merge the existing duplicates before the rule is applied, without losing information: keep the oldest assignment of each group; move to it the tags, journal entries, bookmarks, subscriptions and image attachments of the others (a bookmark or subscription the same user already has on the kept one is dropped as redundant); fill the custom fields that are empty on the kept one from the others; then delete the others. Nothing else is changed.
+- **004-FR-017**: The merge MUST print a report of every group merged (contract, object, kept and removed identifiers, what was moved) and, for every custom field with different non-empty values, the value kept and the value of the removed assignment, so that no value is lost silently; it MUST be safe to run again (second run: nothing to merge) and MUST do nothing when there are no duplicates beyond adding the rule.
+- **004-FR-018**: The behaviour MUST be covered by tests that fail before the change: refusal in the form, import and REST, edit without change, different pairs accepted, the migration merge (tags, report, re-run) and the database rule.
 
 ### Key Entities
 
@@ -139,12 +139,12 @@ A user, an import or an integration tries to assign a contract to an object that
 
 ### Measurable Outcomes
 
-- **SC-001**: A user can assign a contract to a device they have never opened by typing part of its name, without looking up or typing any number, in under 30 seconds.
-- **SC-002**: With 5,000 providers, a user finds one by typing three letters, and the contract form opens as fast as with 10 providers.
-- **SC-003**: 100% of the existing import, bulk edit, REST and GraphQL tests for assignments and contracts pass unchanged.
-- **SC-004**: A user restricted to a subset of devices can never select, or see the name of, a device outside it in either form.
-- **SC-005**: Upgrading leaves every external party and every non-duplicate assignment unchanged; a duplicate group is reduced to its oldest assignment, which keeps all tags, journal entries, bookmarks, subscriptions and image attachments of the group, with a report of each merge and of every conflicting custom field value.
-- **SC-006**: After the upgrade, no pair (contract, object) appears twice, and an attempt to create a second one through any interface fails with a clear message.
+- **004-SC-001**: A user can assign a contract to a device they have never opened by typing part of its name, without looking up or typing any number, in under 30 seconds.
+- **004-SC-002**: With 5,000 providers, a user finds one by typing three letters, and the contract form opens as fast as with 10 providers.
+- **004-SC-003**: 100% of the existing import, bulk edit, REST and GraphQL tests for assignments and contracts pass unchanged.
+- **004-SC-004**: A user restricted to a subset of devices can never select, or see the name of, a device outside it in either form.
+- **004-SC-005**: Upgrading leaves every external party and every non-duplicate assignment unchanged; a duplicate group is reduced to its oldest assignment, which keeps all tags, journal entries, bookmarks, subscriptions and image attachments of the group, with a report of each merge and of every conflicting custom field value.
+- **004-SC-006**: After the upgrade, no pair (contract, object) appears twice, and an attempt to create a second one through any interface fails with a clear message.
 
 ## Assumptions
 

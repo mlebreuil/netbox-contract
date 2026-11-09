@@ -40,7 +40,7 @@ class NestedContractSerializer(WritableNestedSerializer):
 
     Deprecated: replaced by the brief contract (`ContractSerializer(nested=True)`) in the release that removes the
     fields listed in docs/api.md. It is kept unchanged in 2.5.0 because the brief contract would return
-    `contract_type` as an object instead of an id (#309, research D7).
+    `contract_type` as an object instead of an id (#309, research 003-D7).
     """
 
     url = serializers.HyperlinkedIdentityField(
@@ -123,7 +123,7 @@ class ContractTypeSerializer(OrganizationalModelSerializer):
             'created',
             'last_updated',
         )
-        # The slug is derived from the name when it is not given (FR-018: no new required input)
+        # The slug is derived from the name when it is not given (003-FR-018: no new required input)
         extra_kwargs = {'slug': {'required': False}}
         brief_fields = ('id', 'url', 'display', 'name', 'slug', 'description')
 
@@ -319,7 +319,7 @@ class InvoiceSerializer(NetBoxModelSerializer):
         if errors:
             raise serializers.ValidationError({'contracts': errors})
 
-        # a new invoice gets its lines from the contract lines (FR-021, FR-023)
+        # a new invoice gets its lines from the contract lines (001-FR-021, 001-FR-023)
         if is_new and not data.get('template') and len(contracts) == 1:
             errors = invoicing.check_new_invoice(
                 contracts[0], data.get('amount'), data.get('period_start'), data.get('period_end')
@@ -459,7 +459,7 @@ class AccountingDimensionSerializer(NetBoxModelSerializer):
 
 
 class ContractLineAmendmentSerializer(serializers.Serializer):
-    """Input of the amend action (FR-030)."""
+    """Input of the amend action (001-FR-030)."""
 
     effective_date = serializers.DateField(help_text='First day of the new terms')
     unit_price = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True)

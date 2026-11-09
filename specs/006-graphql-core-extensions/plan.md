@@ -20,7 +20,7 @@ Use NetBox 4.7's plugin GraphQL extension points to add, on the core types of th
 
 **Project Type**: NetBox plugin
 
-**Performance Goals**: constant number of queries for a list with contracts (SC-003)
+**Performance Goals**: constant number of queries for a list with contracts (006-SC-003)
 
 **Constraints**: no core GraphQL import at module level (circular import); names unique; start-up must survive a supported model without a GraphQL type (log and skip)
 
@@ -34,7 +34,7 @@ Use NetBox 4.7's plugin GraphQL extension points to add, on the core types of th
 | II. Tested behaviour | Pass. Tests first for every scenario, permissions, query count, unchanged existing queries. |
 | III. Lint-clean | Pass. |
 | IV. Data safety | **Attention**: the relation introduces cascade deletion of assignments when a core object is deleted. Accepted by the owner (clarification 2026-10-29); this feature's own upgrade steps modify or remove no existing row (the duplicate merge belongs to specification 004); orphans are removed only by the explicit, dry-run-by-default command `cleanup_orphan_assignments` (reports every row, never touches an assignment whose type cannot be judged); announced under Breaking Changes. Test: deleting a device removes its assignments, deleting a contract removes assignments but not the device. |
-| V. Backward-compatible interfaces | Pass for GraphQL/REST/web (additive); the deletion behaviour is the one stated exception (FR-012). |
+| V. Backward-compatible interfaces | Pass for GraphQL/REST/web (additive); the deletion behaviour is the one stated exception (006-FR-012). |
 | VI. Simplicity | Pass with note: one module and one relation per model, no custom resolver framework. |
 | VII. Documented change | Pass: `docs/api.md`, a docs page for the command, `CHANGELOG.md` (Enhancements + Breaking Changes). |
 
@@ -61,4 +61,4 @@ CHANGELOG.md
 
 | Item | Why needed | Simpler alternative rejected because |
 |------|------------|--------------------------------------|
-| `GenericRelation` added to core models at start-up | Gives constant-query prefetch and a clean `Exists` filter | A per-object resolver issues one query per device (fails SC-003); a manual prefetch map duplicates what the ORM provides. Cost: cascade deletion, accepted. |
+| `GenericRelation` added to core models at start-up | Gives constant-query prefetch and a clean `Exists` filter | A per-object resolver issues one query per device (fails 006-SC-003); a manual prefetch map duplicates what the ORM provides. Cost: cascade deletion, accepted. |

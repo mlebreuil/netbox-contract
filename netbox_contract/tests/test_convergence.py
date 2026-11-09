@@ -1,4 +1,4 @@
-"""Gaps found by /speckit-converge (tasks T069 to T071)."""
+"""Gaps found by /speckit-converge (tasks 001-T069 to 001-T071)."""
 
 from decimal import Decimal
 from unittest import mock
@@ -17,7 +17,7 @@ BULK_EDIT = 'plugins:netbox_contract:invoice_bulk_edit'
 
 
 class InvoiceBulkEditContractsTestCase(TestCase):
-    """T069: FR-011, FR-009 and FR-031 also apply to bulk edits of invoices."""
+    """001-T069: 001-FR-011, 001-FR-009 and 001-FR-031 also apply to bulk edits of invoices."""
 
     def setUp(self):
         super().setUp()
@@ -63,7 +63,7 @@ class InvoiceBulkEditContractsTestCase(TestCase):
 
 
 class InvoiceBulkEditTemplateTestCase(TestCase):
-    """T070: the template flag is offered only with show_deprecated_fields."""
+    """001-T070: the template flag is offered only with show_deprecated_fields."""
 
     def setUp(self):
         super().setUp()
@@ -85,7 +85,7 @@ class InvoiceBulkEditTemplateTestCase(TestCase):
 
 
 class ContractValuesQueriesTestCase(APITestCase):
-    """T071: the contracts API list computes the contract values without a query per contract."""
+    """001-T071: the contracts API list computes the contract values without a query per contract."""
 
     model = Contract
 

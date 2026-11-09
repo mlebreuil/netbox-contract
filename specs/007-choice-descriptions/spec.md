@@ -84,17 +84,17 @@ The contract status options (Active, Canceled) are described the same way. Admin
 
 ### Functional Requirements
 
-- **FR-001**: The built-in invoice status choices MUST each carry a one-sentence description, and the Posted description MUST state what it locks (amount, currency, period, contracts and the amount fields of its lines).
-- **FR-002**: The built-in unit billing method choices MUST each carry a one-sentence description consistent with the invoicing rules in `docs/`.
-- **FR-003**: The built-in contract status choices MUST each carry a one-sentence description.
-- **FR-004**: The descriptions MUST be shown under the options of the status and billing method drop-downs on the plugin's add, edit and filter forms wherever NetBox can display them (the bulk edit forms have no status or billing method field).
-- **FR-005**: The descriptions MUST be available in English and French, following the plugin's translation process.
-- **FR-006**: Stored values, labels, colours, REST and GraphQL representations, CSV import and export values and filters MUST NOT change, and no migration MUST be needed.
-- **FR-007**: Installations that extend or replace the choices through `FIELD_CHOICES` MUST keep working as before; descriptions given in that configuration MUST be displayed.
-- **FR-008**: Options without a description MUST render without error.
-- **FR-009**: `docs/` and the changelog MUST mention the descriptions and how administrators can supply their own.
-- **FR-010**: The plugin's minimum NetBox version becomes 4.7.0. Provided by specification 008 (minimum NetBox 4.7.0, CI on v4.7.4, README table, changelog warning, version 2.6.0); this specification only relies on it and has no task of its own for it.
-- **FR-011**: The behaviour MUST be covered by tests that fail before the change: descriptions present for each built-in choice and each language, rendering in the forms, administrator extend and replace cases, and unchanged values and colours (constitution principle II).
+- **007-FR-001**: The built-in invoice status choices MUST each carry a one-sentence description, and the Posted description MUST state what it locks (amount, currency, period, contracts and the amount fields of its lines).
+- **007-FR-002**: The built-in unit billing method choices MUST each carry a one-sentence description consistent with the invoicing rules in `docs/`.
+- **007-FR-003**: The built-in contract status choices MUST each carry a one-sentence description.
+- **007-FR-004**: The descriptions MUST be shown under the options of the status and billing method drop-downs on the plugin's add, edit and filter forms wherever NetBox can display them (the bulk edit forms have no status or billing method field).
+- **007-FR-005**: The descriptions MUST be available in English and French, following the plugin's translation process.
+- **007-FR-006**: Stored values, labels, colours, REST and GraphQL representations, CSV import and export values and filters MUST NOT change, and no migration MUST be needed.
+- **007-FR-007**: Installations that extend or replace the choices through `FIELD_CHOICES` MUST keep working as before; descriptions given in that configuration MUST be displayed.
+- **007-FR-008**: Options without a description MUST render without error.
+- **007-FR-009**: `docs/` and the changelog MUST mention the descriptions and how administrators can supply their own.
+- **007-FR-010**: The plugin's minimum NetBox version becomes 4.7.0. Provided by specification 008 (minimum NetBox 4.7.0, CI on v4.7.4, README table, changelog warning, version 2.6.0); this specification only relies on it and has no task of its own for it.
+- **007-FR-011**: The behaviour MUST be covered by tests that fail before the change: descriptions present for each built-in choice and each language, rendering in the forms, administrator extend and replace cases, and unchanged values and colours (constitution principle II).
 
 ### Key Entities
 
@@ -105,10 +105,10 @@ The contract status options (Active, Canceled) are described the same way. Admin
 
 ### Measurable Outcomes
 
-- **SC-001**: A user can state what a Posted invoice locks from the drop-down alone, without opening the documentation.
-- **SC-002**: 100% of the built-in invoice status, contract status and billing method options show a description in English and in French.
-- **SC-003**: 100% of the existing tests on forms, imports, REST and GraphQL pass unchanged.
-- **SC-004**: An installation using `FIELD_CHOICES` for any of these choice sets upgrades with no configuration change and no visible regression.
+- **007-SC-001**: A user can state what a Posted invoice locks from the drop-down alone, without opening the documentation.
+- **007-SC-002**: 100% of the built-in invoice status, contract status and billing method options show a description in English and in French.
+- **007-SC-003**: 100% of the existing tests on forms, imports, REST and GraphQL pass unchanged.
+- **007-SC-004**: An installation using `FIELD_CHOICES` for any of these choice sets upgrades with no configuration change and no visible regression.
 
 ## Assumptions
 

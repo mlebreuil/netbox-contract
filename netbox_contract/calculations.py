@@ -63,7 +63,7 @@ def overlap_days(period_start, period_end, line_start, line_end):
 
 def recurring_invoice_amount(quantity, unit_price, unit_months, period_start, period_end, line_start, line_end):
     """
-    Amount of a recurring line for an invoice period (FR-018): quantity x unit price x (months of the
+    Amount of a recurring line for an invoice period (001-FR-018): quantity x unit price x (months of the
     period) / (months of the unit), multiplied by (days covered by the line) / (days of the period)
     when the line only partly covers the period.
     """
@@ -117,7 +117,7 @@ def invoice_line_amount(
     default_months=None,
 ):
     """
-    Calculated amount of an invoice line that references a contract line (research D7). Without an invoice
+    Calculated amount of an invoice line that references a contract line (research 001-D7). Without an invoice
     period, a recurring line counts for `default_months` (the contract's invoice frequency) when it is given.
     """
     if billing_method == RECURRING:

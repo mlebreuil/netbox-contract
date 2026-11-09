@@ -16,7 +16,7 @@ description: "Task list template for feature implementation"
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
-- **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
+- **[Story]**: Which user story this task belongs to (e.g., NNN-US1, NNN-US2, NNN-US3; NNN = the feature number, see specs/_global/CONVENTIONS.md)
 - Include exact file paths in descriptions
 
 ## Path Conventions
@@ -49,9 +49,9 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project structure per implementation plan
-- [ ] T002 Initialize [language] project with [framework] dependencies
-- [ ] T003 [P] Configure linting and formatting tools
+- [ ] NNN-T001 Create project structure per implementation plan
+- [ ] NNN-T002 Initialize [language] project with [framework] dependencies
+- [ ] NNN-T003 [P] Configure linting and formatting tools
 
 ---
 
@@ -63,12 +63,12 @@ description: "Task list template for feature implementation"
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
+- [ ] NNN-T004 Setup database schema and migrations framework
+- [ ] NNN-T005 [P] Implement authentication/authorization framework
+- [ ] NNN-T006 [P] Setup API routing and middleware structure
+- [ ] NNN-T007 Create base models/entities that all stories depend on
+- [ ] NNN-T008 Configure error handling and logging infrastructure
+- [ ] NNN-T009 Setup environment configuration management
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -84,17 +84,17 @@ Examples of foundational tasks (adjust based on your project):
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] NNN-T010 [P] [NNN-US1] Contract test for [endpoint] in tests/contract/test_[name].py
+- [ ] NNN-T011 [P] [NNN-US1] Integration test for [user journey] in tests/integration/test_[name].py
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
+- [ ] NNN-T012 [P] [NNN-US1] Create [Entity1] model in src/models/[entity1].py
+- [ ] NNN-T013 [P] [NNN-US1] Create [Entity2] model in src/models/[entity2].py
+- [ ] NNN-T014 [NNN-US1] Implement [Service] in src/services/[service].py (depends on NNN-T012, NNN-T013)
+- [ ] NNN-T015 [NNN-US1] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] NNN-T016 [NNN-US1] Add validation and error handling
+- [ ] NNN-T017 [NNN-US1] Add logging for user story 1 operations
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -108,15 +108,15 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] NNN-T018 [P] [NNN-US2] Contract test for [endpoint] in tests/contract/test_[name].py
+- [ ] NNN-T019 [P] [NNN-US2] Integration test for [user journey] in tests/integration/test_[name].py
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
-- [ ] T021 [US2] Implement [Service] in src/services/[service].py
-- [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T023 [US2] Integrate with User Story 1 components (if needed)
+- [ ] NNN-T020 [P] [NNN-US2] Create [Entity] model in src/models/[entity].py
+- [ ] NNN-T021 [NNN-US2] Implement [Service] in src/services/[service].py
+- [ ] NNN-T022 [NNN-US2] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] NNN-T023 [NNN-US2] Integrate with User Story 1 components (if needed)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -130,14 +130,14 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] NNN-T024 [P] [NNN-US3] Contract test for [endpoint] in tests/contract/test_[name].py
+- [ ] NNN-T025 [P] [NNN-US3] Integration test for [user journey] in tests/integration/test_[name].py
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py
-- [ ] T027 [US3] Implement [Service] in src/services/[service].py
-- [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] NNN-T026 [P] [NNN-US3] Create [Entity] model in src/models/[entity].py
+- [ ] NNN-T027 [NNN-US3] Implement [Service] in src/services/[service].py
+- [ ] NNN-T028 [NNN-US3] Implement [endpoint/feature] in src/[location]/[file].py
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -151,12 +151,13 @@ Examples of foundational tasks (adjust based on your project):
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] TXXX [P] Documentation updates in docs/
-- [ ] TXXX Code cleanup and refactoring
-- [ ] TXXX Performance optimization across all stories
-- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
-- [ ] TXXX Security hardening
-- [ ] TXXX Run quickstart.md validation
+- [ ] NNN-TXXX [P] Documentation updates in docs/ and CHANGELOG.md
+- [ ] NNN-TXXX Update the global documents listed in plan.md (specs/_global/data-model.md, contracts/*.md, behaviours.md), then run `python utils/spec_ids.py registry` and `python utils/spec_ids.py check`
+- [ ] NNN-TXXX Code cleanup and refactoring
+- [ ] NNN-TXXX Performance optimization across all stories
+- [ ] NNN-TXXX [P] Additional unit tests (if requested) in tests/unit/
+- [ ] NNN-TXXX Security hardening
+- [ ] NNN-TXXX Run quickstart.md validation
 
 ---
 
@@ -244,6 +245,7 @@ With multiple developers:
 ## Notes
 
 - [P] tasks = different files, no dependencies
+- NNN is the number of this feature: every task and story identifier carries it (NNN-T001, NNN-US1)
 - [Story] label maps task to specific user story for traceability
 - Each user story should be independently completable and testable
 - Verify tests fail before implementing

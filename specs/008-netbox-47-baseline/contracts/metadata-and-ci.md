@@ -1,5 +1,7 @@
 # Contract: plugin metadata and CI
 
+> Delta of feature 008: what this feature adds or changes. The current state is in [specs/_global/contracts/operations.md](../../_global/contracts/operations.md), which this feature keeps up to date.
+
 Public statements this change makes. Each is checked by a test or a command in `quickstart.md`.
 
 ## Plugin metadata (`netbox_contract/__init__.py`, `pyproject.toml`)

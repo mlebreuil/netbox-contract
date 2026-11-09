@@ -14,11 +14,11 @@ venv/bin/python netbox/manage.py makemigrations netbox_contract --check --dry-ru
 venv/bin/python netbox/manage.py migrate netbox_contract                            # 0050-0052 apply, 0051 prints its report
 
 # 2. Story by story (each module can run alone)
-env $T venv/bin/python netbox/manage.py test netbox_contract.tests.test_amend_permission --keepdb    # US1
-env $T venv/bin/python netbox/manage.py test netbox_contract.tests.test_detail_layouts --keepdb      # US2
-env $T venv/bin/python netbox/manage.py test netbox_contract.tests.test_nested_api --keepdb          # US3
-env $T venv/bin/python netbox/manage.py test netbox_contract.tests.test_graphql --keepdb             # US4
-env $T venv/bin/python netbox/manage.py test netbox_contract.tests.test_base_classes --keepdb        # US5
+env $T venv/bin/python netbox/manage.py test netbox_contract.tests.test_amend_permission --keepdb    # 003-US1
+env $T venv/bin/python netbox/manage.py test netbox_contract.tests.test_detail_layouts --keepdb      # 003-US2
+env $T venv/bin/python netbox/manage.py test netbox_contract.tests.test_nested_api --keepdb          # 003-US3
+env $T venv/bin/python netbox/manage.py test netbox_contract.tests.test_graphql --keepdb             # 003-US4
+env $T venv/bin/python netbox/manage.py test netbox_contract.tests.test_base_classes --keepdb        # 003-US5
 
 # 3. Full suite, including APIViewTestCase (REST + GraphQL) for the nine models and query-count baselines
 env $T venv/bin/python netbox/manage.py test netbox_contract.tests --keepdb
@@ -28,11 +28,11 @@ env $T venv/bin/python netbox/manage.py test netbox_contract.tests --keepdb
 
 | Spec scenario | Test |
 |---|---|
-| US1 1-7, edge cases (amend without view; per-line button) | `test_amend_permission` |
-| US2 1-9, edge cases (deleted external party, per-line actions, column choices) | `test_detail_layouts` |
-| US3 1-7, edge cases (invoice line brief, unmatched nested dict) | `test_nested_api` (snapshot guard, writes, brief sets, schema, deprecation notice), `test_api` brief sets |
-| US4 1-5, edge case (computed value refused) | `test_graphql`, `test_api` GraphQL cases |
-| US5 1-7, edge cases (empty slug, long description without spaces, no owner) | `test_base_classes` (pure helpers, migrate forward/back/forward with `MigrationExecutor`) |
+| 003-US1 1-7, edge cases (amend without view; per-line button) | `test_amend_permission` |
+| 003-US2 1-9, edge cases (deleted external party, per-line actions, column choices) | `test_detail_layouts` |
+| 003-US3 1-7, edge cases (invoice line brief, unmatched nested dict) | `test_nested_api` (snapshot guard, writes, brief sets, schema, deprecation notice), `test_api` brief sets |
+| 003-US4 1-5, edge case (computed value refused) | `test_graphql`, `test_api` GraphQL cases |
+| 003-US5 1-7, edge cases (empty slug, long description without spaces, no owner) | `test_base_classes` (pure helpers, migrate forward/back/forward with `MigrationExecutor`) |
 
 ## Manual checks (dev server)
 

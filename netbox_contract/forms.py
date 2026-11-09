@@ -419,7 +419,7 @@ class ContractBulkEditForm(NetBoxModelBulkEditForm):
 
 
 class ContractTypeForm(OrganizationalModelForm):
-    # Derived from the name when left empty (FR-018)
+    # Derived from the name when left empty (003-FR-018)
     slug = SlugField(label=_('Slug'), required=False)
     color = ColorField(label=_('Color'))
 
@@ -507,7 +507,7 @@ class InvoiceForm(NetBoxModelForm):
         # Initialise fields settings
         apply_field_settings(self, 'mandatory_invoice_fields', 'hidden_invoice_fields')
 
-        # A posted invoice keeps its amounts, period and contracts; its status can change (FR-031)
+        # A posted invoice keeps its amounts, period and contracts; its status can change (001-FR-031)
         if self.instance.pk and self.instance.locked_in_database():
             for field in (*Invoice.POSTED_LOCKED_FIELDS, 'contracts'):
                 if field in self.fields:
@@ -525,11 +525,11 @@ class InvoiceForm(NetBoxModelForm):
             previous_contract_ids=[] if is_new else list(self.instance.contracts.values_list('pk', flat=True)),
             previous_currency=None if is_new else Invoice.objects.get(pk=self.instance.pk).currency,
         )
-        # a new invoice gets its lines from the contract lines (FR-021, FR-023)
+        # a new invoice gets its lines from the contract lines (001-FR-021, 001-FR-023)
         contracts = list(self.cleaned_data.get('contracts') or [])
         self.line_overrides = None
         if is_new and not self.cleaned_data.get('template') and len(contracts) == 1 and not errors:
-            # quantities and unit prices typed in the preview of the lines (FR-032)
+            # quantities and unit prices typed in the preview of the lines (001-FR-032)
             self.line_overrides, errors = invoicing.parse_line_overrides(self.data)
             self.extra_lines, extra_errors = invoicing.parse_extra_lines(self.data)
             errors += extra_errors
@@ -601,7 +601,7 @@ class InvoiceForm(NetBoxModelForm):
 
 
 class InvoiceLineDimensionsForm(forms.Form):
-    """Accounting dimensions of one row of the preview of a new invoice (FR-032)."""
+    """Accounting dimensions of one row of the preview of a new invoice (001-FR-032)."""
 
     accounting_dimensions = DynamicModelMultipleChoiceField(
         queryset=AccountingDimension.objects.all(),
@@ -908,7 +908,7 @@ class InvoiceLineForm(NetBoxModelForm):
         label=_('Accounting dimensions'),
     )
 
-    # Fields fixed on a saved line that references a contract line (FR-024)
+    # Fields fixed on a saved line that references a contract line (001-FR-024)
     CALCULATED_LINE_FIXED_FIELDS = ('invoice', 'contract_line', 'currency', 'amount')
 
     fieldsets = (
@@ -923,13 +923,13 @@ class InvoiceLineForm(NetBoxModelForm):
         self.fields['quantity'].help_text = _(
             'Defaults to 1, or to the quantity of the contract line; usage-based lines are entered per invoice'
         )
-        # The amount is always quantity x unit price (FR-024, decision I14)
+        # The amount is always quantity x unit price (001-FR-024, decision 001-I14)
         self.fields['amount'].disabled = True
         self.fields['amount'].help_text = _('Calculated from the quantity and the unit price when the line is saved')
         if not self.instance.pk:
             return
 
-        # Lines of a posted invoice: only their accounting dimensions, comments and tags change (FR-031)
+        # Lines of a posted invoice: only their accounting dimensions, comments and tags change (001-FR-031)
         if self.instance.invoice_locked():
             for field in InvoiceLine.POSTED_LOCKED_FIELDS:
                 self.fields[field].disabled = True
@@ -1181,7 +1181,7 @@ class ContractLineForm(NetBoxModelForm):
 
 
 class ContractLineAmendForm(forms.Form):
-    """New unit price and/or quantity of a contract line from a date (FR-030)."""
+    """New unit price and/or quantity of a contract line from a date (001-FR-030)."""
 
     effective_date = forms.DateField(
         widget=DatePicker(), label=_('Applies from'), help_text=_('First day of the new terms')

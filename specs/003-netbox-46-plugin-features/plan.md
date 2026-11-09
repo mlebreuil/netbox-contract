@@ -25,7 +25,7 @@ This feature adopts the NetBox 4.6 plugin features in the unreleased 2.5.0, as a
 - **Base classes.** Contract types become `OrganizationalModel` and service providers become `PrimaryModel`. A
   lossless, reported data migration fills the slugs and shortens long descriptions.
 
-Details: [research.md](research.md) (D1-D12), [data-model.md](data-model.md), [contracts/](contracts/),
+Details: [research.md](research.md) (003-D1 to 003-D12), [data-model.md](data-model.md), [contracts/](contracts/),
 [quickstart.md](quickstart.md).
 
 ## Technical Context
@@ -42,9 +42,9 @@ Details: [research.md](research.md) (D1-D12), [data-model.md](data-model.md), [c
 0052 (service provider schema).
 
 **Testing**:
-- The NetBox test runner, with five new modules (D11).
+- The NetBox test runner, with five new modules (003-D11).
 - `test_api.py` moves to `APIViewTestCases.APIViewTestCase` for the nine models (REST + GraphQL).
-- Four existing modules are adapted (SC-006).
+- Four existing modules are adapted (003-SC-006).
 - ruff.
 
 **Target Platform**: NetBox plugin on Linux servers (self-hosted NetBox 4.6)
@@ -52,16 +52,16 @@ Details: [research.md](research.md) (D1-D12), [data-model.md](data-model.md), [c
 **Project Type**: NetBox plugin (Django app, web UI, REST and GraphQL APIs)
 
 **Performance Goals**:
-- The contract page computes its values in a fixed number of queries (FR-006).
-- The contract line list adds no per-row query for its actions column (annotations, D4).
+- The contract page computes its values in a fixed number of queries (003-FR-006).
+- The contract line list adds no per-row query for its actions column (annotations, 003-D4).
 - GraphQL lists add no per-object query for generic relations (`build_gfk_prefetch`).
 - The other list query-count baselines are unchanged, unless the owner join changes them; any change gets a stated
   reason.
 
 **Constraints**:
-- Existing route names and page addresses are kept (FR-022), and so are the plugin settings and import columns.
-- Contract type creation never requires a slug (FR-018).
-- Migrations are lossless and re-runnable (FR-017).
+- Existing route names and page addresses are kept (003-FR-022), and so are the plugin settings and import columns.
+- Contract type creation never requires a slug (003-FR-018).
+- Migrations are lossless and re-runnable (003-FR-017).
 - No API announced for removal in 4.7 is used. The legacy action sets mentioned in `ActionsMixin` are not used.
 
 **Scale/Scope**:
@@ -81,29 +81,29 @@ Phase 1:
 
 | Principle | Status | Evidence |
 |---|---|---|
-| I. NetBox-native plugin | Met | Core layouts and panels (D1-D4), `ObjectAction` and model actions (D6), `nested=True` serializers (D7), the documented plugin GraphQL path (D8), core base classes (D9). Every API exists in 4.6.0, and none is announced for removal |
+| I. NetBox-native plugin | Met | Core layouts and panels (003-D1 to 003-D4), `ObjectAction` and model actions (003-D6), `nested=True` serializers (003-D7), the documented plugin GraphQL path (003-D8), core base classes (003-D9). Every API exists in 4.6.0, and none is announced for removal |
 | II. Tested behaviour | Met | Five story test modules written first, plus `APIViewTestCase` for nine models. The quickstart scenario map covers every acceptance scenario and edge case. Query-count changes are re-recorded only with a reason |
 | III. Lint-clean | Met | `ruff check` after each story; no rule disabled |
-| IV. Data safety and migrations | Met | No field is removed: the nested contract shrink is only announced (D7). 0051 is lossless in both directions (long descriptions moved to comments, restored on reverse) and reported, and its data step is idempotent. `makemigrations --check` is clean. No stored value changes except the reported description shortening, which keeps the full text |
-| V. Backward-compatible interfaces | Met | REST output keeps every field (brief sets only gain fields), and the later removal is announced per field (FR-012a). No new required input (the slug is optional, FR-018). Filters, settings, import columns and routes are kept. Writes by id or attributes are unchanged |
+| IV. Data safety and migrations | Met | No field is removed: the nested contract shrink is only announced (003-D7). 0051 is lossless in both directions (long descriptions moved to comments, restored on reverse) and reported, and its data step is idempotent. `makemigrations --check` is clean. No stored value changes except the reported description shortening, which keeps the full text |
+| V. Backward-compatible interfaces | Met | REST output keeps every field (brief sets only gain fields), and the later removal is announced per field (003-FR-012a). No new required input (the slug is optional, 003-FR-018). Filters, settings, import columns and routes are kept. Writes by id or attributes are unchanged |
 | VI. Simplicity | Met | No dependency. Removes about 700 template lines and 3 serializers. The plugin-specific code is small subclasses of core classes plus one pure helper module (`text.py`) |
 | VII. Documented change | Met | CHANGELOG 2.5.0 #309 entry with "Behaviour changes" and "Deprecations" (every field to be removed listed). 2.5.0 removes nothing, so a minor version fits, `docs/` pages for amend, API and models, `CLAUDE.md` updated. README unchanged: requirements are unchanged |
 
 Re-check after design: no violation. The REST field removal, first recorded as an exception, was found CRITICAL by
-`/speckit-analyze` (IV/V and VII) and replaced by the additive option (D7).
-The `AmendContractLine` button declares its permission (D6).
+`/speckit-analyze` (IV/V and VII) and replaced by the additive option (003-D7).
+The `AmendContractLine` button declares its permission (003-D6).
 
 ## Decisions taken with the maintainer
 
-1. **Amend action only**, with no add + change transition, because Amend was never released (Q1, D6).
+1. **Amend action only**, with no add + change transition, because Amend was never released (003-Q1, 003-D6).
 2. **Additive REST change in 2.5.0.** The nested contract and invoice contracts are unchanged, and the brief sets
    only gain fields. The shrink is announced as deprecated and left to a later specified release, which the maintainer
-   named 2.6.0 (Constitution VII asks for 3.0.0 unless it is amended). This supersedes Q2 and 2026-10-02 Q1 (D7).
-3. **GraphQL and base classes in scope** (Q3, D8, D9).
-4. **The list views' configurable tables** on detail pages, with per-line contract line actions (2026-10-02 Q2, D4).
+   named 2.6.0 (Constitution VII asks for 3.0.0 unless it is amended). This supersedes 003-Q2 and 2026-10-02 003-Q1 (003-D7).
+3. **GraphQL and base classes in scope** (003-Q3, 003-D8, 003-D9).
+4. **The list views' configurable tables** on detail pages, with per-line contract line actions (2026-10-02 003-Q2, 003-D4).
 5. **Long contract type descriptions** cut at a word boundary with "…", with the full text moved to comments
-   (2026-10-02 Q3, D10).
-6. **GraphQL exposes stored fields only** (2026-10-02 Q4, D8).
+   (2026-10-02 003-Q3, 003-D10).
+6. **GraphQL exposes stored fields only** (2026-10-02 003-Q4, 003-D8).
 
 Points to watch during implementation:
 - **REST amend action.** `BaseViewSet.initial()` has already restricted the queryset to `add` and `TokenPermissions`
@@ -113,7 +113,7 @@ Points to watch during implementation:
 - **`ObjectsTablePanel` loads the list view through HTMX.** Detail page tests must assert the panel's `hx-get` URL
   and its filters, then call that URL to check the rows. Test the excluded columns and the per-line actions on the
   list response.
-- **Keep the REST output byte-for-byte where D7 promises "identical".** Snapshot today's nested invoice, nested
+- **Keep the REST output byte-for-byte where 003-D7 promises "identical".** Snapshot today's nested invoice, nested
   dimensions, nested contract and invoice `contracts` in `test_nested_api` before touching the serializers. The
   snapshot covers keys and value types, and `contract_type` must stay an integer in the nested contract.
 - **The GraphQL type for the model `Contract` is named `ContractType`.** It clashes with the plugin's `ContractType`
@@ -133,7 +133,7 @@ Points to watch during implementation:
 specs/003-netbox-46-plugin-features/
 ├── spec.md
 ├── plan.md              # this file
-├── research.md          # Phase 0: decisions D1-D12
+├── research.md          # Phase 0: decisions 003-D1 to 003-D12
 ├── data-model.md        # Phase 1: contract type, service provider, amend permission, migrations
 ├── quickstart.md        # Phase 1: validation commands and scenario map
 ├── contracts/
@@ -148,18 +148,18 @@ specs/003-netbox-46-plugin-features/
 
 ```text
 netbox_contract/
-├── models.py                   # ContractType(OrganizationalModel), ServiceProvider(PrimaryModel), ContractLine.Meta.permissions (D6, D9)
-├── text.py                     # NEW: unique_slug(), shorten_description(), pure (D9, D10)
-├── panels.py                   # NEW: SettingsAttributesPanel, per-model attribute panels, deprecated panels, message/values TemplatePanels, AddContractLine (D1-D4)
-├── object_actions.py           # NEW: AmendContractLine (D6)
-├── templatetags/contract_tags.py   # NEW: can_amend filter for contractline_edit.html (D6)
-├── views.py                    # layout on 9 ObjectViews; template_name generic/object.html; amend view permission; contract line list annotations (D1, D4, D6)
-├── tables.py                   # ContractLineActionsColumn; locked/contract tables and AMEND_BUTTON removed; owner columns (D4, D9)
-├── filtersets.py               # ContractFilterSet.invoice_id; Organizational/PrimaryModelFilterSet bases (D5, D9)
-├── forms.py                    # Organizational/PrimaryModel form bases, slug optional, owner fields in fieldsets (D9)
-├── api/serializers.py          # nested=True for invoice/dimension/line, brief_fields, NestedContractSerializer deprecated, Organizational/PrimaryModelSerializer (D7, D9)
-├── api/views.py                # amend action permissions; annotations (D4, D6)
-├── graphql/                    # NEW: __init__.py, filters.py, types.py, schema.py (D8)
+├── models.py                   # ContractType(OrganizationalModel), ServiceProvider(PrimaryModel), ContractLine.Meta.permissions (003-D6, 003-D9)
+├── text.py                     # NEW: unique_slug(), shorten_description(), pure (003-D9, 003-D10)
+├── panels.py                   # NEW: SettingsAttributesPanel, per-model attribute panels, deprecated panels, message/values TemplatePanels, AddContractLine (003-D1 to 003-D4)
+├── object_actions.py           # NEW: AmendContractLine (003-D6)
+├── templatetags/contract_tags.py   # NEW: can_amend filter for contractline_edit.html (003-D6)
+├── views.py                    # layout on 9 ObjectViews; template_name generic/object.html; amend view permission; contract line list annotations (003-D1, 003-D4, 003-D6)
+├── tables.py                   # ContractLineActionsColumn; locked/contract tables and AMEND_BUTTON removed; owner columns (003-D4, 003-D9)
+├── filtersets.py               # ContractFilterSet.invoice_id; Organizational/PrimaryModelFilterSet bases (003-D5, 003-D9)
+├── forms.py                    # Organizational/PrimaryModel form bases, slug optional, owner fields in fieldsets (003-D9)
+├── api/serializers.py          # nested=True for invoice/dimension/line, brief_fields, NestedContractSerializer deprecated, Organizational/PrimaryModelSerializer (003-D7, 003-D9)
+├── api/views.py                # amend action permissions; annotations (003-D4, 003-D6)
+├── graphql/                    # NEW: __init__.py, filters.py, types.py, schema.py (003-D8)
 ├── migrations/0050_contractline_amend_permission.py
 ├── migrations/0051_contracttype_organizational.py
 ├── migrations/0052_serviceprovider_primary.py
@@ -170,11 +170,11 @@ netbox_contract/
 │   └── panels/{contract_values,lines_locked,line_lock,invoice_posted,invoice_template,amend_button}.html   # NEW fragments
 ├── locale/{en,fr}/LC_MESSAGES/django.{po,mo}
 └── tests/
-    ├── test_amend_permission.py   # NEW (US1)
-    ├── test_detail_layouts.py     # NEW (US2)
-    ├── test_nested_api.py         # NEW (US3)
-    ├── test_graphql.py            # NEW (US4)
-    ├── test_base_classes.py       # NEW (US5)
+    ├── test_amend_permission.py   # NEW (003-US1)
+    ├── test_detail_layouts.py     # NEW (003-US2)
+    ├── test_nested_api.py         # NEW (003-US3)
+    ├── test_graphql.py            # NEW (003-US4)
+    ├── test_base_classes.py       # NEW (003-US5)
     └── test_api.py, test_issue_307.py, test_amendments.py, test_locking.py, test_deprecated.py   # adapted
 CHANGELOG.md, docs/{api,contract_lines,contract,index}.md, CLAUDE.md
 ```
@@ -185,4 +185,4 @@ CHANGELOG.md, docs/{api,contract_lines,contract,index}.md, CLAUDE.md
 ## Complexity Tracking
 
 No constitution violation to justify. The nested REST shrink, first tracked here, was replaced by the additive option
-(D7) after `/speckit-analyze` (C1, C2).
+(003-D7) after `/speckit-analyze` (C1, C2).

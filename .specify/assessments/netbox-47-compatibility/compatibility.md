@@ -49,4 +49,4 @@ The 4.7 breaking changes below do not touch the plugin; the search covered `netb
 
 ## Correction, 2026-10-30
 
-Implementing specification 008 found one adjustment this assessment missed: `makemigrations --check` on 4.7.4 proposes `AlterField` on `ContractType.owner` and `ServiceProvider.owner` (NetBox 4.7 sets `related_name='+'`). A state-only migration `0053_owner_related_name` fixes it (specification 008, research D7). The plugin therefore did not run entirely unchanged on 4.7.4.
+Implementing specification 008 found one adjustment this assessment missed: `makemigrations --check` on 4.7.4 proposes `AlterField` on `ContractType.owner` and `ServiceProvider.owner` (NetBox 4.7 sets `related_name='+'`). A state-only migration `0053_owner_related_name` fixes it (specification 008, research 008-D7). The plugin therefore did not run entirely unchanged on 4.7.4.

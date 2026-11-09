@@ -1,4 +1,4 @@
-"""Amendment of the price or quantity of a contract line from a date (FR-030, decision I10)."""
+"""Amendment of the price or quantity of a contract line from a date (001-FR-030, decision 001-I10)."""
 
 from datetime import date
 from decimal import Decimal
@@ -87,7 +87,7 @@ class AmendmentTestCase(TestCase):
         july = invoicing.propose_invoice(self.contract, date(2025, 7, 1), date(2025, 7, 31))
         self.assertEqual(june.total, Decimal('200.00'))
         self.assertEqual(july.total, Decimal('220.00'))
-        # a period across the change gets both lines, each prorated by its days (FR-018): 600 x 30/92, 660 x 62/92
+        # a period across the change gets both lines, each prorated by its days (001-FR-018): 600 x 30/92, 660 x 62/92
         quarter = invoicing.lines_to_generate(self.contract, date(2025, 6, 1), date(2025, 8, 31))
         self.assertEqual(sorted(line.amount for line in quarter), [Decimal('195.65'), Decimal('444.78')])
 

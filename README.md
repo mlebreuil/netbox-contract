@@ -167,3 +167,7 @@ Before version 2.6, deleting a device, site or other object left its contract as
 The report gives the number per object type and, for each assignment, its contract, the object type and the former identifier. Assignments whose object type is no longer installed are listed separately and are never deleted. Running the command again lists nothing once it is clean.
 
 The custom script "Report currency mismatches" (in `scripts/netbox-contract.py`) lists existing records whose currency does not match their contract or invoice, without changing them.
+
+## Contributing
+
+See [CONTRIBUTING.md](https://github.com/mlebreuil/netbox-contract/blob/develop/CONTRIBUTING.md). AI-assisted contributions are welcome under the [AI contribution policy](https://github.com/mlebreuil/netbox-contract/blob/develop/AI_POLICY.md): issues, pull request descriptions and comments are written in your own words, and you understand what you submit.

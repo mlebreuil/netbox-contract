@@ -3,7 +3,7 @@
 Phase 0 of [plan.md](plan.md). Every decision below was checked against the NetBox source in the dev container
 (`/workspaces/netbox/netbox`, 4.6.x) and the CI pin (`v4.6.10`). No `NEEDS CLARIFICATION` remains.
 
-## D1. URL registration: every view through `register_model_view`
+## 002-D1. URL registration: every view through `register_model_view`
 
 **Decision**: decorate every list, add, import, bulk edit, bulk delete, detail, edit and delete view of the nine
 models with `@register_model_view`, using the names and paths core uses:
@@ -31,10 +31,10 @@ path from `path`, so these decorators reproduce exactly the 82 route names and a
 `journal` and `changelog` for every `NetBoxModel`; they only appear once the detail include exists. The hand-written
 `*_changelog` paths become duplicates and are removed. This is the core pattern (for example `circuits/urls.py`).
 
-**Alternatives considered**: registering only the four detail views (clarification Q2, rejected by the maintainer);
+**Alternatives considered**: registering only the four detail views (clarification 002-Q2, rejected by the maintainer);
 keeping hand-written list paths next to includes (two sources of truth for the same names).
 
-## D2. Filterset registration
+## 002-D2. Filterset registration
 
 **Decision**: decorate each of the nine `*FilterSet` classes with `@register_filterset`
 (`from utilities.filtersets import register_filterset`).
@@ -42,12 +42,12 @@ keeping hand-written list paths next to includes (two sources of truth for the s
 **Rationale**: `FilterModifierMixin._enhance_fields_with_modifiers` (`utilities/forms/mixins.py`) looks the filterset
 up in `registry['filtersets']['netbox_contract.<model>']`; without it no field gets the `FilterModifierWidget`. With
 it, each filter form field whose form-field class has lookups and whose filterset has the matching `__<lookup>`
-filters gets the modifier selector. Filter query strings are unchanged (FR-005): the filtersets themselves are not
+filters gets the modifier selector. Filter query strings are unchanged (002-FR-005): the filtersets themselves are not
 modified.
 
 **Alternatives considered**: none; this is the only mechanism.
 
-## D3. Form sections (`fieldsets`) and fields hidden by settings
+## 002-D3. Form sections (`fieldsets`) and fields hidden by settings
 
 **Decision**:
 - Add `fieldsets = (FieldSet(...), ...)` to the nine model forms, the nine bulk-edit forms and the nine filter forms.
@@ -55,7 +55,7 @@ modified.
 - `comments` is left out of the sections of model and bulk-edit forms: `htmx/form.html` and `generic/bulk_edit.html`
   render `form.comments` on their own after the sections; listing it would render it twice.
 - Filter forms start with `FieldSet('q', 'filter_id', 'tag')` (without `tag` for the contract type, contract assignment
-  and accounting dimension filter forms, which have no tag filter; adding one is out of scope, FR-007); the tenancy and contact mixins' fields get their core
+  and accounting dimension filter forms, which have no tag filter; adding one is out of scope, 002-FR-007); the tenancy and contact mixins' fields get their core
   sections (`FieldSet('tenant_group_id', 'tenant_id', name=_('Tenant'))`,
   `FieldSet('contact', 'contact_role', 'contact_group', name=_('Contacts'))`).
 - Deprecated fields (`mrc`, `yrc`, `nrc` on the contract form, `template` on the invoice model and bulk-edit forms)
@@ -70,7 +70,7 @@ modified.
 **Rationale**: once a form has `fieldsets`, `htmx/form.html`, `generic/bulk_edit.html` and `inc/filter_list.html`
 render only the names listed in them (plus hidden fields, custom fields, owner, comments, changelog message). A field
 left out of every section silently disappears, and a hidden field left in a section renders a label with no visible
-input. Removing hidden and deleted names keeps FR-007 (same fields, same hiding) and scenario US3-2 (no empty
+input. Removing hidden and deleted names keeps 002-FR-007 (same fields, same hiding) and scenario 002-US3-2 (no empty
 section). A generic test checks, for every plugin form, that each visible field is in exactly one section.
 
 **Grouping** (section names are translatable). The Tenant and Contacts filter sections hold the fields inherited from
@@ -95,7 +95,7 @@ Bulk-edit forms use the same sections restricted to the fields they have.
 receive a hidden field's value from the query string, and the setting's behaviour would change); leaving hidden
 fields in sections (renders empty labelled rows).
 
-## D4. Contract type description is a `CharField`
+## 002-D4. Contract type description is a `CharField`
 
 **Decision**: `ContractTypeFilterForm`, `ContractTypeCSVForm` and `ContractTypeBulkEditForm` declare
 `description = forms.CharField(required=False, ...)`, optional as today (`CommentField` defaults to `required=False` and the model field is `blank=True`). The unused
@@ -106,13 +106,13 @@ fields in sections (renders empty labelled rows).
 
 **Alternatives considered**: keeping `CommentField` with a `TextInput` widget (still labelled as Markdown).
 
-## D5. Invoice and invoice line pre-fill without copying `ObjectEditView.get`
+## 002-D5. Invoice and invoice line pre-fill without copying `ObjectEditView.get`
 
 **Decision**: `InvoiceEditView.get` and `InvoiceLineEditView.get` compute the pre-filled values as today (restricted
 lookups with `restrict(request.user, 'view')`, #307), then set `self.form` to a per-request subclass of the form whose
 `__init__` merges them under the `initial` core passes (`initial={**defaults, **(initial or {})}`), and return
 `super().get(request, *args, **kwargs)`. A small helper in `views.py` builds that subclass. Because core's `initial`
-comes from the query string, a value in the address wins for both screens (clarification Q5, as core does); for
+comes from the query string, a value in the address wins for both screens (clarification 002-Q5, as core does); for
 invoices this changes today's behaviour, where the contract-derived values and today's date replaced query-string
 values, and it is listed as a behaviour change. The values keep their Python types (`date`, `Decimal`), so the
 existing pre-fill tests (`test_prefill.py`, `test_issue_307.py`) pass unchanged. The new-invoice preview moves to
@@ -122,7 +122,7 @@ form. Nothing is pre-filled for an existing object (`kwargs` holds `pk`). The vi
 `as_view()`, so setting `self.form` does not leak between requests.
 
 **Rationale**: core `get()` builds `initial` from `normalize_querydict(request.GET)`, applies the `quickadd` prefix,
-returns `htmx/quick_add.html` for `_quickadd` and `htmx/form.html` for HTMX partial requests (FR-009). Wrapping the
+returns `htmx/quick_add.html` for `_quickadd` and `htmx/form.html` for HTMX partial requests (002-FR-009). Wrapping the
 form class reuses all of that with no copy. The form's `__init__` cannot do it: it has no access to
 the user, so it could not apply the #307 restriction. `alter_object()` is rejected because it also runs on POST.
 
@@ -131,11 +131,11 @@ the values become strings, which changes the form's `initial` types and breaks t
 pre-fill in `InvoiceForm.__init__` (no user); `alter_object` setting instance attributes (runs on POST and cannot set
 the `contracts` many-to-many on an unsaved instance).
 
-## D6. Templates under `templates/netbox_contract/`
+## 002-D6. Templates under `templates/netbox_contract/`
 
 **Decision**: move `templates/contract_assignments_bottom.html` to
 `templates/netbox_contract/inc/contract_assignments_bottom.html` and update `template_content.py`; delete
-`templates/contract_list_bottom.html` (clarification Q3). The catalogs are refreshed and every untranslated or fuzzy
+`templates/contract_list_bottom.html` (clarification 002-Q3). The catalogs are refreshed and every untranslated or fuzzy
 French entry is translated, including those of #278/#307 (maintainer decision during implementation); for a msgid
 NetBox core also translates, NetBox's catalog takes precedence, so the plugin uses the same wording (Tenancy →
 Utilisateur). Refresh the `.po` references with `makemessages` and
@@ -145,18 +145,18 @@ translation is lost.
 **Rationale**: Django resolves `contract_assignments_bottom.html` across all apps' template folders, so a same-named
 template of another app could shadow it. `inc/` is where the plugin keeps its partials.
 
-## D7. Invoice template only with deprecated fields shown
+## 002-D7. Invoice template only with deprecated fields shown
 
 **Decision**: in `ContractView.get_extra_context`, look up the invoice template and build its lines table only when
 `show_deprecated_fields` is true; otherwise `invoice_template` and `invoicelines_table` are `None`, so the section of
-`contract.html` (`{% if invoice_template %}`) is not rendered (clarification Q1).
+`contract.html` (`{% if invoice_template %}`) is not rendered (clarification 002-Q1).
 
 **Rationale**: consistent with the rest of the deprecated data; saves one query (two with a template) per contract
 page when the setting is off, which is the default. #278 had added the panel on purpose (templates "kept for
 reference"); the maintainer confirmed hiding it during implementation, and templates stay reachable from the invoice
 list.
 
-## D8. Tests and baselines
+## 002-D8. Tests and baselines
 
 **Decision**: one new module `netbox_contract/tests/test_conventions.py`, written first, with:
 - the 82 route names of [contracts/routes.md](contracts/routes.md) reversed and resolved to the expected view class;
@@ -176,12 +176,12 @@ list.
 List view query counts should not change (no queryset or table changes); `tests/query_counts.json` is re-recorded
 only if a list view test reports a change, with the reason stated in the commit.
 
-## D9. Release
+## 002-D9. Release
 
 **Decision**: no version bump. 2.5.0 is not released yet (latest tag `v2.4.7`; the #307 fixes are already listed in
 the 2.5.0 section of `CHANGELOG.md`), so these changes ship in 2.5.0 with a `#308` entry in that section, after #307,
 and the two visible changes are added to its "Behaviour changes" list (invoice template section hidden when
-deprecated fields are off; unused root template removed; invoice pre-fill keeps values given in the address). This keeps clarification Q4 (a 2.5.x release, no new
+deprecated fields are off; unused root template removed; invoice pre-fill keeps values given in the address). This keeps clarification 002-Q4 (a 2.5.x release, no new
 feature version) without numbering a patch of an unreleased version. If 2.5.0 is tagged before this branch is
 merged, the entry moves to a new 2.5.1 section and `version` is bumped in `netbox_contract/__init__.py` and
 `pyproject.toml`. `docs/contract.md` and `docs/invoice.md` are checked where they describe the forms and updated if a

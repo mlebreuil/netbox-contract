@@ -7,7 +7,7 @@ CENT = Decimal('0.01')
 
 def derive_invoice_line_amounts(apps, schema_editor):
     """
-    Give every invoice line without unit price one, so that its amount is quantity x unit price (decision I14).
+    Give every invoice line without unit price one, so that its amount is quantity x unit price (decision 001-I14).
     The amount never changes: unit price = amount / quantity when that is exact, otherwise the line gets quantity
     1 and unit price = amount, and its former quantity is kept in its comments.
     """

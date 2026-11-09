@@ -7,5 +7,5 @@ register = template.Library()
 
 @register.filter
 def can_amend(line, user):
-    """`{% if object|can_amend:request.user %}`: the rule of the Amend button (research D6)."""
+    """`{% if object|can_amend:request.user %}`: the rule of the Amend button (research 003-D6)."""
     return _can_amend(line, user)

@@ -1,4 +1,4 @@
-"""Posted invoices are locked; new invoices are Draft by default (FR-031, decision I12)."""
+"""Posted invoices are locked; new invoices are Draft by default (001-FR-031, decision 001-I12)."""
 
 from datetime import date
 from decimal import Decimal

@@ -298,7 +298,7 @@ AMEND_BUTTON = (
 
 class ContractLineActionsColumn(columns.ActionsColumn):
     """
-    Actions of a contract line, decided line by line (research D4): no Delete on a locked line, and an Amend button
+    Actions of a contract line, decided line by line (research 003-D4): no Delete on a locked line, and an Amend button
     when the line can be amended and the user may amend it. Reads the with_lock_state() annotations when present.
     """
 

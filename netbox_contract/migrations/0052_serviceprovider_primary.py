@@ -1,4 +1,4 @@
-"""Service providers become NetBox primary objects: they get a description and an owner (#309, research D9)."""
+"""Service providers become NetBox primary objects: they get a description and an owner (#309, research 003-D9)."""
 
 import django.db.models.deletion
 from django.db import migrations, models

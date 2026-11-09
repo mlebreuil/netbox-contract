@@ -1,4 +1,4 @@
-"""Spec user story 3: billable flag and computed contract values (FR-005..FR-008a)."""
+"""Spec user story 3: billable flag and computed contract values (001-FR-005..FR-008a)."""
 
 from datetime import date
 from decimal import Decimal
@@ -109,7 +109,7 @@ class BillableHierarchyTestCase(TestCase):
 
 
 class BillableLockTestCase(TestCase):
-    """FR-008a and scenario 5."""
+    """001-FR-008a and scenario 5."""
 
     def setUp(self):
         self.parent = make_contract(name='Parent')

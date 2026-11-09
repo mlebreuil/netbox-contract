@@ -34,20 +34,20 @@ Checked against `.specify/memory/constitution.md` version 1.0.0 (Principles I-VI
 
 | Principle | Status | Evidence |
 |---|---|---|
-| I. NetBox-native plugin | Met | `Unit` and `ContractLine` are `NetBoxModel`s with the full stack (tasks T015-T022, including the change log route); `min_version` 4.6.0; the one known deprecation-bound API (custom scripts) is recorded as an accepted exception in research D10 with its migration path (logic kept in `reports.py`) |
-| II. Tested behaviour | Met | tests first in every story; every scenario and edge case mapped in quickstart.md; CI pinned to a NetBox 4.6 tag (T002); query-count baseline regenerated with a stated reason (list views change) |
+| I. NetBox-native plugin | Met | `Unit` and `ContractLine` are `NetBoxModel`s with the full stack (tasks 001-T015 to 001-T022, including the change log route); `min_version` 4.6.0; the one known deprecation-bound API (custom scripts) is recorded as an accepted exception in research 001-D10 with its migration path (logic kept in `reports.py`) |
+| II. Tested behaviour | Met | tests first in every story; every scenario and edge case mapped in quickstart.md; CI pinned to a NetBox 4.6 tag (001-T002); query-count baseline regenerated with a stated reason (list views change) |
 | III. Lint-clean | Met | every story ends with `ruff check` |
 | IV. Data safety and migrations | Met | migration 0044 schema, 0045 idempotent lossless conversion with a report; `invoiced_at_conversion` flag; nothing altered silently; deprecated fields and templates kept and never deleted |
-| V. Backward-compatible interfaces | Met with recorded behaviour changes | no REST field, endpoint, setting or import column removed or renamed; new validation rules and invoice-creation behaviour are listed as behaviour changes in the changelog task (T057) |
+| V. Backward-compatible interfaces | Met with recorded behaviour changes | no REST field, endpoint, setting or import column removed or renamed; new validation rules and invoice-creation behaviour are listed as behaviour changes in the changelog task (001-T057) |
 | VI. Simplicity and minimal dependencies | Met | no new dependency (money library rejected); logic in `calculations.py`, `validators.py`, `conversion.py`, `reports.py`, `services/invoicing.py` |
-| VII. Documented change | Met | documentation, changelog and README tasks (T056-T058); single release 2.5.0 published only when all milestones are done |
+| VII. Documented change | Met | documentation, changelog and README tasks (001-T056 to 001-T058); single release 2.5.0 published only when all milestones are done |
 
 Re-check after design: no violation, so no entry in Complexity Tracking.
 
 ## Decisions taken with the maintainer
 
 1. **Single release** (2.5.0). Release 1 and release 2 are merged; the build order in the spec's story priorities is kept as internal milestones.
-2. **Quantity at the invoice line**: unit and unit price come from the contract line, the amount is calculated (research D7). Usage-based lines are generated without quantity.
+2. **Quantity at the invoice line**: unit and unit price come from the contract line, the amount is calculated (research 001-D7). Usage-based lines are generated without quantity.
 3. **Lock once invoiced**: a contract that has an invoice cannot get new, changed or deleted contract lines; a new contract must be created. Consequence: converted lines of contracts that already had invoices at upgrade are locked; a used unit's billing method and months are locked with them.
 4. **Invoice templates are kept**, never deleted, deprecated; the template-line copy on save is removed in this release.
 5. **Invoice lines are generated at invoice creation** (screen and REST create), never on an existing invoice and never through bulk import; there is no generation button or endpoint.
@@ -83,7 +83,7 @@ netbox_contract/
 ├── reports.py                  # NEW currency mismatch detection
 ├── signals.py                  # NEW pre_delete guards (locked contract lines, lines of posted invoices)
 ├── services/invoicing.py       # NEW propose_invoice, lines_to_generate (+ preview overrides and added lines), generate_invoice_lines
-├── services/amendments.py      # NEW amend_contract_line (FR-030)
+├── services/amendments.py      # NEW amend_contract_line (001-FR-030)
 ├── management/commands/convert_contract_lines.py   # NEW
 ├── forms.py, views.py, tables.py, filtersets.py, urls.py, navigation.py, search.py   # new screens, pre-fill, hidden deprecated fields
 ├── api/serializers.py, api/views.py, api/urls.py   # new endpoints, new fields, validation
@@ -94,8 +94,8 @@ netbox_contract/
     ├── test_calculations.py, test_currency.py, test_conversion.py,
     ├── test_contract_lines.py, test_values.py, test_prefill.py, test_api.py,
     ├── test_reports.py, test_generation.py, test_locking.py,
-    ├── test_deprecated.py      # NEW (deprecated fields and invoice templates, US2)
-    ├── test_amendments.py, test_posted.py, test_invoice_preview.py   # NEW (FR-030, FR-031, FR-032)
+    ├── test_deprecated.py      # NEW (deprecated fields and invoice templates, 001-US2)
+    ├── test_amendments.py, test_posted.py, test_invoice_preview.py   # NEW (001-FR-030, 001-FR-031, 001-FR-032)
     ├── test_convergence.py     # NEW (gaps found by /speckit-converge: bulk edit rules, contract values of API lists)
     ├── helpers.py              # NEW shared test factories (not a test module)
     └── query_counts.json       # regenerated
