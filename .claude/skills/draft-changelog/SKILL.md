@@ -47,7 +47,7 @@ Issue links are `https://github.com/mlebreuil/netbox-contract/issues/N`.
 ## 3. Write each entry
 
 - Say what changed for the reader, not what the code did. State the upgrade action in Breaking Changes.
-- A spec identifier, when cited, is always qualified (`008-FR-008`); the check rejects a bare one.
+- A spec identifier, when cited, is always qualified (`NNN-FR-008`); the check rejects a bare one.
 - Anything that rewrites data names the migration (`0054`) and what is not undone when migrating back.
 - No trailing period where the bullet is a short title; match the neighbours.
 
