@@ -40,7 +40,7 @@ Config is stored in .pre-commit-config.yaml
 
 There are 2 permanent branch in the repository:
 
-* master - The current stable release. Individual changes should never be pushed directly to this branch, but rather merged from develop.
+* main - The current stable release. Individual changes should never be pushed directly to this branch, but rather merged from develop.
 * develop - Active development for the upcoming patch release. Pull requests will typically be based on this branch unless they introduce breaking changes that must be deferred until the next minor release.
 
 For each new feature or bug fix a branch is created from the corresponding issue.

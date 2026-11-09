@@ -1,11 +1,11 @@
 ---
 name: release-plugin
-description: Prepare and publish a netbox-contract release - version bump, compatibility table, changelog, checks, release pull request from develop to master, GitHub release that publishes to PyPI. Use when a maintainer asks to prepare, cut, tag or ship a plugin release.
+description: Prepare and publish a netbox-contract release - version bump, compatibility table, changelog, checks, release pull request from develop to main, GitHub release that publishes to PyPI. Use when a maintainer asks to prepare, cut, tag or ship a plugin release.
 ---
 
 # Release the plugin
 
-Releases are built from `develop` and merged into `master`; the tag is created by the GitHub release, and publishing
+Releases are built from `develop` and merged into `main`; the tag is created by the GitHub release, and publishing
 the release starts `.github/workflows/python-publish.yml`, which uploads to PyPI through trusted publishing (the
 `release` environment). **A file uploaded to PyPI can never be replaced.** Prepare the release changes without asking,
 but open a pull request only when the maintainer explicitly asks. **Confirm with the maintainer before step 7**, and
@@ -68,7 +68,7 @@ moved into the version.
 ## 6. Open the release PR (only when explicitly requested)
 
 If requested, branch from `develop` named `release-X.Y.Z` (or the issue branch if there is one), commit the release
-changes, and open a PR into `master`. Its description is written by the maintainer (AI policy); give a short draft
+changes, and open a PR into `main`. Its description is written by the maintainer (AI policy); give a short draft
 marked as a draft and say so when handing it over. Wait for CI. Otherwise, hand off the prepared branch and a brief
 draft description without opening a PR.
 
@@ -77,7 +77,7 @@ draft description without opening a PR.
 After the PR merges and the maintainer says go:
 
 ```bash
-gh release create vX.Y.Z --target master --title "vX.Y.Z" --notes-file <notes>
+gh release create vX.Y.Z --target main --title "vX.Y.Z" --notes-file <notes>
 ```
 
 The notes are the changelog section for the version, reviewed. Then watch the workflow
@@ -91,7 +91,7 @@ Install it in a clean virtualenv and import `netbox_contract` as a smoke test.
 
 ## 8. Hand off
 
-Report the release URL, the PyPI version, and any step left to the maintainer (merge `master` back into `develop` if
+Report the release URL, the PyPI version, and any step left to the maintainer (merge `main` back into `develop` if
 the branches diverged, close the milestone, announce).
 
 ## Why
