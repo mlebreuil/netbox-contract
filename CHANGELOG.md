@@ -4,6 +4,12 @@
 
 ## Version 2
 
+### Version 2.6.1
+
+#### Other Changes
+
+* [#329](https://github.com/mlebreuil/netbox-contract/issues/329) - The reverse name of a contract's tenant is now `netbox_contract_contracts` instead of `contracts`, so that it cannot clash with another plugin; code outside the plugin that reads `tenant.contracts` must use the new name, the screens, REST API and GraphQL are not affected, and the state-only migration 0056 changes no data
+
 ### Version 2.6.0
 
 > [!WARNING]

@@ -336,7 +336,7 @@ class Contract(ContactsMixin, NetBoxModel):
     tenant = models.ForeignKey(
         to='tenancy.Tenant',
         on_delete=models.PROTECT,
-        related_name='contracts',
+        related_name='netbox_contract_contracts',
         blank=True,
         null=True,
         verbose_name=_('tenant'),
