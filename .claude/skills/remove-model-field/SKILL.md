@@ -52,7 +52,8 @@ Remove from the outside in, so imports never break midway.
 8. **Model and migration**: remove the field, run `makemigrations` (needs `DEVELOPER = True`), read the generated
    migration, and check `--check` is clean. If another migration or the conversion code references the field, keep
    the historical model access it needs.
-9. `python utils/spec_ids.py check`; `registry` if specs changed; translations; `ruff check`.
+9. `python3 utils/spec_ids.py check`; `python3 utils/spec_ids.py registry` if specs changed;
+   translations; pre-commit's Ruff hook.
 10. **Changelog**: Breaking Changes (what users must do), and the removed field under the model's bullet in REST API
     Changes. Version bump is major only for a removal in the public interfaces (Constitution VII).
 

@@ -38,8 +38,8 @@ alias, as `external_party_object_type` is for `external_party_object`.
 4. Remove it from `README.md`, `docs/`, `specs/_global/` (retire its requirement with `Retired: ...`).
 5. If removing it changes behaviour (the former default now always applies), that is a Breaking Change: say what
    administrators must do.
-6. `python utils/spec_ids.py check`, `ruff check`, test suite; `CHANGELOG.md` Breaking Changes. Major version only
-   if the removal changes behaviour for existing configurations (Constitution VII).
+6. `python3 utils/spec_ids.py check`, pre-commit's Ruff hook, and the test suite; `CHANGELOG.md` Breaking
+   Changes. Major version only if the removal changes behaviour for existing configurations (Constitution VII).
 
 ## Why
 

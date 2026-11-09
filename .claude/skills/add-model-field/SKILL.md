@@ -74,8 +74,10 @@ visible by default). A list that shows a computed value must not query per row (
 - `docs/` page of the model; `README.md` if a setting or requirement changed; regenerate affected screenshots with
   `utils/docs_screenshots/make_screenshots.sh`.
 - `specs/_global/data-model.md`, `contracts/rest-api.md`, `contracts/graphql.md`, `contracts/ui.md` (and
-  `behaviours.md` for rules); then `python utils/spec_ids.py check` and, if specs changed, `... registry`.
-- `makemessages -l en -l fr` and `msgfmt` for new strings.
+  `behaviours.md` for rules); then `python3 utils/spec_ids.py check` and, if specs changed,
+  `python3 utils/spec_ids.py registry`.
+- Run `makemessages -l en -l fr` through NetBox's management command from `netbox_contract/`, then `msgfmt` on the
+  plugin's catalogs for new strings.
 - `CHANGELOG.md`: Enhancements, plus a bullet under REST API Changes for the model (`netbox_contract.Contract`) listing
   the added field. A change in behaviour for existing users goes under Breaking Changes. Use `draft-changelog`.
 
@@ -83,7 +85,7 @@ visible by default). A list that shows a computed value must not query per row (
 
 - [ ] model, migration (`--check` clean) · [ ] serializer · [ ] 4 forms · [ ] filterset · [ ] table · [ ] panel
 - [ ] search · [ ] GraphQL · [ ] locks · [ ] tests (fail first) · [ ] query counts · [ ] docs + screenshots
-- [ ] `specs/_global/` · [ ] identifier check · [ ] translations · [ ] CHANGELOG · [ ] `ruff check`
+- [ ] `specs/_global/` · [ ] identifier check · [ ] translations · [ ] CHANGELOG · [ ] pre-commit
 
 ## Why
 

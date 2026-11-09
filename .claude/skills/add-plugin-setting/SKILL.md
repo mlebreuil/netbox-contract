@@ -45,7 +45,7 @@ Test the default (previous behaviour unchanged) and each non-default value; cite
 - `README.md`: the setting, its default, allowed values (Constitution VII).
 - `docs/`: the page where the behaviour is described.
 - `specs/_global/contracts/ui.md` (settings) and, if it changes rules, `behaviours.md`; then
-  `python utils/spec_ids.py check` (and `registry` if specs changed).
+  `python3 utils/spec_ids.py check` (and `python3 utils/spec_ids.py registry` if specs changed).
 - `CHANGELOG.md`: Enhancements (or Breaking Changes if the default changes behaviour). Use `draft-changelog`.
 
 ## No migration

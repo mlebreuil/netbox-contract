@@ -44,7 +44,8 @@ guards in `models.py` / `signals.py` that mention it, data worth converting, and
 8. Choices used only by this model; delete guards and signals that mention it.
 9. The model and the migration: `makemigrations` (needs `DEVELOPER = True`); read it; `--check` clean. Relations from
    other models are removed in the same migration or an earlier one.
-10. `python utils/spec_ids.py check`, `registry`, translations, `ruff check`, full test suite.
+10. `python3 utils/spec_ids.py check`, `python3 utils/spec_ids.py registry` if specs changed,
+    translations, pre-commit's Ruff hook, full test suite.
 11. Changelog: Breaking Changes, REST API Changes (removed endpoints), major version (Constitution VII).
 
 ## Why

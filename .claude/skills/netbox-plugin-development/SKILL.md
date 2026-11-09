@@ -20,6 +20,8 @@ license: Apache-2.0
 > - Supported range is NetBox **4.7+** only (`min_version = '4.7.0'`, no `max_version`; compatibility is the README
 >   table and the NetBox tag pinned in CI). Skip the 4.5/4.6 shims (`try`/`except ImportError` imports, tuple
 >   choices): use `Choice(...)` and the `*TestMixin` filterset test names directly.
+> - The upstream examples below target 4.5–4.7 and link to an API-integration skill that is not vendored here. Treat
+>   those as generic examples only; they do not change this plugin's 4.7+ support range or define its API practices.
 > - Packaging is `setup.py` + `pyproject.toml`; the version is written once in `netbox_contract/version.py`, as
 >   below, and `pyproject.toml` reads it (`dynamic`). NetBox loads a plugin through `PLUGINS` and the module-level
 >   `config` (`importlib.import_module(name)` then `.config` in NetBox's `settings.py`), not through an entry point,

@@ -18,9 +18,8 @@ Tests come first (Constitution II): write the view, API and GraphQL tests (step 
   needs an owner and description (see `ServiceProvider`). The form, filterset, table, serializer and GraphQL bases
   follow the model base class.
 - **Choices.** A status or type field uses a `ChoiceSet` in `models.py` so installations can extend it through
-  `FIELD_CHOICES`.
-- **Choices.** Use `Choice(value, label, color, description=_('...'))` entries, as the existing choice sets do, so the
-  option description shows in forms and filters.
+  `FIELD_CHOICES`; use `Choice(value, label, color, description=_('...'))` entries so option descriptions show in
+  forms and filters.
 - **Relations to core models.** Name the model as a string (`'dcim.Device'`). A new FK to a core model gets a
   `related_name` that cannot collide with another plugin's (NetBox Labs' advice: prefix it with
   `%(app_label)s_`); the plugin's older relations use plain names, so keep the existing ones as they are (renaming
@@ -56,8 +55,9 @@ rendered. FK fields use `selector=True` where NetBox offers it.
 - Register every view with `register_model_view`: detail, `list` (`path=''`, `detail=False`), `add` and `edit`
   (one class), `delete`, `bulk_import` (`path='import'`), `bulk_edit` (`path='edit'`), `bulk_delete`
   (`path='delete'`); the last four with `detail=False`. Copy `AccountingDimension` in `views.py` as the pattern.
-- The detail view declares `layout = SimpleLayout(...)` with panels from `panels.py`. Do not add a template unless a
-  page needs breadcrumbs; templates live under `templates/netbox_contract/`, never at the root of `templates/`.
+- The detail view declares `layout = SimpleLayout(...)` with panels from `panels.py`; add breadcrumbs there when
+  needed. Detail pages generally need no page template. Templates live under `templates/netbox_contract/`, never at
+  the root of `templates/`.
 - `urls.py` lists the model in its tuple of model names; it includes `get_model_urls` and nothing else per model.
 - Route names are pinned by `tests/test_conventions.py`: add the new routes to `ROUTES`.
 
@@ -87,7 +87,8 @@ A `SearchIndex` subclass in `search.py`, added to the `indexes` list at the bott
 - `docs/<model>.md` and an entry in `mkdocs.yml`; `docs/permissions.md` if there is a new permission action.
 - Screenshots are generated, never taken by hand: add a `SHOTS` entry in `utils/docs_screenshots/capture.py` (and seed
   data if needed), then run `utils/docs_screenshots/make_screenshots.sh <name>` and look at the images.
-- New user-facing strings use `gettext`; run `makemessages -l en -l fr` and `msgfmt` (see `AGENTS.md`).
+- New user-facing strings use `gettext`; run `makemessages -l en -l fr` through NetBox's management command from
+  `netbox_contract/`, then `msgfmt` on the plugin's catalogs (see `AGENTS.md`).
 
 ## 10. Specifications and changelog
 
@@ -96,7 +97,7 @@ A `SearchIndex` subclass in `search.py`, added to the `indexes` list at the bott
 - Cite the requirement next to the rule in code and tests with its qualified identifier (`NNN-FR-012`).
 - `CHANGELOG.md`: a `##### Title` under New Features, and the new endpoints and model under REST API Changes.
   Use `draft-changelog`.
-- Run `python utils/spec_ids.py check`; if the specs changed, `python utils/spec_ids.py registry` and commit the
+- Run `python3 utils/spec_ids.py check`; if the specs changed, run `python3 utils/spec_ids.py registry` and commit the
   result (CI fails on a stale `registry.md`).
 
 ## 11. Tests
@@ -107,8 +108,8 @@ A `SearchIndex` subclass in `search.py`, added to the `indexes` list at the bott
 - `tests/test_graphql.py` for what the generic cases do not reach.
 - A model method or rule gets its own test module; pure calculations go in `calculations.py` and are tested without
   the database.
-- List views are covered by the query-count baseline: record the new entry serially with
-  `UPDATE_QUERY_COUNTS=1 ...` (see `run-tests`) and state why in the commit.
+- List views are covered by the query-count baseline: record the new entry serially with the command in `run-tests`
+  and state why in the change description.
 
 ## Gotchas
 

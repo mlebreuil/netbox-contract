@@ -7,8 +7,9 @@ description: Prepare and publish a netbox-contract release - version bump, compa
 
 Releases are built from `develop` and merged into `master`; the tag is created by the GitHub release, and publishing
 the release starts `.github/workflows/python-publish.yml`, which uploads to PyPI through trusted publishing (the
-`release` environment). **A file uploaded to PyPI can never be replaced.** Do everything up to step 6 without asking;
-**confirm with the maintainer before step 7**, and never skip a failing check.
+`release` environment). **A file uploaded to PyPI can never be replaced.** Prepare the release changes without asking,
+but open a pull request only when the maintainer explicitly asks. **Confirm with the maintainer before step 7**, and
+never skip a failing check.
 
 Ground rule: a release PR contains release changes only (version, changelog, compatibility table). A fix found on the
 way belongs in its own issue and PR, merged before the release. A feature planned as one release is not published in
@@ -64,11 +65,12 @@ pip would install a second copy into the virtualenv). Remove `dist/` and `build/
 Run `draft-changelog` for `X.Y.Z`. Review it with the maintainer. Empty the `## [Unreleased]` heading if its content
 moved into the version.
 
-## 6. Open the release PR
+## 6. Open the release PR (only when explicitly requested)
 
-Branch from `develop` named `release-X.Y.Z` (or the issue branch if there is one), commit the release changes, and open
-a PR into `master`. Its description is written by the maintainer (AI policy); give a short draft marked as a draft and
-say so when handing it over. Wait for CI.
+If requested, branch from `develop` named `release-X.Y.Z` (or the issue branch if there is one), commit the release
+changes, and open a PR into `master`. Its description is written by the maintainer (AI policy); give a short draft
+marked as a draft and say so when handing it over. Wait for CI. Otherwise, hand off the prepared branch and a brief
+draft description without opening a PR.
 
 ## 7. Publish (confirm first)
 

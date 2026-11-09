@@ -6,16 +6,15 @@ description: Run the netbox-contract checks locally - ruff, the Django test suit
 # Run the checks
 
 The plugin is tested inside a NetBox checkout. The suite uses NetBox's `django.test.TestCase` classes, not pytest.
-CI (`.github/workflows/lint-tests.yaml`) runs the same commands on a pinned NetBox tag for Python 3.12 to 3.14, and
+CI (`.github/workflows/lint-tests.yaml`) runs the suite on pinned NetBox `v4.7.4` for Python 3.12 to 3.14, and
 `.github/workflows/spec-ids.yaml` runs the identifier check.
 
 ## Prerequisites
 
 1. A NetBox checkout of the pinned release (the tag named in `lint-tests.yaml`), its virtualenv active, the plugin
-   installed with `pip install -e .`, and PostgreSQL and Redis running. In the dev container the layout is
-   `/workspaces/netbox/netbox` (NetBox, venv in `venv/`) and `/workspaces/netbox/netbox-contract` (this repo).
-2. The test configuration, not the dev one (the debug toolbar refuses to run under tests):
-   `NETBOX_CONFIGURATION=netbox.configuration_testing`.
+   installed with `pip install -e .`, and PostgreSQL and Redis running.
+2. Set `NETBOX_CONFIGURATION=netbox.configuration_testing`; do not use the development configuration because the
+   debug toolbar refuses to run under tests.
 3. If something is missing, tell the user; do not skip a check silently.
 
 ## The checks, in the order to run them
@@ -24,7 +23,7 @@ From the plugin repository:
 
 ```bash
 ruff check                                   # also run by the pre-commit hook; never bypass the hook
-python3 utils/spec_ids.py check              # every identifier qualified and resolving (CI + pre-commit)
+python3 utils/spec_ids.py check
 ```
 
 From the NetBox checkout:
@@ -32,11 +31,11 @@ From the NetBox checkout:
 ```bash
 cd ../netbox
 export NETBOX_CONFIGURATION=netbox.configuration_testing
-venv/bin/python netbox/manage.py test netbox_contract.tests --keepdb                 # whole suite
-venv/bin/python netbox/manage.py test netbox_contract.tests.test_generation --keepdb # one module
+venv/bin/python netbox/manage.py test netbox_contract.tests --keepdb
+venv/bin/python netbox/manage.py test netbox_contract.tests.test_generation --keepdb
 venv/bin/python netbox/manage.py test \
-    netbox_contract.tests.test_generation.GenerationRulesTestCase.test_credit_line --keepdb   # one test
-venv/bin/python netbox/manage.py makemigrations netbox_contract --check --dry-run   # nothing pending
+    netbox_contract.tests.test_generation.GenerationRulesTestCase.test_credit_line --keepdb
+venv/bin/python netbox/manage.py makemigrations netbox_contract --check --dry-run
 ```
 
 `makemigrations` is refused unless the NetBox configuration sets `DEVELOPER = True`.
@@ -73,7 +72,7 @@ Review the diff of the JSON: an increase you cannot explain is a bug (a per-row 
 
 ## Before a pull request
 
-`ruff check`, `spec_ids.py check` (and `spec_ids.py registry` if specs changed, then commit `registry.md`), the whole
+pre-commit, `spec_ids.py check` (and `spec_ids.py registry` if specs changed, then commit `registry.md`), the whole
 suite, `makemigrations --check`, and no unexplained change in `query_counts.json`.
 
 ## Why

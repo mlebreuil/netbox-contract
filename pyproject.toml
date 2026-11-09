@@ -18,9 +18,9 @@ requires-python = ">=3.12"
 license = "MIT"
 license-files = ["LICENSE"]
 
+# Django is provided, and pinned, by NetBox (Constitution VI): do not list it here.
 dependencies = [
     'python-dateutil',
-    'Django',
 ]
 
 classifiers = [
