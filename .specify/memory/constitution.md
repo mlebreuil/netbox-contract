@@ -1,5 +1,6 @@
 <!--
-Sync Impact Report (temporary, remove before committing)
+Sync Impact Report and amendment history (kept: each amendment adds its report above the previous ones)
+--- latest report, version 1.2.0 ---
 - Version change: 1.1.0 -> 1.2.0 (MINOR: new Principle IX, human accountability for AI-assisted work)
 - Reason: adopt the AI contribution policy (AI_POLICY.md, from the NetBox project) and the pull request rules of
   NetBox's AGENTS.md. Agent instructions move to AGENTS.md; CLAUDE.md imports it.
