@@ -53,7 +53,7 @@ class ContractAssignmentListTable(NetBoxTable):
     content_object = tables.Column(linkify=True, orderable=False)
     contract = tables.Column(linkify=True)
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
-    contract__external_party_object = tables.Column(linkify=True)
+    contract__external_party_object = tables.Column(linkify=True, orderable=False)
     tags = columns.TagColumn(url_name='plugins:netbox_contract:contractassignment_list')
     contract__contract_type = columns.ColoredLabelColumn(verbose_name='Contract type')
 
@@ -85,7 +85,7 @@ class ContractAssignmentObjectTable(DeprecatedColumnsMixin, NetBoxTable):
     contract = tables.Column(linkify=True)
     actions = columns.ActionsColumn(actions=('edit', 'delete'))
     contract__external_party_object = tables.Column(
-        verbose_name='Partner', linkify=True
+        verbose_name='Partner', linkify=True, orderable=False
     )
     contract__status = columns.ChoiceFieldColumn(
         verbose_name=('Status'),
@@ -124,7 +124,7 @@ class ContractAssignmentObjectTable(DeprecatedColumnsMixin, NetBoxTable):
 class ContractListTable(DeprecatedColumnsMixin, ContactsColumnMixin, NetBoxTable):
     deprecated_columns = ('mrc', 'yrc', 'nrc')
     name = tables.Column(linkify=True)
-    external_party_object = tables.Column(verbose_name='External party', linkify=True)
+    external_party_object = tables.Column(verbose_name='External party', linkify=True, orderable=False)
     parent = tables.Column(linkify=True)
     yrc = tables.Column(verbose_name='Yearly recurring cost (deprecated)')
     mrc = tables.Column(verbose_name='Monthly recurring cost (deprecated)')
