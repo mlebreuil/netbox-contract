@@ -114,6 +114,26 @@ Make sure taht at the Netbox installtion step you follow the "Option B: Clone th
 
 1. Submit a pull request through the GitHub website.
 
+## Demo data
+
+`manage.py create_demo_data` fills a development database with named scenarios (units, contract lines of each billing
+method, open-ended contracts, a contract hierarchy, Posted, Draft and Canceled invoices, amendments, legacy
+pre-upgrade data, numeric edge cases and accounting dimensions). Load NetBox's demo data first: contracts are
+assigned to the circuit, device and site it finds there. The command:
+
+* refuses to run unless `DEVELOPER = True` in the NetBox configuration;
+* tags everything it creates `netbox-contract-demo`, and skips a scenario whose contract already exists, so it can be
+  run again;
+* with `--reset`, deletes what carries the tag (Posted invoices included) before creating it again.
+
+```
+$ python3 netbox/netbox/manage.py create_demo_data
+$ python3 netbox/netbox/manage.py create_demo_data --reset
+```
+
+The legacy contracts have no contract lines: run `manage.py convert_contract_lines` to see the conversion. It
+converts every contract that has no lines, not only the demo ones.
+
 ## Model changes
 
 Create the migrations:  
