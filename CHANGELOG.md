@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+#### Bug Fixes
+
+* [#317](https://github.com/mlebreuil/netbox-contract/issues/317) - The external party columns of the contract and contract assignment tables can no longer be sorted, which raised a `FieldError` and, because NetBox remembers the sort, broke the Contracts tab of every object
+
 ## Version 2
 
 ### Version 2.6.1
