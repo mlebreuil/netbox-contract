@@ -8,6 +8,7 @@ Deltas: `specs/001-*/contracts/ui-and-settings.md`, `specs/006-*/contracts/graph
 | Command | Purpose |
 |---|---|
 | `convert_contract_lines` | Re-runs the conversion of legacy costs and invoice templates into contract lines; idempotent; prints a report (001-FR-013, 001-FR-014, 001-FR-016) |
+| `create_demo_data [--reset]` | Development only (refuses unless `DEVELOPER = True`): tagged demo scenarios built with the invoicing and amendment services (`demo.py`); idempotent, `--reset` deletes the tagged objects (issue #322) |
 | `cleanup_orphan_assignments [--apply]` | Lists contract assignments whose object no longer exists; deletes exactly those only with `--apply`; assignments of uninstalled object types are listed apart and kept (006-FR-013 to 006-FR-015) |
 
 ## NetBox custom scripts (`scripts/netbox-contract.py`)

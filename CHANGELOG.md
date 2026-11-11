@@ -6,6 +6,10 @@
 
 * [#317](https://github.com/mlebreuil/netbox-contract/issues/317) - The external party columns of the contract and contract assignment tables can no longer be sorted, which raised a `FieldError` and, because NetBox remembers the sort, broke the Contracts tab of every object
 
+#### Other Changes
+
+* [#322](https://github.com/mlebreuil/netbox-contract/issues/322) - New command `manage.py create_demo_data` creates tagged demo scenarios for development (contract lines of each billing method, hierarchy, invoices in each status, amendments, legacy data, numeric edge cases); it replaces the `create-demo-data.py` custom script, refuses to run unless `DEVELOPER = True` and supports `--reset`
+
 ## Version 2
 
 ### Version 2.6.1
