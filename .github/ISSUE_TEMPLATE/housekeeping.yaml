@@ -22,3 +22,12 @@ body:
       description: Please provide justification for the proposed change(s).
     validations:
       required: true
+  - type: textarea
+    attributes:
+      label: Impact on specs, docs and changelog
+      description: >
+        Say whether the change touches `specs/_global/`, `docs/`, `README.md` or `CHANGELOG.md`, or
+        any public interface (REST, GraphQL, plugin settings, import columns). Write "none" if it
+        does not.
+    validations:
+      required: true
