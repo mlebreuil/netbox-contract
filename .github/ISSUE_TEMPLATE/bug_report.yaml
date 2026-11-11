@@ -1,24 +1,27 @@
 ---
 name: 🐛 Bug Report
-description: Report a reproducible bug in the current release of netbo-contract plugin
-labels: ["type: bug"]
+type: Bug
+description: Report a reproducible bug in the current release of the netbox-contract plugin
+labels: ["type: bug", "status: needs triage"]
 body:
   - type: markdown
     attributes:
       value: >
         **NOTE:** This form is only for reporting _reproducible bugs_ in a current netbox-contract plugin release.
+        If you're having trouble with installation or just looking for assistance using the plugin, please visit our
+        [discussion forum](https://github.com/mlebreuil/netbox-contract/discussions) instead.
   - type: input
     attributes:
       label: netbox-contract plugin version
       description: What version of netbox-contract plugin are you currently running?
-      placeholder: v0.1.0
+      placeholder: v2.6.0
     validations:
       required: true
   - type: input
     attributes:
       label: NetBox version
       description: What version of NetBox are you currently running?
-      placeholder: v3.6.0
+      placeholder: v4.7.4
     validations:
       required: true
   - type: dropdown
@@ -26,18 +29,19 @@ body:
       label: Python version
       description: What version of Python are you currently running?
       options:
-        - "3.10"
-        - "3.11"
+        - "3.12"
+        - "3.13"
+        - "3.14"
     validations:
       required: true
   - type: textarea
     attributes:
       label: Steps to Reproduce
       description: >
-        Please provide a minimal working example to demonstrate the bug. Begin with the
-        initialization of any necessary database objects and clearly enumerate each
-        operation carried out. Ensure that your example is as concise as possible
-        while adequately illustrating the issue.
+        Describe in detail the exact steps that someone else can take to reproduce this bug using the current
+        release of the plugin. Begin with the creation of any necessary database objects and call out every
+        operation being performed explicitly. If reporting a bug in the REST API, reconstruct the raw HTTP
+        request(s) being made rather than relying on a client library such as pynetbox.
 
         _Please refrain from including any confidential or sensitive
         information in your example._
@@ -57,3 +61,24 @@ body:
       placeholder: A TypeError exception was raised
     validations:
       required: true
+  - type: textarea
+    attributes:
+      label: Suspected Cause
+      description: >
+        If you have identified the likely root cause(s), please detail your findings
+        here (optional).
+  - type: textarea
+    attributes:
+      label: Proposed Fix
+      description: >
+        If you would like to propose a specific fix likely to resolve this issue, please
+        describe it here (optional).
+  - type: checkboxes
+    attributes:
+      label: Volunteer
+      description: >
+        Check this box if you would like to own this issue and submit a pull request to
+        resolve it once it has been accepted (optional). Please don't submit a pull request
+        until the issue has been assigned to you.
+      options:
+        - label: I volunteer to submit a fix for this bug if it is accepted

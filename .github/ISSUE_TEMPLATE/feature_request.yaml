@@ -1,7 +1,8 @@
 ---
 name: ✨ Feature Request
+type: Feature
 description: Propose a new netbox-contract plugin feature or enhancement
-labels: ["type: feature"]
+labels: ["type: feature", "status: needs triage"]
 body:
   - type: markdown
     attributes:
@@ -14,14 +15,14 @@ body:
     attributes:
       label: netbox-contract plugin version
       description: What version of netbox-contract plugin are you currently running?
-      placeholder: v2.3.0
+      placeholder: v2.6.0
     validations:
       required: true
   - type: input
     attributes:
       label: NetBox version
       description: What version of NetBox are you currently running?
-      placeholder: v4.2.0
+      placeholder: v4.7.4
     validations:
       required: true
   - type: dropdown
@@ -31,16 +32,16 @@ body:
         - Data model extension
         - New functionality
         - Change to existing functionality
+        - Other
     validations:
       required: true
   - type: textarea
     attributes:
       label: Proposed functionality
       description: >
-        Describe in detail the new feature or behavior you are proposing. Include any specific changes
-        to work flows, data models, and/or the user interface. The more detail you provide here, the
-        greater chance your proposal has of being discussed. Feature requests which don't include an
-        actionable implementation plan will be rejected.
+        Describe the new feature or behavior you are proposing, and any changes to work flows, data models
+        and/or the user interface you expect. You do not need to provide a design or implementation plan:
+        accepted proposals are assessed, specified and planned by the maintainers before any work starts.
     validations:
       required: true
   - type: textarea
@@ -52,8 +53,31 @@ body:
       required: true
   - type: textarea
     attributes:
+      label: Database changes
+      description: >
+        Note any changes to the database schema necessary to support the new feature. For example,
+        does the proposal require adding a new model or field? (Not all new features require database
+        changes.)
+  - type: textarea
+    attributes:
+      label: Impact on existing interfaces
+      description: >
+        Would this change or remove an existing REST field or endpoint, GraphQL field, plugin setting or
+        import column, or alter the behavior of existing data? These are public interfaces that are
+        deprecated before they are removed. (Not all new features affect existing interfaces.)
+  - type: textarea
+    attributes:
       label: External dependencies
       description: >
         List any new dependencies on external libraries or services that this new feature would
         introduce. For example, does the proposal require the installation of a new Python package?
         (Not all new features introduce new dependencies.)
+  - type: checkboxes
+    attributes:
+      label: Volunteer
+      description: >
+        Check this box if you would like to own this issue and submit a pull request to
+        resolve it once it has been accepted (optional). Please don't submit a pull request
+        until the issue has been assigned to you.
+      options:
+        - label: I volunteer to implement this feature if it is accepted

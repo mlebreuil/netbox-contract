@@ -2,8 +2,11 @@
 blank_issues_enabled: false
 contact_links:
   - name: 📖 Contributing Policy
-    url: https://github.com/mlebreuil/netbox-contract/blob/main/CONTRIBUTING.md
+    url: https://github.com/mlebreuil/netbox-contract/blob/develop/CONTRIBUTING.md
     about: "Please read through our contributing policy before opening an issue or pull request."
+  - name: 🤖 AI Contribution Policy
+    url: https://github.com/mlebreuil/netbox-contract/blob/develop/AI_POLICY.md
+    about: "Issues and pull request descriptions are written in your own words. Please read the AI policy before opening one."
   - name: ❓ Discussion
     url: https://github.com/mlebreuil/netbox-contract/discussions
     about: "If you're just looking for help, try starting a discussion instead."
