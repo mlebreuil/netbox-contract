@@ -45,10 +45,11 @@ A user, a script or an integration lists the contracts of a party knowing only i
 **Acceptance Scenarios**:
 
 1. **Given** contracts of several parties, **When** the contract list is filtered by a party name, **Then** only the contracts whose external party, service provider or circuit provider, has that name are listed.
-2. **Given** the same data, **When** the REST contracts endpoint and the GraphQL contract list query are filtered by the same name, **Then** they return the same contracts as the list view.
+2. **Given** the same data, **When** the REST contracts endpoint and the GraphQL contract list query are filtered by the same name with an equivalent lookup, **Then** they return the same contracts as the list view.
 3. **Given** a service provider and a circuit provider with the same name, **When** the filter is applied with that name, **Then** the contracts of both are returned.
 4. **Given** a contract with a status other than Active whose party name matches, **When** the filter is applied, **Then** the contract is returned (unlike the quick search, the filter does not restrict the status; it combines with the status filter).
 5. **Given** the existing `service_provider_id` and `provider_id` filters, **When** they are used as before, **Then** they return the same contracts as before this feature.
+6. **Given** contracts of several parties and a contract without a party, **When** the filter excludes a name (the negated variant), **Then** the contracts of the other parties and the contract without a party are returned, and the contracts of the named party are not.
 
 ---
 
@@ -57,8 +58,8 @@ A user, a script or an integration lists the contracts of a party knowing only i
 - The search text matches several parties (for example "tele"): all their contracts are listed.
 - A provider is renamed: the next search and the next filter use the new name immediately; nothing is indexed, so nothing can be stale.
 - A party is deleted, or its type is no longer present: its contracts are not matched by name and the list still renders.
-- The search text is empty: the list is unchanged.
-- Letter case differs ("ACME" against "Acme Telecom"): the quick search matches; the filter follows the same rule as the plugin's other name filters.
+- The search text is empty: the list is unchanged. An empty filter value is ignored.
+- Letter case differs ("ACME" against "Acme Telecom"): the quick search and the contains filter match regardless of case; the exact filter is case-sensitive, and its case-insensitive variant is not.
 - A service provider and a circuit provider share the same numeric ID: only the contracts of the party with the matching name are listed, never those of the other party type.
 - Many contracts and parties: the list stays within its recorded query count (see 009-SC-003).
 
@@ -73,10 +74,10 @@ A user, a script or an integration lists the contracts of a party knowing only i
 - **009-FR-005**: A party-name match MUST consider the party's type: a contract is matched through the provider of its own party type, never through a provider of the other type that has the same ID.
 - **009-FR-006**: The contract list MUST offer a filter on the external party name, in its filter form and its address, matching contracts whose service provider or circuit provider name satisfies the filter.
 - **009-FR-007**: The contracts REST endpoint MUST accept the same filter, with the same result as the list view.
-- **009-FR-008**: The GraphQL contract list query MUST accept the same filter, with the same result as the list view.
+- **009-FR-008**: The GraphQL contract list query MUST accept a party-name filter whose lookups are the GraphQL equivalents of the list filter's (exact, case-insensitive exact, contains, case-insensitive contains); for the same text and an equivalent lookup it MUST return the same contracts as the list view.
 - **009-FR-009**: The party-name filter MUST combine with the other contract filters, and MUST NOT restrict the status by itself.
 - **009-FR-010**: The `service_provider_id` and `provider_id` filters, the contract fields and the REST and GraphQL outputs MUST stay unchanged; the new filter is additive (Constitution V).
-- **009-FR-011**: The new filter and the quick search MUST NOT reveal anything the user may not already see: they return contracts the user may view, as the list does today, and a provider's name is only used for matching, never added to the output.
+- **009-FR-011**: The new filter and the quick search MUST NOT reveal anything the user may not already see: they return contracts the user may view, as the list does today, and a provider's name is only used for matching, never added to the output. The match is not limited to the providers the user may view, because a contract the user may view already shows its party's name (009-D5).
 - **009-FR-012**: The feature MUST NOT change what NetBox's global search indexes (issue #333, proposal 3 is out of scope).
 - **009-FR-013**: The documentation, the changelog, the French translation of any new label and the global specifications (REST, GraphQL, UI, behaviours) MUST describe the new search and filter (Constitution VII, VIII).
 
@@ -90,8 +91,8 @@ A user, a script or an integration lists the contracts of a party knowing only i
 ### Measurable Outcomes
 
 - **009-SC-001**: A user finds the contracts of a supplier by typing any part of its name in the contract list search, for both party types, with no lookup of an ID first.
-- **009-SC-002**: The list view, the REST endpoint and the GraphQL query return the same contracts for the same party-name filter in every test case.
-- **009-SC-003**: The contract list needs no more database queries than today beyond the added match (a fixed number, independent of the number of contracts or parties); the recorded list-view query counts change only by that fixed amount, with a stated reason.
+- **009-SC-002**: The list view, the REST endpoint and the GraphQL query return the same contracts for the same text and an equivalent lookup in every test case.
+- **009-SC-003**: The contract list, with the quick search or the party-name filter applied, needs no more database queries than today beyond the added match (a fixed number, independent of the number of contracts or parties); the recorded list-view query counts change only by that fixed amount, with a stated reason.
 - **009-SC-004**: Every request that worked before this feature, including the ID filters and the quick search by name, reference and comments, returns the same result as before.
 
 ## Assumptions

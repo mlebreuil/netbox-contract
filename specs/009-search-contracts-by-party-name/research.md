@@ -27,7 +27,7 @@ Sources: NetBox 4.7.4 `netbox/netbox/filtersets.py` (`get_additional_lookups`), 
 ## 009-D5. Permissions
 - **Decision**: the provider subqueries are not restricted to the providers the user may view. The result is still limited to the contracts the user may view (the list's, REST's and GraphQL's own restriction), and a provider's name is never added to the output (009-FR-011).
 - **Rationale**: a contract the user can view already shows its party's name in the list, detail page, REST and GraphQL, so matching on it reveals nothing more. Restricting the subquery would hide contracts the user is allowed to see whenever they lack permission on providers, which is the surprising direction.
-- **Open point**: confirm with the maintainer at review; the opposite choice is one `.restrict(user, 'view')` per subquery and costs a user argument on the builder.
+- **Spec**: 009-FR-011 states this decision, and 009-T009 tests it. **Open point**: confirm with the maintainer at review; the opposite choice is one `.restrict(user, 'view')` per subquery and costs a user argument on the builder.
 
 ## 009-D6. Tests
 - **Decision**: new `tests/test_party_name.py`: quick search for both party types, case, once-only listing, other-field matches kept, non-Active excluded, contract without a party, same-ID service provider and circuit provider, empty text; the filter in the filterset, the list view address, REST and GraphQL with the same data, each modifier, combination with the status filter and with `service_provider_id`; rename takes effect; deleted party; ID filters unchanged; a query-count check equal for few and many contracts. The existing `query_counts.json` is verified, not re-recorded unless it changes (Constitution II).

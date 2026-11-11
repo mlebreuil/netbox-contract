@@ -19,7 +19,7 @@ Both party types are searched. The filters combine with every other contract fil
 
 ## GraphQL
 
-`contract_list(filters: {external_party_name: {i_contains: "acme"}})`. The supported lookups are those of 009-D4; the result equals the REST result for the same text (009-FR-008, 009-SC-002).
+`contract_list(filters: {external_party_name: {i_contains: "acme"}})`. The supported lookups are those of 009-D4; for the same text and an equivalent lookup (`i_contains` for `__ic`, `exact` for the exact filter, `i_exact` for `__ie`) the result equals the REST result (009-FR-008, 009-SC-002). GraphQL has no negated variant.
 
 ## Filter form
 
