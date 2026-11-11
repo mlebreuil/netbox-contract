@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-11
 
-**Status**: Draft
+**Status**: Implemented
 
 **Input**: User description: "Issue #333, proposals 1 and 2 only (see `.specify/assessments/search-by-external-party-name/intake.md`): the contract list quick search also matches the name of the contract's external party (service provider or circuit provider), and a party-name filter is added to the contract list, REST API and GraphQL next to the existing ID filters. Global search indexing (proposal 3) is out of scope."
 

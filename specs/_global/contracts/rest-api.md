@@ -9,7 +9,7 @@ before removing, never add a required input to an existing endpoint (Constitutio
 
 | Endpoint | Model | Notes |
 |---|---|---|
-| `contracts/` | Contract | writable `billable`; read-only `total_contract_value`, `yearly_contract_value`, `yearly_billable_value`, computed for a page at once (001-FR-006); `mrc`, `yrc`, `nrc` deprecated; filters `billable`, `invoice_id` |
+| `contracts/` | Contract | writable `billable`; read-only `total_contract_value`, `yearly_contract_value`, `yearly_billable_value`, computed for a page at once (001-FR-006); `mrc`, `yrc`, `nrc` deprecated; filters `billable`, `invoice_id`, `external_party_name`, `external_party_name__ic`, `external_party_name__ie`, `external_party_name__n` (name of the service provider or circuit provider, 009-FR-006, 009-FR-007, 009-FR-009); `q` also matches the party's name, Active contracts only (009-FR-001 to 009-FR-004) |
 | `contract-lines/` | ContractLine | read-only `total_value`, `yearly_value`, `replaces`, `invoiced_at_conversion`; `currency` defaults to the contract's; filters `contract_id`, `unit_id`, `unit`, `currency`, `billing_method`, `accounting_dimensions`, `invoice_id` |
 | `contract-lines/{id}/amend/` | action | POST `effective_date`, `reason`, `unit_price` and/or `quantity` (001-FR-030); 201 with the new line |
 | `units/` | Unit | `months` required for `recurring`, forbidden otherwise; DELETE refused (409) while used |

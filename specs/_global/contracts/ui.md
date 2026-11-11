@@ -35,6 +35,9 @@ Per-feature deltas: `specs/001-*/contracts/ui-and-settings.md`, `002-*/contracts
   the contract form chooses the external party type then the provider (004-FR-001 to 004-FR-008). Submitted names:
   `content_object_content_type` / `content_object_object_id`, `external_party_object_content_type` /
   `external_party_object_object_id`; the old query names `content_type` / `object_id` still pre-fill (004-FR-004).
+- Contract list: the quick search also matches the name of the external party (service provider or circuit provider),
+  still Active contracts only (009-FR-001 to 009-FR-004); the filter form has `external_party_name` in the Parties
+  section, with the lookup modifiers (009-FR-006).
 - A duplicate assignment is refused with "<contract> is already assigned to <object>." (004-FR-014).
 - Choice drop-downs show a description under status and billing method options as `data-description`
   (007-FR-004).

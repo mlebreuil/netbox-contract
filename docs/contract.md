@@ -13,6 +13,12 @@
 
 What a contract bills for is described by its [contract lines](contract_lines.md).
 
+## Finding contracts by their external party
+
+You remember the supplier's name, not its number. Type part of the name of a service provider or a circuit provider in the search box of the contract list: the Active contracts whose external party's name contains the text are listed, together with those that match on their own name, external reference or comments. A provider you rename is found under its new name at once.
+
+The contract filter panel has an *External party name* field in the *Parties* section, with the usual modifiers (is, contains, is not, ...), which also works in the address (`?external_party_name__ic=acme`), in the REST API and in GraphQL (see [API](api.md)). Unlike the search box, the filter does not restrict the status; combine it with the *Status* filter if you need to. Global (NetBox-wide) search does not look at the external party's name.
+
 ## Contract types and service providers
 
 - **Contract types** are NetBox organizational objects: name, slug, description (up to 200 characters), color, comments and owner. The slug can be left empty in the form, the import and the REST API: it is then derived from the name (`support-licences` for "Support & Licences", with `-2`, `-3`, ... when it is taken).

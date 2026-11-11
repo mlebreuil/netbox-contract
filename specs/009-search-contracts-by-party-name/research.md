@@ -36,3 +36,11 @@ Sources: NetBox 4.7.4 `netbox/netbox/filtersets.py` (`get_additional_lookups`), 
 ## 009-D7. Documentation and translation
 - **Decision**: `docs/contract.md` (searching and filtering contracts by party name), `docs/api.md` (REST filter, GraphQL filter and one example), `CHANGELOG.md` Enhancements entry linked to #333 in the format of the latest release, French translation of the filter label (`makemessages` then `msgfmt`).
 - **Rationale**: Constitution VII.
+
+## Implementation notes
+
+- **009-I1. The modifier drop-down is shown**: declaring `external_party_name__ic`, `__ie` and `__n` as method filters is enough for NetBox's `FilterModifierMixin` to wrap the form field in its modifier widget (it only checks that the `field__lookup` filter exists), confirmed by `test_modifier_dropdown`. Resolves the open point of 009-D2.
+- **009-I2. GraphQL filter as a custom method**: a `@strawberry_django.filter_field()` method on `ContractFilter` taking `value: StrFilterLookup` works and is `prefix`-aware (tested through a contract line filter). All lookups of `StrFilterLookup` are supported except `is_null`; `in_list` is matched as any of its values. The fallback of 009-D4 was not needed.
+- **009-I3. The REST serializer cannot render a contract without a party**: `ContractSerializer.get_external_party_object` calls `external_party_object_type.model_class()` and raises on a null type. This exists before this feature and the forms require a party, so it is left as is (009-FR-010: REST output unchanged); the REST tests of this feature do not use a contract without party. The list view, GraphQL and the filters handle such a contract.
+- **009-I4. No translation catalogue change**: the label "External party name" already exists in the French catalogue ("Nom du prestataire"); the filter field has no help text, so no new string exists. `makemessages` was not committed: it also reorders entries unrelated to this feature because the catalogue had drifted from the code.
+- **009-I5. Query counts**: the list view's recorded counts (`tests/query_counts.json`) are unchanged; the quick search and the filter add a subquery to the one list query, and the tests compare 3 and 30 contracts and providers.

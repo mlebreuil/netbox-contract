@@ -225,7 +225,7 @@ class ContractFilterForm(ContactModelFilterForm, TenancyFilterForm, NetBoxModelF
             'contract_type', 'status', 'external_reference', 'internal_party', 'parent', 'billable',
             name=_('Attributes'),
         ),
-        FieldSet('service_provider_id', 'provider_id', name=_('Parties')),
+        FieldSet('service_provider_id', 'provider_id', 'external_party_name', name=_('Parties')),
         FieldSet('currency', name=_('Billing')),
         FieldSet('tenant_group_id', 'tenant_id', name=_('Tenant')),
         FieldSet('contact', 'contact_role', 'contact_group', name=_('Contacts')),
@@ -253,6 +253,8 @@ class ContractFilterForm(ContactModelFilterForm, TenancyFilterForm, NetBoxModelF
         label=_('Circuit Provider'),
         help_text=_('Filter by Circuit Provider'),
     )
+
+    external_party_name = forms.CharField(required=False, label=_('External party name'))
 
     external_reference = forms.CharField(required=False, label=_('External reference'))
 
