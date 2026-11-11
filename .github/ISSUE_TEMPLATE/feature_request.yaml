@@ -1,6 +1,5 @@
 ---
 name: ✨ Feature Request
-type: Feature
 description: Propose a new netbox-contract plugin feature or enhancement
 labels: ["type: feature", "status: needs triage"]
 body:
