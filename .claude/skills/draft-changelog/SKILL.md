@@ -15,6 +15,9 @@ draft to the user for review; never commit it unreviewed. `docs/changelog.md` on
   it; otherwise create it above the previous release, keeping the existing heading levels. Ask when unclear.
 - The issues: `gh issue view <N> --json title,body,labels,state` for each issue of the release, and the commits since
   the previous tag (`git log vX.Y.Z..HEAD --oneline`) to find changes without an issue entry.
+  The `type:` label is a hint, not the rule: `type: bug` usually goes to Bug Fixes, `type: feature` to Enhancements or
+  New Features, `type: housekeeping` to Other Changes (or nowhere, when it changes no behaviour). Behaviour that changes
+  for existing users goes to Breaking Changes whatever the label.
 - The specs of the features (`specs/NNN-*/spec.md`) for what changed in behaviour, and their `tasks.md`, which say
   which section an item goes in.
 

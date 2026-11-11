@@ -6,17 +6,17 @@ Contributions are welcome!
 
 ### Report bugs or submit feedback
 
-Report bugs and submit feetback [here](https://github.com/mlebreuil/netbox-contract/issues).
+Report bugs and submit feedback [here](https://github.com/mlebreuil/netbox-contract/issues) using the bug report or feature request form. Issues are written in your own words (see the AI policy below). Open a pull request only for an issue that has been accepted and assigned to you; a feature is assessed and specified by the maintainers first.
 
 ### Fix bugs
 
-Look through the GitHub issues for bugs. Anything tagged with "bug" and "help
-wanted" is open to whoever wants to implement it.
+Look through the GitHub issues labelled `type: bug`. A bug is open to whoever wants to fix it once the issue is
+accepted and assigned to them; volunteer in the issue first.
 
 ### Implement features
 
-Look through the GitHub issues for features. Anything tagged with "enhancement"
-and "help wanted" is open to whoever wants to implement it.
+Look through the GitHub issues labelled `type: feature`. A feature is open to whoever wants to implement it once
+the issue is accepted and assigned to them; volunteer in the issue first.
 
 ## Coding conventions
  
@@ -33,7 +33,7 @@ ruff check netbox_contract/
 ```
 
 
-The pre-commit Python framework is used to simplify the managment of pre-commit hooks.  
+The pre-commit Python framework is used to simplify the management of pre-commit hooks.  
 Config is stored in .pre-commit-config.yaml   
 
 ## Repository structure
@@ -49,7 +49,7 @@ For each new feature or bug fix a branch is created from the corresponding issue
 
 
 1. [Install Netbox](https://github.com/netbox-community/netbox/blob/develop/docs/installation/).
-Make sure taht at the Netbox installtion step you follow the "Option B: Clone the Git Repository"
+Make sure that at the Netbox installation step you follow the "Option B: Clone the Git Repository"
 
 2. From the Netbox directory you activate the NetBox virtual environment 
 
@@ -80,7 +80,7 @@ Make sure taht at the Netbox installtion step you follow the "Option B: Clone th
     pre-commit install
     ```
 
-6. Update the Netbox configuration and run the database migrations as mentionned in the plugin installation steps.
+6. Update the Netbox configuration and run the database migrations as mentioned in the plugin installation steps.
 
 7. Create a branch for local development:
 

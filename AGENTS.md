@@ -151,6 +151,10 @@ in NetBox core, so script logic lives in importable modules).
 ## Workflow
 
 - Branches: `develop` for development, `main` for releases; one branch per GitHub issue, created from `develop`.
+- Issues come from the forms in `.github/ISSUE_TEMPLATE/` and carry a `type:` label (`type: bug`, `type: feature`,
+  `type: housekeeping`) and, until a maintainer accepts them, `status: needs triage`. Work starts only on an accepted
+  issue. An accepted `type: feature` issue starts the Spec Kit sequence (`/speckit-assess-intake`, then
+  `/speckit-specify`); a bug or housekeeping change that alters behaviour updates the spec, docs and changelog as below.
 - Features follow Spec Kit (`/speckit-*` skills in `.claude/skills/`, artifacts in `specs/<feature>/`: spec, plan,
   research decisions, data model, contracts, tasks). Keep the spec, `research.md` decisions and `tasks.md` in step
   with behaviour changes.
