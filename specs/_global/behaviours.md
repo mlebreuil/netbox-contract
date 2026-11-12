@@ -58,6 +58,7 @@ first (Constitution II).
 | Rule | IDs |
 |---|---|
 | Assign a contract to an object by choosing its type then searching the object, limited to what the user may view | 004-FR-001, 004-FR-002, 004-FR-003, 004-FR-004, 004-FR-005, 004-FR-006 |
+| Find contracts by the name of their external party: quick search, and a filter in the list, REST and GraphQL; global search unchanged | 009-FR-001 to 009-FR-012 |
 | Choose the external party of a contract the same way | 004-FR-007, 004-FR-008 |
 | A contract is assigned to an object at most once, enforced in the application and the database; duplicates were merged at upgrade | 004-FR-014, 004-FR-015, 004-FR-016, 004-FR-017 |
 | Deleting an object deletes its assignments; orphans are cleaned by an explicit command | 006-FR-012, 006-FR-013, 006-FR-014, 006-FR-015 |

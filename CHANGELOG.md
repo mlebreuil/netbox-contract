@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+#### Enhancements
+
+* [#333](https://github.com/mlebreuil/netbox-contract/issues/333) - Contracts can be found by the name of their external party: the contract list search also matches the name of the service provider or circuit provider, and a new filter `external_party_name` (with `__ic`, `__ie` and `__n`) is available in the contract list, the REST API and GraphQL, next to `service_provider_id` and `provider_id`. The search still lists only Active contracts; global search is unchanged
+
 #### Bug Fixes
 
 * [#317](https://github.com/mlebreuil/netbox-contract/issues/317) - The external party columns of the contract and contract assignment tables can no longer be sorted, which raised a `FieldError` and, because NetBox remembers the sort, broke the Contracts tab of every object

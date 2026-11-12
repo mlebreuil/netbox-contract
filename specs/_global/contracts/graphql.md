@@ -21,6 +21,9 @@ Added to NetBox's `/graphql/` schema; types live in `netbox_contract.graphql.typ
 - Generic relations are unions: `Contract.external_party_object` (service provider or circuit provider) and
   `ContractAssignment.content_object` (circuit, virtual circuit, site, device, rack, virtual machine, cluster;
   other `supported_models` resolve to `null`).
+- `ContractFilter.external_party_name` takes the string lookups of the schema (all but `is_null`) and applies them to the
+  name of the external party of either type, `prefix`-aware so it works through relations; it equals the REST
+  `external_party_name` filters for equivalent lookups, with no negated variant (009-FR-008).
 - Permissions: results are restricted to `view` with object constraints; unviewable relations are `null`
   (003-FR-014).
 
