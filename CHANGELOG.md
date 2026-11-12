@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## Version 2
+
+### Version 2.6.1
+
 #### Enhancements
 
 * [#333](https://github.com/mlebreuil/netbox-contract/issues/333) - Contracts can be found by the name of their external party: the contract list search also matches the name of the service provider or circuit provider, and a new filter `external_party_name` (with `__ic`, `__ie` and `__n`) is available in the contract list, the REST API and GraphQL, next to `service_provider_id` and `provider_id`. The search still lists only Active contracts; global search is unchanged
@@ -13,14 +17,12 @@
 #### Other Changes
 
 * [#322](https://github.com/mlebreuil/netbox-contract/issues/322) - New command `manage.py create_demo_data` creates tagged demo scenarios for development (contract lines of each billing method, hierarchy, invoices in each status, amendments, legacy data, numeric edge cases); it replaces the `create-demo-data.py` custom script, refuses to run unless `DEVELOPER = True` and supports `--reset`
-
-## Version 2
-
-### Version 2.6.1
-
-#### Other Changes
-
 * [#329](https://github.com/mlebreuil/netbox-contract/issues/329) - The reverse name of a contract's tenant is now `netbox_contract_contracts` instead of `contracts`, so that it cannot clash with another plugin; code outside the plugin that reads `tenant.contracts` must use the new name, the screens, REST API and GraphQL are not affected, and the state-only migration 0056 changes no data
+
+#### REST API Changes
+
+* `netbox_contract.Contract`
+    * Added the filter `external_party_name` (with `__ic`, `__ie` and `__n`) to `GET /api/plugins/contracts/contracts/`; `q` also matches the name of the service provider or circuit provider
 
 ### Version 2.6.0
 
