@@ -1,5 +1,5 @@
 """
-Issue #309, user story 3: nested objects and brief representations in the REST API (spec 003, research D7,
+Issue #309, user story 3: nested objects and brief representations in the REST API (spec 003, research 003-D7,
 contracts/rest-api.md). 2.5.0 removes no REST field; the fields a later release will remove are announced.
 """
 
@@ -42,7 +42,7 @@ def repository_file(*parts):
     raise SkipTest(f'{"/".join(parts)} is not available next to this installation')
 
 
-# Today's nested contract (assignments, contract lines, contract parent): kept unchanged in 2.5.0 (FR-009)
+# Today's nested contract (assignments, contract lines, contract parent): kept unchanged in 2.5.0 (003-FR-009)
 NESTED_CONTRACT = {
     'id', 'url', 'display', 'name', 'contract_type', 'external_party_object_type', 'external_party_object_id',
     'external_party_object', 'external_reference', 'internal_party', 'tenant', 'status', 'start_date', 'end_date',
@@ -85,7 +85,7 @@ BRIEF_FIELDS = {
     'contractassignment': {'id', 'url', 'display', 'content_object', 'contract', 'tags', 'custom_fields'},
 }
 
-# "Deprecations announced in 2.5.0" of contracts/rest-api.md (FR-012a)
+# "Deprecations announced in 2.5.0" of contracts/rest-api.md (003-FR-012a)
 DEPRECATED_NESTED_CONTRACT = NESTED_CONTRACT - {'id', 'url', 'display', 'name', 'status'}
 DEPRECATED_INVOICE_CONTRACTS = FULL_CONTRACT - {'id', 'url', 'display', 'name', 'status'}
 DEPRECATED_BRIEF = BRIEF_FIELDS['contracts'] - {'id', 'url', 'display', 'name', 'status'}
@@ -123,7 +123,8 @@ class NestedAPITestCase(APITestCase):
 
 
 class NestedSnapshotTestCase(NestedAPITestCase):
-    """T035 (guard): the nested objects clients read today keep their keys and value types (US3-1 to US3-3)."""
+    """003-T035 (guard): the nested objects clients read today keep their keys and value types (003-US3-1 to
+    003-US3-3)."""
 
     def test_nested_contract(self):
         for endpoint, pk, field in (
@@ -150,7 +151,7 @@ class NestedSnapshotTestCase(NestedAPITestCase):
 
 
 class ReplacesTestCase(NestedAPITestCase):
-    """T036: `replaces` is the brief contract line (US3-3)."""
+    """003-T036: `replaces` is the brief contract line (003-US3-3)."""
 
     def test_replaces(self):
         replaces = self.get('contractline', self.successor.pk)['replaces']
@@ -159,7 +160,7 @@ class ReplacesTestCase(NestedAPITestCase):
 
 
 class NestedWriteTestCase(NestedAPITestCase):
-    """T037 (guard): related objects are written by id or by attributes, as before (US3-4)."""
+    """003-T037 (guard): related objects are written by id or by attributes, as before (003-US3-4)."""
 
     def post(self, name, data):
         url = reverse(f'plugins-api:netbox_contract-api:{name}-list')
@@ -198,7 +199,7 @@ class NestedWriteTestCase(NestedAPITestCase):
 
 
 class BriefTestCase(NestedAPITestCase):
-    """T038: brief=true returns the 2.5.0 brief sets, which only add fields (US3-5)."""
+    """003-T038: brief=true returns the 2.5.0 brief sets, which only add fields (003-US3-5)."""
 
     def setUp(self):
         super().setUp()
@@ -226,7 +227,7 @@ class BriefTestCase(NestedAPITestCase):
 
 
 class SchemaTestCase(APITestCase):
-    """T039: OpenAPI components of the nested objects (US3-6)."""
+    """003-T039: OpenAPI components of the nested objects (003-US3-6)."""
 
     model = ContractLine
 
@@ -269,7 +270,8 @@ class SchemaTestCase(APITestCase):
 
 
 class DeprecationNoticeTestCase(APITestCase):
-    """T040: every field to be removed later is announced in the changelog and the API docs (US3-7, FR-012a)."""
+    """003-T040: every field to be removed later is announced in the changelog and the API docs (003-US3-7,
+    003-FR-012a)."""
 
     model = ContractLine
 

@@ -1,6 +1,6 @@
 """
-Contract types become NetBox organizational objects (#309, research D9 and D10): they get a slug, comments and an
-owner, and their description is limited to 200 characters like on core objects.
+Contract types become NetBox organizational objects (#309, research 003-D9 and 003-D10): they get a slug, comments
+and an owner, and their description is limited to 200 characters like on core objects.
 
 Existing types get a unique slug derived from their name. A description longer than 200 characters is shortened at a
 word boundary and its full text is moved to the comments, so that no text is lost; every slug made unique and every

@@ -1,4 +1,6 @@
-# Contract: GraphQL API (D8, FR-013 to FR-015a)
+# Contract: GraphQL API (003-D8, 003-FR-013 to 003-FR-015a)
+
+> Delta of feature 003: what this feature adds or changes. The current state is in [specs/_global/contracts/graphql.md](../../_global/contracts/graphql.md), which this feature keeps up to date.
 
 Queries added to NetBox's `/graphql/` schema (two per model):
 

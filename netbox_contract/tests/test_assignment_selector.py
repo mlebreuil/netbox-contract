@@ -277,7 +277,7 @@ class ExternalPartyFormTestCase(TestCase):
 
 
 class UnchangedInterfacesTestCase(TestCase):
-    """Bulk edit of contracts keeps its own external party fields (specification FR-009)."""
+    """Bulk edit of contracts keeps its own external party fields (specification 004-FR-009)."""
 
     def test_bulk_edit_form_fields(self):
         fields = forms.ContractBulkEditForm().fields

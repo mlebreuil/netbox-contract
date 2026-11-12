@@ -1,4 +1,4 @@
-"""Fixes after the code review of 2026-09-27 (tasks T075 to T083)."""
+"""Fixes after the code review of 2026-09-27 (tasks 001-T075 to 001-T083)."""
 
 import importlib
 from datetime import date, timedelta
@@ -34,7 +34,7 @@ POSTED = InvoiceStatusChoices.STATUS_POSTED
 
 
 class NoPeriodTestCase(TestCase):
-    """T075: without an invoice period only the lines active today are invoiced."""
+    """001-T075: without an invoice period only the lines active today are invoiced."""
 
     def test_ended_and_replaced_lines_are_not_billed(self):
         contract = make_contract(start_date=None, end_date=None)
@@ -49,7 +49,7 @@ class NoPeriodTestCase(TestCase):
 
 
 class PrefillLastInvoiceTestCase(TestCase):
-    """T076: an invoice without end date does not break the pre-fill."""
+    """001-T076: an invoice without end date does not break the pre-fill."""
 
     def test_invoice_without_period_is_ignored(self):
         self.user.is_superuser = True
@@ -63,7 +63,7 @@ class PrefillLastInvoiceTestCase(TestCase):
 
 
 class PreviewPermissionsTestCase(TestCase):
-    """T077: the pre-fill and the preview only show contracts the user may view."""
+    """001-T077: the pre-fill and the preview only show contracts the user may view."""
 
     def setUp(self):
         super().setUp()
@@ -94,7 +94,7 @@ class PreviewPermissionsTestCase(TestCase):
 
 
 class ParentCurrencyTestCase(TestCase):
-    """T078: a parent changes currency together with its non-billable descendants."""
+    """001-T078: a parent changes currency together with its non-billable descendants."""
 
     def setUp(self):
         self.parent = make_contract(name='Parent', currency='eur')
@@ -130,7 +130,7 @@ class ParentCurrencyTestCase(TestCase):
 
 
 class ZeroPriceTestCase(TestCase):
-    """T079: a unit price of 0 typed in the preview is kept."""
+    """001-T079: a unit price of 0 typed in the preview is kept."""
 
     def test_zero_price(self):
         contract = make_contract()
@@ -144,7 +144,7 @@ class ZeroPriceTestCase(TestCase):
 
 
 class DerivedAmountTestCase(TestCase):
-    """T080: every invoice line amount is quantity x unit price (decision I14)."""
+    """001-T080: every invoice line amount is quantity x unit price (decision 001-I14)."""
 
     def setUp(self):
         super().setUp()
@@ -243,7 +243,7 @@ class DerivedAmountAPITestCase(APITestCase):
 
 
 class AmendPermissionTestCase(TestCase):
-    """T081, revised by #309: the amend screen needs the amend action (add + change no longer suffice)."""
+    """001-T081, revised by #309: the amend screen needs the amend action (add + change no longer suffice)."""
 
     def test_change_only_is_refused(self):
         contract = make_contract()
@@ -261,7 +261,7 @@ class AmendPermissionTestCase(TestCase):
 
 
 class ContractDeletionTestCase(TestCase):
-    """T082: a contract whose lines are on Posted invoices cannot be deleted."""
+    """001-T082: a contract whose lines are on Posted invoices cannot be deleted."""
 
     def setUp(self):
         self.parent = make_contract(name='Parent')
@@ -284,7 +284,7 @@ class ContractDeletionTestCase(TestCase):
 
 
 class ContractValuesOnceTestCase(TestCase):
-    """T083: the contract page computes the contract values once."""
+    """001-T083: the contract page computes the contract values once."""
 
     def test_contract_page(self):
         self.user.is_superuser = True

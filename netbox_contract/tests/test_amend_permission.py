@@ -1,4 +1,4 @@
-"""Issue #309, user story 1: the amend permission action on contract lines (spec 003, research D4 and D6)."""
+"""Issue #309, user story 1: the amend permission action on contract lines (spec 003, research 003-D4 and 003-D6)."""
 
 from datetime import date
 from decimal import Decimal
@@ -73,7 +73,7 @@ class LineAnnotationsTestCase(DjangoTestCase):
 
 
 class PermissionRegistrationTestCase(DjangoTestCase):
-    """US1-1: contract lines declare an "amend" action that object permissions offer."""
+    """003-US1-1: contract lines declare an "amend" action that object permissions offer."""
 
     def test_action_registered(self):
         actions = {action.name: action for action in registry['model_actions']['netbox_contract.contractline']}
@@ -86,7 +86,7 @@ class PermissionRegistrationTestCase(DjangoTestCase):
 
 
 class AmendUITestCase(TestCase):
-    """US1-2 and US1-4 to US1-7: who sees the Amend button and may use the amend screen."""
+    """003-US1-2 and 003-US1-4 to 003-US1-7: who sees the Amend button and may use the amend screen."""
 
     def setUp(self):
         super().setUp()
@@ -114,7 +114,7 @@ class AmendUITestCase(TestCase):
                 (self.assertContains if shown else self.assertNotContains)(response, url)
 
     def test_view_and_amend_only(self):
-        """US1-2: view + amend, without add or change, is enough to amend."""
+        """003-US1-2: view + amend, without add or change, is enough to amend."""
         self.add_permissions(
             'netbox_contract.view_contract', 'netbox_contract.view_contractline',
             'netbox_contract.amend_contractline',
@@ -128,7 +128,7 @@ class AmendUITestCase(TestCase):
         self.assertTrue(ContractLine.objects.filter(replaces=self.line, unit_price=Decimal('110')).exists())
 
     def test_add_and_change_without_amend(self):
-        """US1-4: add + change no longer allow amending."""
+        """003-US1-4: add + change no longer allow amending."""
         self.add_permissions(
             'netbox_contract.view_contract', 'netbox_contract.view_contractline',
             'netbox_contract.add_contractline', 'netbox_contract.change_contractline',
@@ -137,7 +137,7 @@ class AmendUITestCase(TestCase):
         self.assertEqual(self.client.get(self.amend_url).status_code, 403)
 
     def test_edit_page_with_change_and_amend(self):
-        """FR-003: the locked-line message of the edit page offers Amend to a user allowed to amend the line."""
+        """003-FR-003: the locked-line message of the edit page offers Amend to a user allowed to amend the line."""
         self.add_permissions(
             'netbox_contract.view_contract', 'netbox_contract.view_contractline',
             'netbox_contract.change_contractline', 'netbox_contract.amend_contractline',
@@ -145,7 +145,7 @@ class AmendUITestCase(TestCase):
         self.assertButtonShown(True, edit=True)
 
     def test_constrained_to_another_contract(self):
-        """US1-5: an amend permission limited to the lines of another contract does not apply to this line."""
+        """003-US1-5: an amend permission limited to the lines of another contract does not apply to this line."""
         other = invoiced_recurring_line(name='Other contract')
         self.add_permissions('netbox_contract.view_contract', 'netbox_contract.view_contractline')
         add_constrained_permission(self.user, 'netbox_contract.amend_contractline', {'contract': other.contract.pk})
@@ -154,7 +154,7 @@ class AmendUITestCase(TestCase):
         self.assertButtonShown(True, line=other)
 
     def test_lines_that_cannot_be_amended(self):
-        """US1-6: one-time and already replaced lines show no button; a recurring line not invoiced yet does."""
+        """003-US1-6: one-time and already replaced lines show no button; a recurring line not invoiced yet does."""
         self.add_permissions(
             'netbox_contract.view_contract', 'netbox_contract.view_contractline',
             'netbox_contract.amend_contractline',
@@ -174,7 +174,7 @@ class AmendUITestCase(TestCase):
         )
 
     def test_superuser(self):
-        """US1-7."""
+        """003-US1-7."""
         self.user.is_superuser = True
         self.user.save()
         self.assertButtonShown(True, edit=True)
@@ -199,7 +199,7 @@ class AmendUITestCase(TestCase):
 
 
 class AmendAPITestCase(APITestCase):
-    """US1-3, US1-4 and the REST table of contracts/rest-api.md for POST contract-lines/{id}/amend/."""
+    """003-US1-3, 003-US1-4 and the REST table of contracts/rest-api.md for POST contract-lines/{id}/amend/."""
 
     model = ContractLine
 

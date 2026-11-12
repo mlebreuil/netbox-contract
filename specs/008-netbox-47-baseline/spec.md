@@ -34,7 +34,7 @@ A maintainer opens a pull request and CI runs the whole suite against the NetBox
 
 **Acceptance Scenarios**:
 
-1. **Given** NetBox v4.7.4 and the plugin, **When** the full suite runs, **Then** 1020 existing tests plus the 2 metadata tests of T006 and the migration-state test of T016 run, none fail and no test is skipped that ran before (9 tests are skipped today for unrelated reasons).
+1. **Given** NetBox v4.7.4 and the plugin, **When** the full suite runs, **Then** 1020 existing tests plus the 2 metadata tests of 008-T006 and the migration-state test of 008-T016 run, none fail and no test is skipped that ran before (9 tests are skipped today for unrelated reasons).
 2. **Given** the CI configuration, **When** it is read, **Then** it checks out the NetBox tag `v4.7.4` and runs on Python 3.12, 3.13 and 3.14.
 3. **Given** the REST tests for contracts, contract lines and invoices, **When** they run, **Then** they send dates the way an API client does (as text) and still check the stored objects.
 4. **Given** the plugin models and migrations, **When** the pending model changes are computed on NetBox 4.7.4, **Then** there are none.
@@ -69,16 +69,16 @@ An administrator reading the README, the changelog or the plugin metadata sees t
 
 ### Functional Requirements
 
-- **FR-001**: The CI MUST run the suite against the NetBox tag `v4.7.4` on Python 3.12, 3.13 and 3.14, and the lint job MUST be unchanged.
-- **FR-002**: The REST create, bulk create and update tests for contracts, contract lines and invoices MUST give dates as text (decimal amounts stay as they are, see `research.md` D1) and MUST still verify the stored values.
-- **FR-003**: The recorded list-view query counts MUST be updated to the NetBox 4.7.4 values, once, with the reason stated, using the project's re-record procedure (serial run, no parallel).
-- **FR-004**: The full suite MUST pass on NetBox v4.7.4: no failure, and no test newly skipped.
-- **FR-005**: The plugin's minimum NetBox version MUST be 4.7.0, with no maximum version.
-- **FR-006**: The plugin version MUST become 2.6.0 and the README compatibility table MUST list NetBox 4.7 with plugin 2.6, keeping 4.6 with 2.4 and 2.5.
-- **FR-007**: The changelog MUST open the 2.6.0 section with the NetBox 4.7.0 requirement warning, and list the CI pin under Other Changes, following the changelog rules of `CLAUDE.md`.
-- **FR-008**: `CLAUDE.md`, `CONTRIBUTING.md` and the constitution's compatibility section MUST name NetBox 4.7 as the minimum and `v4.7.4` as the pinned test release, the constitution through `/speckit-constitution`.
-- **FR-009**: The change MUST NOT alter plugin behaviour, REST or GraphQL output, settings or templates, and MUST NOT change any stored column or value; its only model-level change is the state-only migration of FR-010.
-- **FR-010**: On NetBox 4.7, `makemigrations --check` MUST report nothing pending for the plugin: a migration `0053_owner_related_name` MUST record `related_name='+'` on `ContractType.owner` and `ServiceProvider.owner`, depend only on `users.0015_owner` (not on a later `users` migration, so it works on every 4.7.x), produce no SQL, and a test MUST fail when the models and migrations differ.
+- **008-FR-001**: The CI MUST run the suite against the NetBox tag `v4.7.4` on Python 3.12, 3.13 and 3.14, and the lint job MUST be unchanged.
+- **008-FR-002**: The REST create, bulk create and update tests for contracts, contract lines and invoices MUST give dates as text (decimal amounts stay as they are, see `research.md` 008-D1) and MUST still verify the stored values.
+- **008-FR-003**: The recorded list-view query counts MUST be updated to the NetBox 4.7.4 values, once, with the reason stated, using the project's re-record procedure (serial run, no parallel).
+- **008-FR-004**: The full suite MUST pass on NetBox v4.7.4: no failure, and no test newly skipped.
+- **008-FR-005**: The plugin's minimum NetBox version MUST be 4.7.0, with no maximum version.
+- **008-FR-006**: The plugin version MUST become 2.6.0 and the README compatibility table MUST list NetBox 4.7 with plugin 2.6, keeping 4.6 with 2.4 and 2.5.
+- **008-FR-007**: The changelog MUST open the 2.6.0 section with the NetBox 4.7.0 requirement warning, and list the CI pin under Other Changes, following the changelog rules of `CLAUDE.md`.
+- **008-FR-008**: `CLAUDE.md`, `CONTRIBUTING.md` and the constitution's compatibility section MUST name NetBox 4.7 as the minimum and `v4.7.4` as the pinned test release, the constitution through `/speckit-constitution`.
+- **008-FR-009**: The change MUST NOT alter plugin behaviour, REST or GraphQL output, settings or templates, and MUST NOT change any stored column or value; its only model-level change is the state-only migration of 008-FR-010.
+- **008-FR-010**: On NetBox 4.7, `makemigrations --check` MUST report nothing pending for the plugin: a migration `0053_owner_related_name` MUST record `related_name='+'` on `ContractType.owner` and `ServiceProvider.owner`, depend only on `users.0015_owner` (not on a later `users` migration, so it works on every 4.7.x), produce no SQL, and a test MUST fail when the models and migrations differ.
 
 ### Key Entities
 
@@ -88,10 +88,10 @@ An administrator reading the README, the changelog or the plugin metadata sees t
 
 ### Measurable Outcomes
 
-- **SC-001**: The suite passes on NetBox 4.7.4 with 0 failures on all three Python versions.
-- **SC-002**: An administrator finds the required NetBox version for each plugin version in under one minute from the README.
-- **SC-003**: 0 changes to plugin behaviour: the REST, GraphQL and page tests outside the two groups above are untouched.
-- **SC-004**: Specifications 004 to 007 can start with a green baseline on the version they target.
+- **008-SC-001**: The suite passes on NetBox 4.7.4 with 0 failures on all three Python versions.
+- **008-SC-002**: An administrator finds the required NetBox version for each plugin version in under one minute from the README.
+- **008-SC-003**: 0 changes to plugin behaviour: the REST, GraphQL and page tests outside the two groups above are untouched.
+- **008-SC-004**: Specifications 004 to 007 can start with a green baseline on the version they target.
 
 ## Assumptions
 

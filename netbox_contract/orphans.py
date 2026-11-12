@@ -1,4 +1,4 @@
-"""Assignments whose object no longer exists (spec 006, research R8)."""
+"""Assignments whose object no longer exists (spec 006, research 006-D8)."""
 
 from dataclasses import dataclass, field
 

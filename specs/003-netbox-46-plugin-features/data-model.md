@@ -1,9 +1,11 @@
 # Data Model: Adopt NetBox 4.6 plugin features
 
+> Delta of feature 003: what this feature adds or changes. The current state is in [specs/_global/data-model.md](../_global/data-model.md), which this feature keeps up to date.
+
 Phase 1 of [plan.md](plan.md). Only two models change shape (contract type, service provider), and one model gains a
 permission (contract line). The other six models are unchanged.
 
-## ContractType → `OrganizationalModel` (D9, D10)
+## ContractType → `OrganizationalModel` (003-D9, 003-D10)
 
 | Field | Before | After | Notes |
 |---|---|---|---|
@@ -16,10 +18,10 @@ permission (contract line). The other six models are unchanged.
 
 Validation:
 - The slug is unique.
-- An empty slug is derived from the name and never rejected (FR-018).
+- An empty slug is derived from the name and never rejected (003-FR-018).
 - A slug that is given is validated by the slug format and is kept as given.
 
-## ServiceProvider → `PrimaryModel` (D9)
+## ServiceProvider → `PrimaryModel` (003-D9)
 
 | Field | Before | After |
 |---|---|---|
@@ -27,7 +29,7 @@ Validation:
 | `description` | none | `CharField(200, blank)` (inherited) |
 | `owner` | none | `ForeignKey(users.Owner, PROTECT, null)` (inherited) |
 
-## ContractLine: permission action (D6)
+## ContractLine: permission action (003-D6)
 
 `Meta.permissions = [('amend', 'Amend the price or quantity of an invoiced contract line')]`. There is no column
 change.
@@ -48,7 +50,7 @@ Re-run safety (Constitution IV):
   none.
 - Reversing `0051` restores `TextField` for `description`. `restore_descriptions` then puts the full text from
   `comments` back into `description` for every moved description (`shorten_description(comments) == description`),
-  and only then are the new columns dropped. Moved descriptions are not lost (spec US5-7). Comments typed after the
+  and only then are the new columns dropped. Moved descriptions are not lost (spec 003-US5-7). Comments typed after the
   upgrade are dropped with their column, as the migration docstring says.
 - Both data functions delegate to pure helpers in `netbox_contract/text.py` (`unique_slug`, `shorten_description`,
   `plan_contract_type_changes`).

@@ -12,7 +12,7 @@
 
 The plugin's GraphQL API lets a client list contract assignments and read the assigned object. The other direction is missing: starting from a device or a site, a client cannot ask for its contracts, and cannot ask "which devices have no contract". Integrations (inventory exports, coverage reports, dashboards) must fetch all assignments and join them themselves. This feature adds, on the objects that can have contracts, a way to read their contracts and two filters, all inside the standard NetBox GraphQL endpoint.
 
-It needs NetBox 4.7 (see Assumptions). It changes no existing GraphQL, REST or web interface and no stored column. It does change one behaviour: deleting a device, site or other covered object now also deletes its contract assignments (FR-012), and an administrator command removes the orphan assignments that earlier deletions left (User Story 4).
+It needs NetBox 4.7 (see Assumptions). It changes no existing GraphQL, REST or web interface and no stored column. It does change one behaviour: deleting a device, site or other covered object now also deletes its contract assignments (006-FR-012), and an administrator command removes the orphan assignments that earlier deletions left (User Story 4).
 
 ## Clarifications
 
@@ -108,22 +108,22 @@ An administrator runs a command that lists the contract assignments whose device
 
 ### Functional Requirements
 
-- **FR-001**: Each GraphQL type of an object that can have contracts MUST offer a field returning the object's contract assignments, from which the contract and its fields can be read.
-- **FR-002**: The types extended MUST be exactly those of the `supported_models` setting that have a GraphQL type.
-- **FR-003**: Only contracts and assignments the current user may view MUST be returned, including object permission constraints.
-- **FR-004**: The list query of each extended type MUST accept a filter on "has contracts" and a filter on "has an active contract" (a contract whose status is active, whatever its dates), each true or false.
-- **FR-005**: The filters MUST respect the user's view permission on contracts and assignments, and MUST combine with the existing filters.
-- **FR-006**: The number of database queries to serve a list of objects with their contracts MUST NOT grow with the number of objects.
-- **FR-007**: Existing plugin GraphQL queries, REST API and web pages MUST NOT change, with one stated exception (FR-012).
-- **FR-008**: The new names MUST NOT collide with names provided by NetBox or other plugins; a collision MUST NOT prevent NetBox from starting.
-- **FR-009**: The documentation of the API (`docs/api.md`) MUST describe the new fields, the filters and the permission behaviour, with an example query; the changelog MUST list them under REST API Changes or the release's GraphQL section.
-- **FR-010**: The plugin's minimum NetBox version becomes 4.7.0. Provided by specification 008 (minimum NetBox 4.7.0, CI on v4.7.4, README table, changelog warning, version 2.6.0); this specification only relies on it and has no task of its own for it.
-- **FR-011**: The behaviour MUST be covered by tests that fail before the change: each scenario above, the permission cases, the query-count check and the unchanged existing queries (constitution principle II).
-- **FR-012**: Deleting an object that can have contracts MUST also delete its contract assignments; the upgrade itself MUST NOT delete or change any existing assignment, and the changelog MUST list the deletion behaviour under Breaking Changes.
-- **FR-013**: An administrator command MUST find the orphan contract assignments (assignments whose object no longer exists) and report them: how many, per object type, with the contract and the former object identifier of each.
-- **FR-014**: The command MUST delete nothing unless explicitly told to; when told to, it MUST delete exactly the orphans it reported, in one transaction, and a second run MUST find none.
-- **FR-015**: Assignments whose object type no longer exists in the installation MUST be reported separately and MUST NOT be deleted by the command (the situation cannot be judged safely).
-- **FR-016**: The command and its dry-run default MUST be documented (`docs/`, changelog Enhancements), and covered by tests that fail before the change: report, no deletion by default, deletion on request, re-run, assignments with a valid object untouched, unknown object type reported not deleted.
+- **006-FR-001**: Each GraphQL type of an object that can have contracts MUST offer a field returning the object's contract assignments, from which the contract and its fields can be read.
+- **006-FR-002**: The types extended MUST be exactly those of the `supported_models` setting that have a GraphQL type.
+- **006-FR-003**: Only contracts and assignments the current user may view MUST be returned, including object permission constraints.
+- **006-FR-004**: The list query of each extended type MUST accept a filter on "has contracts" and a filter on "has an active contract" (a contract whose status is active, whatever its dates), each true or false.
+- **006-FR-005**: The filters MUST respect the user's view permission on contracts and assignments, and MUST combine with the existing filters.
+- **006-FR-006**: The number of database queries to serve a list of objects with their contracts MUST NOT grow with the number of objects.
+- **006-FR-007**: Existing plugin GraphQL queries, REST API and web pages MUST NOT change, with one stated exception (006-FR-012).
+- **006-FR-008**: The new names MUST NOT collide with names provided by NetBox or other plugins; a collision MUST NOT prevent NetBox from starting.
+- **006-FR-009**: The documentation of the API (`docs/api.md`) MUST describe the new fields, the filters and the permission behaviour, with an example query; the changelog MUST list them under REST API Changes or the release's GraphQL section.
+- **006-FR-010**: The plugin's minimum NetBox version becomes 4.7.0. Provided by specification 008 (minimum NetBox 4.7.0, CI on v4.7.4, README table, changelog warning, version 2.6.0); this specification only relies on it and has no task of its own for it.
+- **006-FR-011**: The behaviour MUST be covered by tests that fail before the change: each scenario above, the permission cases, the query-count check and the unchanged existing queries (constitution principle II).
+- **006-FR-012**: Deleting an object that can have contracts MUST also delete its contract assignments; the upgrade itself MUST NOT delete or change any existing assignment, and the changelog MUST list the deletion behaviour under Breaking Changes.
+- **006-FR-013**: An administrator command MUST find the orphan contract assignments (assignments whose object no longer exists) and report them: how many, per object type, with the contract and the former object identifier of each.
+- **006-FR-014**: The command MUST delete nothing unless explicitly told to; when told to, it MUST delete exactly the orphans it reported, in one transaction, and a second run MUST find none.
+- **006-FR-015**: Assignments whose object type no longer exists in the installation MUST be reported separately and MUST NOT be deleted by the command (the situation cannot be judged safely).
+- **006-FR-016**: The command and its dry-run default MUST be documented (`docs/`, changelog Enhancements), and covered by tests that fail before the change: report, no deletion by default, deletion on request, re-run, assignments with a valid object untouched, unknown object type reported not deleted.
 
 ### Key Entities
 
@@ -134,12 +134,12 @@ An administrator runs a command that lists the contract assignments whose device
 
 ### Measurable Outcomes
 
-- **SC-001**: A client obtains a device and its contracts with one request instead of two requests plus a client-side match.
-- **SC-002**: "Devices without an active contract" is answered by one filtered request, with no client-side processing.
-- **SC-003**: A list of 200 devices with their contracts costs the same number of database queries as a list of 2.
-- **SC-004**: A user without permission on contracts never receives a contract name, status or amount through the new fields or filters.
-- **SC-005**: 100% of the existing plugin GraphQL tests pass unchanged.
-- **SC-006**: After the cleanup command is run on a database with orphans, a second run reports none, and the orphan count shown by the first run equals the number of rows removed.
+- **006-SC-001**: A client obtains a device and its contracts with one request instead of two requests plus a client-side match.
+- **006-SC-002**: "Devices without an active contract" is answered by one filtered request, with no client-side processing.
+- **006-SC-003**: A list of 200 devices with their contracts costs the same number of database queries as a list of 2.
+- **006-SC-004**: A user without permission on contracts never receives a contract name, status or amount through the new fields or filters.
+- **006-SC-005**: 100% of the existing plugin GraphQL tests pass unchanged.
+- **006-SC-006**: After the cleanup command is run on a database with orphans, a second run reports none, and the orphan count shown by the first run equals the number of rows removed.
 
 ## Assumptions
 

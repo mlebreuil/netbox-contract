@@ -44,7 +44,7 @@ class ExtensionTestCase(GraphQLTestCase):
     def by_name(self, query=LIST):
         return {d['name']: d['contract_assignments'] for d in self.data(query)['device_list']}
 
-    # US1
+    # 006-US1
     def test_device_with_two_contracts(self):
         self.superuser()
         assignments = self.by_name()
@@ -92,7 +92,7 @@ class ExtensionTestCase(GraphQLTestCase):
             self.data(query)
         self.assertEqual(len(small), len(large))
 
-    # FR-012: deleted with their object
+    # 006-FR-012: deleted with their object
     def test_assignments_deleted_with_their_object(self):
         before = ContractAssignment.objects.count()
         self.d_both.delete()
@@ -105,7 +105,7 @@ class ExtensionTestCase(GraphQLTestCase):
         self.assertTrue(Device.objects.filter(pk=self.d_canceled.pk).exists())
         self.assertFalse(ContractAssignment.objects.filter(object_id=self.d_canceled.pk).exists())
 
-    # US2
+    # 006-US2
     def test_has_contracts(self):
         self.superuser()
         self.assertEqual(self.devices('has_contracts: true'), ['d-active', 'd-both', 'd-canceled'])
@@ -132,7 +132,7 @@ class ExtensionTestCase(GraphQLTestCase):
         self.assertEqual(self.devices('has_active_contract: true'), [])
         self.assertEqual(self.devices('has_contracts: true'), ['d-both', 'd-canceled'])
 
-    # US3
+    # 006-US3
     def test_core_type_without_new_field_is_unchanged(self):
         self.superuser()
         data = self.data('{ device_list { name site { name } } }')['device_list']

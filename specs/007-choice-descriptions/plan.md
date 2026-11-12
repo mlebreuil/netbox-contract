@@ -14,7 +14,7 @@ Give the three built-in choice sets (invoice status, contract status, unit billi
 
 **Primary Dependencies**: NetBox 4.7 `utilities.choices.Choice`, `utilities.forms.fields.ChoiceField/MultipleChoiceField/TypedChoiceField`; no new dependency
 
-**Storage**: none, no migration expected (descriptions are not part of the `choices` value Django records; to be confirmed by `makemigrations --check` in task T015)
+**Storage**: none, no migration expected (descriptions are not part of the `choices` value Django records; to be confirmed by `makemigrations --check` in task 007-T015)
 
 **Testing**: unit tests on the choice sets, rendering tests of the forms, `FIELD_CHOICES` tests
 

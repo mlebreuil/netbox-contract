@@ -1,4 +1,4 @@
-"""REST and GraphQL API of the nine models: NetBox's complete API test case (#309 T046) and model rules."""
+"""REST and GraphQL API of the nine models: NetBox's complete API test case (#309 001-T046) and model rules."""
 
 from datetime import date
 from decimal import Decimal
@@ -201,7 +201,7 @@ class ContractLineAPITestCase(
 
 
 class ContractAPITestCase(APITestCase):
-    """contracts/: billable flag, computed values and deprecated fields (US3)."""
+    """contracts/: billable flag, computed values and deprecated fields (001-US3)."""
 
     model = Contract
 
@@ -259,7 +259,7 @@ class ContractAPITestCase(APITestCase):
 
 
 #
-# Complete API test cases (REST and GraphQL) of the other models (#309 T046)
+# Complete API test cases (REST and GraphQL) of the other models (#309 001-T046)
 #
 
 DRAFT = InvoiceStatusChoices.STATUS_DRAFT

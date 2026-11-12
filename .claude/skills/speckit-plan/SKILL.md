@@ -10,6 +10,8 @@ user-invocable: true
 disable-model-invocation: false
 ---
 
+> **Project rule - identifiers** (`specs/_global/CONVENTIONS.md`): every identifier carries the number of its feature, `NNN-FR-001`, `NNN-SC-001`, `NNN-US1` (scenario `NNN-US1-2`), `NNN-T001`, `NNN-D1` (research decision), `NNN-I1` (implementation decision), `NNN-Q1` (clarification). Never write a bare `FR-001`, `T001`, `US1` or `D1`: where this skill shows one, write it with the `NNN-` of the feature at hand. Numbers are never reused or renumbered (a removed requirement becomes a `Retired: NNN-FR-009 (reason)` line). Next free number: `python utils/spec_ids.py next NNN FR`; validate: `python utils/spec_ids.py check`.
+
 
 ## User Input
 
@@ -126,7 +128,7 @@ Command ends after Phase 1 design. Report branch, IMPL_PLAN path, and generated 
      Task: "Find best practices for {tech} in {domain}"
    ```
 
-3. **Consolidate findings** in `research.md` using format:
+3. **Consolidate findings** in `research.md`, one heading `## NNN-D<n>. <title>` per decision (n = 1, 2, ... in order, never renumbered), using format:
    - Decision: [what was chosen]
    - Rationale: [why chosen]
    - Alternatives considered: [what else evaluated]
@@ -156,6 +158,8 @@ Command ends after Phase 1 design. Report branch, IMPL_PLAN path, and generated 
    - Keep this artifact as a validation/run guide; implementation details belong in `tasks.md` and the implementation phase
 
 **Output**: data-model.md, /contracts/*, quickstart.md
+
+**Global documents**: `data-model.md` and `contracts/` of the feature are deltas (what this feature adds, changes or removes) and start with a `> Delta of feature NNN ...` line pointing to the matching document in `specs/_global/`. The plan's "Global documents" section lists which of `specs/_global/data-model.md`, `contracts/*.md` and `behaviours.md` the feature changes; `/speckit-tasks` turns that into a task.
 
 ## Key rules
 

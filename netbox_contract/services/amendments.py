@@ -1,7 +1,7 @@
 """
-Amendment of the price or quantity of an invoiced contract line from a date (FR-030, decision I10).
+Amendment of the price or quantity of an invoiced contract line from a date (001-FR-030, decision 001-I10).
 
-The contract terms of an invoiced line are locked (FR-029). An amendment keeps them: the line ends the
+The contract terms of an invoiced line are locked (001-FR-029). An amendment keeps them: the line ends the
 day before the new terms apply, and a successor line with the new unit price or quantity starts that day.
 Invoiced periods therefore keep their price, and the reason is recorded in the NetBox change log.
 """

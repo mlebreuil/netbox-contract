@@ -4,8 +4,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from netbox.filtersets import NetBoxModelFilterSet, OrganizationalModelFilterSet, PrimaryModelFilterSet
 from tenancy.filtersets import ContactModelFilterSet, TenancyFilterSet
+from utilities.filters import MultiValueCharFilter
 from utilities.filtersets import register_filterset
 
+from .external_party import party_name_condition
 from .models import (
     AccountingDimension,
     AccountingDimensionStatusChoices,
@@ -49,6 +51,18 @@ class ContractFilterSet(ContactModelFilterSet, NetBoxModelFilterSet, TenancyFilt
         method='filter_by_circuit_provider',
         label='Circuit provider'
     )
+    # The name of the external party, whichever its type (009-FR-006, 009-D2). NetBox adds lookup variants only to
+    # filters without a method, so the modifiers shown by the filter form are declared here.
+    external_party_name = MultiValueCharFilter(method='filter_by_party_name', label='External party name')
+    external_party_name__ic = MultiValueCharFilter(
+        method='filter_by_party_name', label='External party name (contains)'
+    )
+    external_party_name__ie = MultiValueCharFilter(
+        method='filter_by_party_name', label='External party name (exact, case-insensitive)'
+    )
+    external_party_name__n = MultiValueCharFilter(
+        method='filter_by_party_name', label='External party name (not)'
+    )
     invoice_id = django_filters.ModelMultipleChoiceFilter(
         field_name='invoices', queryset=Invoice.objects.all(), label='Invoice (ID)'
     )
@@ -72,9 +86,26 @@ class ContractFilterSet(ContactModelFilterSet, NetBoxModelFilterSet, TenancyFilt
         return queryset.filter(
             Q(name__icontains=value)
             | Q(external_reference__icontains=value)
-            | Q(comments__icontains=value),
+            | Q(comments__icontains=value)
+            # the name of the external party, a service provider or a circuit provider (009-FR-001, 009-FR-002)
+            | party_name_condition('icontains', [value]),
             Q(status__iexact='Active'),
         )
+
+    PARTY_NAME_LOOKUPS = {
+        'external_party_name': 'exact',
+        'external_party_name__ic': 'icontains',
+        'external_party_name__ie': 'iexact',
+        'external_party_name__n': 'exact',
+    }
+
+    def filter_by_party_name(self, queryset, name, value):
+        """Contracts whose service provider or circuit provider name satisfies the filter (009-FR-009)."""
+        if not value:
+            return queryset
+        condition = party_name_condition(self.PARTY_NAME_LOOKUPS[name], value)
+        # `__n` keeps the contracts that have no party: they do not have the excluded name
+        return queryset.exclude(condition) if name.endswith('__n') else queryset.filter(condition)
 
     def filter_by_service_provider(self, queryset, name, value):
         if not value:

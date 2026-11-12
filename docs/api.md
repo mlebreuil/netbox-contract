@@ -17,6 +17,7 @@ Every list endpoint accepts the standard NetBox filters (`id`, `q`, `tag`, `crea
 ## Contracts
 
 - `billable` (writable, default `true`) and the read-only values `total_contract_value` (null when not available), `yearly_contract_value` and `yearly_billable_value`. Filter: `billable`.
+- Filters on the external party's name, whichever its type (service provider or circuit provider): `external_party_name` (exact name, case-sensitive; repeat the parameter for several names), `external_party_name__ic` (contains, case-insensitive), `external_party_name__ie` (exact, case-insensitive) and `external_party_name__n` (not this name; contracts without party are kept). For example `contracts/?external_party_name__ic=acme`. They combine with the other filters and do not restrict the status. `service_provider_id` and `provider_id` filter by ID as before. The quick search `q` also matches the party's name (and, as before, lists only Active contracts).
 - `mrc`, `yrc` and `nrc` are deprecated and kept for compatibility.
 
 ## Invoices
@@ -50,6 +51,7 @@ The plugin's objects are in NetBox's GraphQL API (`/graphql/`), with two queries
 
 - Every stored field and relation is available. `mrc`, `yrc`, `nrc` (contracts) and `template` (invoices) are marked deprecated.
 - The computed values (`total_contract_value`, `yearly_contract_value` and `yearly_billable_value` of contracts, `total_value` and `yearly_value` of contract lines) are not in GraphQL: read them from the REST API.
+- The contract filter `external_party_name` takes the usual string lookups (`exact`, `i_exact`, `in_list`, `contains`, `i_contains`, `starts_with`, `i_starts_with`, `ends_with`, `i_ends_with`, `regex`, `i_regex`; not `is_null`) and applies them to the name of the external party, whichever its type: `contract_list(filters: {external_party_name: {i_contains: "acme"}}) { name }`. `i_contains` gives the same contracts as `external_party_name__ic` in REST, `exact` as the exact filter and `i_exact` as `external_party_name__ie`; GraphQL has no negated variant.
 - `external_party_object` of a contract is a service provider or a circuit provider. `content_object` of a contract assignment covers the models of the default `supported_models` setting (circuits, virtual circuits, sites, devices, racks, virtual machines, clusters); for an object of another model it is `null`, and `content_type` and `object_id` identify it.
 
 ### Contracts from the core objects

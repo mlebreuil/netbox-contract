@@ -1,7 +1,7 @@
 """
-Panels of the plugin's detail pages (research D1-D4, contracts/detail-pages.md). The pages are declared with NetBox's
-`layout.SimpleLayout` in views.py; this module holds the attribute panels and the few panels and actions that core does
-not provide: attributes hidden by plugin settings, deprecated fields, contract values and lock messages.
+Panels of the plugin's detail pages (research 003-D1 to 003-D4, contracts/detail-pages.md). The pages are declared with
+NetBox's `layout.SimpleLayout` in views.py; this module holds the attribute panels and the few panels and actions that
+core does not provide: attributes hidden by plugin settings, deprecated fields, contract values and lock messages.
 """
 
 from django.conf import settings
@@ -173,7 +173,7 @@ class DeprecatedCostsPanel(DeprecatedPanelMixin, SettingsAttributesPanel):
 
 
 class ContractValuesPanel(SettingsAttributesPanel):
-    """The values of `contract_values()`, computed once by the view (FR-006) and passed as `values` in the context."""
+    """The values of `contract_values()`, computed once by the view (003-FR-006), passed as `values` in the context."""
 
     title = _('Values')
     accessor = 'values'

@@ -1,7 +1,9 @@
 # Contract: REST API changes
 
-This contract covers the nested objects and `brief=true` (D7, FR-009 to FR-012a), the amend action (D6) and the new
-fields (D9). 2.5.0 removes no field from any REST response (Constitution IV/V). Tests in `tests/test_nested_api.py`
+> Delta of feature 003: what this feature adds or changes. The current state is in [specs/_global/contracts/rest-api.md](../../_global/contracts/rest-api.md), which this feature keeps up to date.
+
+This contract covers the nested objects and `brief=true` (003-D7, 003-FR-009 to 003-FR-012a), the amend action (003-D6) and the new
+fields (003-D9). 2.5.0 removes no field from any REST response (Constitution IV/V). Tests in `tests/test_nested_api.py`
 and `tests/test_api.py` assert exactly these sets.
 
 ## Brief representations (`Meta.brief_fields`), 2.5.0
@@ -14,8 +16,8 @@ and `tests/test_api.py` assert exactly these sets.
 | Contract line | `id, url, display, contract, description, quantity, unit, unit_price, currency, start_date, end_date` | `start_date` and `end_date` are added (the model is new in 2.5.0) |
 | Accounting dimension | `id, url, display, name, value` | none |
 | Unit | `id, url, display, name, description, billing_method, months` | none |
-| Contract type | `id, url, display, name, slug, description` | `slug` is added (US5) |
-| Service provider | `id, url, display, name, slug, description` | `description` is added (US5) |
+| Contract type | `id, url, display, name, slug, description` | `slug` is added (003-US5) |
+| Service provider | `id, url, display, name, slug, description` | `description` is added (003-US5) |
 | Contract assignment | `id, url, display, content_object, contract, tags, custom_fields` | none |
 
 ## Nested related objects, 2.5.0
@@ -34,12 +36,12 @@ OpenAPI: `NestedInvoice`, `NestedAccountingDimension` and `NestedContractLine` b
 `BriefAccountingDimension` and `BriefContractLine`, with the same properties, on the pinned NetBox 4.6.10. Earlier 4.6
 releases document the accounting dimension lists with the `AccountingDimension` component, because their schema extension
 for `SerializedPKRelatedField` resolves the serializer class (fixed by netbox#22989). The response keeps the five brief
-fields either way (implementation note, T044, corrected after CI on v4.6.10).
+fields either way (implementation note, 003-T044, corrected after CI on v4.6.10).
 
 ## Deprecations announced in 2.5.0 (removed by the later specified release)
 
 These are listed per field in the #309 changelog entry under "Deprecations" and in `docs/api.md`, with "read
-`contracts/{id}/` instead" (FR-012a). After the shrink:
+`contracts/{id}/` instead" (003-FR-012a). After the shrink:
 - the nested contract becomes the brief contract `id, url, display, name, status`;
 - the contract brief set becomes `id, url, display, name, status`;
 - the invoice brief set becomes `id, url, display, number`.

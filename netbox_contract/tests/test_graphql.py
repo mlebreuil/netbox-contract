@@ -1,4 +1,4 @@
-"""Issue #309, user story 4: the GraphQL API (spec 003, research D8, contracts/graphql.md)."""
+"""Issue #309, user story 4: the GraphQL API (spec 003, research 003-D8, contracts/graphql.md)."""
 
 from dcim.models import Site
 from django.contrib.contenttypes.models import ContentType
@@ -56,7 +56,7 @@ class GraphQLTestCase(APITestCase):
 
 class QueryTestCase(GraphQLTestCase):
     def test_filtered_contract_list_with_relations(self):
-        """US4-1: a filtered list with the contract's relations."""
+        """003-US4-1: a filtered list with the contract's relations."""
         self.superuser()
         data = self.data('''{
             contract_list(filters: {status: {exact: STATUS_ACTIVE}, name: {exact: "Active"}}) {
@@ -74,7 +74,7 @@ class QueryTestCase(GraphQLTestCase):
         self.assertNotIn('Cancelled', names)
 
     def test_permissions(self):
-        """US4-3: results are restricted to what the user may view, constraints included."""
+        """003-US4-3: results are restricted to what the user may view, constraints included."""
         self.add_permissions('netbox_contract.view_contract')
         self.assertEqual(self.data('{ invoice_list { number } }')['invoice_list'], [])
         add_constrained_permission(self.user, 'netbox_contract.view_contractline', {'contract': self.parent.pk})
@@ -85,7 +85,7 @@ class QueryTestCase(GraphQLTestCase):
         )
 
     def test_generic_relations(self):
-        """US4-4: the external party and the assigned object are returned with their type."""
+        """003-US4-4: the external party and the assigned object are returned with their type."""
         self.superuser()
         provider = ServiceProvider.objects.create(name='Telco', slug='telco')
         Contract.objects.filter(pk=self.cancelled.pk).update(
@@ -127,7 +127,7 @@ class QueryTestCase(GraphQLTestCase):
         })
 
     def test_deprecated_fields(self):
-        """US4-5: deprecated fields are present and marked deprecated."""
+        """003-US4-5: deprecated fields are present and marked deprecated."""
         self.superuser()
         for type_name, fields in (('ContractType', {'mrc', 'yrc', 'nrc'}), ('InvoiceType', {'template'})):
             data = self.data(f'{{ __type(name: "{type_name}") {{ fields(includeDeprecated: true) '
@@ -137,7 +137,7 @@ class QueryTestCase(GraphQLTestCase):
                 self.assertEqual(deprecated, fields)
 
     def test_computed_values_not_exposed(self):
-        """FR-015a, edge case: computed values are REST only."""
+        """003-FR-015a, edge case: computed values are REST only."""
         self.superuser()
         result = self.query('{ contract_list { yearly_contract_value } }')
         self.assertIn('errors', result)

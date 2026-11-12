@@ -2,12 +2,14 @@ from typing import TYPE_CHECKING, Annotated
 
 import strawberry
 import strawberry_django
+from django.db.models import Q
 from netbox.graphql.filters import NetBoxModelFilter, OrganizationalModelFilter, PrimaryModelFilter
 from strawberry.scalars import ID
 from strawberry_django import BaseFilterLookup, DateFilterLookup, FilterLookup, StrFilterLookup
 from tenancy.graphql.filter_mixins import ContactFilterMixin, TenancyFilterMixin
 
 from .. import models
+from ..external_party import party_name_condition
 
 if TYPE_CHECKING:
     from core.graphql.filters import ContentTypeFilter
@@ -26,6 +28,21 @@ __all__ = (
     'ServiceProviderFilter',
     'UnitFilter',
 )
+
+# GraphQL string lookup -> Django lookup on the provider name (009-D4); a list is matched as any of its values
+PARTY_NAME_LOOKUPS = {
+    'exact': 'exact',
+    'i_exact': 'iexact',
+    'in_list': 'exact',
+    'contains': 'contains',
+    'i_contains': 'icontains',
+    'starts_with': 'startswith',
+    'i_starts_with': 'istartswith',
+    'ends_with': 'endswith',
+    'i_ends_with': 'iendswith',
+    'regex': 'regex',
+    'i_regex': 'iregex',
+}
 
 LAZY = 'netbox_contract.graphql.filters'
 LAZY_ENUMS = 'netbox_contract.graphql.enums'
@@ -92,6 +109,21 @@ class ContractFilter(ContactFilterMixin, TenancyFilterMixin, NetBoxModelFilter):
     parent: Annotated['ContractFilter', strawberry.lazy(LAZY)] | None = strawberry_django.filter_field()
     parent_id: ID | None = strawberry_django.filter_field()
     billable: FilterLookup[bool] | None = strawberry_django.filter_field()
+
+    @strawberry_django.filter_field()
+    def external_party_name(self, info: strawberry.Info, value: StrFilterLookup, prefix) -> Q:
+        """The name of the external party, a service provider or a circuit provider (009-FR-008, 009-D4).
+
+        The lookups are those of the string filters of this schema, applied to the name of the party of either type
+        and combined with AND when several are given. `is_null` has no meaning here and is not supported.
+        """
+        condition = Q()
+        for field, lookup in PARTY_NAME_LOOKUPS.items():
+            given = getattr(value, field, strawberry.UNSET)
+            if given is strawberry.UNSET or given is None:
+                continue
+            condition &= party_name_condition(lookup, given if isinstance(given, list) else [given], prefix)
+        return condition
 
 
 @strawberry_django.filter_type(models.ContractAssignment, lookups=True)

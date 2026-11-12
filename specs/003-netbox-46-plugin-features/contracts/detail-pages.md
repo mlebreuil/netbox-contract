@@ -1,4 +1,6 @@
-# Contract: detail page layouts (D1-D5, FR-003 to FR-008)
+# Contract: detail page layouts (003-D1 to 003-D5, 003-FR-003 to 003-FR-008)
+
+> Delta of feature 003: what this feature adds or changes. The current state is in [specs/_global/contracts/ui.md](../../_global/contracts/ui.md), which this feature keeps up to date.
 
 Each page uses `SimpleLayout(left_panels, right_panels, bottom_panels)`. The plugin content areas `left_page`,
 `right_page` and `full_width_page` are appended by `SimpleLayout`. "Same as before" means the same label and value

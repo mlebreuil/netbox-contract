@@ -96,7 +96,7 @@ class DetailPageTestCase(TestCase):
 
 
 class LayoutTestCase(DetailPageTestCase):
-    """T019: every detail view declares a SimpleLayout, and every page renders."""
+    """003-T019: every detail view declares a SimpleLayout, and every page renders."""
 
     def test_views_declare_a_layout(self):
         for view in DETAIL_VIEWS:
@@ -111,10 +111,10 @@ class LayoutTestCase(DetailPageTestCase):
 
 
 class ContractPageTestCase(DetailPageTestCase):
-    """T020: the contract page (US2-1 to US2-6)."""
+    """003-T020: the contract page (003-US2-1 to 003-US2-6)."""
 
     def test_attributes(self):
-        """US2-1."""
+        """003-US2-1."""
         response = self.get(self.contract)
         for label in ('Name', 'Contract type', 'External party', 'Status', 'External reference', 'Internal party',
                       'Tenant', 'Start date', 'End date', 'Initial term', 'Renewal term', 'Notice period',
@@ -132,7 +132,7 @@ class ContractPageTestCase(DetailPageTestCase):
         self.assertNotContains(self.get(self.parent), attribute_row('Documents'))
 
     def test_hidden_fields(self):
-        """US2-2."""
+        """003-US2-2."""
         with plugin_settings(hidden_contract_fields=['tenant', 'notice_period']):
             response = self.get(self.contract)
         self.assertNotContains(response, attribute_row('Tenant'))
@@ -140,7 +140,7 @@ class ContractPageTestCase(DetailPageTestCase):
         self.assertContains(response, attribute_row('Initial term'))
 
     def test_deprecated_fields(self):
-        """US2-3: deprecated costs and the template panel only with show_deprecated_fields; no template lookup."""
+        """003-US2-3: deprecated costs and the template panel only with show_deprecated_fields; no template lookup."""
         make_invoice(self.contract, number='_invoice_template_Main contract', template=True, status=DRAFT,
                      period_start=None, period_end=None)
         with plugin_settings(show_deprecated_fields=False), CaptureQueriesContext(connection) as queries:
@@ -156,7 +156,7 @@ class ContractPageTestCase(DetailPageTestCase):
         self.assertContains(response, '_invoice_template_Main contract')
 
     def test_values(self):
-        """US2-4: values panel, "Not available" for an open-ended total, a fixed number of queries."""
+        """003-US2-4: values panel, "Not available" for an open-ended total, a fixed number of queries."""
         response = self.get(self.contract)
         for label in ('Billable', 'Total contract value', 'Yearly value', 'Yearly billable value'):
             self.assertContains(response, attribute_row(label))
@@ -176,7 +176,7 @@ class ContractPageTestCase(DetailPageTestCase):
         self.assertEqual(count(small), count(big))
 
     def test_lines_locked(self):
-        """US2-5: locked message and no add button on an invoiced contract; add button otherwise."""
+        """003-US2-5: locked message and no add button on an invoiced contract; add button otherwise."""
         add_url = reverse('plugins:netbox_contract:contractline_add')
         response = self.get(self.contract)
         self.assertContains(response, 'This contract has invoices')
@@ -186,7 +186,7 @@ class ContractPageTestCase(DetailPageTestCase):
         self.assertContains(response, f'{add_url}?contract={self.parent.pk}')
 
     def test_tables(self):
-        """US2-6, and the column each table leaves out (edge case "column choices")."""
+        """003-US2-6, and the column each table leaves out (edge case "column choices")."""
         panels = table_panels(self.get(self.contract))
         lines = panels[reverse('plugins:netbox_contract:contractline_list')][0]
         self.assertEqual(lines['contract_id'], str(self.contract.pk))
@@ -205,7 +205,7 @@ class ContractPageTestCase(DetailPageTestCase):
         self.assertContains(self.get(self.contract), add_invoice)
 
     def test_tables_follow_view_permissions(self):
-        """US2-6: a table of objects the user may not view is not shown."""
+        """003-US2-6: a table of objects the user may not view is not shown."""
         self.user.is_superuser = False
         self.user.save()
         self.add_permissions('netbox_contract.view_contract', 'netbox_contract.view_contractline')
@@ -221,7 +221,7 @@ class ContractPageTestCase(DetailPageTestCase):
 
 
 class OtherPagesTestCase(DetailPageTestCase):
-    """T021: the other detail pages (US2-7)."""
+    """003-T021: the other detail pages (003-US2-7)."""
 
     def test_invoice(self):
         response = self.get(self.invoice)
@@ -327,7 +327,7 @@ class OtherPagesTestCase(DetailPageTestCase):
 
 
 class TableActionsTestCase(TestCase):
-    """T022: contract line actions decided per line in the list the contract page loads (US2-8)."""
+    """003-T022: contract line actions decided per line in the list the contract page loads (003-US2-8)."""
 
     def setUp(self):
         super().setUp()
@@ -384,7 +384,7 @@ class MarkerContent(PluginTemplateExtension):
 
 
 class PluginContentTestCase(DetailPageTestCase):
-    """T023: the three plugin content areas (US2-9)."""
+    """003-T023: the three plugin content areas (003-US2-9)."""
 
     def setUp(self):
         super().setUp()
@@ -399,7 +399,7 @@ class PluginContentTestCase(DetailPageTestCase):
 
 
 class ContractFilterTestCase(DetailPageTestCase):
-    """T024: contracts of an invoice (research D5)."""
+    """003-T024: contracts of an invoice (research 003-D5)."""
 
     def test_ui_list(self):
         response = self.client.get(f'{reverse("plugins:netbox_contract:contract_list")}?invoice_id={self.invoice.pk}')

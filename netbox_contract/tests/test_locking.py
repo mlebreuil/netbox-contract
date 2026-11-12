@@ -1,4 +1,4 @@
-"""Lock of contract lines once invoiced (FR-029) and of used units (FR-001a)."""
+"""Lock of contract lines once invoiced (001-FR-029) and of used units (001-FR-001a)."""
 
 from datetime import date
 from decimal import Decimal
@@ -233,7 +233,7 @@ class LockViewsTestCase(NetBoxTestCase):
 
 
 class InternalFieldsOfLockedLineTestCase(NetBoxTestCase):
-    """Accounting dimensions, comments and tags stay editable on a locked contract line (FR-029, decision I9)."""
+    """Accounting dimensions, comments and tags stay editable on a locked contract line (001-FR-029, 001-I9)."""
 
     def setUp(self):
         super().setUp()

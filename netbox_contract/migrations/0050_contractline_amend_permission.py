@@ -2,7 +2,7 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-    """Declare the "amend" permission action of contract lines (#309, research D6)."""
+    """Declare the "amend" permission action of contract lines (#309, research 003-D6)."""
 
     dependencies = [
         ('netbox_contract', '0049_invoiceline_derived_amounts'),

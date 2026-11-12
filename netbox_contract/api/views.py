@@ -94,7 +94,7 @@ class AmendPermission(BasePermission):
     """
     Gate of the amend action: an authenticated user, with a write-enabled token when a token is used. The object
     permissions (view and amend on the line) are checked by the action itself, because NetBox maps every POST to the
-    "add" permission (research D6).
+    "add" permission (research 003-D6).
     """
 
     def has_permission(self, request, view):
@@ -118,7 +118,7 @@ class ContractLineViewSet(NetBoxModelViewSet):
     @extend_schema(request=ContractLineAmendmentSerializer, responses={201: ContractLineSerializer})
     @action(detail=True, methods=['post'])
     def amend(self, request, pk=None):
-        """End this line and create the line that replaces it with a new unit price or quantity (FR-030)."""
+        """End this line and create the line that replaces it with a new unit price or quantity (001-FR-030)."""
         if not request.user.has_perm('netbox_contract.amend_contractline'):
             raise PermissionDenied()
         # Amending is an "amend" operation, not the "add" BaseViewSet restricts POST requests to

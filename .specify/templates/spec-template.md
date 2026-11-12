@@ -1,5 +1,14 @@
 # Feature Specification: [FEATURE NAME]
 
+<!--
+  IDENTIFIERS (specs/_global/CONVENTIONS.md): replace NNN by the number of this feature (the prefix of its directory,
+  e.g. 004). Every identifier is written with it - NNN-FR-001, NNN-SC-001, NNN-US1, NNN-US1-2 (scenario), NNN-Q1
+  (clarification) - in this file and everywhere it is cited. Numbers are never reused: a removed requirement becomes a
+  line "Retired: NNN-FR-009 (reason, date)". User stories keep the heading "### User Story 1 - Title (Priority: P1)".
+  Check with: python utils/spec_ids.py check
+-->
+
+
 **Feature Branch**: `[###-feature-name]`
 
 **Created**: [DATE]
@@ -87,16 +96,16 @@
 
 ### Functional Requirements
 
-- **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]
-- **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
-- **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
-- **FR-005**: System MUST [behavior, e.g., "log all security events"]
+- **NNN-FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
+- **NNN-FR-002**: System MUST [specific capability, e.g., "validate email addresses"]
+- **NNN-FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
+- **NNN-FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
+- **NNN-FR-005**: System MUST [behavior, e.g., "log all security events"]
 
 *Example of marking unclear requirements:*
 
-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+- **NNN-FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
+- **NNN-FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
 ### Key Entities *(include if feature involves data)*
 
@@ -112,10 +121,10 @@
 
 ### Measurable Outcomes
 
-- **SC-001**: [Measurable metric, e.g., "Users can complete account creation in under 2 minutes"]
-- **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
-- **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
-- **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
+- **NNN-SC-001**: [Measurable metric, e.g., "Users can complete account creation in under 2 minutes"]
+- **NNN-SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
+- **NNN-SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
+- **NNN-SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
 
 ## Assumptions
 

@@ -1,4 +1,4 @@
-"""Spec user story 2: conversion of existing costs and invoice templates (FR-013..FR-016, SC-002)."""
+"""Spec user story 2: conversion of existing costs and invoice templates (001-FR-013..FR-016, 001-SC-002)."""
 
 from datetime import date
 from decimal import Decimal
@@ -176,7 +176,7 @@ class ConversionSafetyTestCase(TestCase):
         self.assertEqual((list(Invoice.objects.values()), list(InvoiceLine.objects.values())), before)
 
     def test_running_twice_creates_no_duplicate(self):
-        """FR-016."""
+        """001-FR-016."""
         make_contract(name='A', mrc=Decimal(100), nrc=Decimal(10))
         make_contract(name='B', yrc=Decimal(1000))
         first = convert_legacy_data()
@@ -213,7 +213,7 @@ class ConversionSafetyTestCase(TestCase):
         self.assertEqual(report.skipped, 1)
 
     def test_contract_with_invoices_is_converted(self):
-        """The lock of FR-029 does not apply to the conversion, but applies to the converted lines."""
+        """The lock of 001-FR-029 does not apply to the conversion, but applies to the converted lines."""
         contract = make_contract(mrc=Decimal(100))
         make_invoice(contract, amount=100)
         convert_legacy_data()

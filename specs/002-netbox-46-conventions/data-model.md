@@ -1,6 +1,8 @@
 # Data model: Align with NetBox 4.6 plugin conventions
 
-No model, field, relation, migration or stored value changes (FR-013). `makemigrations netbox_contract --check`
+> Delta of feature 002: what this feature adds or changes. The current state is in [specs/_global/data-model.md](../_global/data-model.md), which this feature keeps up to date.
+
+No model, field, relation, migration or stored value changes (002-FR-013). `makemigrations netbox_contract --check`
 MUST report nothing pending after the change.
 
 What changes is how the nine existing `NetBoxModel`s are exposed in the UI:

@@ -22,7 +22,7 @@ Declare the breadcrumb trail of contracts, contract lines, invoices and invoice 
 
 **Performance Goals**: no extra query on the detail page beyond the accessors already loaded; list-view query counts unchanged
 
-**Constraints**: entries shown regardless of the viewer's permissions (clarification FR-008); filter parameters must be accepted by the plugin's filtersets
+**Constraints**: entries shown regardless of the viewer's permissions (clarification 005-FR-008); filter parameters must be accepted by the plugin's filtersets
 
 **Scale/Scope**: 4 layouts, 4 templates removed, 1 test module
 

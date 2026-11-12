@@ -79,11 +79,9 @@ jobs:
       - name: Install netbox-contract
         working-directory: netbox-contract
         run: |
-          # Include tests directory for test
-          sed -i 's/exclude-package-data/#exclude-package-data/g' pyproject.toml
+          # Editable install: the tests are not part of the built package
           python -m pip install --upgrade pip
-          pip install .
-          pip install .[test]
+          pip install -e .[test]
       - name: Install dependencies & configure plugin
         working-directory: netbox
         run: |

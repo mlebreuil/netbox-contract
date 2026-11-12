@@ -36,12 +36,12 @@ LAZY = 'netbox_contract.graphql.types'
 DEPRECATED_COST = 'Replaced by contract lines; kept for compatibility (shown with show_deprecated_fields).'
 
 # The objects contracts are assigned to: the default `supported_models` setting. Objects of other models listed in
-# the setting resolve to null; content_type and object_id still identify them (research D8).
+# the setting resolve to null; content_type and object_id still identify them (research 003-D8).
 ASSIGNABLE_MODELS = [Circuit, VirtualCircuit, Site, Device, Rack, VirtualMachine, Cluster]
 
 # Relations are nullable when the related object may be hidden by the user's view permissions.
 # Computed values (total, yearly, yearly billable) are properties, not model fields: fields='__all__' leaves them out
-# and they stay REST only (FR-015a).
+# and they stay REST only (003-FR-015a).
 
 
 @strawberry_django.type(models.ContractType, fields='__all__', filters=ContractTypeFilter, pagination=True)

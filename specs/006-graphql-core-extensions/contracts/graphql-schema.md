@@ -1,5 +1,7 @@
 # Contract: GraphQL schema additions
 
+> Delta of feature 006: what this feature adds or changes. The current state is in [specs/_global/contracts/graphql.md](../../_global/contracts/graphql.md), which this feature keeps up to date.
+
 ```graphql
 query {
   device_list(filters: {has_active_contract: false, site: "paris"}) {

@@ -1,4 +1,4 @@
-"""Spec user story 4: consistent currencies (FR-009..FR-011)."""
+"""Spec user story 4: consistent currencies (001-FR-009..FR-011)."""
 
 from decimal import Decimal
 

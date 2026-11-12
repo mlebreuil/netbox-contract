@@ -1,5 +1,24 @@
 <!--
-Sync Impact Report (temporary, remove before committing)
+Sync Impact Report and amendment history (kept: each amendment adds its report above the previous ones)
+--- latest report, version 1.2.1 ---
+- Version change: 1.2.0 -> 1.2.1 (PATCH: factual correction)
+- Reason: the stable branch is `main`; the repository has no `master` branch. Development Workflow now says `main`
+  receives releases only (also corrected in AGENTS.md, CONTRIBUTING.md and the release-plugin skill).
+- Modified principles: none. Templates checked: none contain the branch name.
+--- earlier report, version 1.2.0 ---
+- Version change: 1.1.0 -> 1.2.0 (MINOR: new Principle IX, human accountability for AI-assisted work)
+- Reason: adopt the AI contribution policy (AI_POLICY.md, from the NetBox project) and the pull request rules of
+  NetBox's AGENTS.md. Agent instructions move to AGENTS.md; CLAUDE.md imports it.
+- Added: Principle IX; Development Workflow bullet on pull requests and issues; merge gate on the description;
+  Technical Constraints bullet on migrations and ruff format.
+- Modified: Constitution Check covers Principles I-IX; Governance names AI_POLICY.md and AGENTS.md.
+- Templates checked: plan-template.md, spec-template.md, tasks-template.md (no version text, no change needed).
+--- earlier report, version 1.1.0 ---
+- Version change: 1.0.1 -> 1.1.0 (MINOR: new Principle VIII, qualified identifiers and the global specification view)
+- Reason: requirement, task and decision numbers restarted in every feature, so a citation in code could not be resolved, and each
+  feature had its own data model and contracts with no view of the whole. See specs/_global/CONVENTIONS.md.
+- Added: Principle VIII; Development Workflow bullets. Templates updated: spec, plan, tasks; skills speckit-*.
+--- earlier report, version 1.0.1 ---
 - Version change: 1.0.0 -> 1.0.1 (PATCH: compatibility clarification, issue #318)
 - Reason: the minimum NetBox version moves from 4.6 to 4.7 (specs/008-netbox-47-baseline);
   the sentence saying 4.7 compatibility was separate work is replaced by a version-neutral one.
@@ -94,6 +113,31 @@ one release MUST NOT be published in pieces.
 
 Rationale: administrators decide whether to upgrade from the changelog and the docs.
 
+### VIII. Traceable Specifications
+
+Every requirement, user story, success criterion, clarification, task and decision is identified by its
+feature number and kind (`001-FR-029`, `003-US2`, `004-T017`, `003-D6`, `001-I14`). An identifier without
+the feature number MUST NOT appear anywhere, and identifiers are never reused or renumbered. Code and tests cite
+the requirement they implement with its qualified identifier. `specs/_global/` is the current description of
+the product (data model, REST, GraphQL, UI, routes, operations, business rules); every feature MUST update it
+in the same pull request, its own `data-model.md` and `contracts/` being deltas. `python utils/spec_ids.py
+check` MUST pass; it runs in CI and in the pre-commit hook.
+
+Rationale: a reference is only useful if it points to exactly one thing, and a specification set is only
+useful if the whole can be read without replaying every feature.
+
+### IX. Human Accountability for AI-Assisted Work
+
+AI tools MAY be used to explore the code and to draft code, tests, documentation, specifications and changelog
+entries. The author of a change MUST have read it, understand it and be able to explain it. Issues, pull request
+descriptions and comments MUST be written in the author's own voice (`AI_POLICY.md`). An AI agent MUST NOT open an
+issue, a pull request or a comment unless the maintainer asks it to, and what it drafts for them is handed over as a
+draft for the author to rewrite. Specifications, the changelog and commit messages drafted with AI are reviewed like
+code.
+
+Rationale: maintainers need to know whose words and whose judgement they are reading; quality depends on a person
+who can answer for the change.
+
 ## Compatibility and Technical Constraints
 
 - Python 3.12 or newer; NetBox 4.7 or newer until a specification raises the minimum (raised from
@@ -107,20 +151,28 @@ Rationale: administrators decide whether to upgrade from the changelog and the d
 - NetBox core custom scripts are announced as deprecated; scripts shipped in `scripts/` MUST be
   limited to what cannot reasonably live in the plugin and MUST keep their logic in importable
   plugin modules so they can move to a replacement mechanism.
+- Schema migrations are generated with `makemigrations`, never written by hand; data migrations are written by hand
+  under Principle IV. `ruff format` is not run on existing files, because it rewrites style beyond the change.
 - Compatibility with a NetBox release newer than the pinned one is separate work and is not
   implied by any feature specification that does not say so.
 
 ## Development Workflow and Quality Gates
 
-- One branch per GitHub issue, created from `develop`; `master` receives releases only.
+- One branch per GitHub issue, created from `develop`; `main` receives releases only.
   Local `develop` MUST be refreshed with `git fetch` before a branch is created or rebased.
 - Features follow the Spec Kit sequence: assessment where the value is unclear, then specify,
   clarify, plan, tasks, analyze, implement. `/speckit-analyze` MUST report no CRITICAL finding
   before implementation starts.
-- A plan MUST include a Constitution Check against Principles I-VII; a violation MUST be listed
+- A plan MUST include a Constitution Check against Principles I-IX; a violation MUST be listed
   in the plan's Complexity Tracking with the simpler alternative that was rejected.
+- A plan MUST list the documents of `specs/_global/` the feature changes, and the tasks MUST include
+  updating them (Principle VIII).
+- Every pull request closes a GitHub issue (`Closes: #N` in its description) and is based on `develop`, except
+  release pull requests. An AI agent checks that the issue is open (`gh issue view N --json state,assignees`) before
+  drafting the pull request.
 - Merge gates: lint clean, tests pass on the pinned NetBox tag, no pending migration, docs and
-  changelog updated, and a review that verifies compliance with this constitution.
+  changelog updated, `specs/_global/` updated and the identifier check passing, the description written by its
+  author (Principle IX), and a review that verifies compliance with this constitution.
 - Commits go through the pre-commit hook; the hook MUST NOT be bypassed.
 
 ## Governance
@@ -131,6 +183,7 @@ semantic versioning (MAJOR: a principle removed or redefined incompatibly; MINOR
 section added or materially expanded; PATCH: clarifications), and MUST be reviewed in a pull
 request by the maintainer. Compliance is reviewed in every pull request and in every plan's
 Constitution Check; unresolved conflicts block the merge. Day-to-day guidance for contributors
-is in `CONTRIBUTING.md`.
+is in `CONTRIBUTING.md`, the AI contribution policy in `AI_POLICY.md`, and the instructions for AI agents in
+`AGENTS.md`.
 
-**Version**: 1.0.1 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-10-30
+**Version**: 1.2.1 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-11-09

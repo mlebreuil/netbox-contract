@@ -1,11 +1,13 @@
 from netbox.plugins import PluginConfig
 
+from .version import __version__
+
 
 class ContractsConfig(PluginConfig):
     name = 'netbox_contract'
     verbose_name = 'Netbox contract'
     description = 'Contract management plugin for Netbox'
-    version = '2.6.0'
+    version = __version__
     author = 'Marc Lebreuil'
     author_email = 'marc@famillelebreuil.net'
     base_url = 'contracts'
@@ -42,7 +44,7 @@ class ContractsConfig(PluginConfig):
 def add_contract_assignments_relation():
     """
     Give the objects contracts can be assigned to a `contract_assignments` relation: GraphQL prefetches and filters
-    through it, and Django deletes the assignments of an object with the object (spec 006, research R4).
+    through it, and Django deletes the assignments of an object with the object (spec 006, research 006-D4).
     """
     from django.apps import apps
     from django.contrib.contenttypes.fields import GenericRelation

@@ -1,6 +1,6 @@
 """
 Text helpers without database access (Constitution VI), shared by the contract type model and data migration 0051
-(#309, research D9 and D10).
+(#309, research 003-D9 and 003-D10).
 """
 
 from django.utils.text import slugify

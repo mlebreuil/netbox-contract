@@ -144,7 +144,7 @@ def make_objects():
 
 class RouteTestCase(TestCase):
     """
-    Every route name of the plugin keeps its address and view (FR-003, SC-003). This is a guard for the URL
+    Every route name of the plugin keeps its address and view (002-FR-003, 002-SC-003). This is a guard for the URL
     refactor: it passes before and after the change.
     """
 
@@ -159,9 +159,9 @@ class RouteTestCase(TestCase):
 
 class JournalTabTestCase(TestCase):
     """
-    The detail page of every plugin model shows the Journal and Changelog tabs (FR-001, SC-001, US1-1). The
+    The detail page of every plugin model shows the Journal and Changelog tabs (002-FR-001, 002-SC-001, 002-US1-1). The
     Journal view is registered by NetBox core through register_model_view, so this also shows that views
-    registered by other code attach to the four models wired by hand before (FR-002 and its edge case).
+    registered by other code attach to the four models wired by hand before (002-FR-002 and its edge case).
     """
 
     @classmethod
@@ -211,7 +211,7 @@ FILTERSETS = (
 
 
 class FilterModifierTestCase(TestCase):
-    """The filter forms offer NetBox's lookup modifiers (FR-004, FR-005, SC-002, US2)."""
+    """The filter forms offer NetBox's lookup modifiers (002-FR-004, 002-FR-005, 002-SC-002, 002-US2)."""
 
     def test_filtersets_registered(self):
         for model_name, filterset, _form in FILTERSETS:
@@ -267,7 +267,8 @@ def section_names(form):
 
 
 class FormSectionsTestCase(TestCase):
-    """Forms group their fields into titled sections, with the same fields as before (FR-006 to FR-008, US3)."""
+    """Forms group their fields into titled sections, with the same fields as before (002-FR-006 to 002-FR-008,
+    002-US3)."""
 
     def test_every_visible_field_in_exactly_one_section(self):
         classes = plugin_forms()
@@ -342,7 +343,8 @@ class FormSectionsTestCase(TestCase):
 
 
 class EditViewTestCase(TestCase):
-    """The invoice and invoice line edit screens answer like core edit views (FR-009, FR-010, SC-006, US4)."""
+    """The invoice and invoice line edit screens answer like core edit views (002-FR-009, 002-FR-010, 002-SC-006,
+    002-US4)."""
 
     @classmethod
     def setUpTestData(cls):
@@ -452,7 +454,7 @@ class ContractTemplateSectionTestCase(TestCase):
 
 class TemplateLocationTestCase(TestCase):
     """
-    Plugin templates live under templates/netbox_contract/ (FR-011). This covers the edge case "a template with the
+    Plugin templates live under templates/netbox_contract/ (002-FR-011). This covers the edge case "a template with the
     same name in another plugin does not replace them": only namespaced template paths remain.
     """
 
@@ -497,19 +499,25 @@ class PluginMetadataTestCase(TestCase):
         self.assertEqual(config.min_version, '4.7.0')
         self.assertIsNone(config.max_version)
 
-    def test_plugin_version_matches_the_package(self):
-        from netbox_contract import config
+    def test_plugin_version_has_a_single_source(self):
+        from netbox_contract import config, version
 
-        # Version should be 2.6.0 as defined in the PluginConfig
-        self.assertEqual(config.version, '2.6.0')
+        # The version is written once, in netbox_contract/version.py, and the plugin configuration reads it
+        self.assertRegex(version.__version__, r'^\d+\.\d+\.\d+$')
+        self.assertEqual(config.version, version.__version__)
 
-        # When running from editable install, also check pyproject.toml matches
+        # pyproject.toml reads it from there instead of repeating it
         pyproject = Path(__file__).resolve().parents[2] / 'pyproject.toml'
         if pyproject.exists():
             import tomllib
             with pyproject.open('rb') as handle:
-                declared = tomllib.load(handle)['project']['version']
-            self.assertEqual(declared, config.version)
+                declared = tomllib.load(handle)
+            self.assertIn('version', declared['project']['dynamic'])
+            self.assertNotIn('version', declared['project'])
+            self.assertEqual(
+                declared['tool']['setuptools']['dynamic']['version'],
+                {'attr': 'netbox_contract.version.__version__'},
+            )
 
 
 class MigrationStateTestCase(TestCase):

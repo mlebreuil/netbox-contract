@@ -380,7 +380,7 @@ class ContractView(generic.ObjectView):
     def get_extra_context(self, request, instance):
         values = contract_values([instance])[instance.pk]
         context = {
-            # Computed once for the page in a fixed number of queries (FR-006), read by ContractValuesPanel
+            # Computed once for the page in a fixed number of queries (005-FR-006), read by ContractValuesPanel
             'values': SimpleNamespace(
                 billable=instance.billable, get_currency_display=instance.get_currency_display, **values
             ),
@@ -505,7 +505,7 @@ def _format_number(value):
 def build_lines_preview(data, user):
     """
     Lines a new invoice would get, from the contract, period, amount and the quantities and unit prices typed
-    in the preview (FR-032). None for an invoice template.
+    in the preview (001-FR-032). None for an invoice template.
     """
     if str(data.get('template', '')).lower() in ('on', 'true', '1'):
         return None
@@ -579,7 +579,7 @@ def build_lines_preview(data, user):
 
 
 class InvoiceLinesPreviewView(BaseObjectView):
-    """Refresh the preview of the lines of a new invoice when its form changes (FR-032)."""
+    """Refresh the preview of the lines of a new invoice when its form changes (001-FR-032)."""
 
     queryset = Invoice.objects.all()
 
@@ -596,6 +596,13 @@ def form_with_defaults(form_class, defaults):
     """
     The form class with extra initial values that the initial values passed by the view (the page address) override.
     Used to pre-fill a new object and still let core ObjectEditView.get() handle quick add and HTMX requests.
+
+    Core get() builds the form itself (self.form(instance=obj, initial=<page address values>)) and offers no hook
+    for extra initial values. This returns a subclass whose __init__ merges `defaults` under the `initial` it is
+    given, so the page address wins, then calls the real __init__. Core instantiates it without knowing.
+    A view sets `self.form = form_with_defaults(self.form, defaults)` in get() for a new object only (no pk), then
+    calls super().get(). The assignment shadows the class attribute on this request's view instance only.
+    The values are initial data, not enforced: the user can change them and POST uses what was submitted.
     """
     class FormWithDefaults(form_class):
         def __init__(self, *args, initial=None, **kwargs):
@@ -858,7 +865,7 @@ class ContractLineView(generic.ObjectView):
 
 @register_model_view(ContractLine, 'amend', path='amend')
 class ContractLineAmendView(BaseObjectView):
-    """End a contract line and create the line that replaces it with a new unit price or quantity (FR-030)."""
+    """End a contract line and create the line that replaces it with a new unit price or quantity (001-FR-030)."""
 
     queryset = ContractLine.objects.select_related('contract', 'unit')
     template_name = 'netbox_contract/contractline_amend.html'
@@ -866,7 +873,7 @@ class ContractLineAmendView(BaseObjectView):
     additional_permissions = ['netbox_contract.view_contractline']
 
     def get_required_permission(self):
-        # The "amend" action of object permissions (research D6); the queryset is restricted to it
+        # The "amend" action of object permissions (research 003-D6); the queryset is restricted to it
         return 'netbox_contract.amend_contractline'
 
     def has_permission(self):

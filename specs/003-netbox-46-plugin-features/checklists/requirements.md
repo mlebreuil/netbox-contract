@@ -34,4 +34,4 @@
 - This is a platform-conformance feature, so the spec names the public interfaces it changes: the REST API, GraphQL, NetBox object permissions and migrations. These interfaces are the user-facing surface for administrators and integrators, as in `specs/002-netbox-46-conventions`. Class names, panels and serializer mechanics are left to the plan.
 - The three clarifications (amend permission, nested REST output, optional scope) were answered by the maintainer before the spec was written and are recorded in the Clarifications section.
 - The plan must record the nested REST shrink without a prior deprecation release in Complexity Tracking, as a maintainer-accepted exception to Constitution IV/V.
-- Left to the plan: the panel arrangement. The table mechanism on detail pages (FR-004a) and the handling of long contract type descriptions (FR-017) were settled in clarification.
+- Left to the plan: the panel arrangement. The table mechanism on detail pages (003-FR-004a) and the handling of long contract type descriptions (003-FR-017) were settled in clarification.

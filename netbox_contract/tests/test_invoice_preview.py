@@ -1,4 +1,4 @@
-"""Preview of the generated lines on the new invoice form, with editable quantities and unit prices (FR-032)."""
+"""Preview of the generated lines on the new invoice form, with editable quantities and unit prices (001-FR-032)."""
 
 from datetime import date
 from decimal import Decimal
@@ -166,7 +166,7 @@ class NewInvoiceFormPreviewTestCase(TestCase):
 
 
 class ExtraLinesTestCase(TestCase):
-    """Lines added to a new invoice in the preview, without contract line (FR-032)."""
+    """Lines added to a new invoice in the preview, without contract line (001-FR-032)."""
 
     def setUp(self):
         super().setUp()
@@ -244,7 +244,7 @@ class ExtraLinesTestCase(TestCase):
 
 
 class PreviewDimensionsTestCase(TestCase):
-    """Accounting dimensions of the lines in the preview of a new invoice (FR-032)."""
+    """Accounting dimensions of the lines in the preview of a new invoice (001-FR-032)."""
 
     def setUp(self):
         super().setUp()

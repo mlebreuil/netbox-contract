@@ -1,6 +1,6 @@
 """
-Invoice amounts from contract lines: the pre-fill of a new invoice (FR-017..FR-020) and the lines
-generated when an invoice is created (FR-021..FR-025). Both use the rules of calculations.py.
+Invoice amounts from contract lines: the pre-fill of a new invoice (001-FR-017..FR-020) and the lines
+generated when an invoice is created (001-FR-021..FR-025). Both use the rules of calculations.py.
 """
 
 import re
@@ -102,7 +102,7 @@ def _plan(contract, period_start, period_end, for_generation):
                 # The generated line gets the quantity still to invoice; its amount is calculated from it
                 amount = calculations.usage_amount(quantity, line.unit_price)
             else:
-                # FR-019: quantity x unit price minus the amounts already on Posted invoices
+                # 001-FR-019: quantity x unit price minus the amounts already on Posted invoices
                 total = calculations.round_amount(line.quantity * line.unit_price)
                 amount = calculations.remaining(total, invoiced_amount)
             if not quantity or not amount:
@@ -122,9 +122,9 @@ def _plan(contract, period_start, period_end, for_generation):
 
 def propose_invoice(contract, period_start, period_end):
     """
-    Amounts proposed for a new invoice of a billable contract (FR-017..FR-019): recurring lines for the period,
-    one-time lines for what remains to invoice, usage-based lines never (FR-017a). Without a period, recurring
-    lines count for one invoice frequency. Raises InvoicingError for a non-billable contract (FR-008).
+    Amounts proposed for a new invoice of a billable contract (001-FR-017..FR-019): recurring lines for the period,
+    one-time lines for what remains to invoice, usage-based lines never (001-FR-017a). Without a period, recurring
+    lines count for one invoice frequency. Raises InvoicingError for a non-billable contract (001-FR-008).
     """
     return _plan(contract, period_start, period_end, for_generation=False)
 
@@ -164,7 +164,7 @@ def check_dimensions(label, dimensions):
 
 def parse_line_overrides(data):
     """
-    Quantities and unit prices typed in the preview of a new invoice (FR-032), from fields named
+    Quantities and unit prices typed in the preview of a new invoice (001-FR-032), from fields named
     `line-<contract line id>-quantity` and `line-<contract line id>-unit_price`. An empty quantity means
     no quantity; an empty unit price keeps the price of the contract line. Returns (overrides, errors).
     """
@@ -194,7 +194,7 @@ def parse_line_overrides(data):
 
 @dataclass
 class ExtraLine:
-    """A line added to a new invoice in the preview, without contract line (FR-032)."""
+    """A line added to a new invoice in the preview, without contract line (001-FR-032)."""
 
     index: int
     description: str = ''
@@ -267,8 +267,8 @@ def price_extra_lines(contract, period_start, period_end, extra_lines):
 
 def lines_to_generate(contract, period_start, period_end, overrides=None):
     """
-    The invoice lines a new invoice of this contract gets (FR-021, FR-022, FR-025), with the quantities and
-    unit prices typed in the preview of the new invoice, if any (FR-032).
+    The invoice lines a new invoice of this contract gets (001-FR-021, 001-FR-022, 001-FR-025), with the quantities and
+    unit prices typed in the preview of the new invoice, if any (001-FR-032).
     """
     lines = _plan(contract, period_start, period_end, for_generation=True).lines
     for planned in lines:
@@ -295,8 +295,8 @@ def check_new_invoice(
     contract, amount, period_start, period_end, overrides=None, extra_lines=(), check_line_dimensions=False
 ):
     """
-    Errors refusing the creation of a new invoice for a contract: a non-billable contract (FR-023) or an
-    amount lower than the total of the lines to generate (FR-021).
+    Errors refusing the creation of a new invoice for a contract: a non-billable contract (001-FR-023) or an
+    amount lower than the total of the lines to generate (001-FR-021).
     """
     try:
         planned = lines_to_generate(contract, period_start, period_end, overrides)

@@ -1,5 +1,7 @@
 # Contract: breadcrumb trails
 
+> Delta of feature 005: what this feature adds or changes. The current state is in [specs/_global/contracts/ui.md](../../_global/contracts/ui.md), which this feature keeps up to date.
+
 Interface is the rendered trail on detail and tab pages. Left to right, the first entry is always the list of the object type, the last the object itself.
 
 | Page | Trail |

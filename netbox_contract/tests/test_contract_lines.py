@@ -1,4 +1,4 @@
-"""Spec user story 1: describe a contract line by line (FR-001..FR-004, FR-002a)."""
+"""Spec user story 1: describe a contract line by line (001-FR-001..FR-004, 001-FR-002a)."""
 
 from datetime import date
 from decimal import Decimal

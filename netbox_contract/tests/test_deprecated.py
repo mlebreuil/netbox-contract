@@ -1,4 +1,4 @@
-"""Deprecated cost fields and invoice templates after the upgrade (FR-014, FR-015, SC-007, US2)."""
+"""Deprecated cost fields and invoice templates after the upgrade (001-FR-014, 001-FR-015, 001-SC-007, 001-US2)."""
 
 from decimal import Decimal
 from unittest import mock
@@ -108,7 +108,7 @@ class DeprecatedFieldsViewTestCase(TestCase):
         template = Invoice.objects.create(number='_invoice_template_Contract', template=True, amount=0)
         template.contracts.add(self.contract)
         InvoiceLine.objects.create(invoice=template, amount=Decimal(10), currency='usd')
-        # Shown on the contract page only with the deprecated fields (#308, clarification Q1)
+        # Shown on the contract page only with the deprecated fields (#308, clarification 002-Q1)
         content = self.get_contract_page()
         self.assertNotIn(template.get_absolute_url(), content)
         self.assertNotIn('Invoice templates (kept for reference)', content)

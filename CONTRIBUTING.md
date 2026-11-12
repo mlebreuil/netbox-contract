@@ -6,17 +6,17 @@ Contributions are welcome!
 
 ### Report bugs or submit feedback
 
-Report bugs and submit feetback [here](https://github.com/mlebreuil/netbox-contract/issues).
+Report bugs and submit feedback [here](https://github.com/mlebreuil/netbox-contract/issues) using the bug report or feature request form. Issues are written in your own words (see the AI policy below). Open a pull request only for an issue that has been accepted and assigned to you; a feature is assessed and specified by the maintainers first.
 
 ### Fix bugs
 
-Look through the GitHub issues for bugs. Anything tagged with "bug" and "help
-wanted" is open to whoever wants to implement it.
+Look through the GitHub issues labelled `type: bug`. A bug is open to whoever wants to fix it once the issue is
+accepted and assigned to them; volunteer in the issue first.
 
 ### Implement features
 
-Look through the GitHub issues for features. Anything tagged with "enhancement"
-and "help wanted" is open to whoever wants to implement it.
+Look through the GitHub issues labelled `type: feature`. A feature is open to whoever wants to implement it once
+the issue is accepted and assigned to them; volunteer in the issue first.
 
 ## Coding conventions
  
@@ -33,14 +33,14 @@ ruff check netbox_contract/
 ```
 
 
-The pre-commit Python framework is used to simplify the managment of pre-commit hooks.  
+The pre-commit Python framework is used to simplify the management of pre-commit hooks.  
 Config is stored in .pre-commit-config.yaml   
 
 ## Repository structure
 
 There are 2 permanent branch in the repository:
 
-* master - The current stable release. Individual changes should never be pushed directly to this branch, but rather merged from develop.
+* main - The current stable release. Individual changes should never be pushed directly to this branch, but rather merged from develop.
 * develop - Active development for the upcoming patch release. Pull requests will typically be based on this branch unless they introduce breaking changes that must be deferred until the next minor release.
 
 For each new feature or bug fix a branch is created from the corresponding issue.
@@ -49,7 +49,7 @@ For each new feature or bug fix a branch is created from the corresponding issue
 
 
 1. [Install Netbox](https://github.com/netbox-community/netbox/blob/develop/docs/installation/).
-Make sure taht at the Netbox installtion step you follow the "Option B: Clone the Git Repository"
+Make sure that at the Netbox installation step you follow the "Option B: Clone the Git Repository"
 
 2. From the Netbox directory you activate the NetBox virtual environment 
 
@@ -80,7 +80,7 @@ Make sure taht at the Netbox installtion step you follow the "Option B: Clone th
     pre-commit install
     ```
 
-6. Update the Netbox configuration and run the database migrations as mentionned in the plugin installation steps.
+6. Update the Netbox configuration and run the database migrations as mentioned in the plugin installation steps.
 
 7. Create a branch for local development:
 
@@ -114,6 +114,26 @@ Make sure taht at the Netbox installtion step you follow the "Option B: Clone th
 
 1. Submit a pull request through the GitHub website.
 
+## Demo data
+
+`manage.py create_demo_data` fills a development database with named scenarios (units, contract lines of each billing
+method, open-ended contracts, a contract hierarchy, Posted, Draft and Canceled invoices, amendments, legacy
+pre-upgrade data, numeric edge cases and accounting dimensions). Load NetBox's demo data first: contracts are
+assigned to the circuit, device and site it finds there. The command:
+
+* refuses to run unless `DEVELOPER = True` in the NetBox configuration;
+* tags everything it creates `netbox-contract-demo`, and skips a scenario whose contract already exists, so it can be
+  run again;
+* with `--reset`, deletes what carries the tag (Posted invoices included) before creating it again.
+
+```
+$ python3 netbox/netbox/manage.py create_demo_data
+$ python3 netbox/netbox/manage.py create_demo_data --reset
+```
+
+The legacy contracts have no contract lines: run `manage.py convert_contract_lines` to see the conversion. It
+converts every contract that has no lines, not only the demo ones.
+
 ## Model changes
 
 Create the migrations:  
@@ -137,8 +157,10 @@ Before you submit a pull request, check that it meets these guidelines:
 
 1. The pull request should include tests.
 2. If the pull request adds functionality, the docs should be updated. 
-3. The pull request should work for Python 3.10 and 3.11. Check [Actions](https://github.com/mlebreuil/netbox-contract/actions)
+3. The pull request should work for every supported Python version (3.12, 3.13 and 3.14). Check [Actions](https://github.com/mlebreuil/netbox-contract/actions)
    and make sure that the tests pass for all supported Python versions.
+4. The pull request closes an issue: put `Closes: #N` in its description and base it on `develop`.
+5. The description is written in your own words (see the AI policy below).
 
 
 ## Deploying
@@ -146,3 +168,21 @@ Before you submit a pull request, check that it meets these guidelines:
 A reminder for the maintainers on how to deploy.
 Make sure all your changes are committed (including an entry in CHANGELOG.md) and that all tests pass.
 Then in the github project go to `Releases` and create a new release with a new tag.  This will automatically upload the release to pypi:
+
+## Specifications and identifiers
+
+Features are specified under `specs/NNN-name/` (Spec Kit). Requirements, user stories, success criteria,
+clarifications, tasks and decisions are always cited with the feature number (`001-FR-029`, `004-T017`,
+`003-D6`), in specifications, code comments, tests, documentation and the changelog. `specs/_global/` describes the
+product as it is now and is updated by every feature. Run `python utils/spec_ids.py check` before pushing (CI and the
+pre-commit hook run it); the rules are in `specs/_global/CONVENTIONS.md`.
+
+## AI-assisted contributions
+
+AI tools are welcome, with two rules: do not let an LLM speak for you (issues, pull request descriptions and comments
+are in your own words), and do not let it think for you (only submit what you understand and can explain). The full
+text is the [AI contribution policy](https://github.com/mlebreuil/netbox-contract/blob/develop/AI_POLICY.md).
+AI agents working in the repository follow
+[`AGENTS.md`](https://github.com/mlebreuil/netbox-contract/blob/develop/AGENTS.md).
+The skills they use are described in
+[`.claude/skills/README.md`](https://github.com/mlebreuil/netbox-contract/blob/develop/.claude/skills/README.md).

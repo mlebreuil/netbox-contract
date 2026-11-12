@@ -1,5 +1,5 @@
 """
-Conversion of the deprecated contract costs and invoice templates into contract lines (research D8).
+Conversion of the deprecated contract costs and invoice templates into contract lines (research 001-D8).
 
 Used by the data migration 0045 (with the historical models of the migration) and by the
 `convert_contract_lines` management command (with the current models). The conversion is
