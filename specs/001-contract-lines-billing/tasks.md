@@ -13,13 +13,13 @@
 - **[P]**: can run in parallel (different files, no dependency on an unfinished task)
 - **[001-US1]..[001-US6]**: the user story of spec.md the task belongs to
 - All paths are relative to the repository root. `tests/` means `netbox_contract/tests/`.
-- Run tests from the NetBox 4.6 checkout: `python netbox/manage.py test netbox_contract.tests --keepdb`; lint with `ruff check`.
+- Running tests and lint: `AGENTS.md` and skill `run-tests`.
 
 ---
 
 ## Phase 1: Setup
 
-- [X] 001-T001 Confirm the development environment: a NetBox 4.6 checkout with this repository installed in editable mode, PostgreSQL and Redis running; run the existing suite once and note that it passes before any change.
+- [X] 001-T001 Confirm the development environment works (`AGENTS.md`); run the existing suite once and note that it passes before any change.
 - [X] 001-T002 [P] Pin CI to NetBox 4.6 in `.github/workflows/lint-tests.yaml`: add `ref:` with the newest `v4.6.x` tag (verify the tag exists) to the "Checkout netbox" step, and check which Python versions NetBox 4.6 supports before touching the `3.12/3.13/3.14` matrix (001-FR-028).
 - [X] 001-T003 [P] Set `min_version = '4.6.0'` (no `max_version`) and `version = '2.5.0'` in `netbox_contract/__init__.py`, set `version = "2.5.0"` in `pyproject.toml`, and add the default setting `'show_deprecated_fields': False` to `default_settings` (001-FR-026, contracts/ui-and-settings.md).
 - [X] 001-T004 [P] Create the new package folders with empty `__init__.py`: `netbox_contract/services/`, `netbox_contract/management/`, `netbox_contract/management/commands/`.

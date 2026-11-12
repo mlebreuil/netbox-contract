@@ -4,9 +4,9 @@
 
 **Tests**: required and written first; each must fail before the change (Constitution II).
 
-**Test command**: `./dc test netbox_contract.tests.test_party_name` (whole suite: `./dc test`). Never run Python on the Mac.
+**Test modules**: `test_party_name` (how to run them: `AGENTS.md`, skill `run-tests`)
 
-**Checks before every commit** (skill `run-tests`): tests, `./dc ruff check` through the pre-commit hook, `python utils/spec_ids.py check`, `makemigrations --check --dry-run` (nothing pending). Commit through `./dc git commit`; never bypass the hook.
+**Checks before every commit** (skill `run-tests`): tests, lint through the pre-commit hook, `spec_ids` check, no pending migration.
 
 ## Phase 1: Setup
 
@@ -53,9 +53,9 @@
 
 - [X] 009-T016 [P] Documentation: `docs/contract.md` (search and filter contracts by external party name: quick search keeps Active-only, filter modifiers) and `docs/api.md` (REST parameters, GraphQL filter with one example query). Rerun `utils/docs_screenshots/make_screenshots.sh` only if a page shown in the docs changed (the filter form is not shown there today: check `SHOTS` in `capture.py`).
 - [X] 009-T017 [P] `CHANGELOG.md`: one bullet in the Enhancements section of the Unreleased release, `* [#333](https://github.com/mlebreuil/netbox-contract/issues/333) - ...`, in the format of the latest release and the order of the `draft-changelog` skill; no per-issue sublist.
-- [X] 009-T018 [P] French translation (the label already exists in the catalogue and no new string was added, so no catalogue change: 009-I4): `makemessages -l en -l fr` from `netbox_contract/` with NetBox's `manage.py` and the test configuration, translate the new label ("External party name"), then `msgfmt` on the plugin's `.po` files (not `compilemessages`, which rebuilds NetBox's own catalogs).
+- [X] 009-T018 [P] French translation (the label already exists in the catalogue and no new string was added, so no catalogue change: 009-I4): refresh the catalogues (recipe in `AGENTS.md`), translate the new label ("External party name") and compile the plugin's catalogues only.
 - [X] 009-T019 Update the global documents listed in the plan: `specs/_global/contracts/rest-api.md` (filters on `contracts/`), `specs/_global/contracts/graphql.md` (`ContractFilter.external_party_name`), `specs/_global/contracts/ui.md` (filter form field and quick search), `specs/_global/behaviours.md` (rule with 009-FR-001 to 009-FR-009); each statement cites its identifiers. Then `python utils/spec_ids.py registry` and check `git diff specs/_global/registry.md` shows only the 009 entries.
-- [X] 009-T020 Final checks: `./dc test` (whole suite, serially), pre-commit through the commit, `python utils/spec_ids.py check`, `makemigrations --check`, `tests/query_counts.json` unchanged or changed with a stated reason; walk through `quickstart.md`; set the spec `Status` to Implemented. Do not push or open a pull request unless the maintainer asks (AI policy); the pull request will be `Closes: #333`, based on `develop`, after `gh issue view 333 --json state,assignees`.
+- [X] 009-T020 Final checks: whole suite (serially), pre-commit through the commit, `spec_ids` check, no pending migration, `tests/query_counts.json` unchanged or changed with a stated reason; walk through `quickstart.md`; set the spec `Status` to Implemented. Do not push or open a pull request unless the maintainer asks (AI policy); the pull request will be `Closes: #333`, based on `develop`, after `gh issue view 333 --json state,assignees`.
 
 ## Dependencies and order
 

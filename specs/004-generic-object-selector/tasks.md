@@ -8,7 +8,7 @@
 
 **Depends on**: 008 done (green baseline on NetBox 4.7.4).
 
-**Test command**: `cd ../netbox && NETBOX_CONFIGURATION=netbox.configuration_testing venv/bin/python netbox/manage.py test netbox_contract.tests.test_assignment_selector netbox_contract.tests.test_views --keepdb`
+**Test modules**: `test_assignment_selector`, `test_views` (how to run them: `AGENTS.md`, skill `run-tests`)
 
 ## Phase 1: Setup
 

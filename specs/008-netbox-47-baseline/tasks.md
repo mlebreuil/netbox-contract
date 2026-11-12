@@ -6,7 +6,7 @@
 
 **Branch**: `318-assess-against-netbox-4-7-4`. Implemented first; released together with 004 to 007 as 2.6.0.
 
-**Test command** (`CLAUDE.md`): `cd ../netbox && NETBOX_CONFIGURATION=netbox.configuration_testing venv/bin/python netbox/manage.py test netbox_contract.tests --keepdb`
+**Tests**: the whole suite, `netbox_contract.tests` (how to run it: `AGENTS.md`, skill `run-tests`)
 
 ## Phase 1: Setup
 
@@ -17,7 +17,7 @@
 **Goal**: green suite on v4.7.4, CI pinned. **Independent test**: full run on v4.7.4 gives `OK (skipped=9)`.
 
 - [X] 008-T002 [008-US1] In `netbox_contract/tests/test_api.py`, give dates as ISO text (not the decimal amounts, which the 4.7 helper compares as `Decimal`) in the `create_data`, bulk create and `update_data` of contracts, contract lines and invoices (about lines 102-111, 345-346, 370-374), keeping the checks of the stored values. Run the three REST test classes: the 9 REST failures are gone.
-- [X] 008-T003 [008-US1] Re-record `netbox_contract/tests/query_counts.json` serially with `UPDATE_QUERY_COUNTS=1 ... manage.py test netbox_contract.tests.test_views --keepdb` (no `--parallel`). Review the diff: exactly the 9 failing list views changed, each by minus one; any other change is investigated, not accepted.
+- [X] 008-T003 [008-US1] Re-record `netbox_contract/tests/query_counts.json` serially, running `test_views` in query-count recording mode (skill `run-tests`; never in parallel). Review the diff: exactly the 9 failing list views changed, each by minus one; any other change is investigated, not accepted.
 - [X] 008-T004 [P] [008-US1] In `.github/workflows/lint-tests.yaml` (about line 77) change the NetBox checkout `ref` from `v4.6.10` to `v4.7.4`; leave the Python matrix (3.12, 3.13, 3.14) and the lint job unchanged.
 - [X] 008-T005 [008-US1] Run the full suite: `Ran 1023 tests` (1020 existing plus the 2 metadata tests and the migration-state test), `OK (skipped=9)`; run a second time without `UPDATE_QUERY_COUNTS` to prove the baseline is stable.
 

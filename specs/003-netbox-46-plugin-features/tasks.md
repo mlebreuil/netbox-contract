@@ -19,11 +19,8 @@ cross-story touch points are listed under Dependencies.
 - **[P]**: can run in parallel (different files, no dependency on an incomplete task)
 - **[Story]**: user story of spec.md (003-US1 to 003-US5)
 
-Commands (from `CLAUDE.md`):
-- Tests run from `/workspaces/netbox/netbox` with
-  `NETBOX_CONFIGURATION=netbox.configuration_testing venv/bin/python netbox/manage.py test <label> --keepdb`.
-- Lint with `ruff check` in the plugin repository.
-- Query-count baselines are re-recorded with `UPDATE_QUERY_COUNTS=1`, serially, and only with a stated reason.
+Running tests, lint and migration checks: `AGENTS.md` and skill `run-tests`. Query-count baselines are re-recorded
+serially and only with a stated reason.
 
 ---
 
@@ -334,7 +331,7 @@ GraphQL.
 
 ## Phase 8: Polish & Cross-Cutting Concerns
 
-- [X] 003-T067 Refresh translations: `makemessages -l en -l fr` from `netbox_contract/` (NetBox `manage.py`, test configuration). Translate the new and fuzzy French entries in `netbox_contract/locale/fr/LC_MESSAGES/django.po`, then `msgfmt` both catalogs. Check that msgids moved from the deleted templates keep their translations Seven entries were reviewed and corrected (six fuzzy guesses and the new "Ownership"); the only remaining fuzzy flag is the catalog header, as before. Both catalogs were compiled with `msgfmt -c`.
+- [X] 003-T067 Refresh translations (recipe in `AGENTS.md`). Translate the new and fuzzy French entries in `netbox_contract/locale/fr/LC_MESSAGES/django.po`, then compile both catalogs. Check that msgids moved from the deleted templates keep their translations Seven entries were reviewed and corrected (six fuzzy guesses and the new "Ownership"); the only remaining fuzzy flag is the catalog header, as before. Both catalogs were compiled with `msgfmt -c`.
 - [X] 003-T068 [P] Update `CLAUDE.md`:
   - Architecture: detail pages via `layout` + `panels.py`; per-line contract line actions and `with_lock_state()`; amend permission action and `object_actions.py`; nested `brief_fields`; `graphql/` package;
   - Tests: the API tests now use `APIViewTestCase`; remove "the plugin has no GraphQL".

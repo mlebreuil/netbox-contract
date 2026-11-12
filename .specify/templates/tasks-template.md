@@ -25,6 +25,9 @@ description: "Task list template for feature implementation"
 - **Web app**: `backend/src/`, `frontend/src/`
 - **Mobile**: `api/src/`, `ios/src/` or `android/src/`
 - Paths shown below assume single project - adjust based on plan.md structure
+- Tasks are repository-relative and outcome-focused: no absolute paths, container or virtualenv commands, or full
+  test/lint/migration command lines. Say "run the `test_x` module" or "run the whole suite"; how is in `AGENTS.md`
+  and the `run-tests` skill (see "Tasks stay free of environment details" in specs/_global/CONVENTIONS.md).
 
 <!--
   ============================================================================

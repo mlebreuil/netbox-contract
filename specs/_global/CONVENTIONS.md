@@ -78,3 +78,18 @@ Rules:
   change. When two features disagree, the later feature's identifier wins and the earlier statement is retired
   (`Retired:` line in the earlier spec; the global document shows only the current rule).
 - Per-feature `data-model.md` and `contracts/*.md` start with a line pointing to the global document they amend.
+
+## Tasks stay free of environment details
+
+`tasks.md` is derived from the plan and can be regenerated, so it names outcomes and repository-relative paths only
+(`netbox_contract/models.py`, `netbox_contract/tests/test_invoice.py`). It never contains:
+
+- absolute paths, container or virtualenv paths, `./dc` or `docker compose` calls, `cd ../netbox`;
+- the full test, lint, migration or translation command line (`NETBOX_CONFIGURATION=… manage.py test …`,
+  `makemessages …`), the NetBox checkout location or version, or the PostgreSQL/Redis setup.
+
+Write "run the `test_x` module", "run the whole suite", "lint is clean", "no pending migration", "refresh and
+translate the catalogues". How to do that is documented once, in `AGENTS.md` (Environment and commands,
+Translations), the `run-tests` skill and, for a given workstation, the instructions outside the repository. A header
+lists the test modules of the feature, not a command. The pre-commit hook is a standing rule (Constitution), not a
+task.
