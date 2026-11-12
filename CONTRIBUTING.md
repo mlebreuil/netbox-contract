@@ -167,7 +167,8 @@ Before you submit a pull request, check that it meets these guidelines:
 
 A reminder for the maintainers on how to deploy.
 Make sure all your changes are committed (including an entry in CHANGELOG.md) and that all tests pass.
-Then in the github project go to `Releases` and create a new release with a new tag.  This will automatically upload the release to pypi:
+Then in the github project go to `Releases` and create a new release with a new tag.  This will automatically upload the release to pypi.
+Once the release pull request is merged into `main`, merge `main` back into `develop` (`git merge origin/main`, then push) so that both branches stay in step. The `release-plugin` skill has the full procedure.
 
 ## Specifications and identifiers
 

@@ -89,10 +89,25 @@ pip index versions netbox-contract      # X.Y.Z listed
 
 Install it in a clean virtualenv and import `netbox_contract` as a smoke test.
 
-## 8. Hand off
+## 8. Merge `main` back into `develop`
 
-Report the release URL, the PyPI version, and any step left to the maintainer (merge `main` back into `develop` if
-the branches diverged, close the milestone, announce).
+The release PR adds merge commits and release changes (version, changelog) to `main` only. Once it is merged, bring
+`main` back so that `develop` carries them and the next release PR does not conflict. Do it right after the release PR
+merges; it does not wait for the PyPI upload.
+
+```bash
+git fetch origin --tags
+git checkout develop && git merge --ff-only origin/develop
+git merge origin/main        # a fast-forward when develop has not moved; otherwise a merge commit
+git push origin develop
+```
+
+Resolve any conflict in favour of `main` for `version.py` and the released changelog section. If `develop` is protected
+and refuses the push, open a PR from `main` into `develop` instead (maintainer's call).
+
+## 9. Hand off
+
+Report the release URL, the PyPI version, and any step left to the maintainer (close the milestone, announce).
 
 ## Why
 
